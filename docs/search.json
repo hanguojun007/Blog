@@ -18,7 +18,7 @@
     "href": "index.html",
     "title": "Blog",
     "section": "",
-    "text": "Order By\n       Default\n         \n          Title\n        \n         \n          Date - Oldest\n        \n         \n          Date - Newest\n        \n         \n          Author\n        \n     \n  \n    \n      \n      \n    \n\n\n\n\n\n\n\n\n\n\nPost With Code\n\n\n\n\n\n\nnews\n\n\ncode\n\n\nanalysis\n\n\n\n\n\n\n\n\n\nJan 13, 2025\n\n\nHarlow Malloc\n\n\n\n\n\n\nNo matching items"
+    "text": "Order By\n       Default\n         \n          Title\n        \n         \n          Date - Oldest\n        \n         \n          Date - Newest\n        \n         \n          Author\n        \n     \n  \n    \n      \n      \n    \n\n\n\n\n\n\n\n\n\n\n使用quarto创建blog\n\n\n\n\n\n\nquarto\n\n\ngithub\n\n\n\n\n\n\n\n\n\nJan 15, 2025\n\n\n大番薯本薯\n\n\n\n\n\n\n\n\n\n\n\n\nPost With Code\n\n\n\n\n\n\nnews\n\n\ncode\n\n\nanalysis\n\n\n\n\n\n\n\n\n\nJan 13, 2025\n\n\nHarlow Malloc\n\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "posts/post-with-code/index.html",
@@ -26,5 +26,26 @@
     "title": "Post With Code",
     "section": "",
     "text": "This is a post with executable code."
+  },
+  {
+    "objectID": "posts/使用quarto创建blog/index.html",
+    "href": "posts/使用quarto创建blog/index.html",
+    "title": "使用quarto创建blog",
+    "section": "",
+    "text": "使用quarto+GitHub搭建个人blog"
+  },
+  {
+    "objectID": "posts/使用quarto创建blog/index.html#参考",
+    "href": "posts/使用quarto创建blog/index.html#参考",
+    "title": "使用quarto创建blog",
+    "section": "参考",
+    "text": "参考\n参考：https://quarto.org/docs/websites/website-blog.html"
+  },
+  {
+    "objectID": "posts/使用quarto创建blog/index.html#要点",
+    "href": "posts/使用quarto创建blog/index.html#要点",
+    "title": "使用quarto创建blog",
+    "section": "要点",
+    "text": "要点\ndraft 设置文档是否为草稿。草稿时，仅在预览时显示，不会在构建时渲染。"
   }
 ]
