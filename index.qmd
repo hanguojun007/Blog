@@ -5,6 +5,8 @@ listing:
   sort: "date desc"
   type: default
   categories: true
+  feed:
+    categories: [quarto]
   sort-ui: true
   filter-ui: true
 page-layout: full

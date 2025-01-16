@@ -4,15 +4,19 @@ project:
 
 website:
   title: "RSSPtho's Blog"
+  site-url: https://www.myblogexample.io
+  description: "生信中转站"
   navbar:
     right:
+      - icon: rss
+        href: index.xml
       - about.qmd
       - icon: github
         href: https://github.com/
 format:
   html:
-    theme: cosmo
-    css: styles.css
+    theme: Sandstone
+    css: Sandstone.css
 
 
 
