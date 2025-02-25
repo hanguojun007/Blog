@@ -4,4 +4,6 @@ title: "My Blog"
 
 This is a Quarto website.
 
+add CNAME
+
 To learn more about Quarto websites visit <https://quarto.org/docs/websites>.
