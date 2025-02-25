@@ -1,0 +1,24 @@
+
+_quarto.yml 文件的配置见
+
+-   https://quarto.org/docs/websites/website-navigation.html
+-   https://quarto.org/docs/websites/website-tools.html
+
+html网页的个性化配置见
+
+-   https://quarto.org/docs/output-formats/html-basics.html
+
+quarto preview 设置见：
+
+-   quarto preview help
+-   https://quarto.org/docs/reference/projects/options.html#preview
+
+控制render的文件见：
+
+-   https://quarto.org/docs/projects/quarto-projects.html
+
+
+设置html主题
+
+-   https://quarto.org/docs/output-formats/html-themes.html
+

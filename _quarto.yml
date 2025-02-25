@@ -1,14 +1,67 @@
 project:
   type: website
   output-dir: docs
+  render:
+    - "*.qmd"
+    - "!log.qmd"
 
 website:
-  title: "Blog"
+  bread-crumbs: true
+  page-navigation: true
+  back-to-top-navigation: true
+  reader-mode: true
+  page-footer: "Copyright 2025, RSSPhto"
   navbar:
+    title: navbar title
+    logo: logo.jpg
+    background: "#7db6bf"
+    # foreground: "#ffffff"
+    # 是否固定导航栏
+    pinned: true
+
+    # 极端情况导航栏显示设置
+    collapse: true
+    collapse-below: lg
+    toggle-position: left
+    tools-collapse: true
+
+    search: true
+
+    # 工具栏
+    tools:
+      - icon: twitter
+        href: https://twitter.com
+      - icon: github
+        menu:
+          - text: Source Code
+            href:  https://code.com
+          - text: Report a Bug
+            href:  https://bugs.com
+
+    # 菜单栏
     left:
-      - href: index.qmd
-        text: Home
+      - text: Home
+        href: index.qmd
+      - text: Books
+        menu:
+          - text: Book1
+            href: Books/Book1/test.qmd
+          - sidebar:Book2
       - about.qmd
+
+  sidebar:
+  #   # 第一个siderbar的style设置会传递到后面的
+    - id: Book2
+      style: floating
+      background: light
+      collapse-level: 3
+      contents:
+        # 想用id，这里第一个不能用`text`
+        - Books/Book2/index.qmd
+        - section: "Section 1"
+          contents:
+            - Books/Book2/test1.qmd
+            - Books/Book2/test2.qmd
 
 format:
   html:
