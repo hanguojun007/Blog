@@ -4,6 +4,7 @@ project:
   render:
     - "*.qmd"
     - "!log.qmd"
+    - "!docs/CNAME"
 
 website:
   bread-crumbs: true
