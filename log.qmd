@@ -1,4 +1,7 @@
 
+在项目中添加CNAME文件，设置自定义域名，render时会自动添加到docs
+
+
 _quarto.yml 文件的配置见
 
 -   https://quarto.org/docs/websites/website-navigation.html
