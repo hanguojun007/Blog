@@ -1,24 +1,10 @@
 [
   {
-    "objectID": "about.html",
-    "href": "about.html",
-    "title": "About",
-    "section": "",
-    "text": "About this site\n\n\n\n Back to top"
-  },
-  {
     "objectID": "index.html",
     "href": "index.html",
     "title": "My Blog",
     "section": "",
     "text": "This is a Quarto website.\nTo learn more about Quarto websites visit https://quarto.org/docs/websites.\n\n\n\n Back to top"
-  },
-  {
-    "objectID": "Books/test.html",
-    "href": "Books/test.html",
-    "title": "Blog",
-    "section": "",
-    "text": "this is a test"
   },
   {
     "objectID": "Books/Book2/test2.html",
@@ -29,6 +15,16 @@
     "crumbs": [
       "Section 1",
       "test2.html"
+    ]
+  },
+  {
+    "objectID": "Books/Book2/index.html",
+    "href": "Books/Book2/index.html",
+    "title": "",
+    "section": "",
+    "text": "introduce\n\n\n\n Back to top",
+    "crumbs": [
+      "index.html"
     ]
   },
   {
@@ -50,13 +46,10 @@
     ]
   },
   {
-    "objectID": "Books/Book2/index.html",
-    "href": "Books/Book2/index.html",
-    "title": "",
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
     "section": "",
-    "text": "introduce\n\n\n\n Back to top",
-    "crumbs": [
-      "index.html"
-    ]
+    "text": "About this site\n\n\n\n Back to top"
   }
 ]
