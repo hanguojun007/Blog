@@ -1,14 +1,7 @@
 ---
-title: "Blog"
-listing:
-  contents: posts
-  sort: "date desc"
-  type: default
-  categories: true
-  sort-ui: false
-  filter-ui: false
-page-layout: full
-title-block-banner: true
+title: "My Blog"
 ---
 
+This is a Quarto website.
 
+To learn more about Quarto websites visit <https://quarto.org/docs/websites>.
