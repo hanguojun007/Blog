@@ -6,15 +6,26 @@ project:
     - "!log.qmd"
     - "!docs/CNAME"
 
+language:
+  search-text-placeholder: Search
+
 website:
-  bread-crumbs: true
-  page-navigation: true
-  back-to-top-navigation: true
-  reader-mode: true
-  page-footer: "Copyright 2025, RSSPhto"
+  # 设置搜索
+  search:
+    location: navbar
+    type: overlay
+    copy-button: true
+
+  bread-crumbs: true # 显示路径
+  page-navigation: true # 上一页，下一页
+  back-to-top-navigation: true # 返回顶部
+  reader-mode: true # 阅读者模式
+  # page-footer: "Copyright 2025 RSSPhto"
+  margin-footer: | # 侧边栏脚注
+    ![](/logo.jpg){width="200px" .conditional-footer}
   navbar:
-    title: navbar title
-    logo: logo.jpg
+    title: RSSPtho
+    # logo: logo.jpg
     background: "#7db6bf"
     # foreground: "#ffffff"
     # 是否固定导航栏
@@ -26,18 +37,10 @@ website:
     toggle-position: left
     tools-collapse: true
 
-    search: true
-
     # 工具栏
     tools:
-      - icon: twitter
-        href: https://twitter.com
       - icon: github
-        menu:
-          - text: Source Code
-            href:  https://code.com
-          - text: Report a Bug
-            href:  https://bugs.com
+        href: https://github.com/hanguojun007
 
     # 菜单栏
     left:
@@ -45,24 +48,31 @@ website:
         href: index.qmd
       - text: Books
         menu:
-          - text: Book1
-            href: Books/Book1/test.qmd
-          - sidebar:Book2
+          - sidebar:ggplot2
+          - sidebar:R4DS
+      - text: Blog
+        href: blog.qmd
       - about.qmd
 
   sidebar:
   #   # 第一个siderbar的style设置会传递到后面的
-    - id: Book2
+    - id: ggplot2
+      title: ggplot2
       style: floating
       background: light
       collapse-level: 3
       contents:
         # 想用id，这里第一个不能用`text`
-        - Books/Book2/index.qmd
-        - section: "Section 1"
-          contents:
-            - Books/Book2/test1.qmd
-            - Books/Book2/test2.qmd
+        - Books/ggplot2/index.qmd
+        # - section: "Section 1"
+        #   contents:
+        #     - Books/ggplot2/test1.qmd
+        #     - Books/ggplot2/test2.qmd
+
+    - id: R4DS
+      title: R for Data Science
+      contents:
+        - Books/R4DS/index.qmd
 
 format:
   html:

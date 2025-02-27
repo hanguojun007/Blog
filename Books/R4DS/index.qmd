@@ -1,0 +1,17 @@
+---
+title: "index"
+date: "2025-02-27"
+date-modified: "2025-02-27"
+format: "html"
+fig-width: 4
+fig-height: 4
+fig-align: center
+execute:
+  warning: false
+---
+
+```{r}
+#| echo: false
+
+source("_common.R")
+```

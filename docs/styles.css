@@ -1,1 +1,4 @@
 /* css styles */
+.conditional-footer {
+  display: none;
+}

@@ -1,9 +1,14 @@
 ---
-title: "My Blog"
+class: conditional-footer
 ---
 
-This is a Quarto website.
+欢迎来到 RSSPtho，这里有
 
-add CNAME
+-   读书笔记
 
-To learn more about Quarto websites visit <https://quarto.org/docs/websites>.
+-   工作经验
+
+-   流程搭建
+
+-   shiny软件
+

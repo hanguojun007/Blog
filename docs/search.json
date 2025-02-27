@@ -2,54 +2,63 @@
   {
     "objectID": "index.html",
     "href": "index.html",
-    "title": "My Blog",
-    "section": "",
-    "text": "This is a Quarto website.\nadd CNAME\nTo learn more about Quarto websites visit https://quarto.org/docs/websites.\n\n\n\n Back to top"
-  },
-  {
-    "objectID": "Books/Book2/test2.html",
-    "href": "Books/Book2/test2.html",
     "title": "",
     "section": "",
-    "text": "test2\n\n\n\n Back to top",
-    "crumbs": [
-      "Section 1",
-      "test2.html"
-    ]
-  },
-  {
-    "objectID": "Books/Book2/index.html",
-    "href": "Books/Book2/index.html",
-    "title": "",
-    "section": "",
-    "text": "introduce\n\n\n\n Back to top",
-    "crumbs": [
-      "index.html"
-    ]
-  },
-  {
-    "objectID": "Books/Book1/test.html",
-    "href": "Books/Book1/test.html",
-    "title": "",
-    "section": "",
-    "text": "this is a test\n\n\n\n Back to top"
-  },
-  {
-    "objectID": "Books/Book2/test1.html",
-    "href": "Books/Book2/test1.html",
-    "title": "",
-    "section": "",
-    "text": "test1 123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\n123\nTEST\n\n\n\n Back to top",
-    "crumbs": [
-      "Section 1",
-      "test1.html"
-    ]
+    "text": "欢迎来到 RSSPtho，这里有\n\n读书笔记\n工作经验\n流程搭建\nshiny软件\n\n\n\n\n Back to top"
   },
   {
     "objectID": "about.html",
     "href": "about.html",
-    "title": "About",
+    "title": "About me",
     "section": "",
-    "text": "About this site\n\n\n\n Back to top"
+    "text": "一名拥有2年工作经验的生物信息工程师。我对R语言充满热情，致力于使用R语言解决生命科学中的数据。\n\n\n\n中科新生命 - 生物信息工程师 (2024.02 - 至今)\n上海云序生物科技有限公司 - 生物信息工程师 (2023.07 - 2024.01)\n\n\n\n硕士 - 生物信息学\n\n中科院分子细胞科学卓越创新中心 & 中国科学院大学 (2020 - 2023)\n\n本科 - 生物科学\n\n山东大学 (2014 - 2020)\n\n\n\n\n\n\nR\nnextflow\npython\ndocker\ngit"
+  },
+  {
+    "objectID": "about.html#工作经历",
+    "href": "about.html#工作经历",
+    "title": "About me",
+    "section": "",
+    "text": "中科新生命 - 生物信息工程师 (2024.02 - 至今)\n上海云序生物科技有限公司 - 生物信息工程师 (2023.07 - 2024.01)"
+  },
+  {
+    "objectID": "about.html#教育经历",
+    "href": "about.html#教育经历",
+    "title": "About me",
+    "section": "",
+    "text": "硕士 - 生物信息学\n\n中科院分子细胞科学卓越创新中心 & 中国科学院大学 (2020 - 2023)\n\n本科 - 生物科学\n\n山东大学 (2014 - 2020)"
+  },
+  {
+    "objectID": "about.html#技能",
+    "href": "about.html#技能",
+    "title": "About me",
+    "section": "",
+    "text": "R\nnextflow\npython\ndocker\ngit"
+  },
+  {
+    "objectID": "Books/R4DS/index.html",
+    "href": "Books/R4DS/index.html",
+    "title": "index",
+    "section": "",
+    "text": "Back to top",
+    "crumbs": [
+      "index"
+    ]
+  },
+  {
+    "objectID": "Books/ggplot2/index.html",
+    "href": "Books/ggplot2/index.html",
+    "title": "index",
+    "section": "",
+    "text": "Back to top",
+    "crumbs": [
+      "index"
+    ]
+  },
+  {
+    "objectID": "blog.html",
+    "href": "blog.html",
+    "title": "",
+    "section": "",
+    "text": "No matching items\n\n Back to top"
   }
 ]

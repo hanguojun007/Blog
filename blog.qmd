@@ -1,0 +1,15 @@
+---
+listing:
+  categories: true
+  date-format: iso
+  sort-ui: [title, date]
+  filter-ui: [title, date]
+  # field-display-names:
+  #   title: "Report"
+  page-size: 10
+  type: default
+  sort:
+    - date
+    - title asc
+  contents: Blog
+---

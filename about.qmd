@@ -1,5 +1,50 @@
 ---
-title: "About"
+title: "About me"
+about:
+  template: trestles
+  image: /profile.jpg
+  image-shape: rectangle
+  image-width: 200px
+  links:
+    - icon: telephone
+      text: "17852637875"
+    - icon: wechat
+      text: jz960801
+    - icon: github
+      text: Github
+      href: https://github.com/hanguojun007
 ---
 
-About this site
+# 关于我
+
+一名拥有2年工作经验的生物信息工程师。我对R语言充满热情，致力于使用R语言解决生命科学中的数据。
+
+---
+
+## 工作经历
+
+中科新生命 - 生物信息工程师 (2024.02 - 至今)
+
+上海云序生物科技有限公司 - 生物信息工程师 (2023.07 - 2024.01)
+
+
+## 教育经历
+
+硕士 - 生物信息学
+
+- **中科院分子细胞科学卓越创新中心 & 中国科学院大学** (2020 - 2023)
+
+本科 - 生物科学
+
+- **山东大学** (2014 - 2020)
+
+---
+
+## 技能
+-   R
+-   nextflow
+-   python
+-   docker
+-   git
+
+---
