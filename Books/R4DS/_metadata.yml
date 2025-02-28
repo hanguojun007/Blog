@@ -1,0 +1,7 @@
+website:
+  sidebar:
+    - id: R4DS
+      title: R for Data Science
+      contents:
+        - Books/R4DS/index.qmd
+        - Books/R4DS/26 Iteration.qmd

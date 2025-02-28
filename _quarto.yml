@@ -50,29 +50,21 @@ website:
         menu:
           - sidebar:ggplot2
           - sidebar:R4DS
+          - sidebar:quarto
       - text: Blog
         href: blog.qmd
       - about.qmd
 
-  sidebar:
-  #   # 第一个siderbar的style设置会传递到后面的
-    - id: ggplot2
-      title: ggplot2
-      style: floating
-      background: light
-      collapse-level: 3
-      contents:
-        # 想用id，这里第一个不能用`text`
-        - Books/ggplot2/index.qmd
-        # - section: "Section 1"
-        #   contents:
-        #     - Books/ggplot2/test1.qmd
-        #     - Books/ggplot2/test2.qmd
+  # sidebar:
+  # #   # 第一个siderbar的style设置会传递到后面的
+  #   style: floating
+  #   background: light
+    # collapse-level: 3
 
-    - id: R4DS
-      title: R for Data Science
-      contents:
-        - Books/R4DS/index.qmd
+metadata-files:
+  - Books/ggplot2/_metadata.yml
+  - Books/R4DS/_metadata.yml
+  - Books/quarto/_metadata.yml
 
 format:
   html:
@@ -80,5 +72,5 @@ format:
     css: styles.css
     toc: true
 
-
-
+execute:
+  freeze: auto
