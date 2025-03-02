@@ -119,14 +119,14 @@ execute:
 
 如果不想渲染整个项目，只渲染部分文档，可以进行如下配置：
 
-```ymal
+```{.ymal}
 project:
   render:
     - section1.qmd
     - section2.qmd
 ```
 
-```ymal
+```{.ymal}
 project:
   render:
     - section*.qmd
@@ -134,7 +134,7 @@ project:
 
 当你想配置某些文件不渲染时，可以进行如下配置，注意一定要包含`*.qmd`:
 
-```ymal
+```{.ymal}
 project:
   render:
     - "*.qmd"
