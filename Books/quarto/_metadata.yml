@@ -1,0 +1,6 @@
+website:
+  sidebar:
+    - id: quarto
+      title: Quarto
+      contents:
+        - Books/quarto/Project Basics.qmd

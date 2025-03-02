@@ -35,23 +35,63 @@
     "text": "R\nnextflow\npython\ndocker\ngit"
   },
   {
-    "objectID": "Books/R4DS/index.html",
-    "href": "Books/R4DS/index.html",
+    "objectID": "Books/ggplot2/index.html",
+    "href": "Books/ggplot2/index.html",
     "title": "index",
     "section": "",
-    "text": "Back to top",
+    "text": "test\n\n\n\n Back to top",
     "crumbs": [
       "index"
     ]
   },
   {
-    "objectID": "Books/ggplot2/index.html",
-    "href": "Books/ggplot2/index.html",
+    "objectID": "Books/R4DS/26 Iteration.html",
+    "href": "Books/R4DS/26 Iteration.html",
+    "title": "26 Iteration",
+    "section": "",
+    "text": "test\n\n\n\n Back to top",
+    "crumbs": [
+      "26 Iteration"
+    ]
+  },
+  {
+    "objectID": "Books/R4DS/index.html",
+    "href": "Books/R4DS/index.html",
     "title": "index",
     "section": "",
-    "text": "Back to top",
+    "text": "rwar\n\n\n\n Back to top",
     "crumbs": [
       "index"
+    ]
+  },
+  {
+    "objectID": "Books/quarto/Project Basics.html",
+    "href": "Books/quarto/Project Basics.html",
+    "title": "Project Basics",
+    "section": "",
+    "text": "原文：https://quarto.org/docs/projects/quarto-projects.html\nquarto的官方网站提供了许多创建项目的教程，如下图，如何创建项目，这里不再赘述。\n\n\n\n官网教程\n\n\n\n\n当你创建一个项目后，会自动生成一个项目级的YAML文件——_quarto.yml，该文件用来配置整个项目。示例如下：\nproject:\n  output-dir: _output\n\ntoc: true\nnumber-sections: true\nbibliography: references.bib\n\nformat:\n  html:\n    css: styles.css\n    html-math-method: katex\n  pdf:\n    documentclass: report\n    margin-left: 30mm\n    margin-right: 30mm\n随着项目的持续进行，对各部分的调控会显得及其臃肿，最好的办法是将其进行拆分。使用metadata-files可以进行配置，下面是一个混合导航栏的拆分示例，更多导航栏信息见https://quarto.org/docs/websites/website-navigation.html。\n\n\n_quarto.yml\n\nproject:\n  type: website\n\nwebsite:\n  navbar:\n    left:\n      - text: Books\n        menu:\n          - sidebar:ggplot2\n\nmetadata-files:\n  - ggplot2/_ggplot.yml\n\n\n\n_ggplot.yml\n\nwebsite:\n  sidebar:\n    - id: ggplot2\n      title: ggplot2\n      contents:\n        - ggplot2/index.qmd\n\n与上面导航栏示例不同，quarto提供了另外一种——文件夹级配置文件——_metadata.yml。如下：\n\n\n_metadata.yml\n\nformat:\n  revealjs:\n    menu: false\n    progress: false\nsearch: false\n\nquarto中的配置信息分为三级，按优先级由低到高：\n\n项目级配置文件：_quarto.yml\n文件夹级配置文件：dir/_metadata.yml\n文件级配置文件：dir/file.qmd\n\nquarto会自动对配置文件进行合并或覆盖，示例如下，最终的配置体现在文件级配置文件中。\n\n\n\n\n\n\n\n\n\n\n_quarto.yml\n\nformat:\n  html:\n    toc: true\nbibliography:\n  - refs.bib\n\n\n\ndir/_metadata.yml\n\nformat:\n  html:\n    code-fold: true\nbibliography:\n  - proj.bib\n\n\n\nmerge\n\nformat:\n  html:\n    toc: true\n    code-fold: true\nbibliography:\n  - refs.bib\n  - proj.bib\n\n\n\n\n也可以设置本地配置文件_quarto.yml.local，不进行上传，该文件会自动添加到.gitignore中。\n\n\n_quarto.yml.local\n\nexecute:\n  cache: true\n\n\n\n\n使用quarto 进行渲染时，你可以：\n\n渲染整个项目quarto render\n渲染某个目录quarto render subdir\n渲染为不同格式的文件quarto render --to pdf\n\n如果不想渲染整个项目，只渲染部分文档，可以进行如下配置：\nproject:\n  render:\n    - section1.qmd\n    - section2.qmd\nproject:\n  render:\n    - section*.qmd\n当你想配置某些文件不渲染时，可以进行如下配置，注意一定要包含*.qmd:\nproject:\n  render:\n    - \"*.qmd\"\n    - \"!ignored.qmd\"\n    - \"!ignored-dir/\"",
+    "crumbs": [
+      "Project Basics"
+    ]
+  },
+  {
+    "objectID": "Books/quarto/Project Basics.html#shared-metadata",
+    "href": "Books/quarto/Project Basics.html#shared-metadata",
+    "title": "Project Basics",
+    "section": "",
+    "text": "当你创建一个项目后，会自动生成一个项目级的YAML文件——_quarto.yml，该文件用来配置整个项目。示例如下：\nproject:\n  output-dir: _output\n\ntoc: true\nnumber-sections: true\nbibliography: references.bib\n\nformat:\n  html:\n    css: styles.css\n    html-math-method: katex\n  pdf:\n    documentclass: report\n    margin-left: 30mm\n    margin-right: 30mm\n随着项目的持续进行，对各部分的调控会显得及其臃肿，最好的办法是将其进行拆分。使用metadata-files可以进行配置，下面是一个混合导航栏的拆分示例，更多导航栏信息见https://quarto.org/docs/websites/website-navigation.html。\n\n\n_quarto.yml\n\nproject:\n  type: website\n\nwebsite:\n  navbar:\n    left:\n      - text: Books\n        menu:\n          - sidebar:ggplot2\n\nmetadata-files:\n  - ggplot2/_ggplot.yml\n\n\n\n_ggplot.yml\n\nwebsite:\n  sidebar:\n    - id: ggplot2\n      title: ggplot2\n      contents:\n        - ggplot2/index.qmd\n\n与上面导航栏示例不同，quarto提供了另外一种——文件夹级配置文件——_metadata.yml。如下：\n\n\n_metadata.yml\n\nformat:\n  revealjs:\n    menu: false\n    progress: false\nsearch: false\n\nquarto中的配置信息分为三级，按优先级由低到高：\n\n项目级配置文件：_quarto.yml\n文件夹级配置文件：dir/_metadata.yml\n文件级配置文件：dir/file.qmd\n\nquarto会自动对配置文件进行合并或覆盖，示例如下，最终的配置体现在文件级配置文件中。\n\n\n\n\n\n\n\n\n\n\n_quarto.yml\n\nformat:\n  html:\n    toc: true\nbibliography:\n  - refs.bib\n\n\n\ndir/_metadata.yml\n\nformat:\n  html:\n    code-fold: true\nbibliography:\n  - proj.bib\n\n\n\nmerge\n\nformat:\n  html:\n    toc: true\n    code-fold: true\nbibliography:\n  - refs.bib\n  - proj.bib\n\n\n\n\n也可以设置本地配置文件_quarto.yml.local，不进行上传，该文件会自动添加到.gitignore中。\n\n\n_quarto.yml.local\n\nexecute:\n  cache: true",
+    "crumbs": [
+      "Project Basics"
+    ]
+  },
+  {
+    "objectID": "Books/quarto/Project Basics.html#rendering-projects",
+    "href": "Books/quarto/Project Basics.html#rendering-projects",
+    "title": "Project Basics",
+    "section": "",
+    "text": "使用quarto 进行渲染时，你可以：\n\n渲染整个项目quarto render\n渲染某个目录quarto render subdir\n渲染为不同格式的文件quarto render --to pdf\n\n如果不想渲染整个项目，只渲染部分文档，可以进行如下配置：\nproject:\n  render:\n    - section1.qmd\n    - section2.qmd\nproject:\n  render:\n    - section*.qmd\n当你想配置某些文件不渲染时，可以进行如下配置，注意一定要包含*.qmd:\nproject:\n  render:\n    - \"*.qmd\"\n    - \"!ignored.qmd\"\n    - \"!ignored-dir/\"",
+    "crumbs": [
+      "Project Basics"
     ]
   },
   {
