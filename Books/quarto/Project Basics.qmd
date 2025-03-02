@@ -1,7 +1,7 @@
 ---
 title: "Project Basics"
 date: "2025-02-28"
-date-modified: "2025-02-28"
+date-modified: "2025-03-01"
 format: "html"
 fig-width: 4
 fig-height: 4
@@ -88,7 +88,7 @@ quarto中的配置信息分为三级，按优先级由低到高：
 -   文件夹级配置文件：`dir/_metadata.yml`
 -   文件级配置文件：`dir/file.qmd`
 
-quarto会自动对配置文件进行合并或覆盖，示例如下：
+quarto会自动对配置文件进行合并或覆盖，示例如下，最终的配置体现在文件级配置文件中。
 
 +---------------------------------------------+---------------------------------------------+---------------------------------------------+
 | ``` {.yaml filename="_quarto.yml"}          | ``` {.yaml filename="dir/_metadata.yml"}    |  ``` {.yaml filename="merge"}               |
@@ -102,8 +102,42 @@ quarto会自动对配置文件进行合并或覆盖，示例如下：
 |                                             |                                             |  ```                                        |
 +---------------------------------------------+---------------------------------------------+---------------------------------------------+
 
-项目中的YAML配置文件可以继承和覆盖。
+也可以设置本地配置文件`_quarto.yml.local`，不进行上传，该文件会自动添加到`.gitignore`中。
 
-总配置文件 `_quarto.yml` 文件夹配置文件 `_metadata.yml`
+```{.yaml filename="_quarto.yml.local"}
+execute:
+  cache: true
+```
 
-freeze
+## Rendering Projects
+
+使用quarto 进行渲染时，你可以：
+
+-   渲染整个项目`quarto render`
+-   渲染某个目录`quarto render subdir`
+-   渲染为不同格式的文件`quarto render --to pdf`
+
+如果不想渲染整个项目，只渲染部分文档，可以进行如下配置：
+
+```ymal
+project:
+  render:
+    - section1.qmd
+    - section2.qmd
+```
+
+```ymal
+project:
+  render:
+    - section*.qmd
+```
+
+当你想配置某些文件不渲染时，可以进行如下配置，注意一定要包含`*.qmd`:
+
+```ymal
+project:
+  render:
+    - "*.qmd"
+    - "!ignored.qmd"
+    - "!ignored-dir/"
+```

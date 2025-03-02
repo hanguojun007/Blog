@@ -200,6 +200,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#project-basics" id="toc-project-basics" class="nav-link active" data-scroll-target="#project-basics">Project Basics</a>
   <ul class="collapse">
   <li><a href="#shared-metadata" id="toc-shared-metadata" class="nav-link" data-scroll-target="#shared-metadata">Shared Metadata</a></li>
+  <li><a href="#rendering-projects" id="toc-rendering-projects" class="nav-link" data-scroll-target="#rendering-projects">Rendering Projects</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -229,7 +230,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">February 28, 2025</p>
+      <p class="date-modified">March 1, 2025</p>
     </div>
   </div>
     
@@ -314,7 +315,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>文件夹级配置文件：<code>dir/_metadata.yml</code></li>
 <li>文件级配置文件：<code>dir/file.qmd</code></li>
 </ul>
-<p>quarto会自动对配置文件进行合并或覆盖，示例如下：</p>
+<p>quarto会自动对配置文件进行合并或覆盖，示例如下，最终的配置体现在文件级配置文件中。</p>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 33%">
@@ -358,9 +359,37 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 </tbody>
 </table>
-<p>项目中的YAML配置文件可以继承和覆盖。</p>
-<p>总配置文件 <code>_quarto.yml</code> 文件夹配置文件 <code>_metadata.yml</code></p>
-<p>freeze</p>
+<p>也可以设置本地配置文件<code>_quarto.yml.local</code>，不进行上传，该文件会自动添加到<code>.gitignore</code>中。</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>_quarto.yml.local</strong></pre>
+</div>
+<div class="sourceCode" id="cb8" data-filename="_quarto.yml.local"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">execute</span><span class="kw">:</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">cache</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="rendering-projects" class="level2">
+<h2 class="anchored" data-anchor-id="rendering-projects">Rendering Projects</h2>
+<p>使用quarto 进行渲染时，你可以：</p>
+<ul>
+<li>渲染整个项目<code>quarto render</code></li>
+<li>渲染某个目录<code>quarto render subdir</code></li>
+<li>渲染为不同格式的文件<code>quarto render --to pdf</code></li>
+</ul>
+<p>如果不想渲染整个项目，只渲染部分文档，可以进行如下配置：</p>
+<pre class="ymal"><code>project:
+  render:
+    - section1.qmd
+    - section2.qmd</code></pre>
+<pre class="ymal"><code>project:
+  render:
+    - section*.qmd</code></pre>
+<p>当你想配置某些文件不渲染时，可以进行如下配置，注意一定要包含<code>*.qmd</code>:</p>
+<pre class="ymal"><code>project:
+  render:
+    - "*.qmd"
+    - "!ignored.qmd"
+    - "!ignored-dir/"</code></pre>
 
 
 </section>

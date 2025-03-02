@@ -4,7 +4,6 @@ project:
   render:
     - "*.qmd"
     - "!log.qmd"
-    - "!docs/CNAME"
 
 language:
   search-text-placeholder: Search
