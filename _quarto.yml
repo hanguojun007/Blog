@@ -70,6 +70,10 @@ format:
     theme: cosmo
     css: styles.css
     toc: true
+    comments: # 添加评论区
+      utterances:
+        repo: hanguojun007/Blog
+        label: ✨💬✨
 
 execute:
   freeze: auto

@@ -1,5 +1,6 @@
 ---
 title: "About me"
+comments: false
 about:
   template: trestles
   image: /profile.jpg
