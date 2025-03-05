@@ -49,7 +49,87 @@
     "href": "Books/R4DS/26 Iteration.html",
     "title": "26 Iteration",
     "section": "",
-    "text": "test\n\n\n\n Back to top",
+    "text": "在tidyverse中有一些常见的循环操作，如：\n\n绘制分面——facet_wrap(),facet_grid()\n分组总结–group_by(),summarise()\nlist-column解压——unnest_wider(),unnest_longer()\n\n下面我们学习另外一些循环技巧。\n\nlibrary(tidyverse)",
+    "crumbs": [
+      "26 Iteration"
+    ]
+  },
+  {
+    "objectID": "Books/R4DS/26 Iteration.html#选择列",
+    "href": "Books/R4DS/26 Iteration.html#选择列",
+    "title": "26 Iteration",
+    "section": "选择列",
+    "text": "选择列\n.cols控制选择哪几列，是一个tidy-select类，类似于dplyr中的select()，可以使用适配select()的函数，如starts_with()、contains()等。\n更多有过关于tidy-select的内容，可以参考?dplyr_tidy_select。\n\ndf &lt;- tibble(\n  grp = sample(2, 10, replace = TRUE),\n  a = rnorm(10),\n  b = rnorm(10),\n  c = rnorm(10),\n  d = rnorm(10)\n)\n\ndf |&gt;\n  group_by(grp) |&gt;\n  summarize(across(everything(), median))\n#&gt; # A tibble: 2 × 5\n#&gt;     grp       a       b     c     d\n#&gt;   &lt;int&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;\n#&gt; 1     1 -0.0935 -0.0163 0.363 0.364\n#&gt; 2     2  0.312  -0.0576 0.208 0.565",
+    "crumbs": [
+      "26 Iteration"
+    ]
+  },
+  {
+    "objectID": "Books/R4DS/26 Iteration.html#函数",
+    "href": "Books/R4DS/26 Iteration.html#函数",
+    "title": "26 Iteration",
+    "section": "函数",
+    "text": "函数\n.fns参数提供across()进行call的函数，可以是 - 函数名，例如mean，注意此处函数后不能有() - purrr-style lambda，例如~mean(.x, na.rm = TRUE) - 上述两种函数组成的named list，例如list(mean = mean,n_miss = ~ sum(is.na(.x))\n\n\n\n函数名\n\n# 函数名后有`()`会报错。\ndf |&gt;\n  group_by(grp) |&gt;\n  summarize(across(everything(), median()))\n#&gt; Error in `summarize()`:\n#&gt; ℹ In argument: `across(everything(), median())`.\n#&gt; Caused by error in `median.default()`:\n#&gt; ! argument \"x\" is missing, with no default\n\n\n\n\n\npurrr-style lambda\n\nrnorm_na &lt;- function(n, n_na, mean = 0, sd = 1) {\n  sample(c(rnorm(n - n_na, mean = mean, sd = sd), rep(NA, n_na)))\n}\n\ndf_miss &lt;- tibble(\n  a = rnorm_na(5, 1),\n  b = rnorm_na(5, 1),\n  c = rnorm_na(5, 2),\n  d = rnorm(5)\n)\n\ndf_miss |&gt;\n  summarize(\n    across(a:d, ~ median(., na.rm = TRUE)),\n    n = n()\n  )\n#&gt; # A tibble: 1 × 5\n#&gt;       a     b      c     d     n\n#&gt;   &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt;\n#&gt; 1 0.139 -1.11 -0.387  1.15     5\n\ndf_miss |&gt;\n  summarize(\n    across(a:d, function(x) median(x, na.rm = TRUE)),\n    n = n()\n  )\n#&gt; # A tibble: 1 × 5\n#&gt;       a     b      c     d     n\n#&gt;   &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt;\n#&gt; 1 0.139 -1.11 -0.387  1.15     5\n\ndf_miss |&gt;\n  summarize(\n    across(a:d, \\(x) median(x, na.rm = TRUE)),\n    n = n()\n  )\n#&gt; # A tibble: 1 × 5\n#&gt;       a     b      c     d     n\n#&gt;   &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt;\n#&gt; 1 0.139 -1.11 -0.387  1.15     5\n\n\n\n\n\n函数list\n\ndf_miss |&gt;\n  summarize(\n    across(a:d, list(\n      median = \\(x) median(x, na.rm = TRUE),\n      n_miss = \\(x) sum(is.na(x))\n    )),\n    n = n()\n  )\n#&gt; # A tibble: 1 × 9\n#&gt;   a_median a_n_miss b_median b_n_miss c_median c_n_miss d_median d_n_miss\n#&gt;      &lt;dbl&gt;    &lt;int&gt;    &lt;dbl&gt;    &lt;int&gt;    &lt;dbl&gt;    &lt;int&gt;    &lt;dbl&gt;    &lt;int&gt;\n#&gt; 1    0.139        1    -1.11        1   -0.387        2     1.15        0\n#&gt; # ℹ 1 more variable: n &lt;int&gt;",
+    "crumbs": [
+      "26 Iteration"
+    ]
+  },
+  {
+    "objectID": "Books/R4DS/26 Iteration.html#列名",
+    "href": "Books/R4DS/26 Iteration.html#列名",
+    "title": "26 Iteration",
+    "section": "列名",
+    "text": "列名\n如果你仔细观察，上面例子中的列名类似于{.col}_{.fn}（这也是为什么函数list是要有name属性的原因）。\n.names参数控制列名定义规则，使用{.col}表示原始列名，{.fn}表示函数名；单个函数默认{.col}，多个函数默认{.col}_{.fn}。\nacross()在与mutate()联用时会将原来的列覆盖，因为.names()默认是{.col}，所以看不出来，当参数值改变后就会直观的体现出来：\n\n\n\n与mutate联用\n\ndf_miss |&gt;\n  mutate(\n    across(a:d, \\(x) coalesce(x, 0), .names = \"{.col}_na_zero\")\n  )\n#&gt; # A tibble: 5 × 8\n#&gt;        a      b      c     d a_na_zero b_na_zero c_na_zero d_na_zero\n#&gt;    &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;\n#&gt; 1  0.434 -1.25  NA     1.60      0.434    -1.25      0         1.60 \n#&gt; 2 NA     -1.43  -0.297 0.776     0        -1.43     -0.297     0.776\n#&gt; 3 -0.156 -0.980 NA     1.15     -0.156    -0.980     0         1.15 \n#&gt; 4 -2.61  -0.683 -0.785 2.13     -2.61     -0.683    -0.785     2.13 \n#&gt; 5  1.11  NA     -0.387 0.704     1.11      0        -0.387     0.704",
+    "crumbs": [
+      "26 Iteration"
+    ]
+  },
+  {
+    "objectID": "Books/R4DS/26 Iteration.html#filter中的循环",
+    "href": "Books/R4DS/26 Iteration.html#filter中的循环",
+    "title": "26 Iteration",
+    "section": "filter()中的循环",
+    "text": "filter()中的循环\ndplyr 提供了两个across()的变体:\n\nif_any()：至少有一个条件返回TRUE\nif_all()：所有条件返回TRUE\n\n\n# same as df_miss |&gt; filter(is.na(a) | is.na(b) | is.na(c) | is.na(d))\ndf_miss |&gt; filter(if_any(a:d, is.na))\n#&gt; # A tibble: 4 × 4\n#&gt;        a      b      c     d\n#&gt;    &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;\n#&gt; 1  0.434 -1.25  NA     1.60 \n#&gt; 2 NA     -1.43  -0.297 0.776\n#&gt; 3 -0.156 -0.980 NA     1.15 \n#&gt; 4  1.11  NA     -0.387 0.704\n\n# same as df_miss |&gt; filter(is.na(a) & is.na(b) & is.na(c) & is.na(d))\ndf_miss |&gt; filter(if_all(a:d, is.na))\n#&gt; # A tibble: 0 × 4\n#&gt; # ℹ 4 variables: a &lt;dbl&gt;, b &lt;dbl&gt;, c &lt;dbl&gt;, d &lt;dbl&gt;",
+    "crumbs": [
+      "26 Iteration"
+    ]
+  },
+  {
+    "objectID": "Books/R4DS/26 Iteration.html#与piovt_longer对比",
+    "href": "Books/R4DS/26 Iteration.html#与piovt_longer对比",
+    "title": "26 Iteration",
+    "section": "与piovt_longer()对比",
+    "text": "与piovt_longer()对比\n使用piovt_longer()可以实现across()，反之则不成立。例如下面的两个例子\n\n\n\nacross\n\ndf |&gt;\n  summarize(across(a:d, list(median = median, mean = mean)))\n#&gt; # A tibble: 1 × 8\n#&gt;   a_median a_mean b_median b_mean c_median c_mean d_median d_mean\n#&gt;      &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;  &lt;dbl&gt;\n#&gt; 1   0.0380  0.205  -0.0163 0.0910    0.260 0.0716    0.540  0.508\n\n\n\n\n\npivot_longer 复现\n\nlong &lt;- df |&gt;\n  pivot_longer(a:d) |&gt;\n  group_by(name) |&gt;\n  summarize(\n    median = median(value),\n    mean = mean(value)\n  )\nlong |&gt;\n  pivot_wider(\n    names_from = name,\n    values_from = c(median, mean),\n    names_vary = \"slowest\",\n    names_glue = \"{name}_{.value}\"\n  )\n#&gt; # A tibble: 1 × 8\n#&gt;   a_median a_mean b_median b_mean c_median c_mean d_median d_mean\n#&gt;      &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;  &lt;dbl&gt;\n#&gt; 1   0.0380  0.205  -0.0163 0.0910    0.260 0.0716    0.540  0.508\n\n\n\n\n\n只能使用pivot_longer\n\ndf_paired &lt;- tibble(\n  a_val = rnorm(10),\n  a_wts = runif(10),\n  b_val = rnorm(10),\n  b_wts = runif(10),\n  c_val = rnorm(10),\n  c_wts = runif(10),\n  d_val = rnorm(10),\n  d_wts = runif(10)\n)\n\ndf_long &lt;- df_paired |&gt;\n  pivot_longer(\n    everything(),\n    names_to = c(\"group\", \".value\"),\n    names_sep = \"_\"\n  )\ndf_long\n#&gt; # A tibble: 40 × 3\n#&gt;   group    val   wts\n#&gt;   &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt;\n#&gt; 1 a      0.715 0.518\n#&gt; 2 b     -0.709 0.691\n#&gt; 3 c      0.718 0.216\n#&gt; 4 d     -0.217 0.733\n#&gt; 5 a     -1.09  0.979\n#&gt; 6 b     -0.209 0.675\n#&gt; # ℹ 34 more rows\n\ndf_long |&gt;\n  group_by(group) |&gt;\n  summarize(mean = weighted.mean(val, wts))\n#&gt; # A tibble: 4 × 2\n#&gt;   group    mean\n#&gt;   &lt;chr&gt;   &lt;dbl&gt;\n#&gt; 1 a      0.126 \n#&gt; 2 b     -0.0704\n#&gt; 3 c     -0.360 \n#&gt; 4 d     -0.248",
+    "crumbs": [
+      "26 Iteration"
+    ]
+  },
+  {
+    "objectID": "Books/R4DS/26 Iteration.html#返回结果不同",
+    "href": "Books/R4DS/26 Iteration.html#返回结果不同",
+    "title": "26 Iteration",
+    "section": "返回结果不同",
+    "text": "返回结果不同\nmap()函数会返回一个list，其变体则不同。\n\n返回输入值\nwalk()函数只能隐性返回输入，对.f生成的结果没有处理，这在循环绘图中十分便利。\nres &lt;- 1:4 |&gt;\n  walk(\\(x) {\n    hist(rnorm(100, x))\n  })\n\nres\n#&gt; [1] 1 2 3 4\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n返回结果结构与输入相同\nmodify()函数会输出一个与输入结构完全相同的结果，常用来修改元素类型。\n\n# Convert to characters\niris |&gt; str()\n#&gt; 'data.frame':    150 obs. of  5 variables:\n#&gt;  $ Sepal.Length: num  5.1 4.9 4.7 4.6 5 5.4 4.6 5 4.4 4.9 ...\n#&gt;  $ Sepal.Width : num  3.5 3 3.2 3.1 3.6 3.9 3.4 3.4 2.9 3.1 ...\n#&gt;  $ Petal.Length: num  1.4 1.4 1.3 1.5 1.4 1.7 1.4 1.5 1.4 1.5 ...\n#&gt;  $ Petal.Width : num  0.2 0.2 0.2 0.2 0.2 0.4 0.3 0.2 0.2 0.1 ...\n#&gt;  $ Species     : Factor w/ 3 levels \"setosa\",\"versicolor\",..: 1 1 1 1 1 1 1 1 1 1 ...\niris |&gt;\n  modify(as.character) |&gt;\n  str()\n#&gt; 'data.frame':    150 obs. of  5 variables:\n#&gt;  $ Sepal.Length: chr  \"5.1\" \"4.9\" \"4.7\" \"4.6\" ...\n#&gt;  $ Sepal.Width : chr  \"3.5\" \"3\" \"3.2\" \"3.1\" ...\n#&gt;  $ Petal.Length: chr  \"1.4\" \"1.4\" \"1.3\" \"1.5\" ...\n#&gt;  $ Petal.Width : chr  \"0.2\" \"0.2\" \"0.2\" \"0.2\" ...\n#&gt;  $ Species     : chr  \"setosa\" \"setosa\" \"setosa\" \"setosa\" ...\n\n其还有变体modify_if()，modify_at()，modify2()，imodify()，使用方法相似，具体差异同下面讲到的一样。\n\n\n返回原子向量\n这一类有map_lgl(),map_int(),map_dbl(),map_chr(),map_vec()；要求返回的原子向量类型为函数名后缀规定的类型，否则报错。例如：map_lgl()函数要求返回结果为由TRUE和FALSE构成的向量，否则报错。map_vec()函数提供了参数.ptype，可以指定返回结果的类型。\n\nnumbers &lt;- list(1, 2, 3, 4)\n\nmap_lgl(numbers, ~ .x %% 2 == 0)\n#&gt; [1] FALSE  TRUE FALSE  TRUE\n\nmap_lgl(numbers, ~ .x * 2)\n#&gt; Error in `map_lgl()`:\n#&gt; ℹ In index: 1.\n#&gt; Caused by error:\n#&gt; ! Can't coerce from a number to a logical.\n\n\n\n返回数据框\n这一类有map_dfc(),map_dfr()，这两类函数在官方文档中已经不再推荐使用，而是使用map() + list_rbind()/list_cbind()的组合方式。\n\n# map ---------------------------------------------\n# Was:\nmtcars |&gt;\n  split(mtcars$cyl) |&gt;\n  map(\\(df) lm(mpg ~ wt, data = df)) |&gt;\n  map_dfr(\\(mod) as.data.frame(t(as.matrix(coef(mod)))))\n#&gt;   (Intercept)        wt\n#&gt; 1    39.57120 -5.647025\n#&gt; 2    28.40884 -2.780106\n#&gt; 3    23.86803 -2.192438\n# Now:\nmtcars |&gt;\n  split(mtcars$cyl) |&gt;\n  map(\\(df) lm(mpg ~ wt, data = df)) |&gt;\n  map(\\(mod) as.data.frame(t(as.matrix(coef(mod))))) |&gt;\n  list_rbind()\n#&gt;   (Intercept)        wt\n#&gt; 1    39.57120 -5.647025\n#&gt; 2    28.40884 -2.780106\n#&gt; 3    23.86803 -2.192438",
+    "crumbs": [
+      "26 Iteration"
+    ]
+  },
+  {
+    "objectID": "Books/R4DS/26 Iteration.html#输入元素不同",
+    "href": "Books/R4DS/26 Iteration.html#输入元素不同",
+    "title": "26 Iteration",
+    "section": "输入元素不同",
+    "text": "输入元素不同\n这一类有：\n\n对不同位置元素操作：map_at(),map_if(),map_depth()。\n要求元素类型为长度是1的list：lmap()和其变体lmap_at(),lmap_if()。\n\n\nmap_at()\n通过参数.at，提供元素在输入中的位置或name属性，针对特定元素进行操作。\n\nl3 &lt;- list(\n  a = 1:3,\n  b = LETTERS[1:3],\n  c = 7:9\n)\n\nl3 |&gt;\n  map_at(.at = c(\"a\", \"c\"), ~ .x + 1)\n#&gt; $a\n#&gt; [1] 2 3 4\n#&gt; \n#&gt; $b\n#&gt; [1] \"A\" \"B\" \"C\"\n#&gt; \n#&gt; $c\n#&gt; [1]  8  9 10\n\n\n\nmap_if()\n通过参数.p，提供元素要满足的条件，针对特定元素进行操作，可以是判断函数，也可以是逻辑向量。\n\nl3 |&gt;\n  map_if(.p = is.numeric, ~ .x + 1)\n#&gt; $a\n#&gt; [1] 2 3 4\n#&gt; \n#&gt; $b\n#&gt; [1] \"A\" \"B\" \"C\"\n#&gt; \n#&gt; $c\n#&gt; [1]  8  9 10\n\n\n\nmap_depth()\n通过参数.depth，提供元素的深度，针对该深度处的元素进行操作。\n\nx &lt;- list(a = list(foo = 1:2, bar = 3:4), b = list(baz = 5:6))\nx |&gt; str()\n#&gt; List of 2\n#&gt;  $ a:List of 2\n#&gt;   ..$ foo: int [1:2] 1 2\n#&gt;   ..$ bar: int [1:2] 3 4\n#&gt;  $ b:List of 1\n#&gt;   ..$ baz: int [1:2] 5 6\n\nx |&gt;\n  map_depth(2, \\(y) paste(y, collapse = \"/\")) |&gt;\n  str()\n#&gt; List of 2\n#&gt;  $ a:List of 2\n#&gt;   ..$ foo: chr \"1/2\"\n#&gt;   ..$ bar: chr \"3/4\"\n#&gt;  $ b:List of 1\n#&gt;   ..$ baz: chr \"5/6\"\n\n# Equivalent to:\nx |&gt;\n  map(\\(y) map(y, \\(z) paste(z, collapse = \"/\"))) |&gt;\n  str()\n#&gt; List of 2\n#&gt;  $ a:List of 2\n#&gt;   ..$ foo: chr \"1/2\"\n#&gt;   ..$ bar: chr \"3/4\"\n#&gt;  $ b:List of 1\n#&gt;   ..$ baz: chr \"5/6\"\n\n\n\nlmap() 类\nlmap()与map()的不同之处在于，后者提取使用[[i]]来提取list中的元素，返回一个向量，前者使用[i]提取list中的元素，返回一个list。\n由于lmap()操作对象是list，所以它可以使用list中的name属性；在返回结果时，它会使用c()将list合并。下面是一个示例：\n\nadd_minus &lt;- function(x) {\n  res1 &lt;- lapply(x, function(y) y - 1)\n  names(res1) &lt;- paste0(names(x), \"_minus\")\n  res2 &lt;- lapply(x, function(y) y + 1)\n  names(res2) &lt;- paste0(names(x), \"_plus\")\n  c(res1, res2)\n}\n\n# The output size varies each time we map f()\ntest &lt;- list(a = 1:4, c = 8:9)\ntest |&gt;\n  lmap(add_minus) |&gt;\n  str()\n#&gt; List of 4\n#&gt;  $ a_minus: num [1:4] 0 1 2 3\n#&gt;  $ a_plus : num [1:4] 2 3 4 5\n#&gt;  $ c_minus: num [1:2] 7 8\n#&gt;  $ c_plus : num [1:2] 9 10\n\n所以，lmap()对参数.x，.f有不同的要求：\n\n.x：list 或 data.frame\n.f：该函数输入为长度是1的list，输出是任意长度的list。",
+    "crumbs": [
+      "26 Iteration"
+    ]
+  },
+  {
+    "objectID": "Books/R4DS/26 Iteration.html#函数参数数目",
+    "href": "Books/R4DS/26 Iteration.html#函数参数数目",
+    "title": "26 Iteration",
+    "section": "函数参数数目",
+    "text": "函数参数数目\n这一类函数有map2()、pmap()和map2()的变体imap()。这些函数与map()的使用方法类似，只是多提供了一组或多组.f函数的参数。同时这些函数都有*_lgl(),*_int(), *_dbl(), *_chr(), *_vec(), *_dfc(), *_dfr(),*walk()等变体，使用方法同上。\n\nimap()\nimap()是map2(x, names(x), ...)或map2(x, seq_along(x), ...)的简写，其余使用方法相同。\n\nset.seed(123)\nimap_chr(sample(10), paste)\n#&gt;  [1] \"3 1\"  \"10 2\" \"2 3\"  \"8 4\"  \"6 5\"  \"9 6\"  \"1 7\"  \"7 8\"  \"5 9\"  \"4 10\"",
     "crumbs": [
       "26 Iteration"
     ]
@@ -59,7 +139,7 @@
     "href": "Books/R4DS/index.html",
     "title": "index",
     "section": "",
-    "text": "rwar\n\n\n\n Back to top",
+    "text": "本篇为书籍R for Data Science的学习笔记。\n原文见：R for Data Science (2e)\n\n\n\n Back to top",
     "crumbs": [
       "index"
     ]

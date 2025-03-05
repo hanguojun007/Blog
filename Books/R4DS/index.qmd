@@ -15,4 +15,7 @@ execute:
 
 source("_common.R")
 ```
-rwar
+
+本篇为书籍`R for Data Science`的学习笔记。
+
+原文见：[R for Data Science (2e)](https://r4ds.hadley.nz/)
