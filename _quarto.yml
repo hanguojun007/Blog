@@ -73,7 +73,8 @@ format:
     comments: # 添加评论区
       utterances:
         repo: hanguojun007/Blog
-        label: ✨💬✨
+        label: utterances
+        issue-term: og:title
 
 execute:
   freeze: auto
