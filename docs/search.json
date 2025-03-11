@@ -45,84 +45,11 @@
     ]
   },
   {
-    "objectID": "Books/R4DS/27 A field guide to base R.html",
-    "href": "Books/R4DS/27 A field guide to base R.html",
-    "title": "27 A field guide to base R",
+    "objectID": "Books/R4DS/28 Quarto.html",
+    "href": "Books/R4DS/28 Quarto.html",
+    "title": "28 Quarto",
     "section": "",
-    "text": "本章介绍一些base R中的重要函数：\n\n提取多个元素——[\n提取单个元素——[&$\napply家族\nfor循环\nPlot\n\n\nlibrary(tidyverse)",
-    "crumbs": [
-      "27 A field guide to base R"
-    ]
-  },
-  {
-    "objectID": "Books/R4DS/27 A field guide to base R.html#提取向量",
-    "href": "Books/R4DS/27 A field guide to base R.html#提取向量",
-    "title": "27 A field guide to base R",
-    "section": "提取向量",
-    "text": "提取向量\n五种常见情景：\n\n正整数表示元素位置提取，重复提取生成重复元素的向量。\n\n\nx &lt;- c(\"one\", \"two\", \"three\", \"four\", \"five\")\nx[c(3, 2, 5)]\n#&gt; [1] \"three\" \"two\"   \"five\"\n\nx[c(1, 1, 5, 5, 5, 2)]\n#&gt; [1] \"one\"  \"one\"  \"five\" \"five\" \"five\" \"two\"\n\n\n负整数表示删除对应位置的元素。\n\n\nx[c(-1, -3, -5)]\n#&gt; [1] \"two\"  \"four\"\n\n\n逻辑向量提取值为TRUE的元素；关于NA的处理与dplyr::filter()不同，前者保留，后者不保留。\n\n\nx &lt;- c(10, 3, NA, 5, 8, 1, NA)\n\n# All non-missing values of x\nx[!is.na(x)]\n#&gt; [1] 10  3  5  8  1\n\n# All even (or missing!) values of x\nx[x %% 2 == 0]\n#&gt; [1] 10 NA  8 NA\n\n\n字符串向量提取有name属性的向量元素。\n\n\nx &lt;- c(abc = 1, def = 2, xyz = 5)\nx[c(\"xyz\", \"def\")]\n#&gt; xyz def \n#&gt;   5   2\n\n\nnothing–x[]返回完整的对象，在后面对data.frame提取时有用。",
-    "crumbs": [
-      "27 A field guide to base R"
-    ]
-  },
-  {
-    "objectID": "Books/R4DS/27 A field guide to base R.html#提取数据框",
-    "href": "Books/R4DS/27 A field guide to base R.html#提取数据框",
-    "title": "27 A field guide to base R",
-    "section": "提取数据框",
-    "text": "提取数据框\n使用df[rows, cols]提取数据框中对应的行或列；其中rows和cols与上面的使用方法一致。\n\ndf &lt;- tibble(\n  x = 1:3,\n  y = c(\"a\", \"e\", \"f\"),\n  z = runif(3)\n)\n\n# Select first row and second column\ndf[1, 2]\n#&gt; # A tibble: 1 × 1\n#&gt;   y    \n#&gt;   &lt;chr&gt;\n#&gt; 1 a\n\n# Select all rows and columns x and y\ndf[, c(\"x\", \"y\")]\n#&gt; # A tibble: 3 × 2\n#&gt;       x y    \n#&gt;   &lt;int&gt; &lt;chr&gt;\n#&gt; 1     1 a    \n#&gt; 2     2 e    \n#&gt; 3     3 f\n\n# Select rows where `x` is greater than 1 and all columns\ndf[df$x &gt; 1, ]\n#&gt; # A tibble: 2 × 3\n#&gt;       x y         z\n#&gt;   &lt;int&gt; &lt;chr&gt; &lt;dbl&gt;\n#&gt; 1     2 e     0.834\n#&gt; 2     3 f     0.601\n\ndata.frame格式与tibble格式的数据框在使用[上的唯一区别是：当df[,cols]中的cols只有一个元素时，data.frame格式返回向量，而tibble格式仍返回tibble。\n\ndf1 &lt;- data.frame(x = 1:3)\ndf1[, \"x\"]\n#&gt; [1] 1 2 3\n\ndf2 &lt;- tibble(x = 1:3)\ndf2[, \"x\"]\n#&gt; # A tibble: 3 × 1\n#&gt;       x\n#&gt;   &lt;int&gt;\n#&gt; 1     1\n#&gt; 2     2\n#&gt; 3     3\n\ndata.frame格式使用drop参数，可以避免降维。\n\ndf1[, \"x\", drop = FALSE]\n#&gt;   x\n#&gt; 1 1\n#&gt; 2 2\n#&gt; 3 3",
-    "crumbs": [
-      "27 A field guide to base R"
-    ]
-  },
-  {
-    "objectID": "Books/R4DS/27 A field guide to base R.html#dplyr-中的等价操作",
-    "href": "Books/R4DS/27 A field guide to base R.html#dplyr-中的等价操作",
-    "title": "27 A field guide to base R",
-    "section": "dplyr 中的等价操作",
-    "text": "dplyr 中的等价操作\n在dplyr包中有几个verb等价于[的特例：\n\nfilter()：等价于按行使用逻辑向量提取，但对于NA的处理不同，filter()不保留NA，而[保留。\n\n\ndf &lt;- tibble(\n  x = c(2, 3, 1, 1, NA),\n  y = letters[1:5],\n  z = runif(5)\n)\ndf |&gt; filter(x &gt; 1)\n#&gt; # A tibble: 2 × 3\n#&gt;       x y           z\n#&gt;   &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt;\n#&gt; 1     2 a     0.157  \n#&gt; 2     3 b     0.00740\n\n# same as\ndf[!is.na(df$x) & df$x &gt; 1, ]\n#&gt; # A tibble: 2 × 3\n#&gt;       x y           z\n#&gt;   &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt;\n#&gt; 1     2 a     0.157  \n#&gt; 2     3 b     0.00740\n\ndf[which(df$x &gt; 1), ]\n#&gt; # A tibble: 2 × 3\n#&gt;       x y           z\n#&gt;   &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt;\n#&gt; 1     2 a     0.157  \n#&gt; 2     3 b     0.00740\n\n\narrange()：等价于按行使用正整数向量提取，向量通常由order()生成。\n\n\ndf |&gt; arrange(x, y)\n#&gt; # A tibble: 5 × 3\n#&gt;       x y           z\n#&gt;   &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt;\n#&gt; 1     1 c     0.466  \n#&gt; 2     1 d     0.498  \n#&gt; 3     2 a     0.157  \n#&gt; 4     3 b     0.00740\n#&gt; 5    NA e     0.290\n\n# same as\ndf[order(df$x, df$y), ]\n#&gt; # A tibble: 5 × 3\n#&gt;       x y           z\n#&gt;   &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt;\n#&gt; 1     1 c     0.466  \n#&gt; 2     1 d     0.498  \n#&gt; 3     2 a     0.157  \n#&gt; 4     3 b     0.00740\n#&gt; 5    NA e     0.290\n\n\nselect() & relocate()：等价于按列使用字符向量提取。\n\n\ndf |&gt; select(x, z)\n#&gt; # A tibble: 5 × 2\n#&gt;       x       z\n#&gt;   &lt;dbl&gt;   &lt;dbl&gt;\n#&gt; 1     2 0.157  \n#&gt; 2     3 0.00740\n#&gt; 3     1 0.466  \n#&gt; 4     1 0.498  \n#&gt; 5    NA 0.290\n\n# same as\ndf[, c(\"x\", \"z\")]\n#&gt; # A tibble: 5 × 2\n#&gt;       x       z\n#&gt;   &lt;dbl&gt;   &lt;dbl&gt;\n#&gt; 1     2 0.157  \n#&gt; 2     3 0.00740\n#&gt; 3     1 0.466  \n#&gt; 4     1 0.498  \n#&gt; 5    NA 0.290",
-    "crumbs": [
-      "27 A field guide to base R"
-    ]
-  },
-  {
-    "objectID": "Books/R4DS/27 A field guide to base R.html#data-frames",
-    "href": "Books/R4DS/27 A field guide to base R.html#data-frames",
-    "title": "27 A field guide to base R",
-    "section": "Data Frames",
-    "text": "Data Frames\n[[和$用来提取数据框中的某列；[[可以通过位置或name属性提取，而$只能通过name属性提取。\n\ntb &lt;- tibble(\n  x = 1:4,\n  y = c(10, 4, 1, 21)\n)\n\n# by position\ntb[[1]]\n#&gt; [1] 1 2 3 4\n\n# by name\ntb[[\"x\"]]\n#&gt; [1] 1 2 3 4\ntb$x\n#&gt; [1] 1 2 3 4\n\ndplyr包提取了pull()函数，它等价于[[和$。\n\ntb |&gt; pull(x)\n#&gt; [1] 1 2 3 4",
-    "crumbs": [
-      "27 A field guide to base R"
-    ]
-  },
-  {
-    "objectID": "Books/R4DS/27 A field guide to base R.html#tibbles",
-    "href": "Books/R4DS/27 A field guide to base R.html#tibbles",
-    "title": "27 A field guide to base R",
-    "section": "Tibbles",
-    "text": "Tibbles\ndata.frame与tibble在使用$时有着显著的不同；前者遵循部分匹配原则，后者使用精确匹配原则。\n\ndf &lt;- data.frame(x1 = 1)\ndf$x\n#&gt; [1] 1\ndf$z\n#&gt; NULL\n\n\ntb &lt;- tibble(x1 = 1)\n\ntb$x1\n#&gt; [1] 1\ntb$z\n#&gt; NULL",
-    "crumbs": [
-      "27 A field guide to base R"
-    ]
-  },
-  {
-    "objectID": "Books/R4DS/27 A field guide to base R.html#dplyrmutate的等价操作",
-    "href": "Books/R4DS/27 A field guide to base R.html#dplyrmutate的等价操作",
-    "title": "27 A field guide to base R",
-    "section": "dplyr::mutate的等价操作",
-    "text": "dplyr::mutate的等价操作\n下面是使用with(),within()和transform()进行等价操作的例子。\n\n\ndata(diamonds, package = \"ggplot2\")\n\n# Most straightforward\ndiamonds$ppc &lt;- diamonds$price / diamonds$carat\n\n# Avoid repeating diamonds\ndiamonds$ppc &lt;- with(diamonds, price / carat)\n\n# The inspiration for dplyr's mutate\ndiamonds &lt;- transform(diamonds, ppc = price / carat)\ndiamonds &lt;- diamonds |&gt; transform(ppc = price / carat)\n\n# Similar to transform(), but uses assignment rather argument matching\n# (can also use = here, since = is equivalent to &lt;- outside of a function call)\ndiamonds &lt;- within(diamonds, {\n  ppc &lt;- price / carat\n})\ndiamonds &lt;- diamonds |&gt; within({\n  ppc &lt;- price / carat\n})\n\n# Protect against partial matching\ndiamonds$ppc &lt;- diamonds[[\"price\"]] / diamonds[[\"carat\"]]\ndiamonds$ppc &lt;- diamonds[, \"price\"] / diamonds[, \"carat\"]\n\n# FORBIDDEN\nattach(diamonds)\ndiamonds$ppc &lt;- price / carat",
-    "crumbs": [
-      "27 A field guide to base R"
-    ]
-  },
-  {
-    "objectID": "Books/R4DS/27 A field guide to base R.html#lists",
-    "href": "Books/R4DS/27 A field guide to base R.html#lists",
-    "title": "27 A field guide to base R",
-    "section": "lists",
-    "text": "lists\n[，[[和$都可以提取list中的元素，但[保留原list层级，而[[和$不保留。\n\nl &lt;- list(\n  a = 1:3,\n  b = \"a string\",\n  c = pi,\n  d = list(-1, -5)\n)\n\nstr(l[1:2])\n#&gt; List of 2\n#&gt;  $ a: int [1:3] 1 2 3\n#&gt;  $ b: chr \"a string\"\n\nstr(l[1])\n#&gt; List of 1\n#&gt;  $ a: int [1:3] 1 2 3\nstr(l[[1]])\n#&gt;  int [1:3] 1 2 3\n\nstr(l[4])\n#&gt; List of 1\n#&gt;  $ d:List of 2\n#&gt;   ..$ : num -1\n#&gt;   ..$ : num -5\nstr(l[[4]])\n#&gt; List of 2\n#&gt;  $ : num -1\n#&gt;  $ : num -5\n\n两者的差异如下图所示：",
-    "crumbs": [
-      "27 A field guide to base R"
-    ]
+    "text": "Introduction\n\n\n\n\n Back to top"
   },
   {
     "objectID": "Books/R4DS/26 Iteration.html",
@@ -212,6 +139,86 @@
     "text": "函数参数数目\n这一类函数有map2()、pmap()和map2()的变体imap()。这些函数与map()的使用方法类似，只是多提供了一组或多组.f函数的参数。同时这些函数都有*_lgl(),*_int(), *_dbl(), *_chr(), *_vec(), *_dfc(), *_dfr(),*walk()等变体，使用方法同上。\n\nimap()\nimap()是map2(x, names(x), ...)或map2(x, seq_along(x), ...)的简写，其余使用方法相同。\n\nset.seed(123)\nimap_chr(sample(10), paste)\n#&gt;  [1] \"3 1\"  \"10 2\" \"2 3\"  \"8 4\"  \"6 5\"  \"9 6\"  \"1 7\"  \"7 8\"  \"5 9\"  \"4 10\"",
     "crumbs": [
       "26 Iteration"
+    ]
+  },
+  {
+    "objectID": "Books/R4DS/27 A field guide to base R.html",
+    "href": "Books/R4DS/27 A field guide to base R.html",
+    "title": "27 A field guide to base R",
+    "section": "",
+    "text": "本章介绍一些base R中的重要函数：\n\n提取多个元素——[\n提取单个元素——[&$\napply家族\nfor循环\nPlot\n\n\nlibrary(tidyverse)",
+    "crumbs": [
+      "27 A field guide to base R"
+    ]
+  },
+  {
+    "objectID": "Books/R4DS/27 A field guide to base R.html#提取向量",
+    "href": "Books/R4DS/27 A field guide to base R.html#提取向量",
+    "title": "27 A field guide to base R",
+    "section": "提取向量",
+    "text": "提取向量\n五种常见情景：\n\n正整数表示元素位置提取，重复提取生成重复元素的向量。\n\n\nx &lt;- c(\"one\", \"two\", \"three\", \"four\", \"five\")\nx[c(3, 2, 5)]\n#&gt; [1] \"three\" \"two\"   \"five\"\n\nx[c(1, 1, 5, 5, 5, 2)]\n#&gt; [1] \"one\"  \"one\"  \"five\" \"five\" \"five\" \"two\"\n\n\n负整数表示删除对应位置的元素。\n\n\nx[c(-1, -3, -5)]\n#&gt; [1] \"two\"  \"four\"\n\n\n逻辑向量提取值为TRUE的元素；关于NA的处理与dplyr::filter()不同，前者保留，后者不保留。\n\n\nx &lt;- c(10, 3, NA, 5, 8, 1, NA)\n\n# All non-missing values of x\nx[!is.na(x)]\n#&gt; [1] 10  3  5  8  1\n\n# All even (or missing!) values of x\nx[x %% 2 == 0]\n#&gt; [1] 10 NA  8 NA\n\n\n字符串向量提取有name属性的向量元素。\n\n\nx &lt;- c(abc = 1, def = 2, xyz = 5)\nx[c(\"xyz\", \"def\")]\n#&gt; xyz def \n#&gt;   5   2\n\n\nnothing–x[]返回完整的对象，在后面对data.frame提取时有用。",
+    "crumbs": [
+      "27 A field guide to base R"
+    ]
+  },
+  {
+    "objectID": "Books/R4DS/27 A field guide to base R.html#提取数据框",
+    "href": "Books/R4DS/27 A field guide to base R.html#提取数据框",
+    "title": "27 A field guide to base R",
+    "section": "提取数据框",
+    "text": "提取数据框\n使用df[rows, cols]提取数据框中对应的行或列；其中rows和cols与上面的使用方法一致。\n\ndf &lt;- tibble(\n  x = 1:3,\n  y = c(\"a\", \"e\", \"f\"),\n  z = runif(3)\n)\n\n# Select first row and second column\ndf[1, 2]\n#&gt; # A tibble: 1 × 1\n#&gt;   y    \n#&gt;   &lt;chr&gt;\n#&gt; 1 a\n\n# Select all rows and columns x and y\ndf[, c(\"x\", \"y\")]\n#&gt; # A tibble: 3 × 2\n#&gt;       x y    \n#&gt;   &lt;int&gt; &lt;chr&gt;\n#&gt; 1     1 a    \n#&gt; 2     2 e    \n#&gt; 3     3 f\n\n# Select rows where `x` is greater than 1 and all columns\ndf[df$x &gt; 1, ]\n#&gt; # A tibble: 2 × 3\n#&gt;       x y         z\n#&gt;   &lt;int&gt; &lt;chr&gt; &lt;dbl&gt;\n#&gt; 1     2 e     0.834\n#&gt; 2     3 f     0.601\n\ndata.frame格式与tibble格式的数据框在使用[上的唯一区别是：当df[,cols]中的cols只有一个元素时，data.frame格式返回向量，而tibble格式仍返回tibble。\n\ndf1 &lt;- data.frame(x = 1:3)\ndf1[, \"x\"]\n#&gt; [1] 1 2 3\n\ndf2 &lt;- tibble(x = 1:3)\ndf2[, \"x\"]\n#&gt; # A tibble: 3 × 1\n#&gt;       x\n#&gt;   &lt;int&gt;\n#&gt; 1     1\n#&gt; 2     2\n#&gt; 3     3\n\ndata.frame格式使用drop参数，可以避免降维。\n\ndf1[, \"x\", drop = FALSE]\n#&gt;   x\n#&gt; 1 1\n#&gt; 2 2\n#&gt; 3 3",
+    "crumbs": [
+      "27 A field guide to base R"
+    ]
+  },
+  {
+    "objectID": "Books/R4DS/27 A field guide to base R.html#dplyr-中的等价操作",
+    "href": "Books/R4DS/27 A field guide to base R.html#dplyr-中的等价操作",
+    "title": "27 A field guide to base R",
+    "section": "dplyr 中的等价操作",
+    "text": "dplyr 中的等价操作\n在dplyr包中有几个verb等价于[的特例：\n\nfilter()：等价于按行使用逻辑向量提取，但对于NA的处理不同，filter()不保留NA，而[保留。\n\n\ndf &lt;- tibble(\n  x = c(2, 3, 1, 1, NA),\n  y = letters[1:5],\n  z = runif(5)\n)\ndf |&gt; filter(x &gt; 1)\n#&gt; # A tibble: 2 × 3\n#&gt;       x y           z\n#&gt;   &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt;\n#&gt; 1     2 a     0.157  \n#&gt; 2     3 b     0.00740\n\n# same as\ndf[!is.na(df$x) & df$x &gt; 1, ]\n#&gt; # A tibble: 2 × 3\n#&gt;       x y           z\n#&gt;   &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt;\n#&gt; 1     2 a     0.157  \n#&gt; 2     3 b     0.00740\n\ndf[which(df$x &gt; 1), ]\n#&gt; # A tibble: 2 × 3\n#&gt;       x y           z\n#&gt;   &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt;\n#&gt; 1     2 a     0.157  \n#&gt; 2     3 b     0.00740\n\n\narrange()：等价于按行使用正整数向量提取，向量通常由order()生成。\n\n\ndf |&gt; arrange(x, y)\n#&gt; # A tibble: 5 × 3\n#&gt;       x y           z\n#&gt;   &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt;\n#&gt; 1     1 c     0.466  \n#&gt; 2     1 d     0.498  \n#&gt; 3     2 a     0.157  \n#&gt; 4     3 b     0.00740\n#&gt; 5    NA e     0.290\n\n# same as\ndf[order(df$x, df$y), ]\n#&gt; # A tibble: 5 × 3\n#&gt;       x y           z\n#&gt;   &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt;\n#&gt; 1     1 c     0.466  \n#&gt; 2     1 d     0.498  \n#&gt; 3     2 a     0.157  \n#&gt; 4     3 b     0.00740\n#&gt; 5    NA e     0.290\n\n\nselect() & relocate()：等价于按列使用字符向量提取。\n\n\ndf |&gt; select(x, z)\n#&gt; # A tibble: 5 × 2\n#&gt;       x       z\n#&gt;   &lt;dbl&gt;   &lt;dbl&gt;\n#&gt; 1     2 0.157  \n#&gt; 2     3 0.00740\n#&gt; 3     1 0.466  \n#&gt; 4     1 0.498  \n#&gt; 5    NA 0.290\n\n# same as\ndf[, c(\"x\", \"z\")]\n#&gt; # A tibble: 5 × 2\n#&gt;       x       z\n#&gt;   &lt;dbl&gt;   &lt;dbl&gt;\n#&gt; 1     2 0.157  \n#&gt; 2     3 0.00740\n#&gt; 3     1 0.466  \n#&gt; 4     1 0.498  \n#&gt; 5    NA 0.290",
+    "crumbs": [
+      "27 A field guide to base R"
+    ]
+  },
+  {
+    "objectID": "Books/R4DS/27 A field guide to base R.html#data-frames",
+    "href": "Books/R4DS/27 A field guide to base R.html#data-frames",
+    "title": "27 A field guide to base R",
+    "section": "Data Frames",
+    "text": "Data Frames\n[[和$用来提取数据框中的某列；[[可以通过位置或name属性提取，而$只能通过name属性提取。\n\ntb &lt;- tibble(\n  x = 1:4,\n  y = c(10, 4, 1, 21)\n)\n\n# by position\ntb[[1]]\n#&gt; [1] 1 2 3 4\n\n# by name\ntb[[\"x\"]]\n#&gt; [1] 1 2 3 4\ntb$x\n#&gt; [1] 1 2 3 4\n\ndplyr包提取了pull()函数，它等价于[[和$。\n\ntb |&gt; pull(x)\n#&gt; [1] 1 2 3 4",
+    "crumbs": [
+      "27 A field guide to base R"
+    ]
+  },
+  {
+    "objectID": "Books/R4DS/27 A field guide to base R.html#tibbles",
+    "href": "Books/R4DS/27 A field guide to base R.html#tibbles",
+    "title": "27 A field guide to base R",
+    "section": "Tibbles",
+    "text": "Tibbles\ndata.frame与tibble在使用$时有着显著的不同；前者遵循部分匹配原则，后者使用精确匹配原则。\n\ndf &lt;- data.frame(x1 = 1)\ndf$x\n#&gt; [1] 1\ndf$z\n#&gt; NULL\n\n\ntb &lt;- tibble(x1 = 1)\n\ntb$x1\n#&gt; [1] 1\ntb$z\n#&gt; NULL",
+    "crumbs": [
+      "27 A field guide to base R"
+    ]
+  },
+  {
+    "objectID": "Books/R4DS/27 A field guide to base R.html#dplyrmutate的等价操作",
+    "href": "Books/R4DS/27 A field guide to base R.html#dplyrmutate的等价操作",
+    "title": "27 A field guide to base R",
+    "section": "dplyr::mutate的等价操作",
+    "text": "dplyr::mutate的等价操作\n下面是使用with(),within()和transform()进行等价操作的例子。\n\n\ndata(diamonds, package = \"ggplot2\")\n\n# Most straightforward\ndiamonds$ppc &lt;- diamonds$price / diamonds$carat\n\n# Avoid repeating diamonds\ndiamonds$ppc &lt;- with(diamonds, price / carat)\n\n# The inspiration for dplyr's mutate\ndiamonds &lt;- transform(diamonds, ppc = price / carat)\ndiamonds &lt;- diamonds |&gt; transform(ppc = price / carat)\n\n# Similar to transform(), but uses assignment rather argument matching\n# (can also use = here, since = is equivalent to &lt;- outside of a function call)\ndiamonds &lt;- within(diamonds, {\n  ppc &lt;- price / carat\n})\ndiamonds &lt;- diamonds |&gt; within({\n  ppc &lt;- price / carat\n})\n\n# Protect against partial matching\ndiamonds$ppc &lt;- diamonds[[\"price\"]] / diamonds[[\"carat\"]]\ndiamonds$ppc &lt;- diamonds[, \"price\"] / diamonds[, \"carat\"]\n\n# FORBIDDEN\nattach(diamonds)\ndiamonds$ppc &lt;- price / carat",
+    "crumbs": [
+      "27 A field guide to base R"
+    ]
+  },
+  {
+    "objectID": "Books/R4DS/27 A field guide to base R.html#lists",
+    "href": "Books/R4DS/27 A field guide to base R.html#lists",
+    "title": "27 A field guide to base R",
+    "section": "lists",
+    "text": "lists\n[，[[和$都可以提取list中的元素，但[保留原list层级，而[[和$不保留。\n\nl &lt;- list(\n  a = 1:3,\n  b = \"a string\",\n  c = pi,\n  d = list(-1, -5)\n)\n\nstr(l[1:2])\n#&gt; List of 2\n#&gt;  $ a: int [1:3] 1 2 3\n#&gt;  $ b: chr \"a string\"\n\nstr(l[1])\n#&gt; List of 1\n#&gt;  $ a: int [1:3] 1 2 3\nstr(l[[1]])\n#&gt;  int [1:3] 1 2 3\n\nstr(l[4])\n#&gt; List of 1\n#&gt;  $ d:List of 2\n#&gt;   ..$ : num -1\n#&gt;   ..$ : num -5\nstr(l[[4]])\n#&gt; List of 2\n#&gt;  $ : num -1\n#&gt;  $ : num -5\n\n两者的差异如下图所示：",
+    "crumbs": [
+      "27 A field guide to base R"
     ]
   },
   {
