@@ -19,8 +19,8 @@ website:
   comments:
     utterances:
       repo: hanguojun007/Blog
-      label: utterances
-      issue-term: og:title
+      # label: utterances
+      # issue-term: og:title
 
   bread-crumbs: true # 显示路径
   page-navigation: true # 上一页，下一页
