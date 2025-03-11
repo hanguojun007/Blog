@@ -5,3 +5,4 @@ website:
       contents:
         - Books/R4DS/index.qmd
         - Books/R4DS/26 Iteration.qmd
+        - Books/R4DS/27 A field guide to base R.qmd

@@ -1,0 +1,348 @@
+---
+title: "27 A field guide to base R"
+date: "2025-03-08"
+date-modified: "2025-03-11"
+format: "html"
+fig-width: 4
+fig-height: 4
+fig-align: center
+execute:
+  warning: false
+---
+
+```{r}
+#| echo: false
+
+source("_common.R")
+```
+
+# Introduction
+
+本章介绍一些`base R`中的重要函数：
+
+-   提取多个元素——`[`
+-   提取单个元素——`[`&`$`
+-   `apply`家族
+-   `for`循环
+-   Plot
+
+```{r}
+#| message: false
+
+library(tidyverse)
+```
+
+# 使用`[`提取多个元素
+
+## 提取向量
+
+五种常见情景：
+
+-   正整数表示元素位置提取，重复提取生成重复元素的向量。
+
+```{r}
+x <- c("one", "two", "three", "four", "five")
+x[c(3, 2, 5)]
+
+x[c(1, 1, 5, 5, 5, 2)]
+```
+
+-   **负整数表示删除对应位置的元素**。
+
+```{r}
+x[c(-1, -3, -5)]
+```
+
+-   逻辑向量提取值为`TRUE`的元素；关于`NA`的处理与`dplyr::filter()`不同，前者保留，后者不保留。
+
+```{r}
+x <- c(10, 3, NA, 5, 8, 1, NA)
+
+# All non-missing values of x
+x[!is.na(x)]
+
+# All even (or missing!) values of x
+x[x %% 2 == 0]
+```
+
+-   字符串向量提取有name属性的向量元素。
+
+```{r}
+x <- c(abc = 1, def = 2, xyz = 5)
+x[c("xyz", "def")]
+```
+
+-   **nothing**--`x[]`返回完整的对象，在后面对`data.frame`提取时有用。
+
+## 提取数据框
+
+使用`df[rows, cols]`提取数据框中对应的行或列；其中`rows`和`cols`与上面的使用方法一致。
+
+```{r}
+df <- tibble(
+  x = 1:3,
+  y = c("a", "e", "f"),
+  z = runif(3)
+)
+
+# Select first row and second column
+df[1, 2]
+
+# Select all rows and columns x and y
+df[, c("x", "y")]
+
+# Select rows where `x` is greater than 1 and all columns
+df[df$x > 1, ]
+```
+
+**`data.frame`格式与`tibble`格式的数据框在使用`[`上的唯一区别是**：当`df[,cols]`中的`cols`只有一个元素时，`data.frame`格式返回向量，而`tibble`格式仍返回`tibble`。
+
+```{r}
+df1 <- data.frame(x = 1:3)
+df1[, "x"]
+
+df2 <- tibble(x = 1:3)
+df2[, "x"]
+```
+
+`data.frame`格式使用`drop`参数，可以避免降维。
+
+```{r}
+df1[, "x", drop = FALSE]
+```
+
+## dplyr 中的等价操作
+
+在dplyr包中有几个verb等价于`[`的特例：
+
+-   `filter()`：等价于按行使用逻辑向量提取，但对于`NA`的处理不同，**`filter()`不保留`NA`，而`[`保留**。
+
+```{r}
+df <- tibble(
+  x = c(2, 3, 1, 1, NA),
+  y = letters[1:5],
+  z = runif(5)
+)
+df |> filter(x > 1)
+
+# same as
+df[!is.na(df$x) & df$x > 1, ]
+
+df[which(df$x > 1), ]
+```
+
+-   `arrange()`：等价于按行使用正整数向量提取，向量通常由`order()`生成。
+
+```{r}
+df |> arrange(x, y)
+
+# same as
+df[order(df$x, df$y), ]
+```
+
+-   `select()` & `relocate()`：等价于按列使用字符向量提取。
+
+```{r}
+df |> select(x, z)
+
+# same as
+df[, c("x", "z")]
+```
+
+# 使用`[[`和`$`提取单个元素
+
+## Data Frames
+
+`[[`和`$`用来提取数据框中的某列；`[[`可以通过位置或name属性提取，而`$`只能通过name属性提取。
+
+```{r}
+tb <- tibble(
+  x = 1:4,
+  y = c(10, 4, 1, 21)
+)
+
+# by position
+tb[[1]]
+
+# by name
+tb[["x"]]
+tb$x
+```
+
+dplyr包提取了`pull()`函数，它等价于`[[`和`$`。
+
+```{r}
+tb |> pull(x)
+```
+
+## Tibbles
+
+`data.frame`与`tibble`在使用`$`时有着显著的不同；**前者遵循部分匹配原则**，后者使用精确匹配原则。
+
+```{r}
+df <- data.frame(x1 = 1)
+df$x
+df$z
+```
+
+```{r}
+tb <- tibble(x1 = 1)
+
+tb$x1
+tb$z
+```
+
+## dplyr::mutate的等价操作
+
+下面是使用`with()`,`within()`和`transform()`进行等价操作的例子。
+
+```{r}
+
+data(diamonds, package = "ggplot2")
+
+# Most straightforward
+diamonds$ppc <- diamonds$price / diamonds$carat
+
+# Avoid repeating diamonds
+diamonds$ppc <- with(diamonds, price / carat)
+
+# The inspiration for dplyr's mutate
+diamonds <- transform(diamonds, ppc = price / carat)
+diamonds <- diamonds |> transform(ppc = price / carat)
+
+# Similar to transform(), but uses assignment rather argument matching
+# (can also use = here, since = is equivalent to <- outside of a function call)
+diamonds <- within(diamonds, {
+  ppc <- price / carat
+})
+diamonds <- diamonds |> within({
+  ppc <- price / carat
+})
+
+# Protect against partial matching
+diamonds$ppc <- diamonds[["price"]] / diamonds[["carat"]]
+diamonds$ppc <- diamonds[, "price"] / diamonds[, "carat"]
+
+# FORBIDDEN
+attach(diamonds)
+diamonds$ppc <- price / carat
+```
+
+## lists
+
+**`[`，`[[`和`$`都可以提取list中的元素，但`[`保留原list层级，而`[[`和`$`不保留。**
+
+```{r}
+l <- list(
+  a = 1:3,
+  b = "a string",
+  c = pi,
+  d = list(-1, -5)
+)
+
+str(l[1:2])
+
+str(l[1])
+str(l[[1]])
+
+str(l[4])
+str(l[[4]])
+```
+
+两者的差异如下图所示：
+
+![](images/pepper.png)
+
+# Apply 家族
+
+在apply家族中与前章中的`map`类似的函数是`lapply()`系，主要针对的是list；而其他如`apply()`针对`array`或`matrix`，`tapply()`类似`group_by()`+`summarize()`。
+
+`lapply()`系包含`lapply()`、`sapply()`、`vapply()`；`sapply()`函数中的参数`simplify`可以将结果整理为向量或矩阵，当`simplify = FLASE`时与`lapply()`等价；`vapply()`函数与`sapply()`相同但更严格，一定会simplify为向量或矩阵，同时必须通过参数`FUN.VALUE`提供返回值的类型。下面是一些示例：
+
+```{r}
+x <- list(a = 1:10, beta = exp(-3:3), logic = c(TRUE, FALSE, FALSE, TRUE))
+# compute the list mean for each list element
+lapply(x, mean)
+# median and quartiles for each list element
+lapply(x, quantile, probs = 1:3 / 4)
+sapply(x, quantile)
+i39 <- sapply(3:9, seq) # list of vectors
+sapply(i39, fivenum)
+vapply(
+  i39, fivenum,
+  c(Min. = 0, "1st Qu." = 0, Median = 0, "3rd Qu." = 0, Max. = 0)
+)
+```
+
+`apply()`在处理非`array`或`matrix`时，会首先执行`as.array()`或`as.matrix()`。所以`apply(df, 2, something)`这种方法一定要慎用，相较于`lapply(df, something)`，它更缓慢且具有隐藏风险。
+
+`tapply()`函数与`group_by()`+`summarize()`等价，但`tapply()`返回的是向量。
+
+```{r}
+diamonds |>
+  group_by(cut) |>
+  summarize(price = mean(price))
+
+tapply(diamonds$price, diamonds$cut, mean)
+```
+
+# for Loops
+
+for 循环的基本格式如下：
+
+```{r}
+#| eval: false
+
+for (element in vector) {
+  # do something with element
+}
+```
+
+for 循环在R中十分常用，但是我们要避免下面格式的循环，不断地对环境变量进行赋值修改：
+
+```{r}
+#| eval: false
+
+out <- NULL
+for (path in paths) {
+  out <- rbind(out, readxl::read_excel(path))
+}
+```
+
+本文提供了另外一种标准地书写格式：先创建固定长度地list，然后使用`do.call()`函数将list中的元素进行拼接。
+
+```{r}
+#| eval: false
+
+files <- vector("list", length(paths))
+seq_along(paths)
+#>  [1]  1  2  3  4  5  6  7  8  9 10 11 12
+for (i in seq_along(paths)) {
+  files[[i]] <- readxl::read_excel(paths[[i]])
+}
+do.call(rbind, files)
+#> # A tibble: 1,704 × 5
+#>   country     continent lifeExp      pop gdpPercap
+#>   <chr>       <chr>       <dbl>    <dbl>     <dbl>
+#> 1 Afghanistan Asia         28.8  8425333      779.
+#> 2 Albania     Europe       55.2  1282697     1601.
+#> 3 Algeria     Africa       43.1  9279525     2449.
+#> 4 Angola      Africa       30.0  4232095     3521.
+#> 5 Argentina   Americas     62.5 17876956     5911.
+#> 6 Australia   Oceania      69.1  8691212    10040.
+#> # ℹ 1,698 more rows
+```
+
+# Plots
+
+虽然ggplot2是一个强大的绘图工具，但是baseR中的一些函数在数据分析探索阶段使用起来十分便利，例如`plot`和`hist`。
+
+```{r}
+#| layout-ncol: 2
+
+# Left
+hist(diamonds$carat)
+
+# Right
+plot(diamonds$carat, diamonds$price)
+```
