@@ -3,11 +3,12 @@ title: "26 Iteration"
 date: "2025-02-28"
 date-modified: "2025-03-05"
 format: "html"
-fig-width: 4
-fig-height: 4
-fig-align: center
 execute:
   warning: false
+  fig-width: 6
+  fig-asp: 0.618
+  out-width: 70%
+  fig-align: center
 ---
 
 ```{r}

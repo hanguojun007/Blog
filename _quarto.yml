@@ -77,6 +77,12 @@ format:
     theme: cosmo
     css: styles.css
     toc: true
+    toc_float: true
 
 execute:
   freeze: auto
+
+knitr:
+  opts_chunk:
+    comment: "#>"
+    collapse: true

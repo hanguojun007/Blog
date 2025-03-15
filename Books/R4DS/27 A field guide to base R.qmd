@@ -3,11 +3,12 @@ title: "27 A field guide to base R"
 date: "2025-03-08"
 date-modified: "2025-03-11"
 format: "html"
-fig-width: 4
-fig-height: 4
-fig-align: center
 execute:
   warning: false
+  fig-width: 6
+  fig-asp: 0.618
+  out-width: 70%
+  fig-align: center
 ---
 
 ```{r}

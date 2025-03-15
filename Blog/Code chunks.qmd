@@ -1,0 +1,72 @@
+---
+title: "quarto 中R代码块的设置"
+author: "大番薯本薯"
+date: "2025-03-15"
+date-modified: "2025-03-15"
+draft: false
+categories: [quarto]
+execute:
+  warning: false
+  fig-width: 6
+  fig-asp: 0.618
+  out-width: 70%
+  fig-align: center
+---
+
+```{r}
+#| echo: false
+
+source("_common.R")
+```
+
+## label
+
+每个代码块可以设置一个label，用来标记代码块和代码块的结果，可以用于交叉引用。
+
+```{{r}}
+#| label: simple-addition
+
+1 + 1
+```
+
+## execute
+
+可以使用execute选项来控制代码块；下面是对可用参数的总结。
+
+![](images/execute.png)
+
+## knitr
+
+因为quarto除对R代码块支持外，还支持python、Julia，所以除通用设置`execute`，quarto 还有R语言特有的设置——knitr。
+
+``` yaml
+knitr:
+  opts_chunk:
+    comment: "#>"
+    collapse: true
+```
+
+上面的设置可以自动将R代码的运行结果于代码拼接起来，并使用`#>`作为注释，达到下面的效果。
+
+```{r}
+#| eval: false
+
+1 + 1
+#> 2
+```
+
+## 行代码
+
+处理上面使用```` ```{r} ````的代码块，quarto还使用`` `r ``的行代码。
+
+```{r}
+#| echo: false
+
+library(tidyverse)
+
+smaller <- diamonds |>
+  filter(carat <= 2.5)
+
+```
+
+![](images/inline%20code.png)
