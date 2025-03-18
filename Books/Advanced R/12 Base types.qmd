@@ -1,0 +1,19 @@
+---
+title: "12 Base types"
+date: "2025-03-18"
+date-modified: "2025-03-18"
+format: "html"
+execute:
+  warning: false
+  fig-width: 6
+  fig-asp: 0.618
+  out-width: 70%
+  fig-align: center
+---
+
+```{r}
+#| echo: false
+
+source("_common.R")
+```
+

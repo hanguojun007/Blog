@@ -153,6 +153,16 @@
     ]
   },
   {
+    "objectID": "Books/Advanced R/index.html",
+    "href": "Books/Advanced R/index.html",
+    "title": "index",
+    "section": "",
+    "text": "本篇为书籍Advanced R的学习笔记。\n原文见：Advanced R\n本书主要包含两方面：\n\nR 语言底层逻辑\n高级编程技巧\n\n下面是全文概览：\n\n第1章：简介。\n第2-8章：R语言基础概念。\n第9-11章：函数编程。\n第12~16章：面向对象编程。\n第17~21章：元编程。\n第22-25章：高级编程技巧。\n\n本书适合在不同阶段，根本不同需求阅读不同章节。\n\n\n\n Back to top",
+    "crumbs": [
+      "index"
+    ]
+  },
+  {
     "objectID": "Blog/Object in R1.html#成为面对对象的五个条件",
     "href": "Blog/Object in R1.html#成为面对对象的五个条件",
     "title": "R 中的面向对象(1)",
@@ -214,6 +224,16 @@
     "title": "quarto 中R代码块的设置",
     "section": "行代码",
     "text": "行代码\n处理上面使用```{r}的代码块，quarto还使用`r的行代码。"
+  },
+  {
+    "objectID": "Books/Advanced R/12 Base types.html",
+    "href": "Books/Advanced R/12 Base types.html",
+    "title": "12 Base types",
+    "section": "",
+    "text": "Back to top",
+    "crumbs": [
+      "12 Base types"
+    ]
   },
   {
     "objectID": "Books/R4DS/26 Iteration.html",

@@ -6,10 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="大番薯本薯">
-<meta name="dcterms.date" content="2025-03-16">
+<meta name="dcterms.date" content="2025-03-18">
 
-<title>R 中的面向对象(1)</title>
+<title>12 Base types</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -22,58 +21,25 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-/* CSS for syntax highlighting */
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
 </style>
 
 
-<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="../site_libs/clipboard/clipboard.min.js"></script>
-<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="../site_libs/quarto-search/fuse.min.js"></script>
-<script src="../site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="../">
-<script src="../site_libs/quarto-html/quarto.js"></script>
-<script src="../site_libs/quarto-html/popper.min.js"></script>
-<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="../site_libs/quarto-html/anchor.min.js"></script>
-<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-01c78b5cd655e4cd89133cf59d535862.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-357f3a88c8c08e74b7450a91eb5d7532.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../Books/Advanced R/index.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-01c78b5cd655e4cd89133cf59d535862.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-357f3a88c8c08e74b7450a91eb5d7532.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": true,
@@ -102,17 +68,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 }</script>
 
 
-<link rel="stylesheet" href="../styles.css">
+<link rel="stylesheet" href="../../styles.css">
 </head>
 
-<body class="nav-fixed">
+<body class="nav-sidebar floating nav-fixed">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="../index.html">
+    <a class="navbar-brand" href="../../index.html">
     <span class="navbar-title">RSSPtho</span>
     </a>
   </div>
@@ -123,7 +89,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="../index.html"> 
+    <a class="nav-link" href="../../index.html"> 
 <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item dropdown ">
@@ -132,33 +98,33 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-books">    
         <li>
-    <a class="dropdown-item" href="../Books/ggplot2/index.html">
+    <a class="dropdown-item" href="../../Books/ggplot2/index.html">
  <span class="dropdown-text">ggplot2</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="../Books/R4DS/index.html">
+    <a class="dropdown-item" href="../../Books/R4DS/index.html">
  <span class="dropdown-text">R for Data Science</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="../Books/Tidy Modeling with R/index.html">
+    <a class="dropdown-item" href="../../Books/Tidy Modeling with R/index.html">
  <span class="dropdown-text">Tidy Modeling with R</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="../Books/Advanced R/index.html">
+    <a class="dropdown-item" href="../../Books/Advanced R/index.html">
  <span class="dropdown-text">Advanced R</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="../Books/quarto/Project Basics.html">
+    <a class="dropdown-item" href="../../Books/quarto/Project Basics.html">
  <span class="dropdown-text">Quarto</span></a>
   </li>  
     </ul>
   </li>
   <li class="nav-item">
-    <a class="nav-link" href="../blog.html"> 
+    <a class="nav-link" href="../../blog.html"> 
 <span class="menu-text">Blog</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../about.html"> 
+    <a class="nav-link" href="../../about.html"> 
 <span class="menu-text">About me</span></a>
   </li>  
 </ul>
@@ -173,59 +139,72 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           </div> <!-- /navcollapse -->
       </div> <!-- /container-fluid -->
     </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../Books/Advanced R/12 Base types.html">12 Base types</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
 </header>
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">index</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+ <span class="menu-text">Object-oriented Programming</span>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R/12 Base types.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">12 Base types</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">On this page</h2>
-   
-  <ul>
-  <li><a href="#概述" id="toc-概述" class="nav-link active" data-scroll-target="#概述">概述</a></li>
-  <li><a href="#成为面对对象的五个条件" id="toc-成为面对对象的五个条件" class="nav-link" data-scroll-target="#成为面对对象的五个条件">成为面对对象的五个条件</a></li>
-  <li><a href="#为什么使用面向对象" id="toc-为什么使用面向对象" class="nav-link" data-scroll-target="#为什么使用面向对象">为什么使用面向对象：</a></li>
-  <li><a href="#r-中的面向对象" id="toc-r-中的面向对象" class="nav-link" data-scroll-target="#r-中的面向对象">R 中的面向对象</a></li>
-  <li><a href="#sloop-包" id="toc-sloop-包" class="nav-link" data-scroll-target="#sloop-包">sloop 包</a></li>
-  </ul>
-</nav>
+        
     <div class="quarto-margin-footer"><div class="margin-footer-item">
-<p><img src="../logo.jpg" class="conditional-footer img-fluid" width="200"></p>
+<p><img src="../../logo.jpg" class="conditional-footer img-fluid" width="200"></p>
 </div></div></div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">R 中的面向对象(1)</h1>
-  <div class="quarto-categories">
-    <div class="quarto-category">面向对象</div>
-  </div>
-  </div>
+<h1 class="title">12 Base types</h1>
+</div>
 
 
 
 <div class="quarto-title-meta">
 
-    <div>
-    <div class="quarto-title-meta-heading">Author</div>
-    <div class="quarto-title-meta-contents">
-             <p>大番薯本薯 </p>
-          </div>
-  </div>
     
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">March 16, 2025</p>
+      <p class="date">March 18, 2025</p>
     </div>
   </div>
   
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">March 16, 2025</p>
+      <p class="date-modified">March 18, 2025</p>
     </div>
   </div>
     
@@ -236,60 +215,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<section id="概述" class="level2">
-<h2 class="anchored" data-anchor-id="概述">概述</h2>
-</section>
-<section id="成为面对对象的五个条件" class="level2">
-<h2 class="anchored" data-anchor-id="成为面对对象的五个条件">成为面对对象的五个条件</h2>
-<ul>
-<li>类</li>
-<li>对象</li>
-<li>继承</li>
-<li>封装</li>
-<li>多态</li>
-</ul>
-<p>定义一个<strong>类</strong>，这个类有一些属性和方法，方法被<strong>封装</strong>为接口和实现；类可以实例化一个<strong>对象</strong>；类之间具有父子关系，子类可以<strong>继承</strong>父类的属性和方法；不同类的方法名是重复的，可以根据类选择对应的实现，这称之为<strong>多态</strong>。</p>
-</section>
-<section id="为什么使用面向对象" class="level2">
-<h2 class="anchored" data-anchor-id="为什么使用面向对象">为什么使用面向对象：</h2>
-<ul>
-<li>封装提供了标准的使用接口，能够降低系统的耦合度。</li>
-<li>继承允许子类继承父类的特性，提高了代码的重用性。</li>
-<li>多态允许相同函数对于不同的类有不同的行为，提高了代码的灵活性。</li>
-</ul>
-<p>想象一下，当你想更新一个函数的使用方法，但是又得保持和以前的兼容性，你只需要再创建一个子类，然后重新实现父类的方法，就可以了。</p>
-</section>
-<section id="r-中的面向对象" class="level2">
-<h2 class="anchored" data-anchor-id="r-中的面向对象">R 中的面向对象</h2>
-<p>R 语言中存在多种面向对象的编程，包括封装类的如RC，R6；泛函类的如S3，S4等。</p>
-<ul>
-<li>基于S3的面向对象编程基于泛型函数（generic function），不基于类层级结构,没有类的继承。</li>
-<li>基于S4的面向对象编程，相对S3健全，实现了类的继承，但是是在函数封装过程中同S3一样，基于泛型函数。</li>
-<li>基于RC（也称S5）的面向对象编程则更加完善，符合上面的要求。</li>
-<li>基于<code>R6</code>包的面向对象编程，同样符合上面的要求。</li>
-<li>基于<code>proto</code>包的面向对象编程在<code>ggplot2</code>包中使用。</li>
-<li>基于<code>R.oo</code>包的面向对象编程类似S3。</li>
-</ul>
-</section>
-<section id="sloop-包" class="level2">
-<h2 class="anchored" data-anchor-id="sloop-包">sloop 包</h2>
-<p>包中的函数<code>sloop::otype()</code>可以用来检查对象的面向对象编程类型。</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sloop)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">otype</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "base"</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">otype</span>(mtcars)</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "S3"</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>mle_obj <span class="ot">&lt;-</span> stats4<span class="sc">::</span><span class="fu">mle</span>(<span class="cf">function</span>(<span class="at">x =</span> <span class="dv">1</span>) (x <span class="sc">-</span> <span class="dv">2</span>)<span class="sc">^</span><span class="dv">2</span>)</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">otype</span>(mle_obj)</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "S4"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
 
 
-</section>
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -711,6 +638,15 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <script src="https://utteranc.es/client.js" repo="hanguojun007/Blog" issue-term="pathname" theme="github-light" crossorigin="anonymous" async="">
 </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../Books/Advanced R/index.html" class="pagination-link" aria-label="index">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">index</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+  </div>
+</nav>
 </div> <!-- /content -->
 
 

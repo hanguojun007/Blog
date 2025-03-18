@@ -1,0 +1,8 @@
+website:
+  sidebar:
+    - id: AdR
+      title: Advanced R
+      contents:
+        - Books/Advanced R/index.qmd
+        - Object-oriented Programming
+        - Books/Advanced R/12 Base types.qmd

@@ -1,0 +1,40 @@
+---
+title: "index"
+date: "2025-03-17"
+date-modified: "2025-03-17"
+format: "html"
+execute:
+  warning: false
+  fig-width: 6
+  fig-asp: 0.618
+  out-width: 70%
+  fig-align: center
+---
+
+```{r}
+#| echo: false
+
+source("_common.R")
+```
+
+
+本篇为书籍`Advanced R`的学习笔记。
+
+原文见：[Advanced R](https://adv-r.hadley.nz/index.html)
+
+本书主要包含两方面：
+
+-   R 语言底层逻辑
+
+-   高级编程技巧
+
+下面是全文概览：
+
+-   第1章：简介。
+-   第2-8章：R语言基础概念。
+-   第9-11章：函数编程。
+-   第12~16章：面向对象编程。
+-   第17~21章：元编程。
+-   第22-25章：高级编程技巧。
+
+本书适合在不同阶段，根本不同需求阅读不同章节。
