@@ -56,6 +56,7 @@ website:
         menu:
           - sidebar:ggplot2
           - sidebar:R4DS
+          - sidebar:TiMoR
           - sidebar:quarto
       - text: Blog
         href: blog.qmd
@@ -71,6 +72,7 @@ metadata-files:
   - Books/ggplot2/_metadata.yml
   - Books/R4DS/_metadata.yml
   - Books/quarto/_metadata.yml
+  - Books/Tidy Modeling with R/_metadata.yml
 
 format:
   html:

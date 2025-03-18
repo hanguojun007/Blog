@@ -7,9 +7,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="大番薯本薯">
-<meta name="dcterms.date" content="2025-03-15">
+<meta name="dcterms.date" content="2025-03-16">
 
-<title>quarto 中R代码块的设置</title>
+<title>R 中的面向对象(1)</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -179,10 +179,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#label" id="toc-label" class="nav-link active" data-scroll-target="#label">label</a></li>
-  <li><a href="#execute" id="toc-execute" class="nav-link" data-scroll-target="#execute">execute</a></li>
-  <li><a href="#knitr" id="toc-knitr" class="nav-link" data-scroll-target="#knitr">knitr</a></li>
-  <li><a href="#行代码" id="toc-行代码" class="nav-link" data-scroll-target="#行代码">行代码</a></li>
+  <li><a href="#概述" id="toc-概述" class="nav-link active" data-scroll-target="#概述">概述</a></li>
+  <li><a href="#成为面对对象的五个条件" id="toc-成为面对对象的五个条件" class="nav-link" data-scroll-target="#成为面对对象的五个条件">成为面对对象的五个条件</a></li>
+  <li><a href="#为什么使用面向对象" id="toc-为什么使用面向对象" class="nav-link" data-scroll-target="#为什么使用面向对象">为什么使用面向对象：</a></li>
+  <li><a href="#r-中的面向对象" id="toc-r-中的面向对象" class="nav-link" data-scroll-target="#r-中的面向对象">R 中的面向对象</a></li>
+  <li><a href="#sloop-包" id="toc-sloop-包" class="nav-link" data-scroll-target="#sloop-包">sloop 包</a></li>
   </ul>
 </nav>
     <div class="quarto-margin-footer"><div class="margin-footer-item">
@@ -193,9 +194,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">quarto 中R代码块的设置</h1>
+<h1 class="title">R 中的面向对象(1)</h1>
   <div class="quarto-categories">
-    <div class="quarto-category">quarto</div>
+    <div class="quarto-category">面向对象</div>
   </div>
   </div>
 
@@ -213,14 +214,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">March 15, 2025</p>
+      <p class="date">March 16, 2025</p>
     </div>
   </div>
   
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">March 15, 2025</p>
+      <p class="date-modified">March 16, 2025</p>
     </div>
   </div>
     
@@ -231,37 +232,57 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<section id="label" class="level2">
-<h2 class="anchored" data-anchor-id="label">label</h2>
-<p>每个代码块可以设置一个label，用来标记代码块和代码块的结果，可以用于交叉引用。</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="in">#| label: simple-addition</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="in">1 + 1</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="概述" class="level2">
+<h2 class="anchored" data-anchor-id="概述">概述</h2>
 </section>
-<section id="execute" class="level2">
-<h2 class="anchored" data-anchor-id="execute">execute</h2>
-<p>可以使用execute选项来控制代码块；下面是对可用参数的总结。</p>
-<p><img src="images/execute.png" class="img-fluid"></p>
+<section id="成为面对对象的五个条件" class="level2">
+<h2 class="anchored" data-anchor-id="成为面对对象的五个条件">成为面对对象的五个条件</h2>
+<ul>
+<li>类</li>
+<li>对象</li>
+<li>继承</li>
+<li>封装</li>
+<li>多态</li>
+</ul>
+<p>定义一个<strong>类</strong>，这个类有一些属性和方法，方法被<strong>封装</strong>为接口和实现；类可以实例化一个<strong>对象</strong>；类之间具有父子关系，子类可以<strong>继承</strong>父类的属性和方法；不同类的方法名是重复的，可以根据类选择对应的实现，这称之为<strong>多态</strong>。</p>
 </section>
-<section id="knitr" class="level2">
-<h2 class="anchored" data-anchor-id="knitr">knitr</h2>
-<p>因为quarto除对R代码块支持外，还支持python、Julia，所以除通用设置<code>execute</code>，quarto 还有R语言特有的设置——knitr。</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">knitr</span><span class="kw">:</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">opts_chunk</span><span class="kw">:</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">comment</span><span class="kw">:</span><span class="at"> </span><span class="st">"#&gt;"</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">collapse</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p>上面的设置可以自动将R代码的运行结果于代码拼接起来，并使用<code>#&gt;</code>作为注释，达到下面的效果。</p>
+<section id="为什么使用面向对象" class="level2">
+<h2 class="anchored" data-anchor-id="为什么使用面向对象">为什么使用面向对象：</h2>
+<ul>
+<li>封装提供了标准的使用接口，能够降低系统的耦合度。</li>
+<li>继承允许子类继承父类的特性，提高了代码的重用性。</li>
+<li>多态允许相同函数对于不同的类有不同的行为，提高了代码的灵活性。</li>
+</ul>
+<p>想象一下，当你想更新一个函数的使用方法，但是又得保持和以前的兼容性，你只需要再创建一个子类，然后重新实现父类的方法，就可以了。</p>
+</section>
+<section id="r-中的面向对象" class="level2">
+<h2 class="anchored" data-anchor-id="r-中的面向对象">R 中的面向对象</h2>
+<p>R 语言中存在多种面向对象的编程，包括封装类的如RC，R6；泛函类的如S3，S4等。</p>
+<ul>
+<li>基于S3的面向对象编程基于泛型函数（generic function），不基于类层级结构,没有类的继承。</li>
+<li>基于S4的面向对象编程，相对S3健全，实现了类的继承，但是是在函数封装过程中同S3一样，基于泛型函数。</li>
+<li>基于RC（也称S5）的面向对象编程则更加完善，符合上面的要求。</li>
+<li>基于<code>R6</code>包的面向对象编程，同样符合上面的要求。</li>
+<li>基于<code>proto</code>包的面向对象编程在<code>ggplot2</code>包中使用。</li>
+<li>基于<code>R.oo</code>包的面向对象编程类似S3。</li>
+</ul>
+</section>
+<section id="sloop-包" class="level2">
+<h2 class="anchored" data-anchor-id="sloop-包">sloop 包</h2>
+<p>包中的函数<code>sloop::otype()</code>可以用来检查对象的面向对象编程类型。</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span> <span class="sc">+</span> <span class="dv">1</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sloop)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">otype</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "base"</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">otype</span>(mtcars)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "S3"</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>mle_obj <span class="ot">&lt;-</span> stats4<span class="sc">::</span><span class="fu">mle</span>(<span class="cf">function</span>(<span class="at">x =</span> <span class="dv">1</span>) (x <span class="sc">-</span> <span class="dv">2</span>)<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">otype</span>(mle_obj)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "S4"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</section>
-<section id="行代码" class="level2">
-<h2 class="anchored" data-anchor-id="行代码">行代码</h2>
-<p>处理上面使用<code>```{r}</code>的代码块，quarto还使用<code>`r</code>的行代码。</p>
-<p><img src="images/inline code.png" class="img-fluid"></p>
 
 
 </section>

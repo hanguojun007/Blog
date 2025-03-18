@@ -1,0 +1,42 @@
+---
+title: "1 Software for modeling"
+date: "2025-03-17"
+date-modified: "2025-03-17"
+format: "html"
+execute:
+  warning: false
+  fig-width: 6
+  fig-asp: 0.618
+  out-width: 70%
+  fig-align: center
+---
+
+```{r}
+#| echo: false
+
+source("_common.R")
+```
+
+模型是能一种能描述系统之间的关系的数学工具，它能够还原或简化关系。
+
+## 建模软件的基础
+
+-   用户友好，轻松产生实践。
+-   科学的方法论，发现隐藏的错误。
+
+## 模型类型
+
+### 描述模型
+
+### 推理模型
+
+假设检验法
+
+### 预测模型
+
+动力学模型
+
+经验驱动模型
+
+## 模型类型间的联系
+

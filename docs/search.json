@@ -45,6 +45,34 @@
     ]
   },
   {
+    "objectID": "Books/Tidy Modeling with R/1 Software for modeling.html",
+    "href": "Books/Tidy Modeling with R/1 Software for modeling.html",
+    "title": "1 Software for modeling",
+    "section": "",
+    "text": "模型是能一种能描述系统之间的关系的数学工具，它能够还原或简化关系。"
+  },
+  {
+    "objectID": "Books/Tidy Modeling with R/1 Software for modeling.html#建模软件的基础",
+    "href": "Books/Tidy Modeling with R/1 Software for modeling.html#建模软件的基础",
+    "title": "1 Software for modeling",
+    "section": "建模软件的基础",
+    "text": "建模软件的基础\n\n用户友好，轻松产生实践。\n科学的方法论，发现隐藏的错误。"
+  },
+  {
+    "objectID": "Books/Tidy Modeling with R/1 Software for modeling.html#模型类型",
+    "href": "Books/Tidy Modeling with R/1 Software for modeling.html#模型类型",
+    "title": "1 Software for modeling",
+    "section": "模型类型",
+    "text": "模型类型\n\n描述模型\n\n\n推理模型\n假设检验法\n\n\n预测模型\n动力学模型\n经验驱动模型"
+  },
+  {
+    "objectID": "Books/Tidy Modeling with R/1 Software for modeling.html#模型类型间的联系",
+    "href": "Books/Tidy Modeling with R/1 Software for modeling.html#模型类型间的联系",
+    "title": "1 Software for modeling",
+    "section": "模型类型间的联系",
+    "text": "模型类型间的联系"
+  },
+  {
     "objectID": "Books/R4DS/27 A field guide to base R.html",
     "href": "Books/R4DS/27 A field guide to base R.html",
     "title": "27 A field guide to base R",
@@ -123,6 +151,34 @@
     "crumbs": [
       "27 A field guide to base R"
     ]
+  },
+  {
+    "objectID": "Blog/Object in R1.html#成为面对对象的五个条件",
+    "href": "Blog/Object in R1.html#成为面对对象的五个条件",
+    "title": "R 中的面向对象(1)",
+    "section": "成为面对对象的五个条件",
+    "text": "成为面对对象的五个条件\n\n类\n对象\n继承\n封装\n多态\n\n定义一个类，这个类有一些属性和方法，方法被封装为接口和实现；类可以实例化一个对象；类之间具有父子关系，子类可以继承父类的属性和方法；不同类的方法名是重复的，可以根据类选择对应的实现，这称之为多态。"
+  },
+  {
+    "objectID": "Blog/Object in R1.html#为什么使用面向对象",
+    "href": "Blog/Object in R1.html#为什么使用面向对象",
+    "title": "R 中的面向对象(1)",
+    "section": "为什么使用面向对象：",
+    "text": "为什么使用面向对象：\n\n封装提供了标准的使用接口，能够降低系统的耦合度。\n继承允许子类继承父类的特性，提高了代码的重用性。\n多态允许相同函数对于不同的类有不同的行为，提高了代码的灵活性。\n\n想象一下，当你想更新一个函数的使用方法，但是又得保持和以前的兼容性，你只需要再创建一个子类，然后重新实现父类的方法，就可以了。"
+  },
+  {
+    "objectID": "Blog/Object in R1.html#r-中的面向对象",
+    "href": "Blog/Object in R1.html#r-中的面向对象",
+    "title": "R 中的面向对象(1)",
+    "section": "R 中的面向对象",
+    "text": "R 中的面向对象\nR 语言中存在多种面向对象的编程，包括封装类的如RC，R6；泛函类的如S3，S4等。\n\n基于S3的面向对象编程基于泛型函数（generic function），不基于类层级结构,没有类的继承。\n基于S4的面向对象编程，相对S3健全，实现了类的继承，但是是在函数封装过程中同S3一样，基于泛型函数。\n基于RC（也称S5）的面向对象编程则更加完善，符合上面的要求。\n基于R6包的面向对象编程，同样符合上面的要求。\n基于proto包的面向对象编程在ggplot2包中使用。\n基于R.oo包的面向对象编程类似S3。"
+  },
+  {
+    "objectID": "Blog/Object in R1.html#sloop-包",
+    "href": "Blog/Object in R1.html#sloop-包",
+    "title": "R 中的面向对象(1)",
+    "section": "sloop 包",
+    "text": "sloop 包\n包中的函数sloop::otype()可以用来检查对象的面向对象编程类型。\n\nlibrary(sloop)\n\notype(1:10)\n#&gt; [1] \"base\"\n\notype(mtcars)\n#&gt; [1] \"S3\"\n\nmle_obj &lt;- stats4::mle(function(x = 1) (x - 2)^2)\notype(mle_obj)\n#&gt; [1] \"S4\""
   },
   {
     "objectID": "Blog/Code chunks.html",
@@ -260,6 +316,16 @@
     ]
   },
   {
+    "objectID": "Books/Tidy Modeling with R/index.html",
+    "href": "Books/Tidy Modeling with R/index.html",
+    "title": "index",
+    "section": "",
+    "text": "本篇为书籍Tidy Modeling with R的学习笔记。\n原文见：Tidy Modeling with R\ntidymodels R包官方网站：https://www.tidymodels.org\n本书主要包含两方面：\n\n如何使用tidymodels包进行机器学习建模\n统计建模中的实践经验\n\n下面是全文概览：\n\n第1章：概述模型的分类，强调什么是好的建模软件。\n第2章：回顾 tidyverse 语法。\n第3章：base R中的统计建模总览及其不足。\n第4~9章：tidymodel系列包的介绍：recipes，parsnip，workflows，yardstick等。\n第10~15章：模型性能评估与调参。\n第16~21章：如何理解和解构模型。\n\n\n\n\n Back to top",
+    "crumbs": [
+      "index"
+    ]
+  },
+  {
     "objectID": "Books/quarto/Project Basics.html",
     "href": "Books/quarto/Project Basics.html",
     "title": "Project Basics",
@@ -294,6 +360,6 @@
     "href": "blog.html",
     "title": "",
     "section": "",
-    "text": "Order By\n       Default\n         \n          Title\n        \n         \n          Date - Oldest\n        \n         \n          Date - Newest\n        \n     \n  \n    \n      \n      \n    \n\n\n\n\n\n\n\n\n\n\nquarto 中R代码块的设置\n\n\n\n\n\n\nquarto\n\n\n\n\n\n\n\n\n\n2025-03-15\n\n\n大番薯本薯\n\n\n\n\n\n\nNo matching items\n\n Back to top"
+    "text": "Order By\n       Default\n         \n          Title\n        \n         \n          Date - Oldest\n        \n         \n          Date - Newest\n        \n     \n  \n    \n      \n      \n    \n\n\n\n\n\n\n\n\n\n\nquarto 中R代码块的设置\n\n\n\n\n\n\nquarto\n\n\n\n\n\n\n\n\n\n2025-03-15\n\n\n大番薯本薯\n\n\n\n\n\n\n\n\n\n\n\n\nR 中的面向对象(1)\n\n\n\n\n\n\n面向对象\n\n\n\n\n\n\n\n\n\n2025-03-16\n\n\n大番薯本薯\n\n\n\n\n\n\nNo matching items\n\n Back to top"
   }
 ]

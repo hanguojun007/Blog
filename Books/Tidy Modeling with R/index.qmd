@@ -1,0 +1,42 @@
+---
+title: "index"
+date: "2025-03-17"
+date-modified: "2025-03-17"
+format: "html"
+execute:
+  warning: false
+  fig-width: 6
+  fig-asp: 0.618
+  out-width: 70%
+  fig-align: center
+---
+
+```{r}
+#| echo: false
+
+source("_common.R")
+```
+
+
+本篇为书籍`Tidy Modeling with R`的学习笔记。
+
+原文见：[Tidy Modeling with R](https://www.tmwr.org)
+
+tidymodels R包官方网站：[https://www.tidymodels.org](https://www.tidymodels.org)
+
+本书主要包含两方面：
+
+-   如何使用tidymodels包进行机器学习建模
+
+-   统计建模中的实践经验
+
+下面是全文概览：
+
+-   第1章：概述模型的分类，强调什么是好的建模软件。
+-   第2章：回顾 tidyverse 语法。
+-   第3章：base R中的统计建模总览及其不足。
+-   第4~9章：tidymodel系列包的介绍：recipes，parsnip，workflows，yardstick等。
+-   第10~15章：模型性能评估与调参。
+-   第16~21章：如何理解和解构模型。
+
+
