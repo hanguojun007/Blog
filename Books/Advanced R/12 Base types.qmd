@@ -17,3 +17,144 @@ execute:
 source("_common.R")
 ```
 
+# Introduction
+
+在R中，流传着这么一句话——R里的一切都是对象。但此`对象`非彼`对象`，前者指得是来自于S语言的`base object`，同我们研究的面向对象(OO object)不是一回事。
+
+下面我们介绍如何区分`base object`和`OO object`及所有`base object`的类别。
+
+## Base VS OO objects
+
+区分二者的三种方法：
+
+-   `is.object()`：base object返回`FALSE`，OO object返回`TRUE`。
+-   `sloop::otype()`：base object返回`base`，OO object返回其他，如`S3`。
+-   `attr()`：base object返回`NULL`，OO object返回`class`属性。
+
+```{r}
+is.object(1:10)
+is.object(mtcars)
+
+sloop::otype(1:10)
+sloop::otype(mtcars)
+
+attr(1:10, "class")
+attr(mtcars, "class")
+```
+
+## Base types
+
+无论是`OO object`还是`base object`，都有一个**base type**，使用`typeof()`来查看；不要使用`mode()`或`storage.mode()`，它们只适配S语言。
+
+```{r}
+typeof(1:10)
+
+typeof(mtcars)
+
+typeof(mean)
+```
+
+R 的底层使用了C语言中的`switch`语句来对不同base type执行不同处理。想要新增一个base type需要修改R-core，所以通常不会随意增加base type。截至目前一共有25种base type，下面按照本书中出现的顺序列举。
+
+### Vector
+
+| base Type   | C Type    |
+|-------------|-----------|
+| `NULL`      | `NILSXP`  |
+| `logical`   | `LGLSXP`  |
+| `integer`   | `INTSXP`  |
+| `double`    | `REALSXP` |
+| `complex`   | `CPLXSXP` |
+| `character` | `STRSXP`  |
+| `list`      | `VECSXP`  |
+| `raw`       | `RAWSXP`  |
+
+```{r}
+typeof(NULL)
+typeof(1L)
+typeof(1i)
+```
+
+### Functions
+
+| base Type | C Type       | function type       |
+|-----------|--------------|---------------------|
+| `closure` | `CLOSXP`     | regular R functions |
+| `special` | `SPECIALSXP` | internal functions  |
+| `builtin` | `BUILTINSXP` | primitive functions |
+
+```{r}
+typeof(mean)
+typeof(`[`)
+typeof(sum)
+```
+
+### Environments
+
+| base Type   | C Type |
+|-------------|--------|
+| environment | ENVSXP |
+
+```{r}
+typeof(globalenv())
+```
+
+### S4
+
+| base Type | C Type  |
+|-----------|---------|
+| `S4`      | `S4SXP` |
+
+```{r}
+mle_obj <- stats4::mle(function(x = 1) (x - 2)^2)
+typeof(mle_obj)
+```
+
+### Language components
+
+| base Type    | C Type    |
+|--------------|-----------|
+| `symbol`     | `SYMSXP`  |
+| `language`   | `LANGSXP` |
+| `pairlist`   | `LISTSXP` |
+| `expression` | `EXPRSXP` |
+
+```{r}
+typeof(quote(a))
+typeof(quote(a + 1))
+typeof(formals(mean))
+typeof(expression(1 + 0:9))
+```
+
+### Others
+
+| base Type     | C Type       |
+|---------------|--------------|
+| `externalptr` | `EXTPTRSXP`  |
+| `weakref`     | `WEAKREFSXP` |
+| `bytecode`    | `BCODESXP`   |
+| `promise`     | `PROMSXP`    |
+| `...`         | `DOTSXP`     |
+| `any`         | `ANYSXP`     |
+
+### Numeric type
+
+"numeric"在R中存在三种解读：
+
+-   某些地方，`numeric`是`double`的别名。例如`as.numeric()`和`as.double()`等价，`numeric()`和`double()`等价。
+
+-   在S3和S4系统中，"numeric"用作"integer type"或"double type"的缩写：
+
+    ```{r}
+    sloop::s3_class(1)
+    sloop::s3_class(1L)
+    ```
+
+-   `is.numeric()`用来检测那些行为类似number的对象。例如，因子的本质是"integer type"，但是没有number的行为（求取一个因子的均值毫无意义）。
+
+    ```{r}
+    typeof(factor("x"))
+    is.numeric(factor("x"))
+    ```
+
+本书中的`numeric`表示`integer`或`double`。

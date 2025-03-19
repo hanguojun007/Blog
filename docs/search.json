@@ -230,7 +230,7 @@
     "href": "Books/Advanced R/12 Base types.html",
     "title": "12 Base types",
     "section": "",
-    "text": "Back to top",
+    "text": "在R中，流传着这么一句话——R里的一切都是对象。但此对象非彼对象，前者指得是来自于S语言的base object，同我们研究的面向对象(OO object)不是一回事。\n下面我们介绍如何区分base object和OO object及所有base object的类别。\n\n\n区分二者的三种方法：\n\nis.object()：base object返回FALSE，OO object返回TRUE。\nsloop::otype()：base object返回base，OO object返回其他，如S3。\nattr()：base object返回NULL，OO object返回class属性。\n\n\nis.object(1:10)\n#&gt; [1] FALSE\nis.object(mtcars)\n#&gt; [1] TRUE\n\nsloop::otype(1:10)\n#&gt; [1] \"base\"\nsloop::otype(mtcars)\n#&gt; [1] \"S3\"\n\nattr(1:10, \"class\")\n#&gt; NULL\nattr(mtcars, \"class\")\n#&gt; [1] \"data.frame\"\n\n\n\n\n无论是OO object还是base object，都有一个base type，使用typeof()来查看；不要使用mode()或storage.mode()，它们只适配S语言。\n\ntypeof(1:10)\n#&gt; [1] \"integer\"\n\ntypeof(mtcars)\n#&gt; [1] \"list\"\n\ntypeof(mean)\n#&gt; [1] \"closure\"\n\nR 的底层使用了C语言中的switch语句来对不同base type执行不同处理。想要新增一个base type需要修改R-core，所以通常不会随意增加base type。截至目前一共有25种base type，下面按照本书中出现的顺序列举。\n\n\n\n\n\nbase Type\nC Type\n\n\n\n\nNULL\nNILSXP\n\n\nlogical\nLGLSXP\n\n\ninteger\nINTSXP\n\n\ndouble\nREALSXP\n\n\ncomplex\nCPLXSXP\n\n\ncharacter\nSTRSXP\n\n\nlist\nVECSXP\n\n\nraw\nRAWSXP\n\n\n\n\ntypeof(NULL)\n#&gt; [1] \"NULL\"\ntypeof(1L)\n#&gt; [1] \"integer\"\ntypeof(1i)\n#&gt; [1] \"complex\"\n\n\n\n\n\n\n\nbase Type\nC Type\nfunction type\n\n\n\n\nclosure\nCLOSXP\nregular R functions\n\n\nspecial\nSPECIALSXP\ninternal functions\n\n\nbuiltin\nBUILTINSXP\nprimitive functions\n\n\n\n\ntypeof(mean)\n#&gt; [1] \"closure\"\ntypeof(`[`)\n#&gt; [1] \"special\"\ntypeof(sum)\n#&gt; [1] \"builtin\"\n\n\n\n\n\n\n\nbase Type\nC Type\n\n\n\n\nenvironment\nENVSXP\n\n\n\n\ntypeof(globalenv())\n#&gt; [1] \"environment\"\n\n\n\n\n\n\n\nbase Type\nC Type\n\n\n\n\nS4\nS4SXP\n\n\n\n\nmle_obj &lt;- stats4::mle(function(x = 1) (x - 2)^2)\ntypeof(mle_obj)\n#&gt; [1] \"S4\"\n\n\n\n\n\n\n\nbase Type\nC Type\n\n\n\n\nsymbol\nSYMSXP\n\n\nlanguage\nLANGSXP\n\n\npairlist\nLISTSXP\n\n\nexpression\nEXPRSXP\n\n\n\n\ntypeof(quote(a))\n#&gt; [1] \"symbol\"\ntypeof(quote(a + 1))\n#&gt; [1] \"language\"\ntypeof(formals(mean))\n#&gt; [1] \"pairlist\"\ntypeof(expression(1 + 0:9))\n#&gt; [1] \"expression\"\n\n\n\n\n\n\n\nbase Type\nC Type\n\n\n\n\nexternalptr\nEXTPTRSXP\n\n\nweakref\nWEAKREFSXP\n\n\nbytecode\nBCODESXP\n\n\npromise\nPROMSXP\n\n\n...\nDOTSXP\n\n\nany\nANYSXP\n\n\n\n\n\n\n“numeric”在R中存在三种解读：\n\n某些地方，numeric是double的别名。例如as.numeric()和as.double()等价，numeric()和double()等价。\n在S3和S4系统中，“numeric”用作”integer type”或”double type”的缩写：\n\nsloop::s3_class(1)\n#&gt; [1] \"double\"  \"numeric\"\nsloop::s3_class(1L)\n#&gt; [1] \"integer\" \"numeric\"\n\nis.numeric()用来检测那些行为类似number的对象。例如，因子的本质是”integer type”，但是没有number的行为（求取一个因子的均值毫无意义）。\n\ntypeof(factor(\"x\"))\n#&gt; [1] \"integer\"\nis.numeric(factor(\"x\"))\n#&gt; [1] FALSE\n\n\n本书中的numeric表示integer或double。",
     "crumbs": [
       "12 Base types"
     ]
@@ -381,5 +381,25 @@
     "title": "",
     "section": "",
     "text": "Order By\n       Default\n         \n          Title\n        \n         \n          Date - Oldest\n        \n         \n          Date - Newest\n        \n     \n  \n    \n      \n      \n    \n\n\n\n\n\n\n\n\n\n\nquarto 中R代码块的设置\n\n\n\n\n\n\nquarto\n\n\n\n\n\n\n\n\n\n2025-03-15\n\n\n大番薯本薯\n\n\n\n\n\n\n\n\n\n\n\n\nR 中的面向对象(1)\n\n\n\n\n\n\n面向对象\n\n\n\n\n\n\n\n\n\n2025-03-16\n\n\n大番薯本薯\n\n\n\n\n\n\nNo matching items\n\n Back to top"
+  },
+  {
+    "objectID": "Books/Advanced R/12 Base types.html#base-vs-oo-objects",
+    "href": "Books/Advanced R/12 Base types.html#base-vs-oo-objects",
+    "title": "12 Base types",
+    "section": "",
+    "text": "区分二者的三种方法：\n\nis.object()：base object返回FALSE，OO object返回TRUE。\nsloop::otype()：base object返回base，OO object返回其他，如S3。\nattr()：base object返回NULL，OO object返回class属性。\n\n\nis.object(1:10)\n#&gt; [1] FALSE\nis.object(mtcars)\n#&gt; [1] TRUE\n\nsloop::otype(1:10)\n#&gt; [1] \"base\"\nsloop::otype(mtcars)\n#&gt; [1] \"S3\"\n\nattr(1:10, \"class\")\n#&gt; NULL\nattr(mtcars, \"class\")\n#&gt; [1] \"data.frame\"",
+    "crumbs": [
+      "12 Base types"
+    ]
+  },
+  {
+    "objectID": "Books/Advanced R/12 Base types.html#base-types",
+    "href": "Books/Advanced R/12 Base types.html#base-types",
+    "title": "12 Base types",
+    "section": "",
+    "text": "无论是OO object还是base object，都有一个base type，使用typeof()来查看；不要使用mode()或storage.mode()，它们只适配S语言。\n\ntypeof(1:10)\n#&gt; [1] \"integer\"\n\ntypeof(mtcars)\n#&gt; [1] \"list\"\n\ntypeof(mean)\n#&gt; [1] \"closure\"\n\nR 的底层使用了C语言中的switch语句来对不同base type执行不同处理。想要新增一个base type需要修改R-core，所以通常不会随意增加base type。截至目前一共有25种base type，下面按照本书中出现的顺序列举。\n\n\n\n\n\nbase Type\nC Type\n\n\n\n\nNULL\nNILSXP\n\n\nlogical\nLGLSXP\n\n\ninteger\nINTSXP\n\n\ndouble\nREALSXP\n\n\ncomplex\nCPLXSXP\n\n\ncharacter\nSTRSXP\n\n\nlist\nVECSXP\n\n\nraw\nRAWSXP\n\n\n\n\ntypeof(NULL)\n#&gt; [1] \"NULL\"\ntypeof(1L)\n#&gt; [1] \"integer\"\ntypeof(1i)\n#&gt; [1] \"complex\"\n\n\n\n\n\n\n\nbase Type\nC Type\nfunction type\n\n\n\n\nclosure\nCLOSXP\nregular R functions\n\n\nspecial\nSPECIALSXP\ninternal functions\n\n\nbuiltin\nBUILTINSXP\nprimitive functions\n\n\n\n\ntypeof(mean)\n#&gt; [1] \"closure\"\ntypeof(`[`)\n#&gt; [1] \"special\"\ntypeof(sum)\n#&gt; [1] \"builtin\"\n\n\n\n\n\n\n\nbase Type\nC Type\n\n\n\n\nenvironment\nENVSXP\n\n\n\n\ntypeof(globalenv())\n#&gt; [1] \"environment\"\n\n\n\n\n\n\n\nbase Type\nC Type\n\n\n\n\nS4\nS4SXP\n\n\n\n\nmle_obj &lt;- stats4::mle(function(x = 1) (x - 2)^2)\ntypeof(mle_obj)\n#&gt; [1] \"S4\"\n\n\n\n\n\n\n\nbase Type\nC Type\n\n\n\n\nsymbol\nSYMSXP\n\n\nlanguage\nLANGSXP\n\n\npairlist\nLISTSXP\n\n\nexpression\nEXPRSXP\n\n\n\n\ntypeof(quote(a))\n#&gt; [1] \"symbol\"\ntypeof(quote(a + 1))\n#&gt; [1] \"language\"\ntypeof(formals(mean))\n#&gt; [1] \"pairlist\"\ntypeof(expression(1 + 0:9))\n#&gt; [1] \"expression\"\n\n\n\n\n\n\n\nbase Type\nC Type\n\n\n\n\nexternalptr\nEXTPTRSXP\n\n\nweakref\nWEAKREFSXP\n\n\nbytecode\nBCODESXP\n\n\npromise\nPROMSXP\n\n\n...\nDOTSXP\n\n\nany\nANYSXP\n\n\n\n\n\n\n“numeric”在R中存在三种解读：\n\n某些地方，numeric是double的别名。例如as.numeric()和as.double()等价，numeric()和double()等价。\n在S3和S4系统中，“numeric”用作”integer type”或”double type”的缩写：\n\nsloop::s3_class(1)\n#&gt; [1] \"double\"  \"numeric\"\nsloop::s3_class(1L)\n#&gt; [1] \"integer\" \"numeric\"\n\nis.numeric()用来检测那些行为类似number的对象。例如，因子的本质是”integer type”，但是没有number的行为（求取一个因子的均值毫无意义）。\n\ntypeof(factor(\"x\"))\n#&gt; [1] \"integer\"\nis.numeric(factor(\"x\"))\n#&gt; [1] FALSE\n\n\n本书中的numeric表示integer或double。",
+    "crumbs": [
+      "12 Base types"
+    ]
   }
 ]
