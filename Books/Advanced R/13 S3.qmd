@@ -1,0 +1,314 @@
+---
+title: "13 S3"
+date: "2025-03-20"
+date-modified: "2025-03-20"
+format: "html"
+execute:
+  warning: false
+  fig-width: 6
+  fig-asp: 0.618
+  out-width: 70%
+  fig-align: center
+---
+
+```{r}
+#| echo: false
+
+source("_common.R")
+```
+
+## Introduction
+
+R base 和`stats`包只使用了S3面向对象。S3面向对象不像其他语言中那么严格，R编程人员有很大的自由，这是危险的；为了能更好的使用S3对象，本章会介绍使用S3面向对象时约定的惯例。
+
+```{r}
+library(sloop)
+```
+
+
+## Basics
+
+### S3 对象
+
+一个S3对象是一个至少有1个`class`属性的base type。例如factor，它的base type是`integer`，除此之外还有`class`属性和`levels`属性。
+
+```{r}
+f <- factor(c("a", "b", "c"))
+
+typeof(f)
+attributes(f)
+```
+
+使用`unclass()`可以去除S3对象的`class`属性，暴露出其底层的base type，同时失去对象的特有行为。
+
+```{r}
+unclass(f)
+```
+
+### 泛型函数
+
+同一个泛型函数对不同S3对象根据对象的`class`属性，具有不同的实现结果。
+
+```{r}
+print(f)
+
+# stripping class reverts to integer behaviour
+print(unclass(f))
+```
+
+识别泛型函数的一种简单方法是使用`sloop::ftype()`，如果结果中有"generic"字样，就是泛型函数。上面的`print()`也是泛型3函数。
+
+```{r}
+ftype(print)
+ftype(str)
+ftype(unclass)
+```
+
+诚如前面所讲，泛型函数作为S3系统实现面向对象的工具，它具有封装的特性，会隐藏对象中的细节。例如常用的`str()`泛型函数，虽然用来查看对象的结构，但你所看到的是对象想让你看到的，没有展示对象内部详细的细节。`POSIXlt`类用来表示时间，使用`str()`只能看到年月日，但其底层是一个`list`。
+
+```{r}
+time <- strptime(c("2017-01-01", "2020-05-04 03:21"), "%Y-%m-%d")
+str(time)
+
+str(unclass(time))
+```
+
+泛型函数就像一个中间人：它定义接口 (即参数) ，然后为不同类找到正确的实现。特定类的实现称为方法（method），泛型通过执行方法分派（method dispatch）来找到该方法。
+
+可以使用`sloop::s3_dispatch()`函数查看方法分派的过程。如下面所示，找到了当前print的多个实现`print.factor`和`print.default`，最终选择了`print.factor`。
+
+```{r}
+s3_dispatch(print(f))
+```
+
+从结果中可以看到，泛型函数的命名规则是`generic.class()`。通常你无需使用`generic.class()`形式的函数，只需使用`generic()`，它会根据输入对象的`class`属性自动识别。因为某些函数的定义早于S3系统，所以类型`<>.<>`的函数不都是泛函，可以使用`sloop::ftype()`进行识别。
+
+```{r}
+ftype(t.test)
+ftype(t.data.frame)
+```
+
+S3 系统的泛函通常无法看到源码，但是可以使用`sloop::s3_get_method()`查看。
+
+```{r}
+#| error: true
+weighted.mean.Date
+
+s3_get_method(weighted.mean.Date)
+```
+
+## Classes
+
+S3 面向对象类的正式定义和实例化，只能使用`structure()`或`calss<-()`函数通过设置`class`属性的方法。
+
+```{r}
+# Create and assign class in one step
+x <- structure(list(), class = "my_class")
+
+# Create, then set class
+x <- list()
+class(x) <- "my_class"
+```
+
+使用`class()`查看一个对象的类型，使用`inherits(x, "classname")`来判断一个对象是否属于某类。
+
+```{r}
+class(x)
+inherits(x, "my_class")
+inherits(x, "your_class")
+```
+
+classname 可以是任意字符串，但是推荐使用字姆和`_`，杜绝使用`.`。在package中使用class时，推荐加上包名。
+
+S3 面向对象没有类正确性检查，意味着可以随意更改一个对象的类：
+
+```{r}
+# Create a linear model
+mod <- lm(log(mpg) ~ log(disp), data = mtcars)
+class(mod)
+print(mod)
+
+# Turn it into a date (?!)
+class(mod) <- "Date"
+
+# Unsurprisingly this doesn't work very well
+print(mod)
+```
+
+为了避免上述问题发生，推荐创建三个函数：
+
+-   低级构造函数(Constructor)，`new_myclass()`：高效地创建结构正确的类。
+-   验证函数(validator)，`validate_myclass()`：验证类的合法性。
+-   帮助函数(helper)，`myclass()`：用户友好的创建类。
+
+### Constructors
+
+S3 面向对象创建类的随意性，无法保证类的结构统一，构造函数可以很好地避免。构造函数应当遵循下面三条原则：
+
+-   函数命名为`new_myclass()`样式。
+-   一个参数服务于构成类的base type；每个属性一个参数。
+-   检查base type和每个参数的类型是否符合要求。
+
+下面是一个具有units属性，class属性为`difftime`的类构造函数：
+
+```{r}
+new_difftime <- function(x = double(), units = "secs") {
+  stopifnot(is.double(x))
+  units <- match.arg(units, c("secs", "mins", "hours", "days", "weeks"))
+
+  structure(x,
+    class = "difftime",
+    units = units
+  )
+}
+
+new_difftime(c(1, 10, 3600), "secs")
+
+new_difftime(52, "weeks")
+```
+
+### Validators
+
+越复杂的类越需要细致地检查。如下例factor类，虽然有对输入类型检查，但仍然创建了错误的类。
+
+```{r}
+new_factor <- function(x = integer(), levels = character()) {
+  stopifnot(is.integer(x))
+  stopifnot(is.character(levels))
+
+  structure(
+    x,
+    levels = levels,
+    class = "factor"
+  )
+}
+
+new_factor(1:5, "a")
+new_factor(0:1, "a")
+```
+
+想比于构造函数中对base type和参数类型的检查，对类输入的其他检查应该分离为单独的函数。这样当你知道输入是正确时，可以以更低的成本创建类，并且检查方法可以用在其他地方。
+
+```{r}
+validate_factor <- function(x) {
+  values <- unclass(x)
+  levels <- attr(x, "levels")
+
+  if (!all(!is.na(values) & values > 0)) {
+    stop(
+      "All `x` values must be non-missing and greater than zero",
+      call. = FALSE
+    )
+  }
+
+  if (length(levels) < max(values)) {
+    stop(
+      "There must be at least as many `levels` as possible values in `x`",
+      call. = FALSE
+    )
+  }
+
+  x
+}
+
+validate_factor(new_factor(1:5, "a"))
+validate_factor(new_factor(0:1, "a"))
+```
+
+### Helpers
+
+提供一个方便使用者创建类的函数，遵循以下原则：
+
+-   函数名和类名相同，`myclass()`。
+-   如果存在constructor和validator，函数要使用它们。
+-   为终端用户创建精心设计的错误消息。。
+-   有一个精心设计的用户界面，精心选择的默认值和有用的转换
+
+下面是三个常见的示例：
+
+#### 输入参数类型强制转换
+
+例如上面的`new_difftime()`对输入十分严格，当输入是integer时报错。
+
+```{r}
+#| error: true
+new_difftime(1:10)
+```
+
+可以在helper函数中添加类型强制转换：
+
+```{r}
+difftime <- function(x = double(), units = "secs") {
+  x <- as.double(x)
+  new_difftime(x, units = units)
+}
+
+difftime(1:10)
+```
+
+#### 提供有用的默认值
+
+在生成factor时，提供默认的levels。
+
+```{r}
+factor <- function(x = character(), levels = unique(x)) {
+  ind <- match(x, levels)
+  validate_factor(new_factor(ind, levels))
+}
+
+factor(c("a", "a", "b"))
+```
+
+#### 使用简单成分组成用户界面
+
+下面是一个构建`POSIXct`类的函数，函数的输入都是简单的整数。
+
+```{r}
+POSIXct <- function(year = integer(),
+                    month = integer(),
+                    day = integer(),
+                    hour = 0L,
+                    minute = 0L,
+                    sec = 0,
+                    tzone = "") {
+  ISOdatetime(year, month, day, hour, minute, sec, tz = tzone)
+}
+
+POSIXct(2020, 1, 1, tzone = "America/New_York")
+```
+
+## Generics and methods
+
+如上所述，S3系统的泛函会执行方法分派，该过程由`UseMethod()`函数实现。该函数有两个参数：
+
+-   generic：字符串类型的泛函名称。
+-   object：要分派的对象。
+
+
+```{r}
+x <- structure(1:10, class = "test")
+t(x)
+t
+t.test
+```
+
+## 函数总结
+
+```{r}
+x <- table(rpois(100, 5))
+x
+
+
+typeof(x) # 查看base type
+attributes(x) # 查看属性
+s3_class(x) # 查看S3 class
+class() # 查看class
+inherits(x, "classname") # 判断是否属于classname
+sloop::s3_methods_class("table") # 查看类可以用的泛函
+sloop::s3_methods_generic("print") # 查看与泛函相关的类
+
+UseMethod()
+.class2(x)
+methods("print")
+```
+
