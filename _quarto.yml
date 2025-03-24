@@ -4,6 +4,7 @@ project:
   render:
     - "*.qmd"
     - "!log.qmd"
+    - "!Books/Advanced R/13 S3.qmd"
 
 language:
   search-text-placeholder: Search

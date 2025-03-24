@@ -123,6 +123,7 @@ classname 可以是任意字符串，但是推荐使用字姆和`_`，杜绝使�
 S3 面向对象没有类正确性检查，意味着可以随意更改一个对象的类：
 
 ```{r}
+#| error: true
 # Create a linear model
 mod <- lm(log(mpg) ~ log(disp), data = mtcars)
 class(mod)
@@ -172,6 +173,7 @@ new_difftime(52, "weeks")
 越复杂的类越需要细致地检查。如下例factor类，虽然有对输入类型检查，但仍然创建了错误的类。
 
 ```{r}
+#| error: true
 new_factor <- function(x = integer(), levels = character()) {
   stopifnot(is.integer(x))
   stopifnot(is.character(levels))
@@ -291,6 +293,22 @@ t(x)
 t
 t.test
 ```
+
+
+```{r}
+generic2 <- function(x) UseMethod("generic2")
+generic2.a1 <- function(x) "a1"
+# generic2.a2 <- function(x) "a2"
+generic2.b <- function(x) {
+  class(x) <- "a1"
+  NextMethod()
+}
+
+generic2(structure(list(), class = c("b", "a2")))
+
+```
+
+
 
 ## 函数总结
 

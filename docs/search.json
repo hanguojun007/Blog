@@ -157,7 +157,7 @@
     "href": "Books/Advanced R/index.html",
     "title": "index",
     "section": "",
-    "text": "本篇为书籍Advanced R的学习笔记。\n原文见：Advanced R\n本书主要包含两方面：\n\nR 语言底层逻辑\n高级编程技巧\n\n下面是全文概览：\n\n第1章：简介。\n第2-8章：R语言基础概念。\n第9-11章：函数编程。\n第12~16章：面向对象编程。\n第17~21章：元编程。\n第22-25章：高级编程技巧。\n\n本书适合在不同阶段，根本不同需求阅读不同章节。\n\n\n\n Back to top",
+    "text": "本篇为书籍Advanced R的学习笔记。\n原文见：Advanced R\n本书主要包含两方面：\n\nR 语言底层逻辑\n高级编程技巧\n\n下面是全文概览：\n\n第1章：简介。\n第2-8章：R语言基础概念。\n第9-11章：函数编程。\n第12~16章：面向对象编程。\n第17~21章：元编程。\n第22-25章：高级编程技巧。\n\n本书适合在不同阶段，根本不同需求阅读不同章节。\n本书中的练习题解决方案：Advanced R Solutions\n\n\n\n Back to top",
     "crumbs": [
       "index"
     ]
@@ -400,6 +400,116 @@
     "text": "无论是OO object还是base object，都有一个base type，使用typeof()来查看；不要使用mode()或storage.mode()，它们只适配S语言。\n\ntypeof(1:10)\n#&gt; [1] \"integer\"\n\ntypeof(mtcars)\n#&gt; [1] \"list\"\n\ntypeof(mean)\n#&gt; [1] \"closure\"\n\nR 的底层使用了C语言中的switch语句来对不同base type执行不同处理。想要新增一个base type需要修改R-core，所以通常不会随意增加base type。截至目前一共有25种base type，下面按照本书中出现的顺序列举。\n\n\n\n\n\nbase Type\nC Type\n\n\n\n\nNULL\nNILSXP\n\n\nlogical\nLGLSXP\n\n\ninteger\nINTSXP\n\n\ndouble\nREALSXP\n\n\ncomplex\nCPLXSXP\n\n\ncharacter\nSTRSXP\n\n\nlist\nVECSXP\n\n\nraw\nRAWSXP\n\n\n\n\ntypeof(NULL)\n#&gt; [1] \"NULL\"\ntypeof(1L)\n#&gt; [1] \"integer\"\ntypeof(1i)\n#&gt; [1] \"complex\"\n\n\n\n\n\n\n\nbase Type\nC Type\nfunction type\n\n\n\n\nclosure\nCLOSXP\nregular R functions\n\n\nspecial\nSPECIALSXP\ninternal functions\n\n\nbuiltin\nBUILTINSXP\nprimitive functions\n\n\n\n\ntypeof(mean)\n#&gt; [1] \"closure\"\ntypeof(`[`)\n#&gt; [1] \"special\"\ntypeof(sum)\n#&gt; [1] \"builtin\"\n\n\n\n\n\n\n\nbase Type\nC Type\n\n\n\n\nenvironment\nENVSXP\n\n\n\n\ntypeof(globalenv())\n#&gt; [1] \"environment\"\n\n\n\n\n\n\n\nbase Type\nC Type\n\n\n\n\nS4\nS4SXP\n\n\n\n\nmle_obj &lt;- stats4::mle(function(x = 1) (x - 2)^2)\ntypeof(mle_obj)\n#&gt; [1] \"S4\"\n\n\n\n\n\n\n\nbase Type\nC Type\n\n\n\n\nsymbol\nSYMSXP\n\n\nlanguage\nLANGSXP\n\n\npairlist\nLISTSXP\n\n\nexpression\nEXPRSXP\n\n\n\n\ntypeof(quote(a))\n#&gt; [1] \"symbol\"\ntypeof(quote(a + 1))\n#&gt; [1] \"language\"\ntypeof(formals(mean))\n#&gt; [1] \"pairlist\"\ntypeof(expression(1 + 0:9))\n#&gt; [1] \"expression\"\n\n\n\n\n\n\n\nbase Type\nC Type\n\n\n\n\nexternalptr\nEXTPTRSXP\n\n\nweakref\nWEAKREFSXP\n\n\nbytecode\nBCODESXP\n\n\npromise\nPROMSXP\n\n\n...\nDOTSXP\n\n\nany\nANYSXP\n\n\n\n\n\n\n“numeric”在R中存在三种解读：\n\n某些地方，numeric是double的别名。例如as.numeric()和as.double()等价，numeric()和double()等价。\n在S3和S4系统中，“numeric”用作”integer type”或”double type”的缩写：\n\nsloop::s3_class(1)\n#&gt; [1] \"double\"  \"numeric\"\nsloop::s3_class(1L)\n#&gt; [1] \"integer\" \"numeric\"\n\nis.numeric()用来检测那些行为类似number的对象。例如，因子的本质是”integer type”，但是没有number的行为（求取一个因子的均值毫无意义）。\n\ntypeof(factor(\"x\"))\n#&gt; [1] \"integer\"\nis.numeric(factor(\"x\"))\n#&gt; [1] FALSE\n\n\n本书中的numeric表示integer或double。",
     "crumbs": [
       "12 Base types"
+    ]
+  },
+  {
+    "objectID": "Books/Advanced R/1 Introduction.html",
+    "href": "Books/Advanced R/1 Introduction.html",
+    "title": "1 Introduction",
+    "section": "",
+    "text": "一千个人有一千个哈姆雷特。对于我而言，我因为生物信息了解R，因为tidyverse的编程哲学喜欢上了R。但R不是一个很严谨的语言，需要不断学习尝试，遵循一定惯例。",
+    "crumbs": [
+      "1 Introduction"
+    ]
+  },
+  {
+    "objectID": "Books/Advanced R/1 Introduction.html#why-r",
+    "href": "Books/Advanced R/1 Introduction.html#why-r",
+    "title": "1 Introduction",
+    "section": "",
+    "text": "一千个人有一千个哈姆雷特。对于我而言，我因为生物信息了解R，因为tidyverse的编程哲学喜欢上了R。但R不是一个很严谨的语言，需要不断学习尝试，遵循一定惯例。",
+    "crumbs": [
+      "1 Introduction"
+    ]
+  },
+  {
+    "objectID": "Books/Advanced R/1 Introduction.html#who-should-read-this-book",
+    "href": "Books/Advanced R/1 Introduction.html#who-should-read-this-book",
+    "title": "1 Introduction",
+    "section": "Who should read this book",
+    "text": "Who should read this book\n本书适合两类人：\n\n中级 R 程序员，他们希望更深入地研究 R 语言，理解语言的工作原理，并学习解决各种问题的新策略。\n来自其他语言的程序员，他们正在学习 R，并且想要理解为什么 R 是这样工作的。\n\n为了阅读这本书之前，你需要用 R 或其他编程语言编写大量的代码，熟悉数据分析的基础知识 (即数据导入、操作和可视化) ，熟悉 CRAN 包的安装和使用。",
+    "crumbs": [
+      "1 Introduction"
+    ]
+  },
+  {
+    "objectID": "Books/Advanced R/1 Introduction.html#what-you-will-get-out-of-this-book",
+    "href": "Books/Advanced R/1 Introduction.html#what-you-will-get-out-of-this-book",
+    "title": "1 Introduction",
+    "section": "What you will get out of this book",
+    "text": "What you will get out of this book\n阅读本书，你可以：\n\n熟悉 R 的基础知识。你将了解复杂数据类型以及对它们执行操作的最佳方法，对函数如何工作有深入的了解，知道什么是环境，以及如何使用条件系统。\n理解函数式编程的含义，以及为什么它是数据科学的有用工具。你将能够快速学习如何使用现有的工具，并且具备在需要时创建自己的功能性工具的知识。\n了解 R 的各种面向对象系统。你将最熟悉 S3，并且知道 S4 和 R6，以及在需要时在哪里查找更多信息。\n欣赏元编程的双刃剑。你将能够创建使用整洁计算、保存类型和创建优雅代码来表示重要操作的函数，也会明白什么是危险，什么时候应该避免。\n有一个良好的直觉，在 R 中的操作是缓慢的或使用大量的内存。你将知道如何使用分析来查明性能瓶颈，并且知道足够多的 C++ 来将慢速 R 函数转换为快速 C++ 等价物。",
+    "crumbs": [
+      "1 Introduction"
+    ]
+  },
+  {
+    "objectID": "Books/Advanced R/1 Introduction.html#what-you-will-not-learn",
+    "href": "Books/Advanced R/1 Introduction.html#what-you-will-not-learn",
+    "title": "1 Introduction",
+    "section": "What you will not learn",
+    "text": "What you will not learn\n本书不涉及：\n\n如何进行数据分析，数据分析推荐R for Data Science。\n如何生成R包，构建R包推荐R packages。",
+    "crumbs": [
+      "1 Introduction"
+    ]
+  },
+  {
+    "objectID": "Books/Advanced R/1 Introduction.html#meta-techniques",
+    "href": "Books/Advanced R/1 Introduction.html#meta-techniques",
+    "title": "1 Introduction",
+    "section": "Meta-techniques",
+    "text": "Meta-techniques\n提升编程能力的两个途径：\n\n阅读源代码。\n采用科学思维",
+    "crumbs": [
+      "1 Introduction"
+    ]
+  },
+  {
+    "objectID": "Books/Advanced R/1 Introduction.html#recommended-reading",
+    "href": "Books/Advanced R/1 Introduction.html#recommended-reading",
+    "title": "1 Introduction",
+    "section": "Recommended reading",
+    "text": "Recommended reading\n\nThe Structure and Interpretation of Computer Programs：提升R面向对象的理解。\nConcepts, Techniques and Models of Computer Programming：理解R与其他语言的差异。\nThe Pragmatic Programmer",
+    "crumbs": [
+      "1 Introduction"
+    ]
+  },
+  {
+    "objectID": "Books/Advanced R/1 Introduction.html#getting-help",
+    "href": "Books/Advanced R/1 Introduction.html#getting-help",
+    "title": "1 Introduction",
+    "section": "Getting help",
+    "text": "Getting help\n在遇到困难寻求帮助时，下面是一些问答网站：\n\nRstudio Community\nStackOverflow\nR-help mailing list\n\n在寻求帮助前，你要：\n\n确定你的R版本和R包版本，及环境。\n给出一个复现问题的最小示例（reprex）。",
+    "crumbs": [
+      "1 Introduction"
+    ]
+  },
+  {
+    "objectID": "Books/Advanced R/1 Introduction.html#acknowledgments",
+    "href": "Books/Advanced R/1 Introduction.html#acknowledgments",
+    "title": "1 Introduction",
+    "section": "Acknowledgments",
+    "text": "Acknowledgments\n…",
+    "crumbs": [
+      "1 Introduction"
+    ]
+  },
+  {
+    "objectID": "Books/Advanced R/1 Introduction.html#conventions",
+    "href": "Books/Advanced R/1 Introduction.html#conventions",
+    "title": "1 Introduction",
+    "section": "Conventions",
+    "text": "Conventions\n对本书中的一些符号进行说明：\n\nf() 表示函数\ng 表示变量和函数参数\nh/ 表示路径\n#&gt; 表示终端运行结果\nset.seed(1014) 每章固定随机数种子",
+    "crumbs": [
+      "1 Introduction"
+    ]
+  },
+  {
+    "objectID": "Books/Advanced R/1 Introduction.html#colophon",
+    "href": "Books/Advanced R/1 Introduction.html#colophon",
+    "title": "1 Introduction",
+    "section": "Colophon",
+    "text": "Colophon\n书中的R 和 R包版本会实时更新，请阅读原文了解详细信息。",
+    "crumbs": [
+      "1 Introduction"
     ]
   }
 ]

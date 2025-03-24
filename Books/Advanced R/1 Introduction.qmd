@@ -1,0 +1,99 @@
+---
+title: "1 Introduction"
+date: "2025-03-23"
+date-modified: "2025-03-23"
+format: "html"
+execute:
+  warning: false
+  fig-width: 6
+  fig-asp: 0.618
+  out-width: 70%
+  fig-align: center
+---
+
+```{r}
+#| echo: false
+
+source("_common.R")
+```
+
+## Why R?
+
+一千个人有一千个哈姆雷特。对于我而言，我因为生物信息了解R，因为tidyverse的编程哲学喜欢上了R。但R不是一个很严谨的语言，需要不断学习尝试，遵循一定惯例。
+
+## Who should read this book
+
+本书适合两类人：
+
+-   中级 R 程序员，他们希望更深入地研究 R 语言，理解语言的工作原理，并学习解决各种问题的新策略。
+-   来自其他语言的程序员，他们正在学习 R，并且想要理解为什么 R 是这样工作的。
+
+为了阅读这本书之前，你需要用 R 或其他编程语言编写大量的代码，熟悉数据分析的基础知识 (即数据导入、操作和可视化) ，熟悉 CRAN 包的安装和使用。
+
+## What you will get out of this book
+
+阅读本书，你可以：
+
+-   熟悉 R 的基础知识。你将了解复杂数据类型以及对它们执行操作的最佳方法，对函数如何工作有深入的了解，知道什么是环境，以及如何使用条件系统。
+
+-   理解函数式编程的含义，以及为什么它是数据科学的有用工具。你将能够快速学习如何使用现有的工具，并且具备在需要时创建自己的功能性工具的知识。
+
+-   了解 R 的各种面向对象系统。你将最熟悉 S3，并且知道 S4 和 R6，以及在需要时在哪里查找更多信息。
+
+-   欣赏元编程的双刃剑。你将能够创建使用整洁计算、保存类型和创建优雅代码来表示重要操作的函数，也会明白什么是危险，什么时候应该避免。
+
+-   有一个良好的直觉，在 R 中的操作是缓慢的或使用大量的内存。你将知道如何使用分析来查明性能瓶颈，并且知道足够多的 C++ 来将慢速 R 函数转换为快速 C++ 等价物。
+
+## What you will not learn
+
+本书不涉及：
+
+-   如何进行数据分析，数据分析推荐[R for Data Science](https://r4ds.hadley.nz/)。
+-   如何生成R包，构建R包推荐[R packages](http://r-pkgs.had.co.nz/)。
+
+## Meta-techniques
+
+提升编程能力的两个途径：
+
+-   阅读源代码。
+-   采用科学思维
+
+## Recommended reading
+
+-   [The Structure and Interpretation of Computer Programs](https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/6515/sicp.zip/full-text/book/book-Z-H-4.html)：提升R面向对象的理解。
+
+-   [Concepts, Techniques and Models of Computer Programming](https://webperso.info.ucl.ac.be/~pvr/VanRoyHaridi2003-book.pdf)：理解R与其他语言的差异。
+
+-   The Pragmatic Programmer
+
+## Getting help
+
+在遇到困难寻求帮助时，下面是一些问答网站：
+
+-   [Rstudio Community](https://community.rstudio.com/)
+-   [StackOverflow](http://stackoverflow.com/)
+-   [R-help mailing list](https://stat.ethz.ch/mailman/listinfo/r-help)
+
+在寻求帮助前，你要：
+
+-   确定你的R版本和R包版本，及环境。
+
+-   给出一个复现问题的最小示例（reprex）。
+
+## Acknowledgments
+
+...
+
+## Conventions
+
+对本书中的一些符号进行说明：
+
+-   `f()` 表示函数
+-   `g` 表示变量和函数参数
+-   `h/` 表示路径
+-   `#>` 表示终端运行结果
+-   `set.seed(1014)` 每章固定随机数种子
+
+## Colophon
+
+书中的R 和 R包版本会实时更新，请阅读[原文](https://adv-r.hadley.nz/introduction.html#conventions)了解详细信息。

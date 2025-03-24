@@ -38,3 +38,5 @@ source("_common.R")
 -   第22-25章：高级编程技巧。
 
 本书适合在不同阶段，根本不同需求阅读不同章节。
+
+本书中的练习题解决方案：[Advanced R Solutions](9https://advanced-r-solutions.rbind.io/)
