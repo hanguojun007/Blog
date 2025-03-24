@@ -5,7 +5,8 @@ website:
       contents:
         - Books/Advanced R/index.qmd
         - Books/Advanced R/1 Introduction.qmd
-        - Foundations Introduction
+        - Foundations
+        - Books/Advanced R/Foundations Introduction.qmd
         - Object-oriented Programming
         - Books/Advanced R/12 Base types.qmd
         # - Books/Advanced R/13 S3.qmd

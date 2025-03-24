@@ -511,5 +511,22 @@
     "crumbs": [
       "1 Introduction"
     ]
+  },
+  {
+    "objectID": "Books/Advanced R/Introduction.html",
+    "href": "Books/Advanced R/Introduction.html",
+    "title": "",
+    "section": "",
+    "text": "Back to top"
+  },
+  {
+    "objectID": "Books/Advanced R/Foundations Introduction.html",
+    "href": "Books/Advanced R/Foundations Introduction.html",
+    "title": "Introduction",
+    "section": "",
+    "text": "第二章：object和它的name之间的区别。认识到它们的区别，你会在复制对象时更加的小心，因为这涉及内存的消耗，你会明白哪些操作是廉价的，哪些是昂贵的。\n第三章：vector的类型和属性(attributes)。\n第四章：子集操作。\n第五章：控制流，if,for,switch(),while等语句。\n第六章：函数function构建细节，运行机制，退出机制；lazy 语式。\n第七章：R环境的数据结构。\n第八章：控制如何输出错误，警告，信息等。\n\n\n\n\n Back to top",
+    "crumbs": [
+      "Introduction"
+    ]
   }
 ]

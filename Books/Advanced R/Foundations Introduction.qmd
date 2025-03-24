@@ -1,0 +1,33 @@
+---
+title: "Introduction"
+date: "2025-03-24"
+date-modified: "2025-03-24"
+format: "html"
+execute:
+  warning: false
+  fig-width: 6
+  fig-asp: 0.618
+  out-width: 70%
+  fig-align: center
+---
+
+```{r}
+#| echo: false
+
+source("_common.R")
+```
+
+-   第二章：`object`和它的`name`之间的区别。认识到它们的区别，你会在复制对象时更加的小心，因为这涉及内存的消耗，你会明白哪些操作是廉价的，哪些是昂贵的。
+
+-   第三章：`vector`的类型和属性(attributes)。
+
+-   第四章：子集操作。
+
+-   第五章：控制流，`if`,`for`,`switch()`,`while`等语句。
+
+-   第六章：函数`function`构建细节，运行机制，退出机制；lazy 语式。
+
+-   第七章：R环境的数据结构。
+
+-   第八章：控制如何输出错误，警告，信息等。
+
