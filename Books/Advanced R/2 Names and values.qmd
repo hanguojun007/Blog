@@ -1,0 +1,225 @@
+---
+title: "2 Names and values"
+date: "2025-03-24"
+date-modified: "2025-03-24"
+format: "html"
+execute:
+  warning: false
+  fig-width: 6
+  fig-asp: 0.618
+  out-width: 70%
+  fig-align: center
+---
+
+```{r}
+#| echo: false
+
+source("_common.R")
+```
+
+## Introduction
+
+厘清`object`和其`name`的区别十分重要，这可以帮助你：
+
+-   更加精准地判断你的代码对内存的消耗。
+-   写出运行更快的代码。
+-   更好理解R的函数式编程。
+
+### Quiz
+
+思考下面问题，检测你是否可以跳过本章节，答案见 @sec-quiz_answer
+
+1.  给定下面的数据框，如何创建名为`3`的新列，内容为前两列之和。
+
+    ```{r}
+    df <- data.frame(runif(3), runif(3))
+    names(df) <- c(1, 2)
+    ```
+
+2.  下面的代码中`y`会占用多少内存？
+
+    ```{r}
+    x <- runif(1e6)
+    y <- list(x, x, x)
+    ```
+
+3.  下面的代码中，哪一行会使得`a`进行了复制。
+
+    ```{r}
+    a <- c(1, 5, 3, 2)
+    b <- a
+    b[[1]] <- 10
+    ```
+
+### Outline
+
+-   `object` and its `name`, `<-`.
+-   when R makes a copy, `tracemem()`.
+-   how much memroy an object occupies, `lobstr::obj_size()`.
+-   two important exceptions to copy-on-modify.
+-   frees up the memory, `gc()`.
+
+### Prerequisites
+
+```{r}
+library(lobstr)
+```
+
+### Sources
+
+本章节的很多内容来自于下面3处：
+
+-   R documentation: `?Memory`, `?gc`.
+-   memory profiling in [Writing R extensions](https://cran.r-project.org/doc/manuals/R-exts.html).
+-   SEXPs in [R internals](https://cran.r-project.org/doc/manuals/R-ints.html)
+
+## Binding basics
+
+考虑下面的代码：
+
+```{r}
+x <- c(1, 2, 3)
+y <- x
+```
+
+我们创建了一个名为`x`，值为`1,2,3`的向量，然后复制了一份讲其命名为`y`。那么，R在内存中是否也复制了一份，也即消耗了2倍的内存呢？事实上，此时消耗的内存并不是两倍，实际情况如下图所示。
+
+![](images/binding-2.png)
+
+解释一下：
+
+-   `c(1,2,3)`创建了对象向量，并占用内存，地址为`0x74b`。
+-   `<-` 为对象绑定一个名字，即`x`。
+-   `y <- x`虽然将`x`复制了一份，但是`x`和`y`的值相同，都是对象`c(1,2,3)`，所以内存地址是不变。
+
+也即是说：内存和`<-`后面的对象有关系，后面的不变，内存地址不变，内存消耗几乎不变；`<-`前面的只是对象的名字，因为实际的内存地址会发生变动，需要绑定一个标签来识别。
+
+查看对象的地址可以使用`lobstr::obj_addr()`，当你运行时，结果肯定不同，因为内存地址会发生变动。
+
+```{r}
+obj_addr(x)
+obj_addr(y)
+```
+
+请注意：上述说的“`x`和`y`的值相同”，与“创建值相同的两个对象”不同。
+
+```{r}
+a <- c(1, 2, 3)
+b <- c(1, 2, 3)
+obj_addr(a)
+obj_addr(b)
+```
+
+### Non-syntactic names
+
+R 中对变量名的要求：必须由字母、数字、`.`、`_`构成，但`_`、数字、`.`+数字不能位于开头；不能使用关键字，查看关键字`?Reserved`；使用`` ` `` 可以将任意字符包裹起来当作变量名；不建议使用`'`或`"`将变量名包裹。
+
+```{r}
+#| error: true
+_abc <- 1
+
+if <- 10
+
+`_abc` <- 1
+`_abc`
+
+`if` <- 10
+`if`
+```
+
+### Exercises
+
+-   下面所指的`mean`函数内存地址都相同。
+```{r}
+obj_addr(mean)
+obj_addr(base::mean)
+obj_addr(get("mean"))
+obj_addr(evalq(mean))
+obj_addr(match.fun("mean"))
+```
+
+-   `utils::read.csv()`添加参数`check.names = FALSE`可以抑制列名的强制转换。
+
+-   `make.names()`在将非法名转换为合法名时，会遵循下面的规则：
+    -   必要时添加前缀`X`。
+    -   非法字符转换为`.`。
+    -   缺失值转换为`NA`。
+    -   R中的关键字后添加`.`。
+
+## Copy-on-modify
+
+诚如上述，当对象相同时，没有发生内存的消耗；但是如果对`y`进行了值得修改，那么内存会发生变动，如下所示。
+
+```{r}
+y[[3]] <- 4
+x
+y
+obj_addr(x)
+obj_addr(y)
+```
+
+`x`绑定得原对象值未改变，R 创建新的对象，重新与`y`进行绑定。
+
+![](images/binding-3.png)
+
+如果你修改多次对象，R 会创建多个新的对象，然后重新绑定，但是旧的对象不会消失，仍然存在于内存中，如下所示。
+
+```{r}
+y[[3]] <- 5
+obj_addr(y)
+```
+
+::: {.callout-note}
+请注意：在Rstudio中进行上述内存地址检查时，会有所不同。
+:::
+
+### `tracemem()`
+
+`tracemem()`可以跟踪对象，在对象发生变动时显示变动情况，如下所示。
+
+```{r}
+cat(tracemem(x), "\n")
+
+y <- x
+y[[3]] <- 4L
+y[[3]] <- 5L
+```
+
+使用`untracemem()`可以停止跟踪，如下所示。
+
+```{r}
+untracemem(y)
+y[[3]] <- 6L
+```
+
+### Function calls
+
+函数生成对象时遵循相同的规则，如下所示。
+
+```{r}
+f <- function(a) {
+  a
+}
+
+cat(tracemem(x), "\n")
+
+z <- f(x)
+# there's no copy here!
+
+untracemem(x)
+```
+
+![](images/binding-f1.png)
+
+解释一下：
+
+-   黄色部分表示函数，有参数`a`。
+-   灰色部分表示执行环境，返回函数运行后的结果`a`。
+-   因为返回结果和`x`一致，没有改变对象，所以仍然绑定相同的对象。
+-   当函数返回结果与`x`不一致时，会创建新的对象，重新绑定。
+
+### Lists
+
+
+
+## Quiz answers {#sec-quiz_answer}
