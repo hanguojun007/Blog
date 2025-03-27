@@ -270,21 +270,90 @@ ref(d1, d2, d3)
 
 ### Character vectors
 
-
-
+对于字符串类型的向量，R 使用全局字符串池来储存字符串。
 
 ```{r}
 x <- c("a", "a", "abc", "d")
-
-x <- c(1, 2, 3)
-
-
-obj_addr(x)
-
-ref(x)
-
+y <- c("a", "d")
+z <- list("a", "a", "abc", "d")
 ref(x, character = TRUE)
+ref(y, character = TRUE)
+ref(z, character = TRUE)
 ```
 
+![](images/character-2.png)
+
+### Exercises
+
+-   `1:10`在内存中创建了对象，但是没有绑定，R无法对没有name的对象进行操作。
+
+-   `x`最先是`integer`类型，`x[[3]] <- 4` 使用了`double`类型的数据替换，会导致R先复制一份`double`类型的向量，然后再替换数据。数据类型见下一章。
+
+## Object size
+
+使用`lobstr::obj_size()`可以查看对象的大小。
+
+```{r}
+obj_size(letters)
+obj_size(ggplot2::diamonds)
+```
+
+list对象，因为有上述的浅复制机制，实际大小会与想象的不同。
+
+```{r}
+x <- runif(1e6)
+obj_size(x)
+
+y <- list(x, x, x)
+obj_size(y)
+```
+
+上述对象中，`y`比`x`要略大一些，大约`80b`，因为包含了三份空元素的list大小是`80b`。
+
+```{r}
+obj_size(list(NULL, NULL, NULL))
+```
+
+字符串向量也有相同的现象。
+
+```{r}
+banana <- "bananas bananas bananas"
+obj_size(banana)
+obj_size(rep(banana, 100))
+```
+
+### Exercises
+...
+
+## Modify-in-place
+
+
+```{r}
+x <- data.frame(matrix(runif(5 * 1e4), ncol = 5))
+medians <- vapply(x, median, numeric(1))
+
+for (i in seq_along(medians)) {
+  x[[i]] <- x[[i]] - medians[[i]]
+}
+
+cat(tracemem(x), "\n")
+#> <0x7f80c429e020>
+
+for (i in 1:5) {
+  x[[i]] <- x[[i]] - medians[[i]]
+}
+untracemem(x)
+```
+
+```{r}
+y <- as.list(x)
+cat(tracemem(y), "\n")
+#> <0x7f80c5c3de20>
+
+for (i in 1:5) {
+  y[[i]] <- y[[i]] - medians[[i]]
+}
+
+```
 
 ## Quiz answers {#sec-quiz_answer}

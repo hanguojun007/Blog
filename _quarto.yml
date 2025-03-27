@@ -58,7 +58,7 @@ website:
           - sidebar:ggplot2
           - sidebar:R4DS
           - sidebar:TiMoR
-          - sidebar:AdR
+          - sidebar:AdR2
           - sidebar:quarto
       - text: Blog
         href: blog.qmd
