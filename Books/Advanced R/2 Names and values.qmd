@@ -1,7 +1,7 @@
 ---
 title: "2 Names and values"
 date: "2025-03-24"
-date-modified: "2025-03-26"
+date-modified: "2025-03-28"
 format: "html"
 execute:
   warning: false
@@ -21,8 +21,8 @@ source("_common.R")
 
 厘清`object`和其`name`的区别十分重要，这可以帮助你：
 
--   更加精准地判断你的代码对内存的消耗。
--   写出运行更快的代码。
+-   精准地判断代码对内存的消耗。
+-   理解代码运行缓慢的原因并优化。
 -   更好理解R的函数式编程。
 
 ### Quiz
@@ -53,7 +53,7 @@ source("_common.R")
 
 ### Outline
 
--   `object` and its `name`, `<-`.
+-   2.2节：介绍对象和其name的不同。
 -   when R makes a copy, `tracemem()`.
 -   how much memroy an object occupies, `lobstr::obj_size()`.
 -   two important exceptions to copy-on-modify.
@@ -354,6 +354,33 @@ for (i in 1:5) {
   y[[i]] <- y[[i]] - medians[[i]]
 }
 
+x <- list()
+x[[1]] <- x
+ref(x)
 ```
 
+## Unbinding and the garbage collector
+
+
+
 ## Quiz answers {#sec-quiz_answer}
+
+1.  使用`` \` `` 。
+
+```{r}
+#| eval: false
+df <- data.frame(runif(3), runif(3))
+names(df) <- c(1, 2)
+
+df$`3` <- df$`1` + df$`2`
+```
+
+2.   大约占8MB。
+
+```{r}
+x <- runif(1e6)
+y <- list(x, x, x)
+obj_size(y)
+```
+
+3.   `b[[1]] <- 10`。
