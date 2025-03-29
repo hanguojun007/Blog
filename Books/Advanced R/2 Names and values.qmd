@@ -312,16 +312,21 @@ obj_size(rep(banana, 100))
 
 ### Objects with a single binding
 
-如下面的例子，`v`只绑定了一个name，追踪内存的变动，可以看到没有变化。
+上面提到的“当对象只绑定了一个name时，会直接修改对象的值”，我在实际使用中，发现内存地址会发生变化。我简单的在不同系统中进行了实验，推测可能是系统原因。
+
 ```{r}
-a <- c(1, 2, 3)
-lobstr::obj_addr(a)
-a[[3]] <- 4
-lobstr::obj_addr(a)
-
-a[3] <- 5
-
+v <- c(1, 2, 3)
+lobstr::obj_addr(v)
+v[[3]] <- 4
+lobstr::obj_addr(v)
 ```
+
+在R中存在下面两种情况，使得无法准确预测是否会发生复制:
+
+-   R 对于对象所绑定的name统计只能统计为：0，1，many；一旦对象绑定了多个name，那么就会始终被认为是many，无法回退。
+-   绝大多数函数都会复制对象，除非是用C语言实现的函数。
+
+例如下面的示例（按道理，上面的示例应该是不会发生变化的）：
 
 ```{r}
 # 复制一份对象，a,b的地址是一样的
@@ -334,63 +339,77 @@ a <- c(2,3,4)
 b[[3]] <- 4
 lobstr::obj_addr(a)
 lobstr::obj_addr(b)
-
 ```
 
+上面所描述的对象复制过程，也是R base中`for loop`缓慢的原因，即`for loop`本身并不慢，而是因为每次循环都会发生复制修改对象的操作，导致运行缓慢。下面示例中每次循环都会发生两次复制，而转换为`list`结构时，总共只发生一次复制。
 
 ```{r}
 x <- data.frame(matrix(runif(5 * 1e4), ncol = 5))
 medians <- vapply(x, median, numeric(1))
 
-for (i in seq_along(medians)) {
-  x[[i]] <- x[[i]] - medians[[i]]
-}
+```
 
+```{r}
+#| eval: false
+# 每次循环都复制两次
 cat(tracemem(x), "\n")
-#> <0x7f80c429e020>
 
 for (i in 1:5) {
   x[[i]] <- x[[i]] - medians[[i]]
 }
+#> tracemem[0x564653d5bca8 -> 0x564656d3b6e8]:
+#> tracemem[0x564656d3b6e8 -> 0x564656d3b838]: [[<-.data.frame [[<-
+#> tracemem[0x564656d3b838 -> 0x564656d3b9f8]:
+#> tracemem[0x564656d3b9f8 -> 0x564656d3bbb8]: [[<-.data.frame [[<-
+#> tracemem[0x564656d3bbb8 -> 0x564656d3be58]:
+#> tracemem[0x564656d3be58 -> 0x564656d3bf38]: [[<-.data.frame [[<-
+#> tracemem[0x564656d3bf38 -> 0x564656d3c248]:
+#> tracemem[0x564656d3c248 -> 0x564656d3c558]: [[<-.data.frame [[<-
+#> tracemem[0x564656d3c558 -> 0x564656d3cc58]:
+#> tracemem[0x564656d3cc58 -> 0x564656d37838]: [[<-.data.frame [[<-
 untracemem(x)
 ```
 
 ```{r}
+
+# 总共复制一次
 y <- as.list(x)
 cat(tracemem(y), "\n")
-#> <0x7f80c5c3de20>
 
 for (i in 1:5) {
   y[[i]] <- y[[i]] - medians[[i]]
 }
-
-x <- list()
-x[[1]] <- x
-ref(x)
 ```
+
+### Environments
+
+环境变量储存着对象和name之间的绑定关系，它总是直接修改对象的值，不会进行复制。因为环境本质是一个查找表，存储变量名及其值，如果它们像向量或列表那样每次修改时都进行复制的话，会导致显著的性能开销。
+
+```{r}
+e1 <- rlang::env(a = 1, b = 2, c = 3)
+e2 <- e1
+
+lobstr::obj_addr(e1)
+lobstr::obj_addr(e2)
+```
+
+![](images/e-modify-1.png)
+
+```{r}
+e1$c <- 4
+e2$c
+
+lobstr::obj_addr(e1)
+lobstr::obj_addr(e2)
+```
+
+![](images/e-modify-2.png)
 
 ## Unbinding and the garbage collector
 
+关于garbage collector（gc），可以总结为以下几点：
 
-
-## Quiz answers {#sec-quiz_answer}
-
-1.  使用`` \` `` 。
-
-```{r}
-#| eval: false
-df <- data.frame(runif(3), runif(3))
-names(df) <- c(1, 2)
-
-df$`3` <- df$`1` + df$`2`
-```
-
-2.   大约占8MB。
-
-```{r}
-x <- runif(1e6)
-y <- list(x, x, x)
-obj_size(y)
-```
-
-3.   `b[[1]] <- 10`。
+-   `rm()`只是解除name绑定，不会清除对象。
+-   R 环境中没有name绑定的对象，使用`gc()`会被清除掉。
+-   R 会在内存不足时自动运行`gc()`，使用`gcinfo(TRUE)`后，R每次`gc()`都会输出信息。
+-   你无需手动运行`gc()`，这是没有必要的操作。
