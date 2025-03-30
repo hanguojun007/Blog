@@ -1,0 +1,32 @@
+---
+title: "3 Vectors"
+date: "2025-03-30"
+date-modified: "2025-03-30"
+format: "html"
+execute:
+  warning: false
+  fig-width: 6
+  fig-asp: 0.618
+  out-width: 70%
+  fig-align: center
+---
+
+```{r}
+#| echo: false
+
+source("_common.R")
+```
+
+## Introduction
+
+R 中的Vectors可以分为两种：要求所有元素相同的`atomic`、元素可以是任意类型的`list`，还有一个类似零长度向量的`NULL`。下面是三者关系的示意图。
+
+```{mermaid}
+graph TD
+    A[Atomic] --> B(Vector)
+    C[List] --> B(Vector)
+    D(NULL)
+```
+
+这里提到的vector就是我们常说的向量。在R中，所有的对象都是向量，对向量添加不同属性就构成了不同类型的数据。维度（dimension）和类（clas）是两个比较重要的属性，前者将一维向量升格为二维矩阵甚至多维数组，后者赋予了对象S3面向对象系统。
+ 你
