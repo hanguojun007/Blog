@@ -29,4 +29,257 @@ graph TD
 ```
 
 这里提到的vector就是我们常说的向量。在R中，所有的对象都是向量，对向量添加不同属性就构成了不同类型的数据。维度（dimension）和类（clas）是两个比较重要的属性，前者将一维向量升格为二维矩阵甚至多维数组，后者赋予了对象S3面向对象系统。
- 你
+
+### Outline
+
+-   3.2节：R中最简单的 atomic 向量：`integer`、`double`、`character`、`logical`。
+-   3.3节：向量的三个重要属性：`name`、`dimension`、`class`。
+-   3.4节：具有特殊属性的 atomic 向量：`factor`、`date`、`date-time`、`duration`。
+-   3.5节：list。
+-   3.6节：data.frame 和 tibble。
+
+## Atomic vectors
+
+R 中有四类常见的atomic向量：`integer`、`double`、`character`、`logical`。下面是这四类向量之间的关系图。还有两类不常见的：`complex`和`raw`，前者表示复数，后者表示二级制数据。
+
+```{mermaid}
+graph BT
+    B[Atomic] --> A(Vector)
+    D[Logical] --> B(Atomic)
+    C[Numeric] --> B(Atomic)
+    E[Integer] --> C(Numeric)
+    F[Double] --> C(Numeric)
+    G[Character] --> B(Atomic)
+    subgraph " "
+        D
+        E
+        F
+        G
+    end
+```
+
+### Scalars
+
+上述四种atomic向量都有各自的语法：
+
+-   `logical`：只能使用`TRUE/T`和`FALSE/F`。
+-   `double`：有三种形式：十进制、科学技术法和十六进制；还有三个特殊的符号：`NaN`、`Inf`和`-Inf`。
+-   `integer`：形式同`double`，但是必须添加`L`后缀。
+-   `character`：使用双引号或单引号包裹，`\`进行转义。
+
+### Making longer vectors with c()
+
+使用`c()`函数可以创建长向量，使用`typeof()`查看对象的类型。
+
+```{r}
+lgl_var <- c(TRUE, FALSE)
+int_var <- c(1L, 6L, 10L)
+dbl_var <- c(1, 2.5, 4.5)
+chr_var <- c("these are", "some strings")
+
+typeof(lgl_var)
+typeof(int_var)
+typeof(dbl_var)
+typeof(chr_var)
+```
+
+### Missing values
+
+`NA`是`not applicable`的缩写，表示缺失值。缺失值有一定的‘传染性’：许多包含`NA`的计算会返回`NA`。
+
+```{r}
+NA > 5
+10 * NA
+!NA
+```
+
+但有一些特例：
+
+```{r}
+NA^0
+NA | TRUE
+NA & FALSE
+```
+
+使用`is.na()`判断是否是`NA`，而不是`==`。
+
+```{r}
+x <- c(NA, 5, NA, 10)
+x == NA
+is.na(x)
+```
+
+理论上讲：存在四种`NA`类型，分别对应上述的四种atomic向量：`NA`(logical)、`NA_integer_`(integer)、`NA_real_`(double)、`NA_character`(character)。但平常使用无需强调，R会自动强制转换。`NA`默认表示logical是因为下面的强制转换顺序。
+
+### Coercion
+
+如上所述，当atomic向量中的元素类型不一致时，R会自动强制转换类型。转换的顺序次序为：character → double → integer → logical。例如，`c("a", 1)`的结果是`c("a", "1")`。
+
+```{r}
+c("a", 1)
+```
+
+强制转换的背后是`as.*()`函数，例如`as.logical()`、`as.integer()`、`as.double()`、`as.character()`。转换失败会生成警告信息和缺失值。
+
+```{r}
+#| warning: true
+as.integer(c("1", "1.5", "a"))
+```
+
+### Testing
+
+R 中由类似判断是否是缺失值`is.na()`的其他函数，但是要小心使用。`is.logical()`、`is.integer()`、`is.double()`、`is.character()`这四个函数的用法与`is.na()`相同；`is.vector()`、`is.atomic()`、`is.numeric()`的用法则大不相同。
+
+-   `is.vector()`：根据`mode`参数，判断是否属于atomic向量、list、或expression，同时不能有除name外的其他属性。
+-   `is.atomic()`：判断是否属于atomic向量，`NULL`返回`FALSE`。
+-   `is.numeric()`：属于`double`、`integer`或任何可视为数值的向量。
+
+具体细节可以查看R文档。
+
+### Exercises
+
+...
+
+## Attributes
+
+### Getting and setting
+
+属性可以看作是由键值对构成，附属于对象的元信息。可以使用`attr()`,`attributes()`,`structure()`来提取或设置对象的属性。
+
+```{r}
+# 单独设置
+a <- 1:3
+attr(a, "x") <- "abcdef"
+attr(a, "x")
+
+attr(a, "y") <- 4:6
+str(attributes(a))
+
+
+# 批量设置
+a <- structure(
+  1:3,
+  x = "abcdef",
+  y = 4:6
+)
+str(attributes(a))
+```
+
+![](images/attr.png)
+
+属性极易丢失，但有两个例外，通常会保留：`name`,`dim`；保留属性需要使用S3面向对象系统。
+
+```{r}
+attributes(a[1])
+attributes(sum(a))
+```
+
+### Names
+
+有三种为向量设定name属性的方法。去除name属性有两种方法.
+
+```{r}
+# When creating it:
+x <- c(a = 1, b = 2, c = 3)
+x
+x <- unname(x)
+x
+
+# By assigning a character vector to names()
+x <- 1:3
+names(x) <- c("a", "b", "c")
+x
+names(x) <- NULL
+x
+
+# Inline, with setNames():
+x <- setNames(1:3, c("a", "b", "c"))
+x
+```
+
+在创建name属性时，应当保持name唯一且不为缺失值。需要注意这不是R的强制要求。
+
+### Dimensions
+
+atomic向量添加dim属性，就可以生成二维`matrix`或多维`array`。在R中可以使用`matrix()`,`array()`或`dim()`来生成。
+
+```{r}
+# Two scalar arguments specify row and column sizes
+x <- matrix(1:6, nrow = 2, ncol = 3)
+x
+
+
+# One vector argument to describe all dimensions
+y <- array(1:12, c(2, 3, 2))
+y
+
+# You can also modify an object in place by setting dim()
+z <- 1:6
+dim(z) <- c(3, 2)
+z
+```
+
+atomic向量的许多函数都对matrix和array进行了推广。
+
+|    **Vector**     |        **Matrix**         |    **Array**     |
+|:-----------------:|:-------------------------:|:----------------:|
+|     `names()`     | `rownames()`,`colnames()` |   `dimnames()`   |
+|    `length()`     |     `nrow()`,`ncol()`     |     `dim()`      |
+|       `c()`       |    `rbind()`,`cbind()`    | `abind::abind()` |
+|        \-         |           `t()`           |    `aperm()`     |
+| `is.null(dim(x))` |       `is.matrix()`       |   `is.array()`   |
+
+不能简单地将没有维度的atomic向量视作只有1行或1列的矩阵、1维的数组，因为函数对它们的处理结果是不一样的。
+
+```{r}
+str(1:3) # 1d vector
+str(matrix(1:3, ncol = 1)) # column vector
+str(matrix(1:3, nrow = 1)) # row vector
+str(array(1:3, 3)) # "array" vector
+```
+
+### Exercises
+
+-   comment属性比较特殊，不会被`print`打印出来，只能使用`attr()`或`attributes()`来提取。
+
+## S3 atomic vectors
+
+`class`是另外一个重要的属性，它赋予了对象S3面向对象的能力。每个S3对象由base type构建（base type内容见12章）。本节主要讨论下面四种S3 atomic vectors：
+
+-   `factor`：分类数据。
+-   `Date`：日期数据。
+-   `POSIXct`：日期时间数据。
+-   `difftime`：持续时间数据。
+
+```{mermaid}
+graph BT
+    B[Atomic] --> A(Vector)
+    D[Logical] --> B(Atomic)
+    C[Numeric] --> B(Atomic)
+    E[Integer] --> C(Numeric)
+    F[Double] --> C(Numeric)
+    G[Character] --> B(Atomic)
+    subgraph "base atomic"
+        D
+        E
+        F
+        G
+    end
+    H[factor] --> E
+    I[POSIXct] --> F
+    J[Date] --> F
+    subgraph "S3 atomic"
+        H
+        I
+        J
+    end
+```
+
+### Factors
+
+
+
+```{r}
+NROW()
+?comment
+```

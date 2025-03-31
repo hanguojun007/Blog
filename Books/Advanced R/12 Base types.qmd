@@ -17,7 +17,7 @@ execute:
 source("_common.R")
 ```
 
-# Introduction
+## Introduction
 
 在R中，流传着这么一句话——R里的一切都是对象。但此`对象`非彼`对象`，前者指得是来自于S语言的`base object`，同我们研究的面向对象(OO object)不是一回事。
 
@@ -146,15 +146,15 @@ typeof(expression(1 + 0:9))
 -   在S3和S4系统中，"numeric"用作"integer type"或"double type"的缩写：
 
     ```{r}
-    sloop::s3_class(1)
-    sloop::s3_class(1L)
+sloop::s3_class(1)
+sloop::s3_class(1L)
     ```
 
 -   `is.numeric()`用来检测那些行为类似number的对象。例如，因子的本质是"integer type"，但是没有number的行为（求取一个因子的均值毫无意义）。
 
     ```{r}
-    typeof(factor("x"))
-    is.numeric(factor("x"))
+typeof(factor("x"))
+is.numeric(factor("x"))
     ```
 
 本书中的`numeric`表示`integer`或`double`。
