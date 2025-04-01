@@ -1,7 +1,7 @@
 ---
 title: "3 Vectors"
 date: "2025-03-30"
-date-modified: "2025-03-30"
+date-modified: "2025-04-01"
 format: "html"
 execute:
   warning: false
@@ -277,9 +277,231 @@ graph BT
 
 ### Factors
 
-
+factor 是在integer类型向量基础上，添加`class = fcator`和`levels`两个属性构成。
 
 ```{r}
-NROW()
-?comment
+x <- factor(c("a", "b", "b", "a"))
+x
+
+typeof(x)
+attributes(x)
 ```
+
+![](images/factor.png)
+
+factor 有一个变体——ordered factor，它的属性`levels`具有了顺次意义，例如：low,medium,high等。
+
+```{r}
+grade <- ordered(c("b", "b", "a", "c"), levels = c("c", "b", "a"))
+grade
+```
+
+base R 中的函数如`read.csv()`,`data.frame()`会自动将字符串转换为factor，这种行为很没有道理，因为有时数据中不可能包含全部的level。可以通过`stringsAsFactors = FALSE`来禁用这种行为。
+
+### Dates
+
+Date 是在double类型向量基础上，添加`class = Date`属性构成。去除属性后，可以看到原来的double向量。
+
+```{r}
+today <- Sys.Date()
+
+typeof(today)
+attributes(today)
+
+# 底层double向量，思考一下这个数字的含义？
+unclass(today)
+```
+
+### Date-times
+
+base R 提供了两种储存 date-time 的数据格式：`POSIXct`和`POSIXlt`。这里我们只关注`POSIXct`，因为它构建于double类型向上，且在数据框中广泛应用。`POSIXct`有两个属性：`class = POSIXct`和`tzone`。
+
+```{r}
+now_ct <- as.POSIXct("2018-08-01 22:00", tz = "UTC")
+now_ct
+
+typeof(now_ct)
+attributes(now_ct)
+```
+
+`tzone`属性值控制date-time的显示形式，不改变其本质的double数值。
+
+```{r}
+new_ct <- structure(now_ct, tzone = "Asia/Tokyo")
+new_ct
+unclass(now_ct)
+unclass(new_ct)
+```
+
+### Durations
+
+durations 表示date或date-time之间的持续时间，它是在double类型向量基础上，添加`class = difftime`属性构成，同时有属性`units`，表示持续时间的单位。
+
+```{r}
+one_week_1 <- as.difftime(1, units = "weeks")
+one_week_1
+
+typeof(one_week_1)
+#> [1] "double"
+attributes(one_week_1)
+
+one_week_2 <- as.difftime(7, units = "days")
+one_week_2
+
+typeof(one_week_2)
+attributes(one_week_2)
+```
+
+### Exercises
+
+-   仔细观察下面三个因子的不同。
+
+```{r}
+# 数据和level同时反转
+f1 <- factor(letters)
+f1
+as.integer(f1)
+levels(f1) <- rev(levels(f1))
+f1
+as.integer(f1)
+
+# 仅数据反转
+f2 <- rev(factor(letters))
+f2
+as.integer(f2)
+
+# 仅level反转
+f3 <- factor(letters, levels = rev(letters))
+f3
+as.integer(f3)
+```
+
+## Lists
+
+虽然看起来`list`中的元素是不同，诚如前章所述，list中的元素有其自己的内存地址，也就是说，list中的元素本质是相同的，只是其索引的内容类型不同。
+
+### Creating
+
+使用函数`list()`创建list。
+
+```{r}
+l1 <- list(
+  1:3,
+  "a",
+  c(TRUE, FALSE, TRUE),
+  c(2.3, 5.9)
+)
+
+typeof(l1)
+
+str(l1)
+```
+
+如上所述，list的元素只是索引，所以list的实际内存大小可能与你的期望相差甚远。
+
+```{r}
+lobstr::obj_size(mtcars)
+
+l2 <- list(mtcars, mtcars, mtcars, mtcars)
+lobstr::obj_size(l2)
+```
+
+list 中的元素可以是其他的list。
+
+```{r}
+l3 <- list(list(list(1)))
+str(l3)
+```
+
+![](images/list-recursive.png)
+
+前面讲到函数`c()`要求元素类型一致，否则执行强制转换；当list和其他atomic向量使用`c()`合并时，atomic向量会被强制添加到list中。
+
+```{r}
+l4 <- list(list(1, 2), c(3, 4))
+l5 <- c(list(1, 2), c(3, 4))
+str(l4)
+str(l5)
+```
+
+![](images/list-c.png)
+
+### Testing and coercion
+
+-   使用`typeof()`查看是否为`list`。
+-   使用`as.list()`强制转换为`list`。
+-   使用`unlist()`强制转换为atomic向量。
+
+```{r}
+# 注意as.list的不同
+l6 <- list(1:3)
+l6
+
+typeof(l6)
+
+as.list(1:3)
+```
+
+### Matrices and arrays
+
+atomic向量添加`dim`属性后创建出matrix，list添加`dim`属性后可以创建此出list-matrix、list-array。这些数据结构可以使得处理特殊数据时更加灵活。
+
+```{r}
+l <- list(1:3, "a", TRUE, 1.0)
+dim(l) <- c(2, 2)
+l
+
+l[[1, 1]]
+```
+
+### Exercises
+
+-   使用`[`函数提取元素时，当超出范围，atomic向量返回`NA`，list返回`NULL`。
+
+```{r}
+# Subsetting atomic vectors
+(1:2)[3]
+(1:2)[NA]
+
+# Subsetting lists
+as.list(1:2)[3]
+as.list(1:2)[NA]
+```
+
+## Data frames and tibbles
+
+最重要的两个以list为基础构建的S3 对象是：`data.frame`和`tibble`。
+
+```{mermaid}
+graph BT
+    B[List] --> A(Vector)
+    D[data.frame] --> B(List)
+    C[tibble] --> B(List)
+```
+
+dataframe有三个属性`names`、`class = data.frame`、`row.names`。`names`是list本身的属性，表示为有name的list，在dataframe中表示列名；`row.names`表示行名。同时dataframe要求list中的每个元素长度都相等。作用于list的函数如`names()`，作用于dataframe时返回的是列名，等价于`colnames()`、`length()`返回的是列数，等价于`ncol()`。
+
+```{r}
+df1 <- data.frame(x = 1:3, y = letters[1:3])
+typeof(df1)
+
+attributes(df1)
+
+names(df1)
+length(df1)
+```
+
+tibble由R包tibble提供，是对dataframe的一种补充，二者由唯一的不同是属性`class`，tibble有其自己独特的类`tbl_df`,`tbl`。类的不同赋予了tibble格式在某些行为上与dataframe有着巨大的差别。下面会详细介绍二者的不同。
+
+```{r}
+library(tibble)
+
+df2 <- tibble(x = 1:3, y = letters[1:3])
+typeof(df2)
+
+attributes(df2)
+```
+
+### Creating
+
+

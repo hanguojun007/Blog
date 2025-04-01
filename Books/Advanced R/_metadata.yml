@@ -8,6 +8,7 @@ website:
         - Foundations
         - Books/Advanced R/Foundations Introduction.qmd
         - Books/Advanced R/2 Names and values.qmd
+        - Books/Advanced R/3 Vectors.qmd
         - Object-oriented Programming
         - Books/Advanced R/12 Base types.qmd
         # - Books/Advanced R/13 S3.qmd
