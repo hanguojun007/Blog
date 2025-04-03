@@ -1,8 +1,8 @@
 website:
   sidebar:
-    - id: R4DS
-      title: R for Data Science
+    - id: R4DS2
+      title: R for Data Science(2e)
       contents:
-        - Books/R4DS/index.qmd
-        - Books/R4DS/26 Iteration.qmd
-        - Books/R4DS/27 A field guide to base R.qmd
+        - Books/R4DS2/index.qmd
+        - Books/R4DS2/26 Iteration.qmd
+        - Books/R4DS2/27 A field guide to base R.qmd

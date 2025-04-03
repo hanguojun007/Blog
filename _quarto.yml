@@ -56,7 +56,7 @@ website:
       - text: Books
         menu:
           - sidebar:ggplot2
-          - sidebar:R4DS
+          - sidebar:R4DS2
           - sidebar:TiMoR
           - sidebar:AdR2
           - sidebar:quarto
@@ -72,7 +72,7 @@ website:
 
 metadata-files:
   - Books/ggplot2/_metadata.yml
-  - Books/R4DS/_metadata.yml
+  - Books/R4DS2/_metadata.yml
   - Books/Tidy Modeling with R/_metadata.yml
   - Books/Advanced R/_metadata.yml
   - Books/quarto/_metadata.yml

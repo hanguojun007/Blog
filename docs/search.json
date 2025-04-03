@@ -73,8 +73,8 @@
     "text": "模型类型间的联系"
   },
   {
-    "objectID": "Books/R4DS/27 A field guide to base R.html",
-    "href": "Books/R4DS/27 A field guide to base R.html",
+    "objectID": "Books/R4DS2/27 A field guide to base R.html",
+    "href": "Books/R4DS2/27 A field guide to base R.html",
     "title": "27 A field guide to base R",
     "section": "",
     "text": "本章介绍一些base R中的重要函数：\n\n提取多个元素——[\n提取单个元素——[&$\napply家族\nfor循环\nPlot\n\n\nlibrary(tidyverse)",
@@ -83,8 +83,8 @@
     ]
   },
   {
-    "objectID": "Books/R4DS/27 A field guide to base R.html#提取向量",
-    "href": "Books/R4DS/27 A field guide to base R.html#提取向量",
+    "objectID": "Books/R4DS2/27 A field guide to base R.html#提取向量",
+    "href": "Books/R4DS2/27 A field guide to base R.html#提取向量",
     "title": "27 A field guide to base R",
     "section": "提取向量",
     "text": "提取向量\n五种常见情景：\n\n正整数表示元素位置提取，重复提取生成重复元素的向量。\n\n\nx &lt;- c(\"one\", \"two\", \"three\", \"four\", \"five\")\nx[c(3, 2, 5)]\n#&gt; [1] \"three\" \"two\"   \"five\"\n\nx[c(1, 1, 5, 5, 5, 2)]\n#&gt; [1] \"one\"  \"one\"  \"five\" \"five\" \"five\" \"two\"\n\n\n负整数表示删除对应位置的元素。\n\n\nx[c(-1, -3, -5)]\n#&gt; [1] \"two\"  \"four\"\n\n\n逻辑向量提取值为TRUE的元素；关于NA的处理与dplyr::filter()不同，前者保留，后者不保留。\n\n\nx &lt;- c(10, 3, NA, 5, 8, 1, NA)\n\n# All non-missing values of x\nx[!is.na(x)]\n#&gt; [1] 10  3  5  8  1\n\n# All even (or missing!) values of x\nx[x %% 2 == 0]\n#&gt; [1] 10 NA  8 NA\n\n\n字符串向量提取有name属性的向量元素。\n\n\nx &lt;- c(abc = 1, def = 2, xyz = 5)\nx[c(\"xyz\", \"def\")]\n#&gt; xyz def \n#&gt;   5   2\n\n\nnothing–x[]返回完整的对象，在后面对data.frame提取时有用。",
@@ -93,8 +93,8 @@
     ]
   },
   {
-    "objectID": "Books/R4DS/27 A field guide to base R.html#提取数据框",
-    "href": "Books/R4DS/27 A field guide to base R.html#提取数据框",
+    "objectID": "Books/R4DS2/27 A field guide to base R.html#提取数据框",
+    "href": "Books/R4DS2/27 A field guide to base R.html#提取数据框",
     "title": "27 A field guide to base R",
     "section": "提取数据框",
     "text": "提取数据框\n使用df[rows, cols]提取数据框中对应的行或列；其中rows和cols与上面的使用方法一致。\n\ndf &lt;- tibble(\n  x = 1:3,\n  y = c(\"a\", \"e\", \"f\"),\n  z = runif(3)\n)\n\n# Select first row and second column\ndf[1, 2]\n#&gt; # A tibble: 1 × 1\n#&gt;   y    \n#&gt;   &lt;chr&gt;\n#&gt; 1 a\n\n# Select all rows and columns x and y\ndf[, c(\"x\", \"y\")]\n#&gt; # A tibble: 3 × 2\n#&gt;       x y    \n#&gt;   &lt;int&gt; &lt;chr&gt;\n#&gt; 1     1 a    \n#&gt; 2     2 e    \n#&gt; 3     3 f\n\n# Select rows where `x` is greater than 1 and all columns\ndf[df$x &gt; 1, ]\n#&gt; # A tibble: 2 × 3\n#&gt;       x y         z\n#&gt;   &lt;int&gt; &lt;chr&gt; &lt;dbl&gt;\n#&gt; 1     2 e     0.834\n#&gt; 2     3 f     0.601\n\ndata.frame格式与tibble格式的数据框在使用[上的唯一区别是：当df[,cols]中的cols只有一个元素时，data.frame格式返回向量，而tibble格式仍返回tibble。\n\ndf1 &lt;- data.frame(x = 1:3)\ndf1[, \"x\"]\n#&gt; [1] 1 2 3\n\ndf2 &lt;- tibble(x = 1:3)\ndf2[, \"x\"]\n#&gt; # A tibble: 3 × 1\n#&gt;       x\n#&gt;   &lt;int&gt;\n#&gt; 1     1\n#&gt; 2     2\n#&gt; 3     3\n\ndata.frame格式使用drop参数，可以避免降维。\n\ndf1[, \"x\", drop = FALSE]\n#&gt;   x\n#&gt; 1 1\n#&gt; 2 2\n#&gt; 3 3",
@@ -103,8 +103,8 @@
     ]
   },
   {
-    "objectID": "Books/R4DS/27 A field guide to base R.html#dplyr-中的等价操作",
-    "href": "Books/R4DS/27 A field guide to base R.html#dplyr-中的等价操作",
+    "objectID": "Books/R4DS2/27 A field guide to base R.html#dplyr-中的等价操作",
+    "href": "Books/R4DS2/27 A field guide to base R.html#dplyr-中的等价操作",
     "title": "27 A field guide to base R",
     "section": "dplyr 中的等价操作",
     "text": "dplyr 中的等价操作\n在dplyr包中有几个verb等价于[的特例：\n\nfilter()：等价于按行使用逻辑向量提取，但对于NA的处理不同，filter()不保留NA，而[保留。\n\n\ndf &lt;- tibble(\n  x = c(2, 3, 1, 1, NA),\n  y = letters[1:5],\n  z = runif(5)\n)\ndf |&gt; filter(x &gt; 1)\n#&gt; # A tibble: 2 × 3\n#&gt;       x y           z\n#&gt;   &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt;\n#&gt; 1     2 a     0.157  \n#&gt; 2     3 b     0.00740\n\n# same as\ndf[!is.na(df$x) & df$x &gt; 1, ]\n#&gt; # A tibble: 2 × 3\n#&gt;       x y           z\n#&gt;   &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt;\n#&gt; 1     2 a     0.157  \n#&gt; 2     3 b     0.00740\n\ndf[which(df$x &gt; 1), ]\n#&gt; # A tibble: 2 × 3\n#&gt;       x y           z\n#&gt;   &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt;\n#&gt; 1     2 a     0.157  \n#&gt; 2     3 b     0.00740\n\n\narrange()：等价于按行使用正整数向量提取，向量通常由order()生成。\n\n\ndf |&gt; arrange(x, y)\n#&gt; # A tibble: 5 × 3\n#&gt;       x y           z\n#&gt;   &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt;\n#&gt; 1     1 c     0.466  \n#&gt; 2     1 d     0.498  \n#&gt; 3     2 a     0.157  \n#&gt; 4     3 b     0.00740\n#&gt; 5    NA e     0.290\n\n# same as\ndf[order(df$x, df$y), ]\n#&gt; # A tibble: 5 × 3\n#&gt;       x y           z\n#&gt;   &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt;\n#&gt; 1     1 c     0.466  \n#&gt; 2     1 d     0.498  \n#&gt; 3     2 a     0.157  \n#&gt; 4     3 b     0.00740\n#&gt; 5    NA e     0.290\n\n\nselect() & relocate()：等价于按列使用字符向量提取。\n\n\ndf |&gt; select(x, z)\n#&gt; # A tibble: 5 × 2\n#&gt;       x       z\n#&gt;   &lt;dbl&gt;   &lt;dbl&gt;\n#&gt; 1     2 0.157  \n#&gt; 2     3 0.00740\n#&gt; 3     1 0.466  \n#&gt; 4     1 0.498  \n#&gt; 5    NA 0.290\n\n# same as\ndf[, c(\"x\", \"z\")]\n#&gt; # A tibble: 5 × 2\n#&gt;       x       z\n#&gt;   &lt;dbl&gt;   &lt;dbl&gt;\n#&gt; 1     2 0.157  \n#&gt; 2     3 0.00740\n#&gt; 3     1 0.466  \n#&gt; 4     1 0.498  \n#&gt; 5    NA 0.290",
@@ -113,8 +113,8 @@
     ]
   },
   {
-    "objectID": "Books/R4DS/27 A field guide to base R.html#data-frames",
-    "href": "Books/R4DS/27 A field guide to base R.html#data-frames",
+    "objectID": "Books/R4DS2/27 A field guide to base R.html#data-frames",
+    "href": "Books/R4DS2/27 A field guide to base R.html#data-frames",
     "title": "27 A field guide to base R",
     "section": "Data Frames",
     "text": "Data Frames\n[[和$用来提取数据框中的某列；[[可以通过位置或name属性提取，而$只能通过name属性提取。\n\ntb &lt;- tibble(\n  x = 1:4,\n  y = c(10, 4, 1, 21)\n)\n\n# by position\ntb[[1]]\n#&gt; [1] 1 2 3 4\n\n# by name\ntb[[\"x\"]]\n#&gt; [1] 1 2 3 4\ntb$x\n#&gt; [1] 1 2 3 4\n\ndplyr包提取了pull()函数，它等价于[[和$。\n\ntb |&gt; pull(x)\n#&gt; [1] 1 2 3 4",
@@ -123,8 +123,8 @@
     ]
   },
   {
-    "objectID": "Books/R4DS/27 A field guide to base R.html#tibbles",
-    "href": "Books/R4DS/27 A field guide to base R.html#tibbles",
+    "objectID": "Books/R4DS2/27 A field guide to base R.html#tibbles",
+    "href": "Books/R4DS2/27 A field guide to base R.html#tibbles",
     "title": "27 A field guide to base R",
     "section": "Tibbles",
     "text": "Tibbles\ndata.frame与tibble在使用$时有着显著的不同；前者遵循部分匹配原则，后者使用精确匹配原则。\n\ndf &lt;- data.frame(x1 = 1)\ndf$x\n#&gt; [1] 1\ndf$z\n#&gt; NULL\n\n\ntb &lt;- tibble(x1 = 1)\n\ntb$x1\n#&gt; [1] 1\ntb$z\n#&gt; NULL",
@@ -133,8 +133,8 @@
     ]
   },
   {
-    "objectID": "Books/R4DS/27 A field guide to base R.html#dplyrmutate的等价操作",
-    "href": "Books/R4DS/27 A field guide to base R.html#dplyrmutate的等价操作",
+    "objectID": "Books/R4DS2/27 A field guide to base R.html#dplyrmutate的等价操作",
+    "href": "Books/R4DS2/27 A field guide to base R.html#dplyrmutate的等价操作",
     "title": "27 A field guide to base R",
     "section": "dplyr::mutate的等价操作",
     "text": "dplyr::mutate的等价操作\n下面是使用with(),within()和transform()进行等价操作的例子。\n\n\ndata(diamonds, package = \"ggplot2\")\n\n# Most straightforward\ndiamonds$ppc &lt;- diamonds$price / diamonds$carat\n\n# Avoid repeating diamonds\ndiamonds$ppc &lt;- with(diamonds, price / carat)\n\n# The inspiration for dplyr's mutate\ndiamonds &lt;- transform(diamonds, ppc = price / carat)\ndiamonds &lt;- diamonds |&gt; transform(ppc = price / carat)\n\n# Similar to transform(), but uses assignment rather argument matching\n# (can also use = here, since = is equivalent to &lt;- outside of a function call)\ndiamonds &lt;- within(diamonds, {\n  ppc &lt;- price / carat\n})\ndiamonds &lt;- diamonds |&gt; within({\n  ppc &lt;- price / carat\n})\n\n# Protect against partial matching\ndiamonds$ppc &lt;- diamonds[[\"price\"]] / diamonds[[\"carat\"]]\ndiamonds$ppc &lt;- diamonds[, \"price\"] / diamonds[, \"carat\"]\n\n# FORBIDDEN\nattach(diamonds)\ndiamonds$ppc &lt;- price / carat",
@@ -143,8 +143,8 @@
     ]
   },
   {
-    "objectID": "Books/R4DS/27 A field guide to base R.html#lists",
-    "href": "Books/R4DS/27 A field guide to base R.html#lists",
+    "objectID": "Books/R4DS2/27 A field guide to base R.html#lists",
+    "href": "Books/R4DS2/27 A field guide to base R.html#lists",
     "title": "27 A field guide to base R",
     "section": "lists",
     "text": "lists\n[，[[和$都可以提取list中的元素，但[保留原list层级，而[[和$不保留。\n\nl &lt;- list(\n  a = 1:3,\n  b = \"a string\",\n  c = pi,\n  d = list(-1, -5)\n)\n\nstr(l[1:2])\n#&gt; List of 2\n#&gt;  $ a: int [1:3] 1 2 3\n#&gt;  $ b: chr \"a string\"\n\nstr(l[1])\n#&gt; List of 1\n#&gt;  $ a: int [1:3] 1 2 3\nstr(l[[1]])\n#&gt;  int [1:3] 1 2 3\n\nstr(l[4])\n#&gt; List of 1\n#&gt;  $ d:List of 2\n#&gt;   ..$ : num -1\n#&gt;   ..$ : num -5\nstr(l[[4]])\n#&gt; List of 2\n#&gt;  $ : num -1\n#&gt;  $ : num -5\n\n两者的差异如下图所示：",
@@ -160,6 +160,126 @@
     "text": "本篇为书籍Advanced R的学习笔记。\n原文见：Advanced R\n本书主要包含两方面：\n\nR 语言底层逻辑\n高级编程技巧\n\n下面是全文概览：\n\n第1章：简介。\n第2-8章：R语言基础概念。\n第9-11章：函数编程。\n第12~16章：面向对象编程。\n第17~21章：元编程。\n第22-25章：高级编程技巧。\n\n本书适合在不同阶段，根本不同需求阅读不同章节。\n本书中的练习题解决方案：Advanced R Solutions\n\n\n\n Back to top",
     "crumbs": [
       "index"
+    ]
+  },
+  {
+    "objectID": "Books/Advanced R/3 Vectors.html",
+    "href": "Books/Advanced R/3 Vectors.html",
+    "title": "3 Vectors",
+    "section": "",
+    "text": "R 中的Vectors可以分为两种：要求所有元素相同的atomic、元素可以是任意类型的list，还有一个类似零长度向量的NULL。下面是三者关系的示意图。\n\n\n\n\n\ngraph TD\n    A[Atomic] --&gt; B(Vector)\n    C[List] --&gt; B(Vector)\n    D(NULL)\n\n\n\n\n\n\n这里提到的vector就是我们常说的向量。在R中，所有的对象都是向量，对向量添加不同属性就构成了不同类型的数据。维度（dimension）和类（clas）是两个比较重要的属性，前者将一维向量升格为二维矩阵甚至多维数组，后者赋予了对象S3面向对象系统。\n\n\n\n3.2节：R中最简单的 atomic 向量：integer、double、character、logical。\n3.3节：向量的三个重要属性：name、dimension、class。\n3.4节：具有特殊属性的 atomic 向量：factor、date、date-time、duration。\n3.5节：list。\n3.6节：data.frame 和 tibble。",
+    "crumbs": [
+      "3 Vectors"
+    ]
+  },
+  {
+    "objectID": "Books/Advanced R/3 Vectors.html#introduction",
+    "href": "Books/Advanced R/3 Vectors.html#introduction",
+    "title": "3 Vectors",
+    "section": "",
+    "text": "R 中的Vectors可以分为两种：要求所有元素相同的atomic、元素可以是任意类型的list，还有一个类似零长度向量的NULL。下面是三者关系的示意图。\n\n\n\n\n\ngraph TD\n    A[Atomic] --&gt; B(Vector)\n    C[List] --&gt; B(Vector)\n    D(NULL)\n\n\n\n\n\n\n这里提到的vector就是我们常说的向量。在R中，所有的对象都是向量，对向量添加不同属性就构成了不同类型的数据。维度（dimension）和类（clas）是两个比较重要的属性，前者将一维向量升格为二维矩阵甚至多维数组，后者赋予了对象S3面向对象系统。\n\n\n\n3.2节：R中最简单的 atomic 向量：integer、double、character、logical。\n3.3节：向量的三个重要属性：name、dimension、class。\n3.4节：具有特殊属性的 atomic 向量：factor、date、date-time、duration。\n3.5节：list。\n3.6节：data.frame 和 tibble。",
+    "crumbs": [
+      "3 Vectors"
+    ]
+  },
+  {
+    "objectID": "Books/Advanced R/3 Vectors.html#atomic-vectors",
+    "href": "Books/Advanced R/3 Vectors.html#atomic-vectors",
+    "title": "3 Vectors",
+    "section": "Atomic vectors",
+    "text": "Atomic vectors\nR 中有四类常见的atomic向量：integer、double、character、logical。下面是这四类向量之间的关系图。还有两类不常见的：complex和raw，前者表示复数，后者表示二级制数据。\n\n\n\n\n\ngraph BT\n    B[Atomic] --&gt; A(Vector)\n    D[Logical] --&gt; B(Atomic)\n    C[Numeric] --&gt; B(Atomic)\n    E[Integer] --&gt; C(Numeric)\n    F[Double] --&gt; C(Numeric)\n    G[Character] --&gt; B(Atomic)\n    subgraph \" \"\n        D\n        E\n        F\n        G\n    end\n\n\n\n\n\n\n\nScalars\n上述四种atomic向量都有各自的语法：\n\nlogical：只能使用TRUE/T和FALSE/F。\ndouble：有三种形式：十进制、科学技术法和十六进制；还有三个特殊的符号：NaN、Inf和-Inf。\ninteger：形式同double，但是必须添加L后缀。\ncharacter：使用双引号或单引号包裹，\\进行转义。\n\n\n\nMaking longer vectors with c()\n使用c()函数可以创建长向量，使用typeof()查看对象的类型。\n\nlgl_var &lt;- c(TRUE, FALSE)\nint_var &lt;- c(1L, 6L, 10L)\ndbl_var &lt;- c(1, 2.5, 4.5)\nchr_var &lt;- c(\"these are\", \"some strings\")\n\ntypeof(lgl_var)\n#&gt; [1] \"logical\"\ntypeof(int_var)\n#&gt; [1] \"integer\"\ntypeof(dbl_var)\n#&gt; [1] \"double\"\ntypeof(chr_var)\n#&gt; [1] \"character\"\n\n\n\nMissing values\nNA是not applicable的缩写，表示缺失值。缺失值有一定的‘传染性’：许多包含NA的计算会返回NA。\n\nNA &gt; 5\n#&gt; [1] NA\n10 * NA\n#&gt; [1] NA\n!NA\n#&gt; [1] NA\n\n但有一些特例：\n\nNA^0\n#&gt; [1] 1\nNA | TRUE\n#&gt; [1] TRUE\nNA & FALSE\n#&gt; [1] FALSE\n\n使用is.na()判断是否是NA，而不是==。\n\nx &lt;- c(NA, 5, NA, 10)\nx == NA\n#&gt; [1] NA NA NA NA\nis.na(x)\n#&gt; [1]  TRUE FALSE  TRUE FALSE\n\n理论上讲：存在四种NA类型，分别对应上述的四种atomic向量：NA(logical)、NA_integer_(integer)、NA_real_(double)、NA_character(character)。但平常使用无需强调，R会自动强制转换。NA默认表示logical是因为下面的强制转换顺序。\n\n\nCoercion\n如上所述，当atomic向量中的元素类型不一致时，R会自动强制转换类型。转换的顺序次序为：character → double → integer → logical。例如，c(\"a\", 1)的结果是c(\"a\", \"1\")。\n\nc(\"a\", 1)\n#&gt; [1] \"a\" \"1\"\n\n强制转换的背后是as.*()函数，例如as.logical()、as.integer()、as.double()、as.character()。转换失败会生成警告信息和缺失值。\n\nas.integer(c(\"1\", \"1.5\", \"a\"))\n#&gt; Warning: NAs introduced by coercion\n#&gt; [1]  1  1 NA\n\n\n\nTesting\nR 中由类似判断是否是缺失值is.na()的其他函数，但是要小心使用。is.logical()、is.integer()、is.double()、is.character()这四个函数的用法与is.na()相同；is.vector()、is.atomic()、is.numeric()的用法则大不相同。\n\nis.vector()：根据mode参数，判断是否属于atomic向量、list、或expression，同时不能有除name外的其他属性。\nis.atomic()：判断是否属于atomic向量，NULL返回FALSE。\nis.numeric()：属于double、integer或任何可视为数值的向量。\n\n具体细节可以查看R文档。\n\n\nExercises\n…",
+    "crumbs": [
+      "3 Vectors"
+    ]
+  },
+  {
+    "objectID": "Books/Advanced R/3 Vectors.html#attributes",
+    "href": "Books/Advanced R/3 Vectors.html#attributes",
+    "title": "3 Vectors",
+    "section": "Attributes",
+    "text": "Attributes\n\nGetting and setting\n属性可以看作是由键值对构成，附属于对象的元信息。可以使用attr(),attributes(),structure()来提取或设置对象的属性。\n\n# 单独设置\na &lt;- 1:3\nattr(a, \"x\") &lt;- \"abcdef\"\nattr(a, \"x\")\n#&gt; [1] \"abcdef\"\n\nattr(a, \"y\") &lt;- 4:6\nstr(attributes(a))\n#&gt; List of 2\n#&gt;  $ x: chr \"abcdef\"\n#&gt;  $ y: int [1:3] 4 5 6\n\n\n# 批量设置\na &lt;- structure(\n  1:3,\n  x = \"abcdef\",\n  y = 4:6\n)\nstr(attributes(a))\n#&gt; List of 2\n#&gt;  $ x: chr \"abcdef\"\n#&gt;  $ y: int [1:3] 4 5 6\n\n\n属性极易丢失，但有两个例外，通常会保留：name,dim；保留属性需要使用S3面向对象系统。\n\nattributes(a[1])\n#&gt; NULL\nattributes(sum(a))\n#&gt; NULL\n\n\n\nNames\n有三种为向量设定name属性的方法。去除name属性有两种方法.\n\n# When creating it:\nx &lt;- c(a = 1, b = 2, c = 3)\nx\n#&gt; a b c \n#&gt; 1 2 3\nx &lt;- unname(x)\nx\n#&gt; [1] 1 2 3\n\n# By assigning a character vector to names()\nx &lt;- 1:3\nnames(x) &lt;- c(\"a\", \"b\", \"c\")\nx\n#&gt; a b c \n#&gt; 1 2 3\nnames(x) &lt;- NULL\nx\n#&gt; [1] 1 2 3\n\n# Inline, with setNames():\nx &lt;- setNames(1:3, c(\"a\", \"b\", \"c\"))\nx\n#&gt; a b c \n#&gt; 1 2 3\n\n在创建name属性时，应当保持name唯一且不为缺失值。需要注意这不是R的强制要求。\n\n\nDimensions\natomic向量添加dim属性，就可以生成二维matrix或多维array。在R中可以使用matrix(),array()或dim()来生成。\n\n# Two scalar arguments specify row and column sizes\nx &lt;- matrix(1:6, nrow = 2, ncol = 3)\nx\n#&gt;      [,1] [,2] [,3]\n#&gt; [1,]    1    3    5\n#&gt; [2,]    2    4    6\n\n\n# One vector argument to describe all dimensions\ny &lt;- array(1:12, c(2, 3, 2))\ny\n#&gt; , , 1\n#&gt; \n#&gt;      [,1] [,2] [,3]\n#&gt; [1,]    1    3    5\n#&gt; [2,]    2    4    6\n#&gt; \n#&gt; , , 2\n#&gt; \n#&gt;      [,1] [,2] [,3]\n#&gt; [1,]    7    9   11\n#&gt; [2,]    8   10   12\n\n# You can also modify an object in place by setting dim()\nz &lt;- 1:6\ndim(z) &lt;- c(3, 2)\nz\n#&gt;      [,1] [,2]\n#&gt; [1,]    1    4\n#&gt; [2,]    2    5\n#&gt; [3,]    3    6\n\natomic向量的许多函数都对matrix和array进行了推广。\n\n\n\nVector\nMatrix\nArray\n\n\n\n\nnames()\nrownames(),colnames()\ndimnames()\n\n\nlength()\nnrow(),ncol()\ndim()\n\n\nc()\nrbind(),cbind()\nabind::abind()\n\n\n-\nt()\naperm()\n\n\nis.null(dim(x))\nis.matrix()\nis.array()\n\n\n\n不能简单地将没有维度的atomic向量视作只有1行或1列的矩阵、1维的数组，因为函数对它们的处理结果是不一样的。\n\nstr(1:3) # 1d vector\n#&gt;  int [1:3] 1 2 3\nstr(matrix(1:3, ncol = 1)) # column vector\n#&gt;  int [1:3, 1] 1 2 3\nstr(matrix(1:3, nrow = 1)) # row vector\n#&gt;  int [1, 1:3] 1 2 3\nstr(array(1:3, 3)) # \"array\" vector\n#&gt;  int [1:3(1d)] 1 2 3\n\n\n\nExercises\n\ncomment属性比较特殊，不会被print打印出来，只能使用attr()或attributes()来提取。",
+    "crumbs": [
+      "3 Vectors"
+    ]
+  },
+  {
+    "objectID": "Books/Advanced R/3 Vectors.html#s3-atomic-vectors",
+    "href": "Books/Advanced R/3 Vectors.html#s3-atomic-vectors",
+    "title": "3 Vectors",
+    "section": "S3 atomic vectors",
+    "text": "S3 atomic vectors\nclass是另外一个重要的属性，它赋予了对象S3面向对象的能力。每个S3对象由base type构建（base type内容见12章）。本节主要讨论下面四种S3 atomic vectors：\n\nfactor：分类数据。\nDate：日期数据。\nPOSIXct：日期时间数据。\ndifftime：持续时间数据。\n\n\n\n\n\n\ngraph BT\n    B[Atomic] --&gt; A(Vector)\n    D[Logical] --&gt; B(Atomic)\n    C[Numeric] --&gt; B(Atomic)\n    E[Integer] --&gt; C(Numeric)\n    F[Double] --&gt; C(Numeric)\n    G[Character] --&gt; B(Atomic)\n    subgraph \"base atomic\"\n        D\n        E\n        F\n        G\n    end\n    H[factor] --&gt; E\n    I[POSIXct] --&gt; F\n    J[Date] --&gt; F\n    subgraph \"S3 atomic\"\n        H\n        I\n        J\n    end\n\n\n\n\n\n\n\nFactors\nfactor 是在integer类型向量基础上，添加class = fcator和levels两个属性构成。\n\nx &lt;- factor(c(\"a\", \"b\", \"b\", \"a\"))\nx\n#&gt; [1] a b b a\n#&gt; Levels: a b\n\ntypeof(x)\n#&gt; [1] \"integer\"\nattributes(x)\n#&gt; $levels\n#&gt; [1] \"a\" \"b\"\n#&gt; \n#&gt; $class\n#&gt; [1] \"factor\"\n\n\nfactor 有一个变体——ordered factor，它的属性levels具有了顺次意义，例如：low,medium,high等。\n\ngrade &lt;- ordered(c(\"b\", \"b\", \"a\", \"c\"), levels = c(\"c\", \"b\", \"a\"))\ngrade\n#&gt; [1] b b a c\n#&gt; Levels: c &lt; b &lt; a\n\nbase R 中的函数如read.csv(),data.frame()会自动将字符串转换为factor，这种行为很没有道理，因为有时数据中不可能包含全部的level。可以通过stringsAsFactors = FALSE来禁用这种行为。\n\n\nDates\nDate 是在double类型向量基础上，添加class = Date属性构成。去除属性后，可以看到原来的double向量。\n\ntoday &lt;- Sys.Date()\n\ntypeof(today)\n#&gt; [1] \"double\"\nattributes(today)\n#&gt; $class\n#&gt; [1] \"Date\"\n\n# 底层double向量，思考一下这个数字的含义？\nunclass(today)\n#&gt; [1] 20181\n\n\n\nDate-times\nbase R 提供了两种储存 date-time 的数据格式：POSIXct和POSIXlt。这里我们只关注POSIXct，因为它构建于double类型向上，且在数据框中广泛应用。POSIXct有两个属性：class = POSIXct和tzone。\n\nnow_ct &lt;- as.POSIXct(\"2018-08-01 22:00\", tz = \"UTC\")\nnow_ct\n#&gt; [1] \"2018-08-01 22:00:00 UTC\"\n\ntypeof(now_ct)\n#&gt; [1] \"double\"\nattributes(now_ct)\n#&gt; $class\n#&gt; [1] \"POSIXct\" \"POSIXt\" \n#&gt; \n#&gt; $tzone\n#&gt; [1] \"UTC\"\n\ntzone属性值控制date-time的显示形式，不改变其本质的double数值。\n\nnew_ct &lt;- structure(now_ct, tzone = \"Asia/Tokyo\")\nnew_ct\n#&gt; [1] \"2018-08-02 07:00:00 JST\"\nunclass(now_ct)\n#&gt; [1] 1533160800\n#&gt; attr(,\"tzone\")\n#&gt; [1] \"UTC\"\nunclass(new_ct)\n#&gt; [1] 1533160800\n#&gt; attr(,\"tzone\")\n#&gt; [1] \"Asia/Tokyo\"\n\n\n\nDurations\ndurations 表示date或date-time之间的持续时间，它是在double类型向量基础上，添加class = difftime属性构成，同时有属性units，表示持续时间的单位。\n\none_week_1 &lt;- as.difftime(1, units = \"weeks\")\none_week_1\n#&gt; Time difference of 1 weeks\n\ntypeof(one_week_1)\n#&gt; [1] \"double\"\n#&gt; [1] \"double\"\nattributes(one_week_1)\n#&gt; $class\n#&gt; [1] \"difftime\"\n#&gt; \n#&gt; $units\n#&gt; [1] \"weeks\"\n\none_week_2 &lt;- as.difftime(7, units = \"days\")\none_week_2\n#&gt; Time difference of 7 days\n\ntypeof(one_week_2)\n#&gt; [1] \"double\"\nattributes(one_week_2)\n#&gt; $class\n#&gt; [1] \"difftime\"\n#&gt; \n#&gt; $units\n#&gt; [1] \"days\"\n\n\n\nExercises\n\n仔细观察下面三个因子的不同。\n\n\n# 数据和level同时反转\nf1 &lt;- factor(letters)\nf1\n#&gt;  [1] a b c d e f g h i j k l m n o p q r s t u v w x y z\n#&gt; Levels: a b c d e f g h i j k l m n o p q r s t u v w x y z\nas.integer(f1)\n#&gt;  [1]  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24\n#&gt; [25] 25 26\nlevels(f1) &lt;- rev(levels(f1))\nf1\n#&gt;  [1] z y x w v u t s r q p o n m l k j i h g f e d c b a\n#&gt; Levels: z y x w v u t s r q p o n m l k j i h g f e d c b a\nas.integer(f1)\n#&gt;  [1]  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24\n#&gt; [25] 25 26\n\n# 仅数据反转\nf2 &lt;- rev(factor(letters))\nf2\n#&gt;  [1] z y x w v u t s r q p o n m l k j i h g f e d c b a\n#&gt; Levels: a b c d e f g h i j k l m n o p q r s t u v w x y z\nas.integer(f2)\n#&gt;  [1] 26 25 24 23 22 21 20 19 18 17 16 15 14 13 12 11 10  9  8  7  6  5  4  3\n#&gt; [25]  2  1\n\n# 仅level反转\nf3 &lt;- factor(letters, levels = rev(letters))\nf3\n#&gt;  [1] a b c d e f g h i j k l m n o p q r s t u v w x y z\n#&gt; Levels: z y x w v u t s r q p o n m l k j i h g f e d c b a\nas.integer(f3)\n#&gt;  [1] 26 25 24 23 22 21 20 19 18 17 16 15 14 13 12 11 10  9  8  7  6  5  4  3\n#&gt; [25]  2  1",
+    "crumbs": [
+      "3 Vectors"
+    ]
+  },
+  {
+    "objectID": "Books/Advanced R/3 Vectors.html#lists",
+    "href": "Books/Advanced R/3 Vectors.html#lists",
+    "title": "3 Vectors",
+    "section": "Lists",
+    "text": "Lists\n虽然看起来list中的元素是不同，诚如前章所述，list中的元素有其自己的内存地址，也就是说，list中的元素本质是相同的，只是其索引的内容类型不同。\n\nCreating\n使用函数list()创建list。\n\nl1 &lt;- list(\n  1:3,\n  \"a\",\n  c(TRUE, FALSE, TRUE),\n  c(2.3, 5.9)\n)\n\ntypeof(l1)\n#&gt; [1] \"list\"\n\nstr(l1)\n#&gt; List of 4\n#&gt;  $ : int [1:3] 1 2 3\n#&gt;  $ : chr \"a\"\n#&gt;  $ : logi [1:3] TRUE FALSE TRUE\n#&gt;  $ : num [1:2] 2.3 5.9\n\n如上所述，list的元素只是索引，所以list的实际内存大小可能与你的期望相差甚远。\n\nlobstr::obj_size(mtcars)\n#&gt; 7.21 kB\n\nl2 &lt;- list(mtcars, mtcars, mtcars, mtcars)\nlobstr::obj_size(l2)\n#&gt; 7.29 kB\n\nlist 中的元素可以是其他的list。\n\nl3 &lt;- list(list(list(1)))\nstr(l3)\n#&gt; List of 1\n#&gt;  $ :List of 1\n#&gt;   ..$ :List of 1\n#&gt;   .. ..$ : num 1\n\n\n前面讲到函数c()要求元素类型一致，否则执行强制转换；当list和其他atomic向量使用c()合并时，atomic向量会被强制添加到list中。\n\nl4 &lt;- list(list(1, 2), c(3, 4))\nl5 &lt;- c(list(1, 2), c(3, 4))\nstr(l4)\n#&gt; List of 2\n#&gt;  $ :List of 2\n#&gt;   ..$ : num 1\n#&gt;   ..$ : num 2\n#&gt;  $ : num [1:2] 3 4\nstr(l5)\n#&gt; List of 4\n#&gt;  $ : num 1\n#&gt;  $ : num 2\n#&gt;  $ : num 3\n#&gt;  $ : num 4\n\n\n\n\nTesting and coercion\n\n使用typeof()查看是否为list。\n使用as.list()强制转换为list。\n使用unlist()强制转换为atomic向量。\n\n\n# 注意as.list的不同\nl6 &lt;- list(1:3)\nl6\n#&gt; [[1]]\n#&gt; [1] 1 2 3\n\ntypeof(l6)\n#&gt; [1] \"list\"\n\nas.list(1:3)\n#&gt; [[1]]\n#&gt; [1] 1\n#&gt; \n#&gt; [[2]]\n#&gt; [1] 2\n#&gt; \n#&gt; [[3]]\n#&gt; [1] 3\n\n\n\nMatrices and arrays\natomic向量添加dim属性后创建出matrix，list添加dim属性后可以创建此出list-matrix、list-array。这些数据结构可以使得处理特殊数据时更加灵活。\n\nl &lt;- list(1:3, \"a\", TRUE, 1.0)\ndim(l) &lt;- c(2, 2)\nl\n#&gt;      [,1]      [,2]\n#&gt; [1,] integer,3 TRUE\n#&gt; [2,] \"a\"       1\n\nl[[1, 1]]\n#&gt; [1] 1 2 3\n\n\n\nExercises\n\n使用[函数提取元素时，当超出范围，atomic向量返回NA，list返回NULL。\n\n\n# Subsetting atomic vectors\n(1:2)[3]\n#&gt; [1] NA\n(1:2)[NA]\n#&gt; [1] NA NA\n\n# Subsetting lists\nas.list(1:2)[3]\n#&gt; [[1]]\n#&gt; NULL\nas.list(1:2)[NA]\n#&gt; [[1]]\n#&gt; NULL\n#&gt; \n#&gt; [[2]]\n#&gt; NULL",
+    "crumbs": [
+      "3 Vectors"
+    ]
+  },
+  {
+    "objectID": "Books/Advanced R/3 Vectors.html#data-frames-and-tibbles",
+    "href": "Books/Advanced R/3 Vectors.html#data-frames-and-tibbles",
+    "title": "3 Vectors",
+    "section": "Data frames and tibbles",
+    "text": "Data frames and tibbles\n最重要的两个以list为基础构建的S3 对象是：data.frame和tibble。\n\n\n\n\n\ngraph BT\n    B[List] --&gt; A(Vector)\n    D[data.frame] --&gt; B(List)\n    C[tibble] --&gt; B(List)\n\n\n\n\n\n\ndataframe有三个属性names、class = data.frame、row.names。names是list本身的属性，表示为有name的list，在dataframe中表示列名；row.names表示行名。同时dataframe要求list中的每个元素长度都相等。作用于list的函数如names()，作用于dataframe时返回的是列名，等价于colnames()、length()返回的是列数，等价于ncol()。\n\ndf1 &lt;- data.frame(x = 1:3, y = letters[1:3])\ntypeof(df1)\n#&gt; [1] \"list\"\n\nattributes(df1)\n#&gt; $names\n#&gt; [1] \"x\" \"y\"\n#&gt; \n#&gt; $class\n#&gt; [1] \"data.frame\"\n#&gt; \n#&gt; $row.names\n#&gt; [1] 1 2 3\n\nnames(df1)\n#&gt; [1] \"x\" \"y\"\nlength(df1)\n#&gt; [1] 2\n\ntibble由R包tibble提供，是对dataframe的一种补充，二者由唯一的不同是属性class，tibble有其自己独特的类tbl_df,tbl。类的不同赋予了tibble格式在某些行为上与dataframe有着巨大的差别。下面会详细介绍二者的不同。\n\nlibrary(tibble)\n\ndf2 &lt;- tibble(x = 1:3, y = letters[1:3])\ntypeof(df2)\n#&gt; [1] \"list\"\n\nattributes(df2)\n#&gt; $class\n#&gt; [1] \"tbl_df\"     \"tbl\"        \"data.frame\"\n#&gt; \n#&gt; $row.names\n#&gt; [1] 1 2 3\n#&gt; \n#&gt; $names\n#&gt; [1] \"x\" \"y\"\n\n\nCreating\n在使用data.frame()和tibble()函数创建dataframe或tibble时，主要有下面四点不同：\n\n列为字符串时，是否自动转换为因子：在R 4.0.0之前的版本，data.frame()函数默认stringsAsFactors = TRUE，而tibble()函数始终不会将字符串转换为因子。\n\n\ndf1 &lt;- data.frame(\n  x = 1:3,\n  y = c(\"a\", \"b\", \"c\"),\n  stringsAsFactors = FALSE\n)\nstr(df1)\n#&gt; 'data.frame':    3 obs. of  2 variables:\n#&gt;  $ x: int  1 2 3\n#&gt;  $ y: chr  \"a\" \"b\" \"c\"\n\ndf2 &lt;- tibble(\n  x = 1:3,\n  y = c(\"a\", \"b\", \"c\")\n)\nstr(df2)\n#&gt; tibble [3 × 2] (S3: tbl_df/tbl/data.frame)\n#&gt;  $ x: int [1:3] 1 2 3\n#&gt;  $ y: chr [1:3] \"a\" \"b\" \"c\"\n\n\n列名不规范时，是否自动转换为合法列名：data.frame()在参数check.names = FALSE时不会转换列名，tibble()函数始终不会转换列名，而是使用“`”包裹列名。\n\n\nnames(data.frame(`1` = 1))\n#&gt; [1] \"X1\"\n\nnames(tibble(`1` = 1))\n#&gt; [1] \"1\"\n\n\n在构建数据框时，如果列之间的长度不同：data.frame()函数会将较短的列自动循环，tibble()函数只会循环长度为1的列，否则报错。\n\n\ndata.frame(x = 1:4, y = 1:2)\n#&gt;   x y\n#&gt; 1 1 1\n#&gt; 2 2 2\n#&gt; 3 3 1\n#&gt; 4 4 2\ndata.frame(x = 1:4, y = 1:3)\n#&gt; Error in data.frame(x = 1:4, y = 1:3): arguments imply differing number of rows: 4, 3\n\ntibble(x = 1:4, y = 1)\n#&gt; # A tibble: 4 × 2\n#&gt;       x     y\n#&gt;   &lt;int&gt; &lt;dbl&gt;\n#&gt; 1     1     1\n#&gt; 2     2     1\n#&gt; 3     3     1\n#&gt; 4     4     1\ntibble(x = 1:4, y = 1:2)\n#&gt; Error in `tibble()`:\n#&gt; ! Tibble columns must have compatible sizes.\n#&gt; • Size 4: Existing data.\n#&gt; • Size 2: Column `y`.\n#&gt; ℹ Only values of size one are recycled.\n\n\n在构建数据框时，tibble()函数可以使用前面定义好的列的数据。\n\n\ntibble(\n  x = 1:3,\n  y = x * 2\n)\n#&gt; # A tibble: 3 × 2\n#&gt;       x     y\n#&gt;   &lt;int&gt; &lt;dbl&gt;\n#&gt; 1     1     2\n#&gt; 2     2     4\n#&gt; 3     3     6\n\n\n\nRow names\ndataframe可以使用data.frame(row.names = ...)或rownames(df) &lt;- ...来赋予数据框行名，但是tibble不支持设置行名（实际是可以设置的，只是不建议这样做）。\n\ndf3 &lt;- data.frame(\n  age = c(35, 27, 18),\n  hair = c(\"blond\", \"brown\", \"black\"),\n  row.names = c(\"Bob\", \"Susan\", \"Sam\")\n)\ndf3\n#&gt;       age  hair\n#&gt; Bob    35 blond\n#&gt; Susan  27 brown\n#&gt; Sam    18 black\n\nrownames(df3)\n#&gt; [1] \"Bob\"   \"Susan\" \"Sam\"\n\ndf3[\"Bob\", ]\n#&gt;     age  hair\n#&gt; Bob  35 blond\n\n对于tibble为什么不赞成为数据框设置行名，可以参考原文。dataframe转换为tibble时可以使用rownames_to_column()或as_tibble(rownames = \"rownames\")来保留行名信息。\n\n\nPrinting\n在终端以dataframe或tibble格式分别打印数据，会发现：dataframe将所有行列都打印了出来，而tibble只打印前几行及前几列，同时显示未打印列及行的信息，并且显示每列数据的类型，压缩内容过长的单元格，显示特殊数据比如NA。\n\ndplyr::starwars\n#&gt; # A tibble: 87 × 14\n#&gt;   name           height  mass hair_color  skin_color  eye_color birth_year\n#&gt;   &lt;chr&gt;           &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;       &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;\n#&gt; 1 Luke Skywalker    172    77 blond       fair        blue            19  \n#&gt; 2 C-3PO             167    75 &lt;NA&gt;        gold        yellow         112  \n#&gt; 3 R2-D2              96    32 &lt;NA&gt;        white, blue red             33  \n#&gt; 4 Darth Vader       202   136 none        white       yellow          41.9\n#&gt; 5 Leia Organa       150    49 brown       light       brown           19  \n#&gt; 6 Owen Lars         178   120 brown, grey light       blue            52  \n#&gt; # ℹ 81 more rows\n#&gt; # ℹ 7 more variables: sex &lt;chr&gt;, gender &lt;chr&gt;, homeworld &lt;chr&gt;, …\n\n\n\nSubsetting\n在第4章会学到更多有关提取子集的内容，这里介绍两个dataframe在提取子集时的两个缺点：\n\ndf[, vars]提取的列为1时，会自动降维成向量，除非添加参数df[, vars, drop = FALSE]。\ndf$x根据列名提取某列时，如果没有该列，会尝试返回一个字符串开头是x字符的列。\n\n\ndf1 &lt;- data.frame(xyz = \"a\")\ndf2 &lt;- tibble(xyz = \"a\")\n\nstr(df1$x)\n#&gt;  chr \"a\"\nstr(df2$x)\n#&gt;  NULL\n\n\n\nTesting and coercing\nis.data.frame()可以用来检查是否是dataframe或tibble，is_tibble()只能检查是否是tibble（注意两个函数在形式上的区别.,_）。\n\nis.data.frame(df1)\n#&gt; [1] TRUE\nis.data.frame(df2)\n#&gt; [1] TRUE\n\nis_tibble(df1)\n#&gt; [1] FALSE\nis_tibble(df2)\n#&gt; [1] TRUE\n\n\n\nList columns\n前面我们说过，数据框本质是一个list，所以数据框中的列可以包含任意类型的元素，包括list。tibble本身支持list column，dataframe需要额外的I()函数辅助。\n\n# tibble\ntibble(\n  x = 1:3,\n  y = list(1:2, 1:3, 1:4)\n)\n#&gt; # A tibble: 3 × 2\n#&gt;       x y        \n#&gt;   &lt;int&gt; &lt;list&gt;   \n#&gt; 1     1 &lt;int [2]&gt;\n#&gt; 2     2 &lt;int [3]&gt;\n#&gt; 3     3 &lt;int [4]&gt;\n\n# dataframe\ndf &lt;- data.frame(x = 1:3)\ndf$y &lt;- list(1:2, 1:3, 1:4)\n\ndata.frame(\n  x = 1:3,\n  y = I(list(1:2, 1:3, 1:4))\n)\n#&gt;   x          y\n#&gt; 1 1       1, 2\n#&gt; 2 2    1, 2, 3\n#&gt; 3 3 1, 2, 3, 4\n\n\n\nMatrix and data frame columns\n同上面的list一样，你可以在数据框中添加行数相等的矩阵和数据框。\n\n\ndfm &lt;- data.frame(\n  x = 1:3 * 10\n)\ndfm$y &lt;- matrix(1:9, nrow = 3)\ndfm$z &lt;- data.frame(a = 3:1, b = letters[1:3], stringsAsFactors = FALSE)\n\nstr(dfm)\n#&gt; 'data.frame':    3 obs. of  3 variables:\n#&gt;  $ x: num  10 20 30\n#&gt;  $ y: int [1:3, 1:3] 1 2 3 4 5 6 7 8 9\n#&gt;  $ z:'data.frame':   3 obs. of  2 variables:\n#&gt;   ..$ a: int  3 2 1\n#&gt;   ..$ b: chr  \"a\" \"b\" \"c\"\n\n\n\n\nExercises\n…",
+    "crumbs": [
+      "3 Vectors"
+    ]
+  },
+  {
+    "objectID": "Books/Advanced R/3 Vectors.html#null",
+    "href": "Books/Advanced R/3 Vectors.html#null",
+    "title": "3 Vectors",
+    "section": "NULL",
+    "text": "NULL\nNULL 的长度为0，类型为NULL，且无法拥有任何属性。\n\ntypeof(NULL)\n#&gt; [1] \"NULL\"\n\nlength(NULL)\n#&gt; [1] 0\n\nx &lt;- NULL\nattr(x, \"y\") &lt;- 1\n#&gt; Error in attr(x, \"y\") &lt;- 1: attempt to set an attribute on NULL",
+    "crumbs": [
+      "3 Vectors"
+    ]
+  },
+  {
+    "objectID": "Books/Advanced R/12 Base types.html",
+    "href": "Books/Advanced R/12 Base types.html",
+    "title": "12 Base types",
+    "section": "",
+    "text": "在R中，流传着这么一句话——R里的一切都是对象。但此对象非彼对象，前者指得是来自于S语言的base object，同我们研究的面向对象(OO object)不是一回事。\n下面我们介绍如何区分base object和OO object及所有base object的类别。",
+    "crumbs": [
+      "12 Base types"
+    ]
+  },
+  {
+    "objectID": "Books/Advanced R/12 Base types.html#introduction",
+    "href": "Books/Advanced R/12 Base types.html#introduction",
+    "title": "12 Base types",
+    "section": "",
+    "text": "在R中，流传着这么一句话——R里的一切都是对象。但此对象非彼对象，前者指得是来自于S语言的base object，同我们研究的面向对象(OO object)不是一回事。\n下面我们介绍如何区分base object和OO object及所有base object的类别。",
+    "crumbs": [
+      "12 Base types"
+    ]
+  },
+  {
+    "objectID": "Books/Advanced R/12 Base types.html#base-vs-oo-objects",
+    "href": "Books/Advanced R/12 Base types.html#base-vs-oo-objects",
+    "title": "12 Base types",
+    "section": "Base VS OO objects",
+    "text": "Base VS OO objects\n区分二者的三种方法：\n\nis.object()：base object返回FALSE，OO object返回TRUE。\nsloop::otype()：base object返回base，OO object返回其他，如S3。\nattr()：base object返回NULL，OO object返回class属性。\n\n\nis.object(1:10)\n#&gt; [1] FALSE\nis.object(mtcars)\n#&gt; [1] TRUE\n\nsloop::otype(1:10)\n#&gt; [1] \"base\"\nsloop::otype(mtcars)\n#&gt; [1] \"S3\"\n\nattr(1:10, \"class\")\n#&gt; NULL\nattr(mtcars, \"class\")\n#&gt; [1] \"data.frame\"",
+    "crumbs": [
+      "12 Base types"
+    ]
+  },
+  {
+    "objectID": "Books/Advanced R/12 Base types.html#base-types",
+    "href": "Books/Advanced R/12 Base types.html#base-types",
+    "title": "12 Base types",
+    "section": "Base types",
+    "text": "Base types\n无论是OO object还是base object，都有一个base type，使用typeof()来查看；不要使用mode()或storage.mode()，它们只适配S语言。\n\ntypeof(1:10)\n#&gt; [1] \"integer\"\n\ntypeof(mtcars)\n#&gt; [1] \"list\"\n\ntypeof(mean)\n#&gt; [1] \"closure\"\n\nR 的底层使用了C语言中的switch语句来对不同base type执行不同处理。想要新增一个base type需要修改R-core，所以通常不会随意增加base type。截至目前一共有25种base type，下面按照本书中出现的顺序列举。\n\nVector\n\n\n\nbase Type\nC Type\n\n\n\n\nNULL\nNILSXP\n\n\nlogical\nLGLSXP\n\n\ninteger\nINTSXP\n\n\ndouble\nREALSXP\n\n\ncomplex\nCPLXSXP\n\n\ncharacter\nSTRSXP\n\n\nlist\nVECSXP\n\n\nraw\nRAWSXP\n\n\n\n\ntypeof(NULL)\n#&gt; [1] \"NULL\"\ntypeof(1L)\n#&gt; [1] \"integer\"\ntypeof(1i)\n#&gt; [1] \"complex\"\n\n\n\nFunctions\n\n\n\nbase Type\nC Type\nfunction type\n\n\n\n\nclosure\nCLOSXP\nregular R functions\n\n\nspecial\nSPECIALSXP\ninternal functions\n\n\nbuiltin\nBUILTINSXP\nprimitive functions\n\n\n\n\ntypeof(mean)\n#&gt; [1] \"closure\"\ntypeof(`[`)\n#&gt; [1] \"special\"\ntypeof(sum)\n#&gt; [1] \"builtin\"\n\n\n\nEnvironments\n\n\n\nbase Type\nC Type\n\n\n\n\nenvironment\nENVSXP\n\n\n\n\ntypeof(globalenv())\n#&gt; [1] \"environment\"\n\n\n\nS4\n\n\n\nbase Type\nC Type\n\n\n\n\nS4\nS4SXP\n\n\n\n\nmle_obj &lt;- stats4::mle(function(x = 1) (x - 2)^2)\ntypeof(mle_obj)\n#&gt; [1] \"S4\"\n\n\n\nLanguage components\n\n\n\nbase Type\nC Type\n\n\n\n\nsymbol\nSYMSXP\n\n\nlanguage\nLANGSXP\n\n\npairlist\nLISTSXP\n\n\nexpression\nEXPRSXP\n\n\n\n\ntypeof(quote(a))\n#&gt; [1] \"symbol\"\ntypeof(quote(a + 1))\n#&gt; [1] \"language\"\ntypeof(formals(mean))\n#&gt; [1] \"pairlist\"\ntypeof(expression(1 + 0:9))\n#&gt; [1] \"expression\"\n\n\n\nOthers\n\n\n\nbase Type\nC Type\n\n\n\n\nexternalptr\nEXTPTRSXP\n\n\nweakref\nWEAKREFSXP\n\n\nbytecode\nBCODESXP\n\n\npromise\nPROMSXP\n\n\n...\nDOTSXP\n\n\nany\nANYSXP\n\n\n\n\n\nNumeric type\n“numeric”在R中存在三种解读：\n\n某些地方，numeric是double的别名。例如as.numeric()和as.double()等价，numeric()和double()等价。\n在S3和S4系统中，“numeric”用作”integer type”或”double type”的缩写：\n\nsloop::s3_class(1)\n#&gt; [1] \"double\"  \"numeric\"\nsloop::s3_class(1L)\n#&gt; [1] \"integer\" \"numeric\"\n\nis.numeric()用来检测那些行为类似number的对象。例如，因子的本质是”integer type”，但是没有number的行为（求取一个因子的均值毫无意义）。\n\ntypeof(factor(\"x\"))\n#&gt; [1] \"integer\"\nis.numeric(factor(\"x\"))\n#&gt; [1] FALSE\n\n\n本书中的numeric表示integer或double。",
+    "crumbs": [
+      "12 Base types"
     ]
   },
   {
@@ -224,183 +344,6 @@
     "title": "quarto 中R代码块的设置",
     "section": "行代码",
     "text": "行代码\n处理上面使用```{r}的代码块，quarto还使用`r的行代码。"
-  },
-  {
-    "objectID": "Books/Advanced R/12 Base types.html",
-    "href": "Books/Advanced R/12 Base types.html",
-    "title": "12 Base types",
-    "section": "",
-    "text": "在R中，流传着这么一句话——R里的一切都是对象。但此对象非彼对象，前者指得是来自于S语言的base object，同我们研究的面向对象(OO object)不是一回事。\n下面我们介绍如何区分base object和OO object及所有base object的类别。",
-    "crumbs": [
-      "12 Base types"
-    ]
-  },
-  {
-    "objectID": "Books/R4DS/26 Iteration.html",
-    "href": "Books/R4DS/26 Iteration.html",
-    "title": "26 Iteration",
-    "section": "",
-    "text": "在tidyverse中有一些常见的循环操作，如：\n\n绘制分面——facet_wrap(),facet_grid()\n分组总结–group_by(),summarise()\nlist-column解压——unnest_wider(),unnest_longer()\n\n下面我们学习另外一些循环技巧。\n\nlibrary(tidyverse)",
-    "crumbs": [
-      "26 Iteration"
-    ]
-  },
-  {
-    "objectID": "Books/R4DS/26 Iteration.html#选择列",
-    "href": "Books/R4DS/26 Iteration.html#选择列",
-    "title": "26 Iteration",
-    "section": "选择列",
-    "text": "选择列\n.cols控制选择哪几列，是一个tidy-select类，类似于dplyr中的select()，可以使用适配select()的函数，如starts_with()、contains()等。\n更多有过关于tidy-select的内容，可以参考?dplyr_tidy_select。\n\ndf &lt;- tibble(\n  grp = sample(2, 10, replace = TRUE),\n  a = rnorm(10),\n  b = rnorm(10),\n  c = rnorm(10),\n  d = rnorm(10)\n)\n\ndf |&gt;\n  group_by(grp) |&gt;\n  summarize(across(everything(), median))\n#&gt; # A tibble: 2 × 5\n#&gt;     grp       a       b     c     d\n#&gt;   &lt;int&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;\n#&gt; 1     1 -0.0935 -0.0163 0.363 0.364\n#&gt; 2     2  0.312  -0.0576 0.208 0.565",
-    "crumbs": [
-      "26 Iteration"
-    ]
-  },
-  {
-    "objectID": "Books/R4DS/26 Iteration.html#函数",
-    "href": "Books/R4DS/26 Iteration.html#函数",
-    "title": "26 Iteration",
-    "section": "函数",
-    "text": "函数\n.fns参数提供across()进行call的函数，可以是 - 函数名，例如mean，注意此处函数后不能有() - purrr-style lambda，例如~mean(.x, na.rm = TRUE) - 上述两种函数组成的named list，例如list(mean = mean,n_miss = ~ sum(is.na(.x))\n\n\n\n函数名\n\n# 函数名后有`()`会报错。\ndf |&gt;\n  group_by(grp) |&gt;\n  summarize(across(everything(), median()))\n#&gt; Error in `summarize()`:\n#&gt; ℹ In argument: `across(everything(), median())`.\n#&gt; Caused by error in `median.default()`:\n#&gt; ! argument \"x\" is missing, with no default\n\n\n\n\n\npurrr-style lambda\n\nrnorm_na &lt;- function(n, n_na, mean = 0, sd = 1) {\n  sample(c(rnorm(n - n_na, mean = mean, sd = sd), rep(NA, n_na)))\n}\n\ndf_miss &lt;- tibble(\n  a = rnorm_na(5, 1),\n  b = rnorm_na(5, 1),\n  c = rnorm_na(5, 2),\n  d = rnorm(5)\n)\n\ndf_miss |&gt;\n  summarize(\n    across(a:d, ~ median(., na.rm = TRUE)),\n    n = n()\n  )\n#&gt; # A tibble: 1 × 5\n#&gt;       a     b      c     d     n\n#&gt;   &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt;\n#&gt; 1 0.139 -1.11 -0.387  1.15     5\n\ndf_miss |&gt;\n  summarize(\n    across(a:d, function(x) median(x, na.rm = TRUE)),\n    n = n()\n  )\n#&gt; # A tibble: 1 × 5\n#&gt;       a     b      c     d     n\n#&gt;   &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt;\n#&gt; 1 0.139 -1.11 -0.387  1.15     5\n\ndf_miss |&gt;\n  summarize(\n    across(a:d, \\(x) median(x, na.rm = TRUE)),\n    n = n()\n  )\n#&gt; # A tibble: 1 × 5\n#&gt;       a     b      c     d     n\n#&gt;   &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt;\n#&gt; 1 0.139 -1.11 -0.387  1.15     5\n\n\n\n\n\n函数list\n\ndf_miss |&gt;\n  summarize(\n    across(a:d, list(\n      median = \\(x) median(x, na.rm = TRUE),\n      n_miss = \\(x) sum(is.na(x))\n    )),\n    n = n()\n  )\n#&gt; # A tibble: 1 × 9\n#&gt;   a_median a_n_miss b_median b_n_miss c_median c_n_miss d_median d_n_miss\n#&gt;      &lt;dbl&gt;    &lt;int&gt;    &lt;dbl&gt;    &lt;int&gt;    &lt;dbl&gt;    &lt;int&gt;    &lt;dbl&gt;    &lt;int&gt;\n#&gt; 1    0.139        1    -1.11        1   -0.387        2     1.15        0\n#&gt; # ℹ 1 more variable: n &lt;int&gt;",
-    "crumbs": [
-      "26 Iteration"
-    ]
-  },
-  {
-    "objectID": "Books/R4DS/26 Iteration.html#列名",
-    "href": "Books/R4DS/26 Iteration.html#列名",
-    "title": "26 Iteration",
-    "section": "列名",
-    "text": "列名\n如果你仔细观察，上面例子中的列名类似于{.col}_{.fn}（这也是为什么函数list是要有name属性的原因）。\n.names参数控制列名定义规则，使用{.col}表示原始列名，{.fn}表示函数名；单个函数默认{.col}，多个函数默认{.col}_{.fn}。\nacross()在与mutate()联用时会将原来的列覆盖，因为.names()默认是{.col}，所以看不出来，当参数值改变后就会直观的体现出来：\n\n\n\n与mutate联用\n\ndf_miss |&gt;\n  mutate(\n    across(a:d, \\(x) coalesce(x, 0), .names = \"{.col}_na_zero\")\n  )\n#&gt; # A tibble: 5 × 8\n#&gt;        a      b      c     d a_na_zero b_na_zero c_na_zero d_na_zero\n#&gt;    &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;\n#&gt; 1  0.434 -1.25  NA     1.60      0.434    -1.25      0         1.60 \n#&gt; 2 NA     -1.43  -0.297 0.776     0        -1.43     -0.297     0.776\n#&gt; 3 -0.156 -0.980 NA     1.15     -0.156    -0.980     0         1.15 \n#&gt; 4 -2.61  -0.683 -0.785 2.13     -2.61     -0.683    -0.785     2.13 \n#&gt; 5  1.11  NA     -0.387 0.704     1.11      0        -0.387     0.704",
-    "crumbs": [
-      "26 Iteration"
-    ]
-  },
-  {
-    "objectID": "Books/R4DS/26 Iteration.html#filter中的循环",
-    "href": "Books/R4DS/26 Iteration.html#filter中的循环",
-    "title": "26 Iteration",
-    "section": "filter()中的循环",
-    "text": "filter()中的循环\ndplyr 提供了两个across()的变体:\n\nif_any()：至少有一个条件返回TRUE\nif_all()：所有条件返回TRUE\n\n\n# same as df_miss |&gt; filter(is.na(a) | is.na(b) | is.na(c) | is.na(d))\ndf_miss |&gt; filter(if_any(a:d, is.na))\n#&gt; # A tibble: 4 × 4\n#&gt;        a      b      c     d\n#&gt;    &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;\n#&gt; 1  0.434 -1.25  NA     1.60 \n#&gt; 2 NA     -1.43  -0.297 0.776\n#&gt; 3 -0.156 -0.980 NA     1.15 \n#&gt; 4  1.11  NA     -0.387 0.704\n\n# same as df_miss |&gt; filter(is.na(a) & is.na(b) & is.na(c) & is.na(d))\ndf_miss |&gt; filter(if_all(a:d, is.na))\n#&gt; # A tibble: 0 × 4\n#&gt; # ℹ 4 variables: a &lt;dbl&gt;, b &lt;dbl&gt;, c &lt;dbl&gt;, d &lt;dbl&gt;",
-    "crumbs": [
-      "26 Iteration"
-    ]
-  },
-  {
-    "objectID": "Books/R4DS/26 Iteration.html#与piovt_longer对比",
-    "href": "Books/R4DS/26 Iteration.html#与piovt_longer对比",
-    "title": "26 Iteration",
-    "section": "与piovt_longer()对比",
-    "text": "与piovt_longer()对比\n使用piovt_longer()可以实现across()，反之则不成立。例如下面的两个例子\n\n\n\nacross\n\ndf |&gt;\n  summarize(across(a:d, list(median = median, mean = mean)))\n#&gt; # A tibble: 1 × 8\n#&gt;   a_median a_mean b_median b_mean c_median c_mean d_median d_mean\n#&gt;      &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;  &lt;dbl&gt;\n#&gt; 1   0.0380  0.205  -0.0163 0.0910    0.260 0.0716    0.540  0.508\n\n\n\n\n\npivot_longer 复现\n\nlong &lt;- df |&gt;\n  pivot_longer(a:d) |&gt;\n  group_by(name) |&gt;\n  summarize(\n    median = median(value),\n    mean = mean(value)\n  )\nlong |&gt;\n  pivot_wider(\n    names_from = name,\n    values_from = c(median, mean),\n    names_vary = \"slowest\",\n    names_glue = \"{name}_{.value}\"\n  )\n#&gt; # A tibble: 1 × 8\n#&gt;   a_median a_mean b_median b_mean c_median c_mean d_median d_mean\n#&gt;      &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;  &lt;dbl&gt;\n#&gt; 1   0.0380  0.205  -0.0163 0.0910    0.260 0.0716    0.540  0.508\n\n\n\n\n\n只能使用pivot_longer\n\ndf_paired &lt;- tibble(\n  a_val = rnorm(10),\n  a_wts = runif(10),\n  b_val = rnorm(10),\n  b_wts = runif(10),\n  c_val = rnorm(10),\n  c_wts = runif(10),\n  d_val = rnorm(10),\n  d_wts = runif(10)\n)\n\ndf_long &lt;- df_paired |&gt;\n  pivot_longer(\n    everything(),\n    names_to = c(\"group\", \".value\"),\n    names_sep = \"_\"\n  )\ndf_long\n#&gt; # A tibble: 40 × 3\n#&gt;   group    val   wts\n#&gt;   &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt;\n#&gt; 1 a      0.715 0.518\n#&gt; 2 b     -0.709 0.691\n#&gt; 3 c      0.718 0.216\n#&gt; 4 d     -0.217 0.733\n#&gt; 5 a     -1.09  0.979\n#&gt; 6 b     -0.209 0.675\n#&gt; # ℹ 34 more rows\n\ndf_long |&gt;\n  group_by(group) |&gt;\n  summarize(mean = weighted.mean(val, wts))\n#&gt; # A tibble: 4 × 2\n#&gt;   group    mean\n#&gt;   &lt;chr&gt;   &lt;dbl&gt;\n#&gt; 1 a      0.126 \n#&gt; 2 b     -0.0704\n#&gt; 3 c     -0.360 \n#&gt; 4 d     -0.248",
-    "crumbs": [
-      "26 Iteration"
-    ]
-  },
-  {
-    "objectID": "Books/R4DS/26 Iteration.html#返回结果不同",
-    "href": "Books/R4DS/26 Iteration.html#返回结果不同",
-    "title": "26 Iteration",
-    "section": "返回结果不同",
-    "text": "返回结果不同\nmap()函数会返回一个list，其变体则不同。\n\n返回输入值\nwalk()函数只能隐性返回输入，对.f生成的结果没有处理，这在循环绘图中十分便利。\nres &lt;- 1:4 |&gt;\n  walk(\\(x) {\n    hist(rnorm(100, x))\n  })\n\nres\n#&gt; [1] 1 2 3 4\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n返回结果结构与输入相同\nmodify()函数会输出一个与输入结构完全相同的结果，常用来修改元素类型。\n\n# Convert to characters\niris |&gt; str()\n#&gt; 'data.frame':    150 obs. of  5 variables:\n#&gt;  $ Sepal.Length: num  5.1 4.9 4.7 4.6 5 5.4 4.6 5 4.4 4.9 ...\n#&gt;  $ Sepal.Width : num  3.5 3 3.2 3.1 3.6 3.9 3.4 3.4 2.9 3.1 ...\n#&gt;  $ Petal.Length: num  1.4 1.4 1.3 1.5 1.4 1.7 1.4 1.5 1.4 1.5 ...\n#&gt;  $ Petal.Width : num  0.2 0.2 0.2 0.2 0.2 0.4 0.3 0.2 0.2 0.1 ...\n#&gt;  $ Species     : Factor w/ 3 levels \"setosa\",\"versicolor\",..: 1 1 1 1 1 1 1 1 1 1 ...\niris |&gt;\n  modify(as.character) |&gt;\n  str()\n#&gt; 'data.frame':    150 obs. of  5 variables:\n#&gt;  $ Sepal.Length: chr  \"5.1\" \"4.9\" \"4.7\" \"4.6\" ...\n#&gt;  $ Sepal.Width : chr  \"3.5\" \"3\" \"3.2\" \"3.1\" ...\n#&gt;  $ Petal.Length: chr  \"1.4\" \"1.4\" \"1.3\" \"1.5\" ...\n#&gt;  $ Petal.Width : chr  \"0.2\" \"0.2\" \"0.2\" \"0.2\" ...\n#&gt;  $ Species     : chr  \"setosa\" \"setosa\" \"setosa\" \"setosa\" ...\n\n其还有变体modify_if()，modify_at()，modify2()，imodify()，使用方法相似，具体差异同下面讲到的一样。\n\n\n返回原子向量\n这一类有map_lgl(),map_int(),map_dbl(),map_chr(),map_vec()；要求返回的原子向量类型为函数名后缀规定的类型，否则报错。例如：map_lgl()函数要求返回结果为由TRUE和FALSE构成的向量，否则报错。map_vec()函数提供了参数.ptype，可以指定返回结果的类型。\n\nnumbers &lt;- list(1, 2, 3, 4)\n\nmap_lgl(numbers, ~ .x %% 2 == 0)\n#&gt; [1] FALSE  TRUE FALSE  TRUE\n\nmap_lgl(numbers, ~ .x * 2)\n#&gt; Error in `map_lgl()`:\n#&gt; ℹ In index: 1.\n#&gt; Caused by error:\n#&gt; ! Can't coerce from a number to a logical.\n\n\n\n返回数据框\n这一类有map_dfc(),map_dfr()，这两类函数在官方文档中已经不再推荐使用，而是使用map() + list_rbind()/list_cbind()的组合方式。\n\n# map ---------------------------------------------\n# Was:\nmtcars |&gt;\n  split(mtcars$cyl) |&gt;\n  map(\\(df) lm(mpg ~ wt, data = df)) |&gt;\n  map_dfr(\\(mod) as.data.frame(t(as.matrix(coef(mod)))))\n#&gt;   (Intercept)        wt\n#&gt; 1    39.57120 -5.647025\n#&gt; 2    28.40884 -2.780106\n#&gt; 3    23.86803 -2.192438\n# Now:\nmtcars |&gt;\n  split(mtcars$cyl) |&gt;\n  map(\\(df) lm(mpg ~ wt, data = df)) |&gt;\n  map(\\(mod) as.data.frame(t(as.matrix(coef(mod))))) |&gt;\n  list_rbind()\n#&gt;   (Intercept)        wt\n#&gt; 1    39.57120 -5.647025\n#&gt; 2    28.40884 -2.780106\n#&gt; 3    23.86803 -2.192438",
-    "crumbs": [
-      "26 Iteration"
-    ]
-  },
-  {
-    "objectID": "Books/R4DS/26 Iteration.html#输入元素不同",
-    "href": "Books/R4DS/26 Iteration.html#输入元素不同",
-    "title": "26 Iteration",
-    "section": "输入元素不同",
-    "text": "输入元素不同\n这一类有：\n\n对不同位置元素操作：map_at(),map_if(),map_depth()。\n要求元素类型为长度是1的list：lmap()和其变体lmap_at(),lmap_if()。\n\n\nmap_at()\n通过参数.at，提供元素在输入中的位置或name属性，针对特定元素进行操作。\n\nl3 &lt;- list(\n  a = 1:3,\n  b = LETTERS[1:3],\n  c = 7:9\n)\n\nl3 |&gt;\n  map_at(.at = c(\"a\", \"c\"), ~ .x + 1)\n#&gt; $a\n#&gt; [1] 2 3 4\n#&gt; \n#&gt; $b\n#&gt; [1] \"A\" \"B\" \"C\"\n#&gt; \n#&gt; $c\n#&gt; [1]  8  9 10\n\n\n\nmap_if()\n通过参数.p，提供元素要满足的条件，针对特定元素进行操作，可以是判断函数，也可以是逻辑向量。\n\nl3 |&gt;\n  map_if(.p = is.numeric, ~ .x + 1)\n#&gt; $a\n#&gt; [1] 2 3 4\n#&gt; \n#&gt; $b\n#&gt; [1] \"A\" \"B\" \"C\"\n#&gt; \n#&gt; $c\n#&gt; [1]  8  9 10\n\n\n\nmap_depth()\n通过参数.depth，提供元素的深度，针对该深度处的元素进行操作。\n\nx &lt;- list(a = list(foo = 1:2, bar = 3:4), b = list(baz = 5:6))\nx |&gt; str()\n#&gt; List of 2\n#&gt;  $ a:List of 2\n#&gt;   ..$ foo: int [1:2] 1 2\n#&gt;   ..$ bar: int [1:2] 3 4\n#&gt;  $ b:List of 1\n#&gt;   ..$ baz: int [1:2] 5 6\n\nx |&gt;\n  map_depth(2, \\(y) paste(y, collapse = \"/\")) |&gt;\n  str()\n#&gt; List of 2\n#&gt;  $ a:List of 2\n#&gt;   ..$ foo: chr \"1/2\"\n#&gt;   ..$ bar: chr \"3/4\"\n#&gt;  $ b:List of 1\n#&gt;   ..$ baz: chr \"5/6\"\n\n# Equivalent to:\nx |&gt;\n  map(\\(y) map(y, \\(z) paste(z, collapse = \"/\"))) |&gt;\n  str()\n#&gt; List of 2\n#&gt;  $ a:List of 2\n#&gt;   ..$ foo: chr \"1/2\"\n#&gt;   ..$ bar: chr \"3/4\"\n#&gt;  $ b:List of 1\n#&gt;   ..$ baz: chr \"5/6\"\n\n\n\nlmap() 类\nlmap()与map()的不同之处在于，后者提取使用[[i]]来提取list中的元素，返回一个向量，前者使用[i]提取list中的元素，返回一个list。\n由于lmap()操作对象是list，所以它可以使用list中的name属性；在返回结果时，它会使用c()将list合并。下面是一个示例：\n\nadd_minus &lt;- function(x) {\n  res1 &lt;- lapply(x, function(y) y - 1)\n  names(res1) &lt;- paste0(names(x), \"_minus\")\n  res2 &lt;- lapply(x, function(y) y + 1)\n  names(res2) &lt;- paste0(names(x), \"_plus\")\n  c(res1, res2)\n}\n\n# The output size varies each time we map f()\ntest &lt;- list(a = 1:4, c = 8:9)\ntest |&gt;\n  lmap(add_minus) |&gt;\n  str()\n#&gt; List of 4\n#&gt;  $ a_minus: num [1:4] 0 1 2 3\n#&gt;  $ a_plus : num [1:4] 2 3 4 5\n#&gt;  $ c_minus: num [1:2] 7 8\n#&gt;  $ c_plus : num [1:2] 9 10\n\n所以，lmap()对参数.x，.f有不同的要求：\n\n.x：list 或 data.frame\n.f：该函数输入为长度是1的list，输出是任意长度的list。",
-    "crumbs": [
-      "26 Iteration"
-    ]
-  },
-  {
-    "objectID": "Books/R4DS/26 Iteration.html#函数参数数目",
-    "href": "Books/R4DS/26 Iteration.html#函数参数数目",
-    "title": "26 Iteration",
-    "section": "函数参数数目",
-    "text": "函数参数数目\n这一类函数有map2()、pmap()和map2()的变体imap()。这些函数与map()的使用方法类似，只是多提供了一组或多组.f函数的参数。同时这些函数都有*_lgl(),*_int(), *_dbl(), *_chr(), *_vec(), *_dfc(), *_dfr(),*walk()等变体，使用方法同上。\n\nimap()\nimap()是map2(x, names(x), ...)或map2(x, seq_along(x), ...)的简写，其余使用方法相同。\n\nset.seed(123)\nimap_chr(sample(10), paste)\n#&gt;  [1] \"3 1\"  \"10 2\" \"2 3\"  \"8 4\"  \"6 5\"  \"9 6\"  \"1 7\"  \"7 8\"  \"5 9\"  \"4 10\"",
-    "crumbs": [
-      "26 Iteration"
-    ]
-  },
-  {
-    "objectID": "Books/R4DS/index.html",
-    "href": "Books/R4DS/index.html",
-    "title": "index",
-    "section": "",
-    "text": "本篇为书籍R for Data Science的学习笔记。\n原文见：R for Data Science (2e)\n\n\n\n Back to top",
-    "crumbs": [
-      "index"
-    ]
-  },
-  {
-    "objectID": "Books/Tidy Modeling with R/index.html",
-    "href": "Books/Tidy Modeling with R/index.html",
-    "title": "index",
-    "section": "",
-    "text": "本篇为书籍Tidy Modeling with R的学习笔记。\n原文见：Tidy Modeling with R\ntidymodels R包官方网站：https://www.tidymodels.org\n本书主要包含两方面：\n\n如何使用tidymodels包进行机器学习建模\n统计建模中的实践经验\n\n下面是全文概览：\n\n第1章：概述模型的分类，强调什么是好的建模软件。\n第2章：回顾 tidyverse 语法。\n第3章：base R中的统计建模总览及其不足。\n第4~9章：tidymodel系列包的介绍：recipes，parsnip，workflows，yardstick等。\n第10~15章：模型性能评估与调参。\n第16~21章：如何理解和解构模型。\n\n\n\n\n Back to top",
-    "crumbs": [
-      "index"
-    ]
-  },
-  {
-    "objectID": "Books/quarto/Project Basics.html",
-    "href": "Books/quarto/Project Basics.html",
-    "title": "Project Basics",
-    "section": "",
-    "text": "原文：https://quarto.org/docs/projects/quarto-projects.html\nquarto的官方网站提供了许多创建项目的教程，如下图，如何创建项目，这里不再赘述。\n\n\n\n官网教程\n\n\n\n\n当你创建一个项目后，会自动生成一个项目级的YAML文件——_quarto.yml，该文件用来配置整个项目。示例如下：\nproject:\n  output-dir: _output\n\ntoc: true\nnumber-sections: true\nbibliography: references.bib\n\nformat:\n  html:\n    css: styles.css\n    html-math-method: katex\n  pdf:\n    documentclass: report\n    margin-left: 30mm\n    margin-right: 30mm\n随着项目的持续进行，对各部分的调控会显得及其臃肿，最好的办法是将其进行拆分。使用metadata-files可以进行配置，下面是一个混合导航栏的拆分示例，更多导航栏信息见https://quarto.org/docs/websites/website-navigation.html。\n\n\n_quarto.yml\n\nproject:\n  type: website\n\nwebsite:\n  navbar:\n    left:\n      - text: Books\n        menu:\n          - sidebar:ggplot2\n\nmetadata-files:\n  - ggplot2/_ggplot.yml\n\n\n\n_ggplot.yml\n\nwebsite:\n  sidebar:\n    - id: ggplot2\n      title: ggplot2\n      contents:\n        - ggplot2/index.qmd\n\n与上面导航栏示例不同，quarto提供了另外一种——文件夹级配置文件——_metadata.yml。如下：\n\n\n_metadata.yml\n\nformat:\n  revealjs:\n    menu: false\n    progress: false\nsearch: false\n\nquarto中的配置信息分为三级，按优先级由低到高：\n\n项目级配置文件：_quarto.yml\n文件夹级配置文件：dir/_metadata.yml\n文件级配置文件：dir/file.qmd\n\nquarto会自动对配置文件进行合并或覆盖，示例如下，最终的配置体现在文件级配置文件中。\n\n\n\n\n\n\n\n\n\n\n_quarto.yml\n\nformat:\n  html:\n    toc: true\nbibliography:\n  - refs.bib\n\n\n\ndir/_metadata.yml\n\nformat:\n  html:\n    code-fold: true\nbibliography:\n  - proj.bib\n\n\n\nmerge\n\nformat:\n  html:\n    toc: true\n    code-fold: true\nbibliography:\n  - refs.bib\n  - proj.bib\n\n\n\n\n也可以设置本地配置文件_quarto.yml.local，不进行上传，该文件会自动添加到.gitignore中。\n\n\n_quarto.yml.local\n\nexecute:\n  cache: true\n\n\n\n\n使用quarto 进行渲染时，你可以：\n\n渲染整个项目quarto render\n渲染某个目录quarto render subdir\n渲染为不同格式的文件quarto render --to pdf\n\n如果不想渲染整个项目，只渲染部分文档，可以进行如下配置：\nproject:\n  render:\n    - section1.qmd\n    - section2.qmd\nproject:\n  render:\n    - section*.qmd\n当你想配置某些文件不渲染时，可以进行如下配置，注意一定要包含*.qmd:\nproject:\n  render:\n    - \"*.qmd\"\n    - \"!ignored.qmd\"\n    - \"!ignored-dir/\"",
-    "crumbs": [
-      "Project Basics"
-    ]
-  },
-  {
-    "objectID": "Books/quarto/Project Basics.html#shared-metadata",
-    "href": "Books/quarto/Project Basics.html#shared-metadata",
-    "title": "Project Basics",
-    "section": "",
-    "text": "当你创建一个项目后，会自动生成一个项目级的YAML文件——_quarto.yml，该文件用来配置整个项目。示例如下：\nproject:\n  output-dir: _output\n\ntoc: true\nnumber-sections: true\nbibliography: references.bib\n\nformat:\n  html:\n    css: styles.css\n    html-math-method: katex\n  pdf:\n    documentclass: report\n    margin-left: 30mm\n    margin-right: 30mm\n随着项目的持续进行，对各部分的调控会显得及其臃肿，最好的办法是将其进行拆分。使用metadata-files可以进行配置，下面是一个混合导航栏的拆分示例，更多导航栏信息见https://quarto.org/docs/websites/website-navigation.html。\n\n\n_quarto.yml\n\nproject:\n  type: website\n\nwebsite:\n  navbar:\n    left:\n      - text: Books\n        menu:\n          - sidebar:ggplot2\n\nmetadata-files:\n  - ggplot2/_ggplot.yml\n\n\n\n_ggplot.yml\n\nwebsite:\n  sidebar:\n    - id: ggplot2\n      title: ggplot2\n      contents:\n        - ggplot2/index.qmd\n\n与上面导航栏示例不同，quarto提供了另外一种——文件夹级配置文件——_metadata.yml。如下：\n\n\n_metadata.yml\n\nformat:\n  revealjs:\n    menu: false\n    progress: false\nsearch: false\n\nquarto中的配置信息分为三级，按优先级由低到高：\n\n项目级配置文件：_quarto.yml\n文件夹级配置文件：dir/_metadata.yml\n文件级配置文件：dir/file.qmd\n\nquarto会自动对配置文件进行合并或覆盖，示例如下，最终的配置体现在文件级配置文件中。\n\n\n\n\n\n\n\n\n\n\n_quarto.yml\n\nformat:\n  html:\n    toc: true\nbibliography:\n  - refs.bib\n\n\n\ndir/_metadata.yml\n\nformat:\n  html:\n    code-fold: true\nbibliography:\n  - proj.bib\n\n\n\nmerge\n\nformat:\n  html:\n    toc: true\n    code-fold: true\nbibliography:\n  - refs.bib\n  - proj.bib\n\n\n\n\n也可以设置本地配置文件_quarto.yml.local，不进行上传，该文件会自动添加到.gitignore中。\n\n\n_quarto.yml.local\n\nexecute:\n  cache: true",
-    "crumbs": [
-      "Project Basics"
-    ]
-  },
-  {
-    "objectID": "Books/quarto/Project Basics.html#rendering-projects",
-    "href": "Books/quarto/Project Basics.html#rendering-projects",
-    "title": "Project Basics",
-    "section": "",
-    "text": "使用quarto 进行渲染时，你可以：\n\n渲染整个项目quarto render\n渲染某个目录quarto render subdir\n渲染为不同格式的文件quarto render --to pdf\n\n如果不想渲染整个项目，只渲染部分文档，可以进行如下配置：\nproject:\n  render:\n    - section1.qmd\n    - section2.qmd\nproject:\n  render:\n    - section*.qmd\n当你想配置某些文件不渲染时，可以进行如下配置，注意一定要包含*.qmd:\nproject:\n  render:\n    - \"*.qmd\"\n    - \"!ignored.qmd\"\n    - \"!ignored-dir/\"",
-    "crumbs": [
-      "Project Basics"
-    ]
-  },
-  {
-    "objectID": "blog.html",
-    "href": "blog.html",
-    "title": "",
-    "section": "",
-    "text": "Order By\n       Default\n         \n          Title\n        \n         \n          Date - Oldest\n        \n         \n          Date - Newest\n        \n     \n  \n    \n      \n      \n    \n\n\n\n\n\n\n\n\n\n\nquarto 中R代码块的设置\n\n\n\n\n\n\nquarto\n\n\n\n\n\n\n\n\n\n2025-03-15\n\n\n大番薯本薯\n\n\n\n\n\n\n\n\n\n\n\n\nR 中的面向对象(1)\n\n\n\n\n\n\n面向对象\n\n\n\n\n\n\n\n\n\n2025-03-16\n\n\n大番薯本薯\n\n\n\n\n\n\nNo matching items\n\n Back to top"
-  },
-  {
-    "objectID": "Books/Advanced R/12 Base types.html#base-vs-oo-objects",
-    "href": "Books/Advanced R/12 Base types.html#base-vs-oo-objects",
-    "title": "12 Base types",
-    "section": "Base VS OO objects",
-    "text": "Base VS OO objects\n区分二者的三种方法：\n\nis.object()：base object返回FALSE，OO object返回TRUE。\nsloop::otype()：base object返回base，OO object返回其他，如S3。\nattr()：base object返回NULL，OO object返回class属性。\n\n\nis.object(1:10)\n#&gt; [1] FALSE\nis.object(mtcars)\n#&gt; [1] TRUE\n\nsloop::otype(1:10)\n#&gt; [1] \"base\"\nsloop::otype(mtcars)\n#&gt; [1] \"S3\"\n\nattr(1:10, \"class\")\n#&gt; NULL\nattr(mtcars, \"class\")\n#&gt; [1] \"data.frame\"",
-    "crumbs": [
-      "12 Base types"
-    ]
-  },
-  {
-    "objectID": "Books/Advanced R/12 Base types.html#base-types",
-    "href": "Books/Advanced R/12 Base types.html#base-types",
-    "title": "12 Base types",
-    "section": "Base types",
-    "text": "Base types\n无论是OO object还是base object，都有一个base type，使用typeof()来查看；不要使用mode()或storage.mode()，它们只适配S语言。\n\ntypeof(1:10)\n#&gt; [1] \"integer\"\n\ntypeof(mtcars)\n#&gt; [1] \"list\"\n\ntypeof(mean)\n#&gt; [1] \"closure\"\n\nR 的底层使用了C语言中的switch语句来对不同base type执行不同处理。想要新增一个base type需要修改R-core，所以通常不会随意增加base type。截至目前一共有25种base type，下面按照本书中出现的顺序列举。\n\nVector\n\n\n\nbase Type\nC Type\n\n\n\n\nNULL\nNILSXP\n\n\nlogical\nLGLSXP\n\n\ninteger\nINTSXP\n\n\ndouble\nREALSXP\n\n\ncomplex\nCPLXSXP\n\n\ncharacter\nSTRSXP\n\n\nlist\nVECSXP\n\n\nraw\nRAWSXP\n\n\n\n\ntypeof(NULL)\n#&gt; [1] \"NULL\"\ntypeof(1L)\n#&gt; [1] \"integer\"\ntypeof(1i)\n#&gt; [1] \"complex\"\n\n\n\nFunctions\n\n\n\nbase Type\nC Type\nfunction type\n\n\n\n\nclosure\nCLOSXP\nregular R functions\n\n\nspecial\nSPECIALSXP\ninternal functions\n\n\nbuiltin\nBUILTINSXP\nprimitive functions\n\n\n\n\ntypeof(mean)\n#&gt; [1] \"closure\"\ntypeof(`[`)\n#&gt; [1] \"special\"\ntypeof(sum)\n#&gt; [1] \"builtin\"\n\n\n\nEnvironments\n\n\n\nbase Type\nC Type\n\n\n\n\nenvironment\nENVSXP\n\n\n\n\ntypeof(globalenv())\n#&gt; [1] \"environment\"\n\n\n\nS4\n\n\n\nbase Type\nC Type\n\n\n\n\nS4\nS4SXP\n\n\n\n\nmle_obj &lt;- stats4::mle(function(x = 1) (x - 2)^2)\ntypeof(mle_obj)\n#&gt; [1] \"S4\"\n\n\n\nLanguage components\n\n\n\nbase Type\nC Type\n\n\n\n\nsymbol\nSYMSXP\n\n\nlanguage\nLANGSXP\n\n\npairlist\nLISTSXP\n\n\nexpression\nEXPRSXP\n\n\n\n\ntypeof(quote(a))\n#&gt; [1] \"symbol\"\ntypeof(quote(a + 1))\n#&gt; [1] \"language\"\ntypeof(formals(mean))\n#&gt; [1] \"pairlist\"\ntypeof(expression(1 + 0:9))\n#&gt; [1] \"expression\"\n\n\n\nOthers\n\n\n\nbase Type\nC Type\n\n\n\n\nexternalptr\nEXTPTRSXP\n\n\nweakref\nWEAKREFSXP\n\n\nbytecode\nBCODESXP\n\n\npromise\nPROMSXP\n\n\n...\nDOTSXP\n\n\nany\nANYSXP\n\n\n\n\n\nNumeric type\n“numeric”在R中存在三种解读：\n\n某些地方，numeric是double的别名。例如as.numeric()和as.double()等价，numeric()和double()等价。\n在S3和S4系统中，“numeric”用作”integer type”或”double type”的缩写：\n\nsloop::s3_class(1)\n#&gt; [1] \"double\"  \"numeric\"\nsloop::s3_class(1L)\n#&gt; [1] \"integer\" \"numeric\"\n\nis.numeric()用来检测那些行为类似number的对象。例如，因子的本质是”integer type”，但是没有number的行为（求取一个因子的均值毫无意义）。\n\ntypeof(factor(\"x\"))\n#&gt; [1] \"integer\"\nis.numeric(factor(\"x\"))\n#&gt; [1] FALSE\n\n\n本书中的numeric表示integer或double。",
-    "crumbs": [
-      "12 Base types"
-    ]
   },
   {
     "objectID": "Books/Advanced R/1 Introduction.html",
@@ -513,23 +456,6 @@
     ]
   },
   {
-    "objectID": "Books/Advanced R/Introduction.html",
-    "href": "Books/Advanced R/Introduction.html",
-    "title": "",
-    "section": "",
-    "text": "Back to top"
-  },
-  {
-    "objectID": "Books/Advanced R/Foundations Introduction.html",
-    "href": "Books/Advanced R/Foundations Introduction.html",
-    "title": "Introduction",
-    "section": "",
-    "text": "第二章：object和它的name之间的区别。认识到它们的区别，你会在复制对象时更加的小心，因为这涉及内存的消耗，你会明白哪些操作是廉价的，哪些是昂贵的。\n第三章：vector的类型和属性(attributes)。\n第四章：子集操作。\n第五章：控制流，if,for,switch(),while等语句。\n第六章：函数function构建细节，运行机制，退出机制；lazy 语式。\n第七章：R环境的数据结构。\n第八章：控制如何输出错误，警告，信息等。\n\n\n\n\n Back to top",
-    "crumbs": [
-      "Introduction"
-    ]
-  },
-  {
     "objectID": "Books/Advanced R/2 Names and values.html",
     "href": "Books/Advanced R/2 Names and values.html",
     "title": "2 Names and values",
@@ -600,83 +526,160 @@
     ]
   },
   {
-    "objectID": "Books/Advanced R/12 Base types.html#introduction",
-    "href": "Books/Advanced R/12 Base types.html#introduction",
-    "title": "12 Base types",
+    "objectID": "Books/Advanced R/Foundations Introduction.html",
+    "href": "Books/Advanced R/Foundations Introduction.html",
+    "title": "Introduction",
     "section": "",
-    "text": "在R中，流传着这么一句话——R里的一切都是对象。但此对象非彼对象，前者指得是来自于S语言的base object，同我们研究的面向对象(OO object)不是一回事。\n下面我们介绍如何区分base object和OO object及所有base object的类别。",
+    "text": "第二章：object和它的name之间的区别。认识到它们的区别，你会在复制对象时更加的小心，因为这涉及内存的消耗，你会明白哪些操作是廉价的，哪些是昂贵的。\n第三章：vector的类型和属性(attributes)。\n第四章：子集操作。\n第五章：控制流，if,for,switch(),while等语句。\n第六章：函数function构建细节，运行机制，退出机制；lazy 语式。\n第七章：R环境的数据结构。\n第八章：控制如何输出错误，警告，信息等。\n\n\n\n\n Back to top",
     "crumbs": [
-      "12 Base types"
+      "Introduction"
     ]
   },
   {
-    "objectID": "Books/Advanced R/3 Vectors.html",
-    "href": "Books/Advanced R/3 Vectors.html",
-    "title": "3 Vectors",
+    "objectID": "Books/R4DS2/26 Iteration.html",
+    "href": "Books/R4DS2/26 Iteration.html",
+    "title": "26 Iteration",
     "section": "",
-    "text": "R 中的Vectors可以分为两种：要求所有元素相同的atomic、元素可以是任意类型的list，还有一个类似零长度向量的NULL。下面是三者关系的示意图。\n\n\n\n\n\ngraph TD\n    A[Atomic] --&gt; B(Vector)\n    C[List] --&gt; B(Vector)\n    D(NULL)\n\n\n\n\n\n\n这里提到的vector就是我们常说的向量。在R中，所有的对象都是向量，对向量添加不同属性就构成了不同类型的数据。维度（dimension）和类（clas）是两个比较重要的属性，前者将一维向量升格为二维矩阵甚至多维数组，后者赋予了对象S3面向对象系统。\n\n\n\n3.2节：R中最简单的 atomic 向量：integer、double、character、logical。\n3.3节：向量的三个重要属性：name、dimension、class。\n3.4节：具有特殊属性的 atomic 向量：factor、date、date-time、duration。\n3.5节：list。\n3.6节：data.frame 和 tibble。",
+    "text": "在tidyverse中有一些常见的循环操作，如：\n\n绘制分面——facet_wrap(),facet_grid()\n分组总结–group_by(),summarise()\nlist-column解压——unnest_wider(),unnest_longer()\n\n下面我们学习另外一些循环技巧。\n\nlibrary(tidyverse)",
     "crumbs": [
-      "3 Vectors"
+      "26 Iteration"
     ]
   },
   {
-    "objectID": "Books/Advanced R/3 Vectors.html#introduction",
-    "href": "Books/Advanced R/3 Vectors.html#introduction",
-    "title": "3 Vectors",
+    "objectID": "Books/R4DS2/26 Iteration.html#选择列",
+    "href": "Books/R4DS2/26 Iteration.html#选择列",
+    "title": "26 Iteration",
+    "section": "选择列",
+    "text": "选择列\n.cols控制选择哪几列，是一个tidy-select类，类似于dplyr中的select()，可以使用适配select()的函数，如starts_with()、contains()等。\n更多有过关于tidy-select的内容，可以参考?dplyr_tidy_select。\n\ndf &lt;- tibble(\n  grp = sample(2, 10, replace = TRUE),\n  a = rnorm(10),\n  b = rnorm(10),\n  c = rnorm(10),\n  d = rnorm(10)\n)\n\ndf |&gt;\n  group_by(grp) |&gt;\n  summarize(across(everything(), median))\n#&gt; # A tibble: 2 × 5\n#&gt;     grp       a       b     c     d\n#&gt;   &lt;int&gt;   &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;\n#&gt; 1     1 -0.0935 -0.0163 0.363 0.364\n#&gt; 2     2  0.312  -0.0576 0.208 0.565",
+    "crumbs": [
+      "26 Iteration"
+    ]
+  },
+  {
+    "objectID": "Books/R4DS2/26 Iteration.html#函数",
+    "href": "Books/R4DS2/26 Iteration.html#函数",
+    "title": "26 Iteration",
+    "section": "函数",
+    "text": "函数\n.fns参数提供across()进行call的函数，可以是 - 函数名，例如mean，注意此处函数后不能有() - purrr-style lambda，例如~mean(.x, na.rm = TRUE) - 上述两种函数组成的named list，例如list(mean = mean,n_miss = ~ sum(is.na(.x))\n\n\n\n函数名\n\n# 函数名后有`()`会报错。\ndf |&gt;\n  group_by(grp) |&gt;\n  summarize(across(everything(), median()))\n#&gt; Error in `summarize()`:\n#&gt; ℹ In argument: `across(everything(), median())`.\n#&gt; Caused by error in `median.default()`:\n#&gt; ! argument \"x\" is missing, with no default\n\n\n\n\n\npurrr-style lambda\n\nrnorm_na &lt;- function(n, n_na, mean = 0, sd = 1) {\n  sample(c(rnorm(n - n_na, mean = mean, sd = sd), rep(NA, n_na)))\n}\n\ndf_miss &lt;- tibble(\n  a = rnorm_na(5, 1),\n  b = rnorm_na(5, 1),\n  c = rnorm_na(5, 2),\n  d = rnorm(5)\n)\n\ndf_miss |&gt;\n  summarize(\n    across(a:d, ~ median(., na.rm = TRUE)),\n    n = n()\n  )\n#&gt; # A tibble: 1 × 5\n#&gt;       a     b      c     d     n\n#&gt;   &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt;\n#&gt; 1 0.139 -1.11 -0.387  1.15     5\n\ndf_miss |&gt;\n  summarize(\n    across(a:d, function(x) median(x, na.rm = TRUE)),\n    n = n()\n  )\n#&gt; # A tibble: 1 × 5\n#&gt;       a     b      c     d     n\n#&gt;   &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt;\n#&gt; 1 0.139 -1.11 -0.387  1.15     5\n\ndf_miss |&gt;\n  summarize(\n    across(a:d, \\(x) median(x, na.rm = TRUE)),\n    n = n()\n  )\n#&gt; # A tibble: 1 × 5\n#&gt;       a     b      c     d     n\n#&gt;   &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt;\n#&gt; 1 0.139 -1.11 -0.387  1.15     5\n\n\n\n\n\n函数list\n\ndf_miss |&gt;\n  summarize(\n    across(a:d, list(\n      median = \\(x) median(x, na.rm = TRUE),\n      n_miss = \\(x) sum(is.na(x))\n    )),\n    n = n()\n  )\n#&gt; # A tibble: 1 × 9\n#&gt;   a_median a_n_miss b_median b_n_miss c_median c_n_miss d_median d_n_miss\n#&gt;      &lt;dbl&gt;    &lt;int&gt;    &lt;dbl&gt;    &lt;int&gt;    &lt;dbl&gt;    &lt;int&gt;    &lt;dbl&gt;    &lt;int&gt;\n#&gt; 1    0.139        1    -1.11        1   -0.387        2     1.15        0\n#&gt; # ℹ 1 more variable: n &lt;int&gt;",
+    "crumbs": [
+      "26 Iteration"
+    ]
+  },
+  {
+    "objectID": "Books/R4DS2/26 Iteration.html#列名",
+    "href": "Books/R4DS2/26 Iteration.html#列名",
+    "title": "26 Iteration",
+    "section": "列名",
+    "text": "列名\n如果你仔细观察，上面例子中的列名类似于{.col}_{.fn}（这也是为什么函数list是要有name属性的原因）。\n.names参数控制列名定义规则，使用{.col}表示原始列名，{.fn}表示函数名；单个函数默认{.col}，多个函数默认{.col}_{.fn}。\nacross()在与mutate()联用时会将原来的列覆盖，因为.names()默认是{.col}，所以看不出来，当参数值改变后就会直观的体现出来：\n\n\n\n与mutate联用\n\ndf_miss |&gt;\n  mutate(\n    across(a:d, \\(x) coalesce(x, 0), .names = \"{.col}_na_zero\")\n  )\n#&gt; # A tibble: 5 × 8\n#&gt;        a      b      c     d a_na_zero b_na_zero c_na_zero d_na_zero\n#&gt;    &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;\n#&gt; 1  0.434 -1.25  NA     1.60      0.434    -1.25      0         1.60 \n#&gt; 2 NA     -1.43  -0.297 0.776     0        -1.43     -0.297     0.776\n#&gt; 3 -0.156 -0.980 NA     1.15     -0.156    -0.980     0         1.15 \n#&gt; 4 -2.61  -0.683 -0.785 2.13     -2.61     -0.683    -0.785     2.13 \n#&gt; 5  1.11  NA     -0.387 0.704     1.11      0        -0.387     0.704",
+    "crumbs": [
+      "26 Iteration"
+    ]
+  },
+  {
+    "objectID": "Books/R4DS2/26 Iteration.html#filter中的循环",
+    "href": "Books/R4DS2/26 Iteration.html#filter中的循环",
+    "title": "26 Iteration",
+    "section": "filter()中的循环",
+    "text": "filter()中的循环\ndplyr 提供了两个across()的变体:\n\nif_any()：至少有一个条件返回TRUE\nif_all()：所有条件返回TRUE\n\n\n# same as df_miss |&gt; filter(is.na(a) | is.na(b) | is.na(c) | is.na(d))\ndf_miss |&gt; filter(if_any(a:d, is.na))\n#&gt; # A tibble: 4 × 4\n#&gt;        a      b      c     d\n#&gt;    &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;\n#&gt; 1  0.434 -1.25  NA     1.60 \n#&gt; 2 NA     -1.43  -0.297 0.776\n#&gt; 3 -0.156 -0.980 NA     1.15 \n#&gt; 4  1.11  NA     -0.387 0.704\n\n# same as df_miss |&gt; filter(is.na(a) & is.na(b) & is.na(c) & is.na(d))\ndf_miss |&gt; filter(if_all(a:d, is.na))\n#&gt; # A tibble: 0 × 4\n#&gt; # ℹ 4 variables: a &lt;dbl&gt;, b &lt;dbl&gt;, c &lt;dbl&gt;, d &lt;dbl&gt;",
+    "crumbs": [
+      "26 Iteration"
+    ]
+  },
+  {
+    "objectID": "Books/R4DS2/26 Iteration.html#与piovt_longer对比",
+    "href": "Books/R4DS2/26 Iteration.html#与piovt_longer对比",
+    "title": "26 Iteration",
+    "section": "与piovt_longer()对比",
+    "text": "与piovt_longer()对比\n使用piovt_longer()可以实现across()，反之则不成立。例如下面的两个例子\n\n\n\nacross\n\ndf |&gt;\n  summarize(across(a:d, list(median = median, mean = mean)))\n#&gt; # A tibble: 1 × 8\n#&gt;   a_median a_mean b_median b_mean c_median c_mean d_median d_mean\n#&gt;      &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;  &lt;dbl&gt;\n#&gt; 1   0.0380  0.205  -0.0163 0.0910    0.260 0.0716    0.540  0.508\n\n\n\n\n\npivot_longer 复现\n\nlong &lt;- df |&gt;\n  pivot_longer(a:d) |&gt;\n  group_by(name) |&gt;\n  summarize(\n    median = median(value),\n    mean = mean(value)\n  )\nlong |&gt;\n  pivot_wider(\n    names_from = name,\n    values_from = c(median, mean),\n    names_vary = \"slowest\",\n    names_glue = \"{name}_{.value}\"\n  )\n#&gt; # A tibble: 1 × 8\n#&gt;   a_median a_mean b_median b_mean c_median c_mean d_median d_mean\n#&gt;      &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;  &lt;dbl&gt;\n#&gt; 1   0.0380  0.205  -0.0163 0.0910    0.260 0.0716    0.540  0.508\n\n\n\n\n\n只能使用pivot_longer\n\ndf_paired &lt;- tibble(\n  a_val = rnorm(10),\n  a_wts = runif(10),\n  b_val = rnorm(10),\n  b_wts = runif(10),\n  c_val = rnorm(10),\n  c_wts = runif(10),\n  d_val = rnorm(10),\n  d_wts = runif(10)\n)\n\ndf_long &lt;- df_paired |&gt;\n  pivot_longer(\n    everything(),\n    names_to = c(\"group\", \".value\"),\n    names_sep = \"_\"\n  )\ndf_long\n#&gt; # A tibble: 40 × 3\n#&gt;   group    val   wts\n#&gt;   &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt;\n#&gt; 1 a      0.715 0.518\n#&gt; 2 b     -0.709 0.691\n#&gt; 3 c      0.718 0.216\n#&gt; 4 d     -0.217 0.733\n#&gt; 5 a     -1.09  0.979\n#&gt; 6 b     -0.209 0.675\n#&gt; # ℹ 34 more rows\n\ndf_long |&gt;\n  group_by(group) |&gt;\n  summarize(mean = weighted.mean(val, wts))\n#&gt; # A tibble: 4 × 2\n#&gt;   group    mean\n#&gt;   &lt;chr&gt;   &lt;dbl&gt;\n#&gt; 1 a      0.126 \n#&gt; 2 b     -0.0704\n#&gt; 3 c     -0.360 \n#&gt; 4 d     -0.248",
+    "crumbs": [
+      "26 Iteration"
+    ]
+  },
+  {
+    "objectID": "Books/R4DS2/26 Iteration.html#返回结果不同",
+    "href": "Books/R4DS2/26 Iteration.html#返回结果不同",
+    "title": "26 Iteration",
+    "section": "返回结果不同",
+    "text": "返回结果不同\nmap()函数会返回一个list，其变体则不同。\n\n返回输入值\nwalk()函数只能隐性返回输入，对.f生成的结果没有处理，这在循环绘图中十分便利。\nres &lt;- 1:4 |&gt;\n  walk(\\(x) {\n    hist(rnorm(100, x))\n  })\n\nres\n#&gt; [1] 1 2 3 4\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n返回结果结构与输入相同\nmodify()函数会输出一个与输入结构完全相同的结果，常用来修改元素类型。\n\n# Convert to characters\niris |&gt; str()\n#&gt; 'data.frame':    150 obs. of  5 variables:\n#&gt;  $ Sepal.Length: num  5.1 4.9 4.7 4.6 5 5.4 4.6 5 4.4 4.9 ...\n#&gt;  $ Sepal.Width : num  3.5 3 3.2 3.1 3.6 3.9 3.4 3.4 2.9 3.1 ...\n#&gt;  $ Petal.Length: num  1.4 1.4 1.3 1.5 1.4 1.7 1.4 1.5 1.4 1.5 ...\n#&gt;  $ Petal.Width : num  0.2 0.2 0.2 0.2 0.2 0.4 0.3 0.2 0.2 0.1 ...\n#&gt;  $ Species     : Factor w/ 3 levels \"setosa\",\"versicolor\",..: 1 1 1 1 1 1 1 1 1 1 ...\niris |&gt;\n  modify(as.character) |&gt;\n  str()\n#&gt; 'data.frame':    150 obs. of  5 variables:\n#&gt;  $ Sepal.Length: chr  \"5.1\" \"4.9\" \"4.7\" \"4.6\" ...\n#&gt;  $ Sepal.Width : chr  \"3.5\" \"3\" \"3.2\" \"3.1\" ...\n#&gt;  $ Petal.Length: chr  \"1.4\" \"1.4\" \"1.3\" \"1.5\" ...\n#&gt;  $ Petal.Width : chr  \"0.2\" \"0.2\" \"0.2\" \"0.2\" ...\n#&gt;  $ Species     : chr  \"setosa\" \"setosa\" \"setosa\" \"setosa\" ...\n\n其还有变体modify_if()，modify_at()，modify2()，imodify()，使用方法相似，具体差异同下面讲到的一样。\n\n\n返回原子向量\n这一类有map_lgl(),map_int(),map_dbl(),map_chr(),map_vec()；要求返回的原子向量类型为函数名后缀规定的类型，否则报错。例如：map_lgl()函数要求返回结果为由TRUE和FALSE构成的向量，否则报错。map_vec()函数提供了参数.ptype，可以指定返回结果的类型。\n\nnumbers &lt;- list(1, 2, 3, 4)\n\nmap_lgl(numbers, ~ .x %% 2 == 0)\n#&gt; [1] FALSE  TRUE FALSE  TRUE\n\nmap_lgl(numbers, ~ .x * 2)\n#&gt; Error in `map_lgl()`:\n#&gt; ℹ In index: 1.\n#&gt; Caused by error:\n#&gt; ! Can't coerce from a number to a logical.\n\n\n\n返回数据框\n这一类有map_dfc(),map_dfr()，这两类函数在官方文档中已经不再推荐使用，而是使用map() + list_rbind()/list_cbind()的组合方式。\n\n# map ---------------------------------------------\n# Was:\nmtcars |&gt;\n  split(mtcars$cyl) |&gt;\n  map(\\(df) lm(mpg ~ wt, data = df)) |&gt;\n  map_dfr(\\(mod) as.data.frame(t(as.matrix(coef(mod)))))\n#&gt;   (Intercept)        wt\n#&gt; 1    39.57120 -5.647025\n#&gt; 2    28.40884 -2.780106\n#&gt; 3    23.86803 -2.192438\n# Now:\nmtcars |&gt;\n  split(mtcars$cyl) |&gt;\n  map(\\(df) lm(mpg ~ wt, data = df)) |&gt;\n  map(\\(mod) as.data.frame(t(as.matrix(coef(mod))))) |&gt;\n  list_rbind()\n#&gt;   (Intercept)        wt\n#&gt; 1    39.57120 -5.647025\n#&gt; 2    28.40884 -2.780106\n#&gt; 3    23.86803 -2.192438",
+    "crumbs": [
+      "26 Iteration"
+    ]
+  },
+  {
+    "objectID": "Books/R4DS2/26 Iteration.html#输入元素不同",
+    "href": "Books/R4DS2/26 Iteration.html#输入元素不同",
+    "title": "26 Iteration",
+    "section": "输入元素不同",
+    "text": "输入元素不同\n这一类有：\n\n对不同位置元素操作：map_at(),map_if(),map_depth()。\n要求元素类型为长度是1的list：lmap()和其变体lmap_at(),lmap_if()。\n\n\nmap_at()\n通过参数.at，提供元素在输入中的位置或name属性，针对特定元素进行操作。\n\nl3 &lt;- list(\n  a = 1:3,\n  b = LETTERS[1:3],\n  c = 7:9\n)\n\nl3 |&gt;\n  map_at(.at = c(\"a\", \"c\"), ~ .x + 1)\n#&gt; $a\n#&gt; [1] 2 3 4\n#&gt; \n#&gt; $b\n#&gt; [1] \"A\" \"B\" \"C\"\n#&gt; \n#&gt; $c\n#&gt; [1]  8  9 10\n\n\n\nmap_if()\n通过参数.p，提供元素要满足的条件，针对特定元素进行操作，可以是判断函数，也可以是逻辑向量。\n\nl3 |&gt;\n  map_if(.p = is.numeric, ~ .x + 1)\n#&gt; $a\n#&gt; [1] 2 3 4\n#&gt; \n#&gt; $b\n#&gt; [1] \"A\" \"B\" \"C\"\n#&gt; \n#&gt; $c\n#&gt; [1]  8  9 10\n\n\n\nmap_depth()\n通过参数.depth，提供元素的深度，针对该深度处的元素进行操作。\n\nx &lt;- list(a = list(foo = 1:2, bar = 3:4), b = list(baz = 5:6))\nx |&gt; str()\n#&gt; List of 2\n#&gt;  $ a:List of 2\n#&gt;   ..$ foo: int [1:2] 1 2\n#&gt;   ..$ bar: int [1:2] 3 4\n#&gt;  $ b:List of 1\n#&gt;   ..$ baz: int [1:2] 5 6\n\nx |&gt;\n  map_depth(2, \\(y) paste(y, collapse = \"/\")) |&gt;\n  str()\n#&gt; List of 2\n#&gt;  $ a:List of 2\n#&gt;   ..$ foo: chr \"1/2\"\n#&gt;   ..$ bar: chr \"3/4\"\n#&gt;  $ b:List of 1\n#&gt;   ..$ baz: chr \"5/6\"\n\n# Equivalent to:\nx |&gt;\n  map(\\(y) map(y, \\(z) paste(z, collapse = \"/\"))) |&gt;\n  str()\n#&gt; List of 2\n#&gt;  $ a:List of 2\n#&gt;   ..$ foo: chr \"1/2\"\n#&gt;   ..$ bar: chr \"3/4\"\n#&gt;  $ b:List of 1\n#&gt;   ..$ baz: chr \"5/6\"\n\n\n\nlmap() 类\nlmap()与map()的不同之处在于，后者提取使用[[i]]来提取list中的元素，返回一个向量，前者使用[i]提取list中的元素，返回一个list。\n由于lmap()操作对象是list，所以它可以使用list中的name属性；在返回结果时，它会使用c()将list合并。下面是一个示例：\n\nadd_minus &lt;- function(x) {\n  res1 &lt;- lapply(x, function(y) y - 1)\n  names(res1) &lt;- paste0(names(x), \"_minus\")\n  res2 &lt;- lapply(x, function(y) y + 1)\n  names(res2) &lt;- paste0(names(x), \"_plus\")\n  c(res1, res2)\n}\n\n# The output size varies each time we map f()\ntest &lt;- list(a = 1:4, c = 8:9)\ntest |&gt;\n  lmap(add_minus) |&gt;\n  str()\n#&gt; List of 4\n#&gt;  $ a_minus: num [1:4] 0 1 2 3\n#&gt;  $ a_plus : num [1:4] 2 3 4 5\n#&gt;  $ c_minus: num [1:2] 7 8\n#&gt;  $ c_plus : num [1:2] 9 10\n\n所以，lmap()对参数.x，.f有不同的要求：\n\n.x：list 或 data.frame\n.f：该函数输入为长度是1的list，输出是任意长度的list。",
+    "crumbs": [
+      "26 Iteration"
+    ]
+  },
+  {
+    "objectID": "Books/R4DS2/26 Iteration.html#函数参数数目",
+    "href": "Books/R4DS2/26 Iteration.html#函数参数数目",
+    "title": "26 Iteration",
+    "section": "函数参数数目",
+    "text": "函数参数数目\n这一类函数有map2()、pmap()和map2()的变体imap()。这些函数与map()的使用方法类似，只是多提供了一组或多组.f函数的参数。同时这些函数都有*_lgl(),*_int(), *_dbl(), *_chr(), *_vec(), *_dfc(), *_dfr(),*walk()等变体，使用方法同上。\n\nimap()\nimap()是map2(x, names(x), ...)或map2(x, seq_along(x), ...)的简写，其余使用方法相同。\n\nset.seed(123)\nimap_chr(sample(10), paste)\n#&gt;  [1] \"3 1\"  \"10 2\" \"2 3\"  \"8 4\"  \"6 5\"  \"9 6\"  \"1 7\"  \"7 8\"  \"5 9\"  \"4 10\"",
+    "crumbs": [
+      "26 Iteration"
+    ]
+  },
+  {
+    "objectID": "Books/R4DS2/index.html",
+    "href": "Books/R4DS2/index.html",
+    "title": "index",
     "section": "",
-    "text": "R 中的Vectors可以分为两种：要求所有元素相同的atomic、元素可以是任意类型的list，还有一个类似零长度向量的NULL。下面是三者关系的示意图。\n\n\n\n\n\ngraph TD\n    A[Atomic] --&gt; B(Vector)\n    C[List] --&gt; B(Vector)\n    D(NULL)\n\n\n\n\n\n\n这里提到的vector就是我们常说的向量。在R中，所有的对象都是向量，对向量添加不同属性就构成了不同类型的数据。维度（dimension）和类（clas）是两个比较重要的属性，前者将一维向量升格为二维矩阵甚至多维数组，后者赋予了对象S3面向对象系统。\n\n\n\n3.2节：R中最简单的 atomic 向量：integer、double、character、logical。\n3.3节：向量的三个重要属性：name、dimension、class。\n3.4节：具有特殊属性的 atomic 向量：factor、date、date-time、duration。\n3.5节：list。\n3.6节：data.frame 和 tibble。",
+    "text": "本篇为书籍R for Data Science的学习笔记。\n原文见：R for Data Science (2e)\n\n\n\n Back to top",
     "crumbs": [
-      "3 Vectors"
+      "index"
     ]
   },
   {
-    "objectID": "Books/Advanced R/3 Vectors.html#atomic-vectors",
-    "href": "Books/Advanced R/3 Vectors.html#atomic-vectors",
-    "title": "3 Vectors",
-    "section": "Atomic vectors",
-    "text": "Atomic vectors\nR 中有四类常见的atomic向量：integer、double、character、logical。下面是这四类向量之间的关系图。还有两类不常见的：complex和raw，前者表示复数，后者表示二级制数据。\n\n\n\n\n\ngraph BT\n    B[Atomic] --&gt; A(Vector)\n    D[Logical] --&gt; B(Atomic)\n    C[Numeric] --&gt; B(Atomic)\n    E[Integer] --&gt; C(Numeric)\n    F[Double] --&gt; C(Numeric)\n    G[Character] --&gt; B(Atomic)\n    subgraph \" \"\n        D\n        E\n        F\n        G\n    end\n\n\n\n\n\n\n\nScalars\n上述四种atomic向量都有各自的语法：\n\nlogical：只能使用TRUE/T和FALSE/F。\ndouble：有三种形式：十进制、科学技术法和十六进制；还有三个特殊的符号：NaN、Inf和-Inf。\ninteger：形式同double，但是必须添加L后缀。\ncharacter：使用双引号或单引号包裹，\\进行转义。\n\n\n\nMaking longer vectors with c()\n使用c()函数可以创建长向量，使用typeof()查看对象的类型。\n\nlgl_var &lt;- c(TRUE, FALSE)\nint_var &lt;- c(1L, 6L, 10L)\ndbl_var &lt;- c(1, 2.5, 4.5)\nchr_var &lt;- c(\"these are\", \"some strings\")\n\ntypeof(lgl_var)\n#&gt; [1] \"logical\"\ntypeof(int_var)\n#&gt; [1] \"integer\"\ntypeof(dbl_var)\n#&gt; [1] \"double\"\ntypeof(chr_var)\n#&gt; [1] \"character\"\n\n\n\nMissing values\nNA是not applicable的缩写，表示缺失值。缺失值有一定的‘传染性’：许多包含NA的计算会返回NA。\n\nNA &gt; 5\n#&gt; [1] NA\n10 * NA\n#&gt; [1] NA\n!NA\n#&gt; [1] NA\n\n但有一些特例：\n\nNA^0\n#&gt; [1] 1\nNA | TRUE\n#&gt; [1] TRUE\nNA & FALSE\n#&gt; [1] FALSE\n\n使用is.na()判断是否是NA，而不是==。\n\nx &lt;- c(NA, 5, NA, 10)\nx == NA\n#&gt; [1] NA NA NA NA\nis.na(x)\n#&gt; [1]  TRUE FALSE  TRUE FALSE\n\n理论上讲：存在四种NA类型，分别对应上述的四种atomic向量：NA(logical)、NA_integer_(integer)、NA_real_(double)、NA_character(character)。但平常使用无需强调，R会自动强制转换。NA默认表示logical是因为下面的强制转换顺序。\n\n\nCoercion\n如上所述，当atomic向量中的元素类型不一致时，R会自动强制转换类型。转换的顺序次序为：character → double → integer → logical。例如，c(\"a\", 1)的结果是c(\"a\", \"1\")。\n\nc(\"a\", 1)\n#&gt; [1] \"a\" \"1\"\n\n强制转换的背后是as.*()函数，例如as.logical()、as.integer()、as.double()、as.character()。转换失败会生成警告信息和缺失值。\n\nas.integer(c(\"1\", \"1.5\", \"a\"))\n#&gt; Warning: NAs introduced by coercion\n#&gt; [1]  1  1 NA\n\n\n\nTesting\nR 中由类似判断是否是缺失值is.na()的其他函数，但是要小心使用。is.logical()、is.integer()、is.double()、is.character()这四个函数的用法与is.na()相同；is.vector()、is.atomic()、is.numeric()的用法则大不相同。\n\nis.vector()：根据mode参数，判断是否属于atomic向量、list、或expression，同时不能有除name外的其他属性。\nis.atomic()：判断是否属于atomic向量，NULL返回FALSE。\nis.numeric()：属于double、integer或任何可视为数值的向量。\n\n具体细节可以查看R文档。\n\n\nExercises\n…",
+    "objectID": "Books/Tidy Modeling with R/index.html",
+    "href": "Books/Tidy Modeling with R/index.html",
+    "title": "index",
+    "section": "",
+    "text": "本篇为书籍Tidy Modeling with R的学习笔记。\n原文见：Tidy Modeling with R\ntidymodels R包官方网站：https://www.tidymodels.org\n本书主要包含两方面：\n\n如何使用tidymodels包进行机器学习建模\n统计建模中的实践经验\n\n下面是全文概览：\n\n第1章：概述模型的分类，强调什么是好的建模软件。\n第2章：回顾 tidyverse 语法。\n第3章：base R中的统计建模总览及其不足。\n第4~9章：tidymodel系列包的介绍：recipes，parsnip，workflows，yardstick等。\n第10~15章：模型性能评估与调参。\n第16~21章：如何理解和解构模型。\n\n\n\n\n Back to top",
     "crumbs": [
-      "3 Vectors"
+      "index"
     ]
   },
   {
-    "objectID": "Books/Advanced R/3 Vectors.html#attributes",
-    "href": "Books/Advanced R/3 Vectors.html#attributes",
-    "title": "3 Vectors",
-    "section": "Attributes",
-    "text": "Attributes\n\nGetting and setting\n属性可以看作是由键值对构成，附属于对象的元信息。可以使用attr(),attributes(),structure()来提取或设置对象的属性。\n\n# 单独设置\na &lt;- 1:3\nattr(a, \"x\") &lt;- \"abcdef\"\nattr(a, \"x\")\n#&gt; [1] \"abcdef\"\n\nattr(a, \"y\") &lt;- 4:6\nstr(attributes(a))\n#&gt; List of 2\n#&gt;  $ x: chr \"abcdef\"\n#&gt;  $ y: int [1:3] 4 5 6\n\n\n# 批量设置\na &lt;- structure(\n  1:3,\n  x = \"abcdef\",\n  y = 4:6\n)\nstr(attributes(a))\n#&gt; List of 2\n#&gt;  $ x: chr \"abcdef\"\n#&gt;  $ y: int [1:3] 4 5 6\n\n\n属性极易丢失，但有两个例外，通常会保留：name,dim；保留属性需要使用S3面向对象系统。\n\nattributes(a[1])\n#&gt; NULL\nattributes(sum(a))\n#&gt; NULL\n\n\n\nNames\n有三种为向量设定name属性的方法。去除name属性有两种方法.\n\n# When creating it:\nx &lt;- c(a = 1, b = 2, c = 3)\nx\n#&gt; a b c \n#&gt; 1 2 3\nx &lt;- unname(x)\nx\n#&gt; [1] 1 2 3\n\n# By assigning a character vector to names()\nx &lt;- 1:3\nnames(x) &lt;- c(\"a\", \"b\", \"c\")\nx\n#&gt; a b c \n#&gt; 1 2 3\nnames(x) &lt;- NULL\nx\n#&gt; [1] 1 2 3\n\n# Inline, with setNames():\nx &lt;- setNames(1:3, c(\"a\", \"b\", \"c\"))\nx\n#&gt; a b c \n#&gt; 1 2 3\n\n在创建name属性时，应当保持name唯一且不为缺失值。需要注意这不是R的强制要求。\n\n\nDimensions\natomic向量添加dim属性，就可以生成二维matrix或多维array。在R中可以使用matrix(),array()或dim()来生成。\n\n# Two scalar arguments specify row and column sizes\nx &lt;- matrix(1:6, nrow = 2, ncol = 3)\nx\n#&gt;      [,1] [,2] [,3]\n#&gt; [1,]    1    3    5\n#&gt; [2,]    2    4    6\n\n\n# One vector argument to describe all dimensions\ny &lt;- array(1:12, c(2, 3, 2))\ny\n#&gt; , , 1\n#&gt; \n#&gt;      [,1] [,2] [,3]\n#&gt; [1,]    1    3    5\n#&gt; [2,]    2    4    6\n#&gt; \n#&gt; , , 2\n#&gt; \n#&gt;      [,1] [,2] [,3]\n#&gt; [1,]    7    9   11\n#&gt; [2,]    8   10   12\n\n# You can also modify an object in place by setting dim()\nz &lt;- 1:6\ndim(z) &lt;- c(3, 2)\nz\n#&gt;      [,1] [,2]\n#&gt; [1,]    1    4\n#&gt; [2,]    2    5\n#&gt; [3,]    3    6\n\natomic向量的许多函数都对matrix和array进行了推广。\n\n\n\nVector\nMatrix\nArray\n\n\n\n\nnames()\nrownames(),colnames()\ndimnames()\n\n\nlength()\nnrow(),ncol()\ndim()\n\n\nc()\nrbind(),cbind()\nabind::abind()\n\n\n-\nt()\naperm()\n\n\nis.null(dim(x))\nis.matrix()\nis.array()\n\n\n\n不能简单地将没有维度的atomic向量视作只有1行或1列的矩阵、1维的数组，因为函数对它们的处理结果是不一样的。\n\nstr(1:3) # 1d vector\n#&gt;  int [1:3] 1 2 3\nstr(matrix(1:3, ncol = 1)) # column vector\n#&gt;  int [1:3, 1] 1 2 3\nstr(matrix(1:3, nrow = 1)) # row vector\n#&gt;  int [1, 1:3] 1 2 3\nstr(array(1:3, 3)) # \"array\" vector\n#&gt;  int [1:3(1d)] 1 2 3\n\n\n\nExercises\n\ncomment属性比较特殊，不会被print打印出来，只能使用attr()或attributes()来提取。",
+    "objectID": "Books/quarto/Project Basics.html",
+    "href": "Books/quarto/Project Basics.html",
+    "title": "Project Basics",
+    "section": "",
+    "text": "原文：https://quarto.org/docs/projects/quarto-projects.html\nquarto的官方网站提供了许多创建项目的教程，如下图，如何创建项目，这里不再赘述。\n\n\n\n官网教程\n\n\n\n\n当你创建一个项目后，会自动生成一个项目级的YAML文件——_quarto.yml，该文件用来配置整个项目。示例如下：\nproject:\n  output-dir: _output\n\ntoc: true\nnumber-sections: true\nbibliography: references.bib\n\nformat:\n  html:\n    css: styles.css\n    html-math-method: katex\n  pdf:\n    documentclass: report\n    margin-left: 30mm\n    margin-right: 30mm\n随着项目的持续进行，对各部分的调控会显得及其臃肿，最好的办法是将其进行拆分。使用metadata-files可以进行配置，下面是一个混合导航栏的拆分示例，更多导航栏信息见https://quarto.org/docs/websites/website-navigation.html。\n\n\n_quarto.yml\n\nproject:\n  type: website\n\nwebsite:\n  navbar:\n    left:\n      - text: Books\n        menu:\n          - sidebar:ggplot2\n\nmetadata-files:\n  - ggplot2/_ggplot.yml\n\n\n\n_ggplot.yml\n\nwebsite:\n  sidebar:\n    - id: ggplot2\n      title: ggplot2\n      contents:\n        - ggplot2/index.qmd\n\n与上面导航栏示例不同，quarto提供了另外一种——文件夹级配置文件——_metadata.yml。如下：\n\n\n_metadata.yml\n\nformat:\n  revealjs:\n    menu: false\n    progress: false\nsearch: false\n\nquarto中的配置信息分为三级，按优先级由低到高：\n\n项目级配置文件：_quarto.yml\n文件夹级配置文件：dir/_metadata.yml\n文件级配置文件：dir/file.qmd\n\nquarto会自动对配置文件进行合并或覆盖，示例如下，最终的配置体现在文件级配置文件中。\n\n\n\n\n\n\n\n\n\n\n_quarto.yml\n\nformat:\n  html:\n    toc: true\nbibliography:\n  - refs.bib\n\n\n\ndir/_metadata.yml\n\nformat:\n  html:\n    code-fold: true\nbibliography:\n  - proj.bib\n\n\n\nmerge\n\nformat:\n  html:\n    toc: true\n    code-fold: true\nbibliography:\n  - refs.bib\n  - proj.bib\n\n\n\n\n也可以设置本地配置文件_quarto.yml.local，不进行上传，该文件会自动添加到.gitignore中。\n\n\n_quarto.yml.local\n\nexecute:\n  cache: true\n\n\n\n\n使用quarto 进行渲染时，你可以：\n\n渲染整个项目quarto render\n渲染某个目录quarto render subdir\n渲染为不同格式的文件quarto render --to pdf\n\n如果不想渲染整个项目，只渲染部分文档，可以进行如下配置：\nproject:\n  render:\n    - section1.qmd\n    - section2.qmd\nproject:\n  render:\n    - section*.qmd\n当你想配置某些文件不渲染时，可以进行如下配置，注意一定要包含*.qmd:\nproject:\n  render:\n    - \"*.qmd\"\n    - \"!ignored.qmd\"\n    - \"!ignored-dir/\"",
     "crumbs": [
-      "3 Vectors"
+      "Project Basics"
     ]
   },
   {
-    "objectID": "Books/Advanced R/3 Vectors.html#s3-atomic-vectors",
-    "href": "Books/Advanced R/3 Vectors.html#s3-atomic-vectors",
-    "title": "3 Vectors",
-    "section": "S3 atomic vectors",
-    "text": "S3 atomic vectors\nclass是另外一个重要的属性，它赋予了对象S3面向对象的能力。每个S3对象由base type构建（base type内容见12章）。本节主要讨论下面四种S3 atomic vectors：\n\nfactor：分类数据。\nDate：日期数据。\nPOSIXct：日期时间数据。\ndifftime：持续时间数据。\n\n\n\n\n\n\ngraph BT\n    B[Atomic] --&gt; A(Vector)\n    D[Logical] --&gt; B(Atomic)\n    C[Numeric] --&gt; B(Atomic)\n    E[Integer] --&gt; C(Numeric)\n    F[Double] --&gt; C(Numeric)\n    G[Character] --&gt; B(Atomic)\n    subgraph \"base atomic\"\n        D\n        E\n        F\n        G\n    end\n    H[factor] --&gt; E\n    I[POSIXct] --&gt; F\n    J[Date] --&gt; F\n    subgraph \"S3 atomic\"\n        H\n        I\n        J\n    end\n\n\n\n\n\n\n\nFactors\nfactor 是在integer类型向量基础上，添加class = fcator和levels两个属性构成。\n\nx &lt;- factor(c(\"a\", \"b\", \"b\", \"a\"))\nx\n#&gt; [1] a b b a\n#&gt; Levels: a b\n\ntypeof(x)\n#&gt; [1] \"integer\"\nattributes(x)\n#&gt; $levels\n#&gt; [1] \"a\" \"b\"\n#&gt; \n#&gt; $class\n#&gt; [1] \"factor\"\n\n\nfactor 有一个变体——ordered factor，它的属性levels具有了顺次意义，例如：low,medium,high等。\n\ngrade &lt;- ordered(c(\"b\", \"b\", \"a\", \"c\"), levels = c(\"c\", \"b\", \"a\"))\ngrade\n#&gt; [1] b b a c\n#&gt; Levels: c &lt; b &lt; a\n\nbase R 中的函数如read.csv(),data.frame()会自动将字符串转换为factor，这种行为很没有道理，因为有时数据中不可能包含全部的level。可以通过stringsAsFactors = FALSE来禁用这种行为。\n\n\nDates\nDate 是在double类型向量基础上，添加class = Date属性构成。去除属性后，可以看到原来的double向量。\n\ntoday &lt;- Sys.Date()\n\ntypeof(today)\n#&gt; [1] \"double\"\nattributes(today)\n#&gt; $class\n#&gt; [1] \"Date\"\n\n# 底层double向量，思考一下这个数字的含义？\nunclass(today)\n#&gt; [1] 20179\n\n\n\nDate-times\nbase R 提供了两种储存 date-time 的数据格式：POSIXct和POSIXlt。这里我们只关注POSIXct，因为它构建于double类型向上，且在数据框中广泛应用。POSIXct有两个属性：class = POSIXct和tzone。\n\nnow_ct &lt;- as.POSIXct(\"2018-08-01 22:00\", tz = \"UTC\")\nnow_ct\n#&gt; [1] \"2018-08-01 22:00:00 UTC\"\n\ntypeof(now_ct)\n#&gt; [1] \"double\"\nattributes(now_ct)\n#&gt; $class\n#&gt; [1] \"POSIXct\" \"POSIXt\" \n#&gt; \n#&gt; $tzone\n#&gt; [1] \"UTC\"\n\ntzone属性值控制date-time的显示形式，不改变其本质的double数值。\n\nnew_ct &lt;- structure(now_ct, tzone = \"Asia/Tokyo\")\nnew_ct\n#&gt; [1] \"2018-08-02 07:00:00 JST\"\nunclass(now_ct)\n#&gt; [1] 1533160800\n#&gt; attr(,\"tzone\")\n#&gt; [1] \"UTC\"\nunclass(new_ct)\n#&gt; [1] 1533160800\n#&gt; attr(,\"tzone\")\n#&gt; [1] \"Asia/Tokyo\"\n\n\n\nDurations\ndurations 表示date或date-time之间的持续时间，它是在double类型向量基础上，添加class = difftime属性构成，同时有属性units，表示持续时间的单位。\n\none_week_1 &lt;- as.difftime(1, units = \"weeks\")\none_week_1\n#&gt; Time difference of 1 weeks\n\ntypeof(one_week_1)\n#&gt; [1] \"double\"\n#&gt; [1] \"double\"\nattributes(one_week_1)\n#&gt; $class\n#&gt; [1] \"difftime\"\n#&gt; \n#&gt; $units\n#&gt; [1] \"weeks\"\n\none_week_2 &lt;- as.difftime(7, units = \"days\")\none_week_2\n#&gt; Time difference of 7 days\n\ntypeof(one_week_2)\n#&gt; [1] \"double\"\nattributes(one_week_2)\n#&gt; $class\n#&gt; [1] \"difftime\"\n#&gt; \n#&gt; $units\n#&gt; [1] \"days\"\n\n\n\nExercises\n\n仔细观察下面三个因子的不同。\n\n\n# 数据和level同时反转\nf1 &lt;- factor(letters)\nf1\n#&gt;  [1] a b c d e f g h i j k l m n o p q r s t u v w x y z\n#&gt; Levels: a b c d e f g h i j k l m n o p q r s t u v w x y z\nas.integer(f1)\n#&gt;  [1]  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24\n#&gt; [25] 25 26\nlevels(f1) &lt;- rev(levels(f1))\nf1\n#&gt;  [1] z y x w v u t s r q p o n m l k j i h g f e d c b a\n#&gt; Levels: z y x w v u t s r q p o n m l k j i h g f e d c b a\nas.integer(f1)\n#&gt;  [1]  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24\n#&gt; [25] 25 26\n\n# 仅数据反转\nf2 &lt;- rev(factor(letters))\nf2\n#&gt;  [1] z y x w v u t s r q p o n m l k j i h g f e d c b a\n#&gt; Levels: a b c d e f g h i j k l m n o p q r s t u v w x y z\nas.integer(f2)\n#&gt;  [1] 26 25 24 23 22 21 20 19 18 17 16 15 14 13 12 11 10  9  8  7  6  5  4  3\n#&gt; [25]  2  1\n\n# 仅level反转\nf3 &lt;- factor(letters, levels = rev(letters))\nf3\n#&gt;  [1] a b c d e f g h i j k l m n o p q r s t u v w x y z\n#&gt; Levels: z y x w v u t s r q p o n m l k j i h g f e d c b a\nas.integer(f3)\n#&gt;  [1] 26 25 24 23 22 21 20 19 18 17 16 15 14 13 12 11 10  9  8  7  6  5  4  3\n#&gt; [25]  2  1",
+    "objectID": "Books/quarto/Project Basics.html#shared-metadata",
+    "href": "Books/quarto/Project Basics.html#shared-metadata",
+    "title": "Project Basics",
+    "section": "",
+    "text": "当你创建一个项目后，会自动生成一个项目级的YAML文件——_quarto.yml，该文件用来配置整个项目。示例如下：\nproject:\n  output-dir: _output\n\ntoc: true\nnumber-sections: true\nbibliography: references.bib\n\nformat:\n  html:\n    css: styles.css\n    html-math-method: katex\n  pdf:\n    documentclass: report\n    margin-left: 30mm\n    margin-right: 30mm\n随着项目的持续进行，对各部分的调控会显得及其臃肿，最好的办法是将其进行拆分。使用metadata-files可以进行配置，下面是一个混合导航栏的拆分示例，更多导航栏信息见https://quarto.org/docs/websites/website-navigation.html。\n\n\n_quarto.yml\n\nproject:\n  type: website\n\nwebsite:\n  navbar:\n    left:\n      - text: Books\n        menu:\n          - sidebar:ggplot2\n\nmetadata-files:\n  - ggplot2/_ggplot.yml\n\n\n\n_ggplot.yml\n\nwebsite:\n  sidebar:\n    - id: ggplot2\n      title: ggplot2\n      contents:\n        - ggplot2/index.qmd\n\n与上面导航栏示例不同，quarto提供了另外一种——文件夹级配置文件——_metadata.yml。如下：\n\n\n_metadata.yml\n\nformat:\n  revealjs:\n    menu: false\n    progress: false\nsearch: false\n\nquarto中的配置信息分为三级，按优先级由低到高：\n\n项目级配置文件：_quarto.yml\n文件夹级配置文件：dir/_metadata.yml\n文件级配置文件：dir/file.qmd\n\nquarto会自动对配置文件进行合并或覆盖，示例如下，最终的配置体现在文件级配置文件中。\n\n\n\n\n\n\n\n\n\n\n_quarto.yml\n\nformat:\n  html:\n    toc: true\nbibliography:\n  - refs.bib\n\n\n\ndir/_metadata.yml\n\nformat:\n  html:\n    code-fold: true\nbibliography:\n  - proj.bib\n\n\n\nmerge\n\nformat:\n  html:\n    toc: true\n    code-fold: true\nbibliography:\n  - refs.bib\n  - proj.bib\n\n\n\n\n也可以设置本地配置文件_quarto.yml.local，不进行上传，该文件会自动添加到.gitignore中。\n\n\n_quarto.yml.local\n\nexecute:\n  cache: true",
     "crumbs": [
-      "3 Vectors"
+      "Project Basics"
     ]
   },
   {
-    "objectID": "Books/Advanced R/3 Vectors.html#lists",
-    "href": "Books/Advanced R/3 Vectors.html#lists",
-    "title": "3 Vectors",
-    "section": "Lists",
-    "text": "Lists\n虽然看起来list中的元素是不同，诚如前章所述，list中的元素有其自己的内存地址，也就是说，list中的元素本质是相同的，只是其索引的内容类型不同。\n\nCreating\n使用函数list()创建list。\n\nl1 &lt;- list(\n  1:3,\n  \"a\",\n  c(TRUE, FALSE, TRUE),\n  c(2.3, 5.9)\n)\n\ntypeof(l1)\n#&gt; [1] \"list\"\n\nstr(l1)\n#&gt; List of 4\n#&gt;  $ : int [1:3] 1 2 3\n#&gt;  $ : chr \"a\"\n#&gt;  $ : logi [1:3] TRUE FALSE TRUE\n#&gt;  $ : num [1:2] 2.3 5.9\n\n如上所述，list的元素只是索引，所以list的实际内存大小可能与你的期望相差甚远。\n\nlobstr::obj_size(mtcars)\n#&gt; 7.21 kB\n\nl2 &lt;- list(mtcars, mtcars, mtcars, mtcars)\nlobstr::obj_size(l2)\n#&gt; 7.29 kB\n\nlist 中的元素可以是其他的list。\n\nl3 &lt;- list(list(list(1)))\nstr(l3)\n#&gt; List of 1\n#&gt;  $ :List of 1\n#&gt;   ..$ :List of 1\n#&gt;   .. ..$ : num 1\n\n\n前面讲到函数c()要求元素类型一致，否则执行强制转换；当list和其他atomic向量使用c()合并时，atomic向量会被强制添加到list中。\n\nl4 &lt;- list(list(1, 2), c(3, 4))\nl5 &lt;- c(list(1, 2), c(3, 4))\nstr(l4)\n#&gt; List of 2\n#&gt;  $ :List of 2\n#&gt;   ..$ : num 1\n#&gt;   ..$ : num 2\n#&gt;  $ : num [1:2] 3 4\nstr(l5)\n#&gt; List of 4\n#&gt;  $ : num 1\n#&gt;  $ : num 2\n#&gt;  $ : num 3\n#&gt;  $ : num 4\n\n\n\n\nTesting and coercion\n\n使用typeof()查看是否为list。\n使用as.list()强制转换为list。\n使用unlist()强制转换为atomic向量。\n\n\n# 注意as.list的不同\nl6 &lt;- list(1:3)\nl6\n#&gt; [[1]]\n#&gt; [1] 1 2 3\n\ntypeof(l6)\n#&gt; [1] \"list\"\n\nas.list(1:3)\n#&gt; [[1]]\n#&gt; [1] 1\n#&gt; \n#&gt; [[2]]\n#&gt; [1] 2\n#&gt; \n#&gt; [[3]]\n#&gt; [1] 3\n\n\n\nMatrices and arrays\natomic向量添加dim属性后创建出matrix，list添加dim属性后可以创建此出list-matrix、list-array。这些数据结构可以使得处理特殊数据时更加灵活。\n\nl &lt;- list(1:3, \"a\", TRUE, 1.0)\ndim(l) &lt;- c(2, 2)\nl\n#&gt;      [,1]      [,2]\n#&gt; [1,] integer,3 TRUE\n#&gt; [2,] \"a\"       1\n\nl[[1, 1]]\n#&gt; [1] 1 2 3\n\n\n\nExercises\n\n使用[函数提取元素时，当超出范围，atomic向量返回NA，list返回NULL。\n\n\n# Subsetting atomic vectors\n(1:2)[3]\n#&gt; [1] NA\n(1:2)[NA]\n#&gt; [1] NA NA\n\n# Subsetting lists\nas.list(1:2)[3]\n#&gt; [[1]]\n#&gt; NULL\nas.list(1:2)[NA]\n#&gt; [[1]]\n#&gt; NULL\n#&gt; \n#&gt; [[2]]\n#&gt; NULL",
+    "objectID": "Books/quarto/Project Basics.html#rendering-projects",
+    "href": "Books/quarto/Project Basics.html#rendering-projects",
+    "title": "Project Basics",
+    "section": "",
+    "text": "使用quarto 进行渲染时，你可以：\n\n渲染整个项目quarto render\n渲染某个目录quarto render subdir\n渲染为不同格式的文件quarto render --to pdf\n\n如果不想渲染整个项目，只渲染部分文档，可以进行如下配置：\nproject:\n  render:\n    - section1.qmd\n    - section2.qmd\nproject:\n  render:\n    - section*.qmd\n当你想配置某些文件不渲染时，可以进行如下配置，注意一定要包含*.qmd:\nproject:\n  render:\n    - \"*.qmd\"\n    - \"!ignored.qmd\"\n    - \"!ignored-dir/\"",
     "crumbs": [
-      "3 Vectors"
+      "Project Basics"
     ]
   },
   {
-    "objectID": "Books/Advanced R/3 Vectors.html#data-frames-and-tibbles",
-    "href": "Books/Advanced R/3 Vectors.html#data-frames-and-tibbles",
-    "title": "3 Vectors",
-    "section": "Data frames and tibbles",
-    "text": "Data frames and tibbles\n最重要的两个以list为基础构建的S3 对象是：data.frame和tibble。\n\n\n\n\n\ngraph BT\n    B[List] --&gt; A(Vector)\n    D[data.frame] --&gt; B(List)\n    C[tibble] --&gt; B(List)\n\n\n\n\n\n\ndataframe有三个属性names、class = data.frame、row.names。names是list本身的属性，表示为有name的list，在dataframe中表示列名；row.names表示行名。同时dataframe要求list中的每个元素长度都相等。作用于list的函数如names()，作用于dataframe时返回的是列名，等价于colnames()、length()返回的是列数，等价于ncol()。\n\ndf1 &lt;- data.frame(x = 1:3, y = letters[1:3])\ntypeof(df1)\n#&gt; [1] \"list\"\n\nattributes(df1)\n#&gt; $names\n#&gt; [1] \"x\" \"y\"\n#&gt; \n#&gt; $class\n#&gt; [1] \"data.frame\"\n#&gt; \n#&gt; $row.names\n#&gt; [1] 1 2 3\n\nnames(df1)\n#&gt; [1] \"x\" \"y\"\nlength(df1)\n#&gt; [1] 2\n\ntibble由R包tibble提供，是对dataframe的一种补充，二者由唯一的不同是属性class，tibble有其自己独特的类tbl_df,tbl。类的不同赋予了tibble格式在某些行为上与dataframe有着巨大的差别。下面会详细介绍二者的不同。\n\nlibrary(tibble)\n\ndf2 &lt;- tibble(x = 1:3, y = letters[1:3])\ntypeof(df2)\n#&gt; [1] \"list\"\n\nattributes(df2)\n#&gt; $class\n#&gt; [1] \"tbl_df\"     \"tbl\"        \"data.frame\"\n#&gt; \n#&gt; $row.names\n#&gt; [1] 1 2 3\n#&gt; \n#&gt; $names\n#&gt; [1] \"x\" \"y\"\n\n\nCreating",
-    "crumbs": [
-      "3 Vectors"
-    ]
+    "objectID": "blog.html",
+    "href": "blog.html",
+    "title": "",
+    "section": "",
+    "text": "Order By\n       Default\n         \n          Title\n        \n         \n          Date - Oldest\n        \n         \n          Date - Newest\n        \n     \n  \n    \n      \n      \n    \n\n\n\n\n\n\n\n\n\n\nquarto 中R代码块的设置\n\n\n\n\n\n\nquarto\n\n\n\n\n\n\n\n\n\n2025-03-15\n\n\n大番薯本薯\n\n\n\n\n\n\n\n\n\n\n\n\nR 中的面向对象(1)\n\n\n\n\n\n\n面向对象\n\n\n\n\n\n\n\n\n\n2025-03-16\n\n\n大番薯本薯\n\n\n\n\n\n\nNo matching items\n\n Back to top"
   }
 ]

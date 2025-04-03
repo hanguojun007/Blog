@@ -140,8 +140,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="dropdown-text">ggplot2</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="../../Books/R4DS/index.html">
- <span class="dropdown-text">R for Data Science</span></a>
+    <a class="dropdown-item" href="../../Books/R4DS2/index.html">
+ <span class="dropdown-text">R for Data Science(2e)</span></a>
   </li>  
         <li>
     <a class="dropdown-item" href="../../Books/Tidy Modeling with R/index.html">
@@ -284,7 +284,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#data-frames-and-tibbles" id="toc-data-frames-and-tibbles" class="nav-link" data-scroll-target="#data-frames-and-tibbles">Data frames and tibbles</a>
   <ul class="collapse">
   <li><a href="#creating-1" id="toc-creating-1" class="nav-link" data-scroll-target="#creating-1">Creating</a></li>
+  <li><a href="#row-names" id="toc-row-names" class="nav-link" data-scroll-target="#row-names">Row names</a></li>
+  <li><a href="#printing" id="toc-printing" class="nav-link" data-scroll-target="#printing">Printing</a></li>
+  <li><a href="#subsetting" id="toc-subsetting" class="nav-link" data-scroll-target="#subsetting">Subsetting</a></li>
+  <li><a href="#testing-and-coercing" id="toc-testing-and-coercing" class="nav-link" data-scroll-target="#testing-and-coercing">Testing and coercing</a></li>
+  <li><a href="#list-columns" id="toc-list-columns" class="nav-link" data-scroll-target="#list-columns">List columns</a></li>
+  <li><a href="#matrix-and-data-frame-columns" id="toc-matrix-and-data-frame-columns" class="nav-link" data-scroll-target="#matrix-and-data-frame-columns">Matrix and data frame columns</a></li>
+  <li><a href="#exercises-4" id="toc-exercises-4" class="nav-link" data-scroll-target="#exercises-4">Exercises</a></li>
   </ul></li>
+  <li><a href="#null" id="toc-null" class="nav-link" data-scroll-target="#null">NULL</a></li>
   </ul>
 </nav>
     <div class="quarto-margin-footer"><div class="margin-footer-item">
@@ -313,7 +321,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">April 1, 2025</p>
+      <p class="date-modified">April 3, 2025</p>
     </div>
   </div>
     
@@ -714,7 +722,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="co"># 底层double向量，思考一下这个数字的含义？</span></span>
 <span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="fu">unclass</span>(today)</span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 20179</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 20181</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="date-times" class="level3">
@@ -1012,9 +1020,230 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <section id="creating-1" class="level3">
 <h3 class="anchored" data-anchor-id="creating-1">Creating</h3>
-
-
+<p>在使用<code>data.frame()</code>和<code>tibble()</code>函数创建dataframe或tibble时，主要有下面四点不同：</p>
+<ul>
+<li>列为字符串时，是否自动转换为因子：在R 4.0.0之前的版本，<code>data.frame()</code>函数默认<code>stringsAsFactors = TRUE</code>，而<code>tibble()</code>函数始终不会将字符串转换为因子。</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>df1 <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>,</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> <span class="fu">c</span>(<span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"c"</span>),</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(df1)</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 'data.frame':    3 obs. of  2 variables:</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  $ x: int  1 2 3</span></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  $ y: chr  "a" "b" "c"</span></span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>df2 <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>,</span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> <span class="fu">c</span>(<span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"c"</span>)</span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(df2)</span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; tibble [3 × 2] (S3: tbl_df/tbl/data.frame)</span></span>
+<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  $ x: int [1:3] 1 2 3</span></span>
+<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  $ y: chr [1:3] "a" "b" "c"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ul>
+<li>列名不规范时，是否自动转换为合法列名：<code>data.frame()</code>在参数<code>check.names = FALSE</code>时不会转换列名，<code>tibble()</code>函数始终不会转换列名，而是使用“`”包裹列名。</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(<span class="fu">data.frame</span>(<span class="st">`</span><span class="at">1</span><span class="st">`</span> <span class="ot">=</span> <span class="dv">1</span>))</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "X1"</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(<span class="fu">tibble</span>(<span class="st">`</span><span class="at">1</span><span class="st">`</span> <span class="ot">=</span> <span class="dv">1</span>))</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "1"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ul>
+<li>在构建数据框时，如果列之间的长度不同：<code>data.frame()</code>函数会将较短的列自动循环，<code>tibble()</code>函数只会循环长度为1的列，否则报错。</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">x =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>, <span class="at">y =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>)</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   x y</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 1 1</span></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 2 2</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 3 1</span></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4 4 2</span></span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">x =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>, <span class="at">y =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>)</span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Error in data.frame(x = 1:4, y = 1:3): arguments imply differing number of rows: 4, 3</span></span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(<span class="at">x =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>, <span class="at">y =</span> <span class="dv">1</span>)</span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tibble: 4 × 2</span></span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       x     y</span></span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   &lt;int&gt; &lt;dbl&gt;</span></span>
+<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1     1     1</span></span>
+<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2     2     1</span></span>
+<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3     3     1</span></span>
+<span id="cb30-17"><a href="#cb30-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4     4     1</span></span>
+<span id="cb30-18"><a href="#cb30-18" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(<span class="at">x =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>, <span class="at">y =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>)</span>
+<span id="cb30-19"><a href="#cb30-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Error in `tibble()`:</span></span>
+<span id="cb30-20"><a href="#cb30-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ! Tibble columns must have compatible sizes.</span></span>
+<span id="cb30-21"><a href="#cb30-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; • Size 4: Existing data.</span></span>
+<span id="cb30-22"><a href="#cb30-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; • Size 2: Column `y`.</span></span>
+<span id="cb30-23"><a href="#cb30-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ℹ Only values of size one are recycled.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ul>
+<li>在构建数据框时，<code>tibble()</code>函数可以使用前面定义好的列的数据。</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>,</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> x <span class="sc">*</span> <span class="dv">2</span></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tibble: 3 × 2</span></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       x     y</span></span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   &lt;int&gt; &lt;dbl&gt;</span></span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1     1     2</span></span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2     2     4</span></span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3     3     6</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </section>
+<section id="row-names" class="level3">
+<h3 class="anchored" data-anchor-id="row-names">Row names</h3>
+<p>dataframe可以使用<code>data.frame(row.names = ...)</code>或<code>rownames(df) &lt;- ...</code>来赋予数据框行名，但是tibble不支持设置行名（实际是可以设置的，只是不建议这样做）。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>df3 <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">age =</span> <span class="fu">c</span>(<span class="dv">35</span>, <span class="dv">27</span>, <span class="dv">18</span>),</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">hair =</span> <span class="fu">c</span>(<span class="st">"blond"</span>, <span class="st">"brown"</span>, <span class="st">"black"</span>),</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">row.names =</span> <span class="fu">c</span>(<span class="st">"Bob"</span>, <span class="st">"Susan"</span>, <span class="st">"Sam"</span>)</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>df3</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       age  hair</span></span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Bob    35 blond</span></span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Susan  27 brown</span></span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Sam    18 black</span></span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(df3)</span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "Bob"   "Susan" "Sam"</span></span>
+<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a>df3[<span class="st">"Bob"</span>, ]</span>
+<span id="cb32-16"><a href="#cb32-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     age  hair</span></span>
+<span id="cb32-17"><a href="#cb32-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Bob  35 blond</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>对于tibble为什么不赞成为数据框设置行名，可以参考原文。dataframe转换为tibble时可以使用<code>rownames_to_column()</code>或<code>as_tibble(rownames = "rownames")</code>来保留行名信息。</p>
+</section>
+<section id="printing" class="level3">
+<h3 class="anchored" data-anchor-id="printing">Printing</h3>
+<p>在终端以dataframe或tibble格式分别打印数据，会发现：dataframe将所有行列都打印了出来，而tibble只打印前几行及前几列，同时显示未打印列及行的信息，并且显示每列数据的类型，压缩内容过长的单元格，显示特殊数据比如<code>NA</code>。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>dplyr<span class="sc">::</span>starwars</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tibble: 87 × 14</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   name           height  mass hair_color  skin_color  eye_color birth_year</span></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;           &lt;int&gt; &lt;dbl&gt; &lt;chr&gt;       &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;</span></span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 Luke Skywalker    172    77 blond       fair        blue            19  </span></span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 C-3PO             167    75 &lt;NA&gt;        gold        yellow         112  </span></span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 R2-D2              96    32 &lt;NA&gt;        white, blue red             33  </span></span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4 Darth Vader       202   136 none        white       yellow          41.9</span></span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5 Leia Organa       150    49 brown       light       brown           19  </span></span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6 Owen Lars         178   120 brown, grey light       blue            52  </span></span>
+<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # ℹ 81 more rows</span></span>
+<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # ℹ 7 more variables: sex &lt;chr&gt;, gender &lt;chr&gt;, homeworld &lt;chr&gt;, …</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="subsetting" class="level3">
+<h3 class="anchored" data-anchor-id="subsetting">Subsetting</h3>
+<p>在第4章会学到更多有关提取子集的内容，这里介绍两个dataframe在提取子集时的两个缺点：</p>
+<ul>
+<li><code>df[, vars]</code>提取的列为1时，会自动降维成向量，除非添加参数<code>df[, vars, drop = FALSE]</code>。</li>
+<li><code>df$x</code>根据列名提取某列时，如果没有该列，会尝试返回一个字符串开头是<code>x</code>字符的列。</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>df1 <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">xyz =</span> <span class="st">"a"</span>)</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>df2 <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">xyz =</span> <span class="st">"a"</span>)</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(df1<span class="sc">$</span>x)</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  chr "a"</span></span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(df2<span class="sc">$</span>x)</span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  NULL</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="testing-and-coercing" class="level3">
+<h3 class="anchored" data-anchor-id="testing-and-coercing">Testing and coercing</h3>
+<p><code>is.data.frame()</code>可以用来检查是否是dataframe或tibble，<code>is_tibble()</code>只能检查是否是tibble（注意两个函数在形式上的区别<code>.</code>,<code>_</code>）。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">is.data.frame</span>(df1)</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="fu">is.data.frame</span>(df2)</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a><span class="fu">is_tibble</span>(df1)</span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] FALSE</span></span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a><span class="fu">is_tibble</span>(df2)</span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="list-columns" class="level3">
+<h3 class="anchored" data-anchor-id="list-columns">List columns</h3>
+<p>前面我们说过，数据框本质是一个list，所以数据框中的列可以包含任意类型的元素，包括list。tibble本身支持list column，dataframe需要额外的<code>I()</code>函数辅助。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># tibble</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>,</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> <span class="fu">list</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>)</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tibble: 3 × 2</span></span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       x y        </span></span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   &lt;int&gt; &lt;list&gt;   </span></span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1     1 &lt;int [2]&gt;</span></span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2     2 &lt;int [3]&gt;</span></span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3     3 &lt;int [4]&gt;</span></span>
+<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-13"><a href="#cb36-13" aria-hidden="true" tabindex="-1"></a><span class="co"># dataframe</span></span>
+<span id="cb36-14"><a href="#cb36-14" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">x =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>)</span>
+<span id="cb36-15"><a href="#cb36-15" aria-hidden="true" tabindex="-1"></a>df<span class="sc">$</span>y <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>)</span>
+<span id="cb36-16"><a href="#cb36-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-17"><a href="#cb36-17" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(</span>
+<span id="cb36-18"><a href="#cb36-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>,</span>
+<span id="cb36-19"><a href="#cb36-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> <span class="fu">I</span>(<span class="fu">list</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>))</span>
+<span id="cb36-20"><a href="#cb36-20" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb36-21"><a href="#cb36-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   x          y</span></span>
+<span id="cb36-22"><a href="#cb36-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 1       1, 2</span></span>
+<span id="cb36-23"><a href="#cb36-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 2    1, 2, 3</span></span>
+<span id="cb36-24"><a href="#cb36-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 3 1, 2, 3, 4</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="matrix-and-data-frame-columns" class="level3">
+<h3 class="anchored" data-anchor-id="matrix-and-data-frame-columns">Matrix and data frame columns</h3>
+<p>同上面的list一样，你可以在数据框中添加行数相等的矩阵和数据框。</p>
+<p><img src="images/data-frame-list.png" class="img-fluid"></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>dfm <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span> <span class="sc">*</span> <span class="dv">10</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>dfm<span class="sc">$</span>y <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>, <span class="at">nrow =</span> <span class="dv">3</span>)</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>dfm<span class="sc">$</span>z <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">a =</span> <span class="dv">3</span><span class="sc">:</span><span class="dv">1</span>, <span class="at">b =</span> letters[<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>], <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(dfm)</span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 'data.frame':    3 obs. of  3 variables:</span></span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  $ x: num  10 20 30</span></span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  $ y: int [1:3, 1:3] 1 2 3 4 5 6 7 8 9</span></span>
+<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  $ z:'data.frame':   3 obs. of  2 variables:</span></span>
+<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   ..$ a: int  3 2 1</span></span>
+<span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   ..$ b: chr  "a" "b" "c"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><img src="images/data-frame-matrix.png" class="img-fluid"></p>
+</section>
+<section id="exercises-4" class="level3">
+<h3 class="anchored" data-anchor-id="exercises-4">Exercises</h3>
+<p>…</p>
+</section>
+</section>
+<section id="null" class="level2">
+<h2 class="anchored" data-anchor-id="null">NULL</h2>
+<p>NULL 的长度为0，类型为<code>NULL</code>，且无法拥有任何属性。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(<span class="cn">NULL</span>)</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "NULL"</span></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(<span class="cn">NULL</span>)</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0</span></span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a><span class="fu">attr</span>(x, <span class="st">"y"</span>) <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Error in attr(x, "y") &lt;- 1: attempt to set an attribute on NULL</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+
+
 </section>
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
