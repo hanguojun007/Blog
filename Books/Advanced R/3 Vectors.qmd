@@ -1,7 +1,7 @@
 ---
 title: "3 Vectors"
 date: "2025-03-30"
-date-modified: "2025-04-01"
+date-modified: "2025-04-03"
 format: "html"
 execute:
   warning: false
@@ -504,4 +504,161 @@ attributes(df2)
 
 ### Creating
 
+在使用`data.frame()`和`tibble()`函数创建dataframe或tibble时，主要有下面四点不同：
+
+-   列为字符串时，是否自动转换为因子：在R 4.0.0之前的版本，`data.frame()`函数默认`stringsAsFactors = TRUE`，而`tibble()`函数始终不会将字符串转换为因子。
+
+```{r}
+df1 <- data.frame(
+  x = 1:3,
+  y = c("a", "b", "c"),
+  stringsAsFactors = FALSE
+)
+str(df1)
+
+df2 <- tibble(
+  x = 1:3,
+  y = c("a", "b", "c")
+)
+str(df2)
+```
+
+-   列名不规范时，是否自动转换为合法列名：`data.frame()`在参数`check.names = FALSE`时不会转换列名，`tibble()`函数始终不会转换列名，而是使用“`”包裹列名。
+
+```{r}
+names(data.frame(`1` = 1))
+
+names(tibble(`1` = 1))
+```
+
+-   在构建数据框时，如果列之间的长度不同：`data.frame()`函数会将较短的列自动循环，`tibble()`函数只会循环长度为1的列，否则报错。
+
+```{r}
+#| error: true
+data.frame(x = 1:4, y = 1:2)
+data.frame(x = 1:4, y = 1:3)
+
+tibble(x = 1:4, y = 1)
+tibble(x = 1:4, y = 1:2)
+```
+
+-   在构建数据框时，`tibble()`函数可以使用前面定义好的列的数据。
+
+```{r}
+tibble(
+  x = 1:3,
+  y = x * 2
+)
+```
+
+### Row names
+
+dataframe可以使用`data.frame(row.names = ...)`或`rownames(df) <- ...`来赋予数据框行名，但是tibble不支持设置行名（实际是可以设置的，只是不建议这样做）。
+
+```{r}
+df3 <- data.frame(
+  age = c(35, 27, 18),
+  hair = c("blond", "brown", "black"),
+  row.names = c("Bob", "Susan", "Sam")
+)
+df3
+
+rownames(df3)
+
+df3["Bob", ]
+```
+
+对于tibble为什么不赞成为数据框设置行名，可以参考原文。dataframe转换为tibble时可以使用`rownames_to_column()`或`as_tibble(rownames = "rownames")`来保留行名信息。
+
+### Printing
+
+在终端以dataframe或tibble格式分别打印数据，会发现：dataframe将所有行列都打印了出来，而tibble只打印前几行及前几列，同时显示未打印列及行的信息，并且显示每列数据的类型，压缩内容过长的单元格，显示特殊数据比如`NA`。
+
+```{r}
+dplyr::starwars
+```
+
+### Subsetting
+
+在第4章会学到更多有关提取子集的内容，这里介绍两个dataframe在提取子集时的两个缺点：
+
+-   `df[, vars]`提取的列为1时，会自动降维成向量，除非添加参数`df[, vars, drop = FALSE]`。
+-   `df$x`根据列名提取某列时，如果没有该列，会尝试返回一个字符串开头是`x`字符的列。
+
+```{r}
+df1 <- data.frame(xyz = "a")
+df2 <- tibble(xyz = "a")
+
+str(df1$x)
+str(df2$x)
+```
+
+### Testing and coercing
+
+`is.data.frame()`可以用来检查是否是dataframe或tibble，`is_tibble()`只能检查是否是tibble（注意两个函数在形式上的区别`.`,`_`）。
+
+```{r}
+is.data.frame(df1)
+is.data.frame(df2)
+
+is_tibble(df1)
+is_tibble(df2)
+```
+
+### List columns
+
+前面我们说过，数据框本质是一个list，所以数据框中的列可以包含任意类型的元素，包括list。tibble本身支持list column，dataframe需要额外的`I()`函数辅助。
+
+```{r}
+# tibble
+tibble(
+  x = 1:3,
+  y = list(1:2, 1:3, 1:4)
+)
+
+# dataframe
+df <- data.frame(x = 1:3)
+df$y <- list(1:2, 1:3, 1:4)
+
+data.frame(
+  x = 1:3,
+  y = I(list(1:2, 1:3, 1:4))
+)
+```
+
+### Matrix and data frame columns
+
+同上面的list一样，你可以在数据框中添加行数相等的矩阵和数据框。
+
+![](images/data-frame-list.png)
+
+```{r}
+dfm <- data.frame(
+  x = 1:3 * 10
+)
+dfm$y <- matrix(1:9, nrow = 3)
+dfm$z <- data.frame(a = 3:1, b = letters[1:3], stringsAsFactors = FALSE)
+
+str(dfm)
+```
+
+![](images/data-frame-matrix.png)
+
+### Exercises
+
+...
+
+## NULL
+
+NULL 的长度为0，类型为`NULL`，且无法拥有任何属性。
+
+```{r}
+#| error: true
+typeof(NULL)
+
+length(NULL)
+
+x <- NULL
+attr(x, "y") <- 1
+```
 
