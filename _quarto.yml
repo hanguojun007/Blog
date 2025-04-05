@@ -74,7 +74,7 @@ metadata-files:
   - Books/ggplot2/_metadata.yml
   - Books/R4DS2/_metadata.yml
   - Books/Tidy Modeling with R/_metadata.yml
-  - Books/Advanced R/_metadata.yml
+  - Books/Advanced R(2e)/_metadata.yml
   - Books/quarto/_metadata.yml
 
 

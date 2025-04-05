@@ -192,6 +192,7 @@ new_factor(0:1, "a")
 想比于构造函数中对base type和参数类型的检查，对类输入的其他检查应该分离为单独的函数。这样当你知道输入是正确时，可以以更低的成本创建类，并且检查方法可以用在其他地方。
 
 ```{r}
+#| error: true
 validate_factor <- function(x) {
   values <- unclass(x)
   levels <- attr(x, "levels")
@@ -296,6 +297,7 @@ t.test
 
 
 ```{r}
+#| error: true
 generic2 <- function(x) UseMethod("generic2")
 generic2.a1 <- function(x) "a1"
 # generic2.a2 <- function(x) "a2"
@@ -313,6 +315,7 @@ generic2(structure(list(), class = c("b", "a2")))
 ## 函数总结
 
 ```{r}
+#| error: true
 x <- table(rpois(100, 5))
 x
 
