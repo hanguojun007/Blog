@@ -1,0 +1,14 @@
+website:
+  sidebar:
+    - id: AdR2
+      title: Advanced R(2e)
+      contents:
+        - Books/Advanced R(2e)/index.qmd
+        - Books/Advanced R(2e)/1 Introduction.qmd
+        - Foundations
+        - Books/Advanced R(2e)/Foundations Introduction.qmd
+        - Books/Advanced R(2e)/2 Names and values.qmd
+        - Books/Advanced R(2e)/3 Vectors.qmd
+        - Object-oriented Programming
+        - Books/Advanced R(2e)/12 Base types.qmd
+        - Books/Advanced R(2e)/13 S3.qmd
