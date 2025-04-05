@@ -1,0 +1,28 @@
+---
+title: "4 Subsetting"
+date: "2025-04-05"
+date-modified: "2025-04-05"
+format: "html"
+execute:
+  warning: false
+  fig-width: 6
+  fig-asp: 0.618
+  out-width: 70%
+  fig-align: center
+---
+
+```{r}
+#| echo: false
+
+source("_common.R")
+```
+
+## Introduction
+
+
+
+### Quiz
+
+
+### Outline
+
