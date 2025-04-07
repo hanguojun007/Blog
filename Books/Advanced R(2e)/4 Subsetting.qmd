@@ -39,5 +39,183 @@ R 中的提取子集操作上手很快，使用起来也很方便。但是想要
 
 ## Selecting multiple elements
 
+### Atomic vectors
 
+以提取atomic向量为例，介绍用作提取子集时的6种坐标：
+
+```{r}
+x <- c(2.1, 4.2, 3.3, 5.4)
+```
+
+-   正整数：表示元素在向量中的位置。
+
+```{r}
+x[c(3, 1)]
+x[order(x)]
+
+# Duplicate indices will duplicate values
+x[c(1, 1)]
+
+# Real numbers are silently truncated to integers
+x[c(2.1, 2.9)]
+```
+
+-   负整数：负号表示删除，正负不能同时存在。
+
+```{r}
+#| error: true
+x[-c(3, 1)]
+
+
+x[c(-1, 2)]
+```
+
+-   逻辑值：`TRUE`表示保留，`FALSE`表示删除，`NA`返回`NA`。在`x[y]`的模式中，如果二者长度不等，会发生循环，遵循R base中的循环原则：循环短的一方。
+
+```{r}
+x[c(TRUE, TRUE, FALSE, FALSE)]
+x[x > 3]
+x[c(TRUE, NA, FALSE, TRUE)]
+```
+
+-   Nothing：返回完整的对象，在后面对`data.frame`提取时有用。
+
+```{r}
+x[]
+```
+
+-   Zero：返回长度为0的向量。
+
+```{r}
+x[0]
+```
+
+-   字符串：有`name`属性的向量元素。
+
+```{r}
+(y <- setNames(x, letters[1:4]))
+y[c("d", "c", "a")]
+
+# Like integer indices, you can repeat indices
+y[c("a", "a", "a")]
+
+# When subsetting with [, names are always matched exactly
+z <- c(abc = 1, def = 2)
+z[c("a", "d")]
+```
+
+::: {.callout-note}
+不要使用因子化的字符串向量提取子集，字符串向量因子化后，会视为整数。
+
+```{r}
+y[factor("b")]
+```
+:::
+
+### Lists
+
+`[`函数作用于list时，返回得仍然是一个list；`[[`和`$`函数作用于list时，返回得是list中的元素。
+
+### Matrices and arrays
+
+对于多维的atomic Vector，只需要在每个维度上应用上述6种坐标，就可以得到子集。
+
+```{r}
+a <- matrix(1:9, nrow = 3)
+colnames(a) <- c("A", "B", "C")
+a[1:2, ]
+a[c(TRUE, FALSE, TRUE), c("B", "A")]
+a[0, -2]
+```
+
+因为Matrices和Arrays是带有特殊属性的向量，所以仍然可以只使用一维的向量来提取，但要注意：它们都是列向量。
+
+```{r}
+vals <- outer(1:5, 1:5, FUN = "paste", sep = ",")
+vals
+
+vals[c(4, 15)]
+```
+
+可以使用一个两列matrix提取2维Matrices，三列matrix提取3维Arrays；一行表示一个坐标，返回一个向量。
+
+```{r}
+select <- matrix(ncol = 2, byrow = TRUE, c(
+  1, 1,
+  3, 1,
+  2, 4
+))
+select
+vals[select]
+```
+
+### Data frames and tibbles
+
+Data.frame具有list和matrix的特性：
+
+-   当只提供一个index时，会将其视作list，返回列。
+-   当提供两个index时，将其视作matrix，返回矩阵。
+
+```{r}
+df <- data.frame(x = 1:3, y = 3:1, z = letters[1:3])
+
+df[df$x == 2, ]
+df[c(1, 3), ]
+
+# There are two ways to select columns from a data frame
+# Like a list
+df[c("x", "z")]
+
+# Like a matrix
+df[, c("x", "z")]
+
+
+# There's an important difference if you select a single
+# column: matrix subsetting simplifies by default, list
+# subsetting does not.
+str(df["x"])
+str(df[, "x"])
+```
+
+对tibble使用`[`，始终返回tibble。
+
+```{r}
+tib <- tibble::tibble(x = 1:3, y = 3:1, z = letters[1:3])
+
+str(tib["x"])
+str(tib[, "x"])
+```
+
+### Preserving dimensionality
+
+`[`函数有额外的参数`drop`用于控制是否在只有一列时降维，默认为`TRUE`。
+
+正如上面例子中的结果一样，data.frame在列方向上的index长度为1时，会发生降维：`df["x"]`没有发生降维，`df[, "x"]`则发生了降维。
+
+```{r}
+str(df[, "x", drop = FALSE])
+```
+
+matrix则表现为任意维度的index长度为1时，都会发生降维：
+
+```{r}
+a <- matrix(1:4, nrow = 2)
+str(a[1, ])
+
+str(a[1, , drop = FALSE])
+```
+
+在factor中使用`[`时，也有参数`drop`；但该参数的意义为：是否丢弃没有值的级别，默认为`FALSE`。
+
+```{r}
+z <- factor(c("a", "b"))
+z[1]
+z[1, drop = TRUE]
+```
+
+### Exercises
+
+...
+
+## Selecting a single element
 
