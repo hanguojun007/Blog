@@ -9,6 +9,7 @@ website:
         - Books/Advanced R(2e)/Foundations Introduction.qmd
         - Books/Advanced R(2e)/2 Names and values.qmd
         - Books/Advanced R(2e)/3 Vectors.qmd
+        - Books/Advanced R(2e)/4 Subsetting.qmd
         - Object-oriented Programming
         - Books/Advanced R(2e)/12 Base types.qmd
         # - Books/Advanced R(2e)/13 S3.qmd
