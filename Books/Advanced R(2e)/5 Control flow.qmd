@@ -1,0 +1,182 @@
+---
+title: "5 Control flow"
+date: "2025-04-12"
+date-modified: "2025-04-12"
+format: "html"
+execute:
+  warning: false
+  fig-width: 6
+  fig-asp: 0.618
+  out-width: 70%
+  fig-align: center
+---
+
+```{r}
+#| echo: false
+
+source("_common.R")
+```
+
+## Introduction
+
+R 中有两类主要的控制流类型工具：选择（if）和循环（for）。选择包含`if`、`switch()`等声明；循环包含`for`、`while`等声明。这里假定你已经学会了它们的基础用法，本章主要介绍一些技术细节和鲜为人知的高级用法。
+
+### Outline
+
+-   5.2节：介绍`if`、`ifelse()`、`switch()`函数。
+-   5.3节：介绍`for`、`while`、`repeat`等声明。
+
+## Choices
+
+下面是if-else语句的基本使用格式：
+
+```{r}
+#| eval: false
+
+if (condition) true_action
+
+if (condition) true_action else false_action
+
+if (condition1) {
+  true_action1
+} else if (condition2) {
+  true_action2
+} else {
+  false_action
+}
+```
+
+`if`语句也可以进行赋值操作；在实际书写代码时，建议只有在if-else语句可以写为一行时，才使用赋值操作。
+
+```{r}
+x1 <- if (TRUE) 1 else 2
+x2 <- if (FALSE) 1 else 2
+
+c(x1, x2)
+```
+
+当if-else语句只有`if`声明时，如果条件不满足，则返回`NULL`。函数`c()`、`paste()`会自动去除返回值中的`NULL`值。
+
+```{r}
+greet <- function(name, birthday = FALSE) {
+  paste0(
+    "Hi ", name,
+    if (birthday) " and HAPPY BIRTHDAY"
+  )
+}
+greet("Maria", FALSE)
+greet("Jaime", TRUE)
+```
+
+### Invalid inputs
+
+需要注意的是，`if`声明中的条件返回值只能是长度为1的布尔值。如果长度大于1，在R 4.0版本前会选择第一个值，但在R 4.0版本后会报错。其他类型的输入也会报错。
+
+```{r}
+#| error: true
+
+if ("x") 1
+if (logical()) 1
+if (NA) 1
+if (c(TRUE, FALSE)) 1
+```
+
+### Vectorised if
+
+if-else 语句只能判断一次，假如你想要判断很多次，可以使用`ifelse()`函数。该函数接受三个参数：条件，返回值，其他值。如果条件为`TRUE`，返回值作为结果，否则返回其他值。条件处可以是向量，返回的也是向量。（可以理解for循环if-else语句）
+
+```{r}
+x <- c(1:10, NA, 12)
+ifelse(x %% 5 == 0, "XXX", as.character(x))
+
+ifelse(x %% 2 == 0, "even", "odd")
+```
+
+::: {.callout-tip}
+建议只有在`yes`和`no`条件的返回值类型一致时，再使用`ifelse()`函数。如果不同，因为`c()`是atomic向量，会强制进行类型转换。
+:::
+
+dplyr包提供了等价函数`case_when()`，使用方法如下：
+
+```{r}
+dplyr::case_when(
+  x %% 35 == 0 ~ "fizz buzz",
+  x %% 5 == 0 ~ "fizz",
+  x %% 7 == 0 ~ "buzz",
+  is.na(x) ~ "???",
+  TRUE ~ as.character(x)
+)
+```
+
+### `switch()` statement
+
+`switch()`语句是对if-else语句的压缩，例如你可以将下面的if-else语句:
+
+```{r}
+x_option <- function(x) {
+  if (x == "a") {
+    "option 1"
+  } else if (x == "b") {
+    "option 2"
+  } else if (x == "c") {
+    "option 3"
+  } else {
+    stop("Invalid `x` value")
+  }
+}
+```
+
+简化为`switch()`语句:
+
+```{r}
+x_option <- function(x) {
+  switch(x,
+    a = "option 1",
+    b = "option 2",
+    c = "option 3",
+    stop("Invalid `x` value")
+  )
+}
+```
+
+再判断条件的末尾添加错误信息，可以提高代码的可读性，因为当不满足匹配条件时，`switch()`语句返回`NULL`。
+
+```{r}
+(switch("c",
+  a = 1,
+  b = 2
+))
+```
+
+如果不同的输入条件返回值相同，可以省略返回值，`switch()`会自动向下匹配，例如:
+
+```{r}
+legs <- function(x) {
+  switch(x,
+    cow = ,
+    horse = ,
+    dog = 4,
+    human = ,
+    chicken = 2,
+    plant = 0,
+    stop("Unknown input")
+  )
+}
+legs("cow")
+legs("dog")
+```
+
+::: {.callout-tip}
+`switch()`的输入可以是数值、字符串，但建议只使用字符串。
+:::
+
+## Loops
+
+```{r}
+x <- c(6:-4)
+sqrt(x) #- gives warning
+sqrt(ifelse(x >= 0, x, NA)) # no warning
+
+## Note: the following also gives the warning !
+ifelse(x >= 0, sqrt(x), NA)
+```
