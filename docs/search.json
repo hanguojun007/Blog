@@ -783,5 +783,45 @@
     "crumbs": [
       "4 Subsetting"
     ]
+  },
+  {
+    "objectID": "Books/Advanced R(2e)/5 Control flow.html",
+    "href": "Books/Advanced R(2e)/5 Control flow.html",
+    "title": "5 Control flow",
+    "section": "",
+    "text": "R 中有两类主要的控制流类型工具：选择（if）和循环（for）。选择包含if、switch()等声明；循环包含for、while等声明。这里假定你已经学会了它们的基础用法，本章主要介绍一些技术细节和鲜为人知的高级用法。\n\n\n\n5.2节：介绍if、ifelse()、switch()函数。\n5.3节：介绍for、while、repeat等声明。",
+    "crumbs": [
+      "5 Control flow"
+    ]
+  },
+  {
+    "objectID": "Books/Advanced R(2e)/5 Control flow.html#introduction",
+    "href": "Books/Advanced R(2e)/5 Control flow.html#introduction",
+    "title": "5 Control flow",
+    "section": "",
+    "text": "R 中有两类主要的控制流类型工具：选择（if）和循环（for）。选择包含if、switch()等声明；循环包含for、while等声明。这里假定你已经学会了它们的基础用法，本章主要介绍一些技术细节和鲜为人知的高级用法。\n\n\n\n5.2节：介绍if、ifelse()、switch()函数。\n5.3节：介绍for、while、repeat等声明。",
+    "crumbs": [
+      "5 Control flow"
+    ]
+  },
+  {
+    "objectID": "Books/Advanced R(2e)/5 Control flow.html#choices",
+    "href": "Books/Advanced R(2e)/5 Control flow.html#choices",
+    "title": "5 Control flow",
+    "section": "Choices",
+    "text": "Choices\n下面是if-else语句的基本使用格式：\n\nif (condition) true_action\n\nif (condition) true_action else false_action\n\nif (condition1) {\n  true_action1\n} else if (condition2) {\n  true_action2\n} else {\n  false_action\n}\n\nif语句也可以进行赋值操作；在实际书写代码时，建议只有在if-else语句可以写为一行时，才使用赋值操作。\n\nx1 &lt;- if (TRUE) 1 else 2\nx2 &lt;- if (FALSE) 1 else 2\n\nc(x1, x2)\n#&gt; [1] 1 2\n\n当if-else语句只有if声明时，如果条件不满足，则返回NULL。函数c()、paste()会自动去除返回值中的NULL值。\n\ngreet &lt;- function(name, birthday = FALSE) {\n  paste0(\n    \"Hi \", name,\n    if (birthday) \" and HAPPY BIRTHDAY\"\n  )\n}\ngreet(\"Maria\", FALSE)\n#&gt; [1] \"Hi Maria\"\ngreet(\"Jaime\", TRUE)\n#&gt; [1] \"Hi Jaime and HAPPY BIRTHDAY\"\n\n\nInvalid inputs\n需要注意的是，if声明中的条件返回值只能是长度为1的布尔值。如果长度大于1，在R 4.0版本前会选择第一个值，但在R 4.0版本后会报错。其他类型的输入也会报错。\n\nif (\"x\") 1\n#&gt; Error in if (\"x\") 1: argument is not interpretable as logical\nif (logical()) 1\n#&gt; Error in if (logical()) 1: argument is of length zero\nif (NA) 1\n#&gt; Error in if (NA) 1: missing value where TRUE/FALSE needed\nif (c(TRUE, FALSE)) 1\n#&gt; Error in if (c(TRUE, FALSE)) 1: the condition has length &gt; 1\n\n\n\nVectorised if\nif-else 语句只能判断一次，假如你想要判断很多次，可以使用ifelse()函数。该函数接受三个参数：条件，返回值，其他值。如果条件为TRUE，返回值作为结果，否则返回其他值。条件处可以是向量，返回的也是向量。（可以理解for循环if-else语句）\n\nx &lt;- c(1:10, NA, 12)\nifelse(x %% 5 == 0, \"XXX\", as.character(x))\n#&gt;  [1] \"1\"   \"2\"   \"3\"   \"4\"   \"XXX\" \"6\"   \"7\"   \"8\"   \"9\"   \"XXX\" NA    \"12\"\n\nifelse(x %% 2 == 0, \"even\", \"odd\")\n#&gt;  [1] \"odd\"  \"even\" \"odd\"  \"even\" \"odd\"  \"even\" \"odd\"  \"even\" \"odd\"  \"even\"\n#&gt; [11] NA     \"even\"\n\n\n\n\n\n\n\nTip\n\n\n\n建议只有在yes和no条件的返回值类型一致时，再使用ifelse()函数。如果不同，因为c()是atomic向量，会强制进行类型转换。函数要求得条件如果不是布尔值，则会进行类型转换as.logical()，如果转换结果仍不是布尔值，则会返回转换后的值。\n\n\ndplyr包提供了等价函数case_when()，使用方法如下：\n\ndplyr::case_when(\n  x %% 35 == 0 ~ \"fizz buzz\",\n  x %% 5 == 0 ~ \"fizz\",\n  x %% 7 == 0 ~ \"buzz\",\n  is.na(x) ~ \"???\",\n  TRUE ~ as.character(x)\n)\n#&gt;  [1] \"1\"    \"2\"    \"3\"    \"4\"    \"fizz\" \"6\"    \"buzz\" \"8\"    \"9\"    \"fizz\"\n#&gt; [11] \"???\"  \"12\"\n\n\n\nswitch() statement\nswitch()语句是对if-else语句的压缩，例如你可以将下面的if-else语句:\n\nx_option &lt;- function(x) {\n  if (x == \"a\") {\n    \"option 1\"\n  } else if (x == \"b\") {\n    \"option 2\"\n  } else if (x == \"c\") {\n    \"option 3\"\n  } else {\n    stop(\"Invalid `x` value\")\n  }\n}\n\n简化为switch()语句:\n\nx_option &lt;- function(x) {\n  switch(x,\n    a = \"option 1\",\n    b = \"option 2\",\n    c = \"option 3\",\n    stop(\"Invalid `x` value\")\n  )\n}\n\n再判断条件的末尾添加错误信息，可以提高代码的可读性，因为当不满足匹配条件时，switch()语句返回NULL。\n\n(switch(\"c\",\n  a = 1,\n  b = 2\n))\n#&gt; NULL\n\n如果不同的输入条件返回值相同，可以省略返回值，switch()会自动向下匹配，例如:\n\nlegs &lt;- function(x) {\n  switch(x,\n    cow = ,\n    horse = ,\n    dog = 4,\n    human = ,\n    chicken = 2,\n    plant = 0,\n    stop(\"Unknown input\")\n  )\n}\nlegs(\"cow\")\n#&gt; [1] 4\nlegs(\"dog\")\n#&gt; [1] 4\n\n\n\n\n\n\n\nTip\n\n\n\nswitch()的输入可以是数值、字符串，但建议只使用字符串。\n\n\n\n\nExercises\n…",
+    "crumbs": [
+      "5 Control flow"
+    ]
+  },
+  {
+    "objectID": "Books/Advanced R(2e)/5 Control flow.html#loops",
+    "href": "Books/Advanced R(2e)/5 Control flow.html#loops",
+    "title": "5 Control flow",
+    "section": "Loops",
+    "text": "Loops\nfor 循环的基本格式如下：\n\nfor (item in vector) perform_action\n\n有两种中断循环的方法：break和next。break用于跳出整个循环，next用于跳出当前循环，继续下一个循环。\n\nfor (i in 1:10) {\n  if (i &lt; 3) {\n    next\n  }\n\n  print(i)\n\n  if (i &gt;= 5) {\n    break\n  }\n}\n#&gt; [1] 3\n#&gt; [1] 4\n#&gt; [1] 5\n\n\n\n\n\n\n\nNote\n\n\n\n要注意在环境变量中不要有与item名重复的变量。for循环会赋值给item变量，这样会导致item变量的值变化。\n\ni &lt;- 100\nfor (i in 1:3) {}\ni\n#&gt; [1] 3\n\n\n\n\nCommon pitfalls\n在使用for循环时，有三个常见的易错陷阱：\n\n进行赋值操作前，没有定义容纳结果的变量。\n使用1:length(x)作为索引，而不是seq_along(x)。\n直接索引S3对象。\n\n如果没有事先定义容器，会导致for循环十分缓慢。可以使用vector()函数，定义容器类型：\n\nmeans &lt;- c(1, 50, 20)\nout &lt;- vector(\"list\", length(means))\nfor (i in 1:length(means)) {\n  out[[i]] &lt;- rnorm(10, means[[i]])\n}\n\n1:length(x)在x的长度为0时，会报错。因为:对升序和降序都兼容，使用seq_along()函数可以变相的解决该问题。seq_along()函数返回一个长度与x相同的等差向量。\n\nx &lt;- c(1, 2, 3, 1,2,3)\ny &lt;- numeric(0)\n\n1:length(x)\n#&gt; [1] 1 2 3 4 5 6\nseq_along(x)\n#&gt; [1] 1 2 3 4 5 6\n\n1:length(y) # 在for循环中报错\n#&gt; [1] 1 0\nseq_along(y)\n#&gt; integer(0)\n\n\nmeans &lt;- c()\nout &lt;- vector(\"list\", length(means))\nfor (i in 1:length(means)) {\n  out[[i]] &lt;- rnorm(10, means[[i]])\n}\n#&gt; Error in rnorm(10, means[[i]]): invalid arguments\n\nout &lt;- vector(\"list\", length(means))\nfor (i in seq_along(means)) {\n  out[[i]] &lt;- rnorm(10, means[[i]])\n}\n\n直接迭代S3对象时，for循环会丢掉S3对象的属性：\n\nxs &lt;- as.Date(c(\"2020-01-01\", \"2010-01-01\"))\nfor (x in xs) {\n  print(x)\n}\n#&gt; [1] 18262\n#&gt; [1] 14610\n\nfor (i in seq_along(xs)) {\n  print(xs[[i]])\n}\n#&gt; [1] \"2020-01-01\"\n#&gt; [1] \"2010-01-01\"\n\n\n\nRelated tools\n当你不知道要迭代多少次，可以使用while()和repeat()，它们的基本格式如下：\n\n# 当满足条件时，执行动作，直到条件不满足\nwhile (condition) action\n# 无限循环，直到遇到 break\nrepeat(action)\n\n\nx &lt;- 0\nwhile (x &lt; 10) {\n  x &lt;- x + 1\n  print(x)\n}\n#&gt; [1] 1\n#&gt; [1] 2\n#&gt; [1] 3\n#&gt; [1] 4\n#&gt; [1] 5\n#&gt; [1] 6\n#&gt; [1] 7\n#&gt; [1] 8\n#&gt; [1] 9\n#&gt; [1] 10\n\nrepeat {\n  print(x)\n  x &lt;- x + 1\n  if (x &gt; 10) {\n    break\n  }\n}\n#&gt; [1] 10\n\n理论上讲：所有for循环都可以用while循环替代，所有while循环都可以用repeat循环替代，但是反过来不行；这意味着for循环的灵活性很低，但是在实践中，我们应该使用灵活性低的for循环。\n在数据分析中，我们可以使用更高级的map()和apply()函数。\n\n\nExercises\n\n一定要避免使用1:length(x)，下面的例子，不会报错，但是返回结果不对。\n\n\nx &lt;- numeric()\nout &lt;- vector(\"list\", length(x))\nfor (i in 1:length(x)) {\n  out[i] &lt;- x[i]^2\n}\nout\n#&gt; [[1]]\n#&gt; [1] NA\n\nx &lt;- numeric()\nout &lt;- vector(\"list\", length(x))\nfor (i in seq_along(x)) {\n  out[i] &lt;- x[i]^2\n}\nout\n#&gt; list()\n\n\nR的for循环只评估一次输入，即使for循环中对评估进行了更新，也不会改变，避免了无限循环的可能。\n\n\nxs &lt;- c(1, 2, 3)\nfor (x in xs) {\n  xs &lt;- c(xs, x * 2)\n}\nxs\n#&gt; [1] 1 2 3 2 4 6\n\n\nR的for循环对于item的更新发生在每次迭代开始前，for循环中对item进行的更新无效。\n\n\nfor (i in 1:3) {\n  i &lt;- i * 2\n  print(i)\n}\n#&gt; [1] 2\n#&gt; [1] 4\n#&gt; [1] 6",
+    "crumbs": [
+      "5 Control flow"
+    ]
   }
 ]
