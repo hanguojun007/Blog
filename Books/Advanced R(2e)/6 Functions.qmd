@@ -1,0 +1,43 @@
+---
+title: "6 Functions"
+date: "2025-04-14"
+date-modified: "2025-04-14"
+format: "html"
+execute:
+  warning: false
+  fig-width: 6
+  fig-asp: 0.618
+  out-width: 70%
+  fig-align: center
+---
+
+```{r}
+#| echo: false
+
+source("_common.R")
+```
+
+## Introduction
+
+在学习本章之前，你一定已经写过很多用来减少重复工作的函数，本章会将你在工作中的一些知识进行整合提升，帮助你从理论的视角看待函数。在本章，你会看到一些有趣的小技巧和复杂技术，请一定要留心，这些内容是后面章节中的基石。
+
+
+```{r}
+f2 <- function(a, b) {
+  a * 10
+}
+f2(10, stop("This is an error!"))
+```
+
+### Outline
+
+-   6.2节：构成函数的三要素和原始函数（primitive function）。
+-   6.3节：三种函数形式的优劣。
+-   6.4节：词法作用域规则（rules of lexical scoping）——如何根据名字找到对应的值。
+-   6.5节：参数评估原则：只在第一次使用时评估，避免循环。
+-   6.6节：特殊参数`...`。
+-   6.7节：函数退出机制。
+-   6.8节：
+
+## Function fundamentals
+
