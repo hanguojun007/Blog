@@ -1,7 +1,7 @@
 ---
 title: "6 Functions"
 date: "2025-04-14"
-date-modified: "2025-04-14"
+date-modified: "2025-04-17"
 format: "html"
 execute:
   warning: false
@@ -41,3 +41,251 @@ f2(10, stop("This is an error!"))
 
 ## Function fundamentals
 
+
+### Function components
+
+函数由三部分组成：
+
+-   `formals()`：参数和函数名，控制如何调用函数。
+-   `body()`：函数具体实现。
+-   `environment()`：环境，决定函数如何找到参数对应的值。
+
+在这三部分中，formals和body十分显性，构建出函数时就可以直观地看到；environment相对隐性，需要使用函数`environment()`。
+
+```{r}
+f02 <- function(x, y) {
+  # A comment
+  x + y
+}
+
+formals(f02)
+
+body(f02)
+
+environment(f02)
+```
+
+与R中的其他对象一样，函数也会拥有一些属性。一个常见的属性是`srcref`（source reference），记录了函数的源代码，如下所示。
+
+```{r}
+attr(f02, "srcref")
+```
+
+### Primitive functions
+
+原始函数（primitive function）是一个例外，不包含上面的三要素。
+
+```{r}
+sum
+`[`
+```
+
+它们的`base type`不同。（base type 见第12章）
+
+```{r}
+typeof(sum)
+typeof(`[`)
+```
+
+因为它们的底层是C语言，所以`formals()`、`body()`和`environment()`返回值都是`NULL`。
+
+```{r}
+formals(sum)
+body(sum)
+environment(sum)
+```
+
+### First-class functions
+
+所谓的`first-class`，就是指函数本身就是对象，可以用来赋值给变量，可以传递给函数等等。创建函数只需要`function()`来定义，使用`<-`进行绑定。想象一下其他语言中的`def`，它们的函数不能作为对象进行传递。
+
+如果一个函数没有绑定名字，那么它就是**匿名函数**。匿名函数通常用在`lapply()`等函数中，用来实现高效的数据处理。
+
+```{r}
+#| eval: false
+lapply(mtcars, function(x) length(unique(x)))
+Filter(function(x) !is.numeric(x), mtcars)
+integrate(function(x) sin(x)^2, 0, pi)
+```
+
+有关R函数的闭包特性，见第7章。
+
+### Invoking a function
+
+使用函数的常见方式是`myfun(param1, param2, ...)`，如果你有了一组参数数据，可以使用`do.call()`来调用函数。
+
+```{r}
+args <- list(1:10, na.rm = TRUE)
+do.call(mean, args)
+```
+
+### Exercises
+
+-   使用`is.function()`来判断一个对象是否是函数。对于原始函数，使用`is.primitive()`。
+
+## Function composition
+
+base R 提供了两种函数组合使用的方式。例如，当你想使用`sqrt()`和`mean()`计算某个群体的方差：
+
+```{r}
+x <- runif(100)
+square <- function(x) x^2
+deviation <- function(x) x - mean(x)
+```
+
+第一种方法：
+
+```{r}
+sqrt(mean(square(deviation(x))))
+```
+
+第二种方法：
+
+```{r}
+out <- deviation(x)
+out <- square(out)
+out <- mean(out)
+out <- sqrt(out)
+out
+```
+
+magrittr包提供了第三种方式——管道符`%>%`（R 4.0 之后可以之间使用 `|>` 代替）。
+
+```{r}
+library(magrittr)
+
+x %>%
+  deviation() %>%
+  square() %>%
+  mean() %>%
+  sqrt()
+```
+
+## Lexical scoping
+
+在第二章中，我们讲到为对象命名；在这里，我们介绍它的反面，根据名字找到对象——词法作用域(lexical scoping)。
+
+R 的词法作用域遵循下面四个规则：
+
+-   Name masking——函数内部的变量优先于函数外部的变量。
+-   Functions versus variables——当某个函数与变量同名时，函数优先于变量。
+-   A fresh start——函数每次执行都是独立的。
+-   Dynamic lookup——函数只有在运行时才会查找。
+
+### Name masking
+
+函数查找变量时，首先查找函数内的变量，然后再查找函数外，即——由内到外逐级查找，直至找到为止。
+
+```{r}
+x <- 10
+y <- 20
+z <- 30
+g05 <- function() {
+  x <- 1
+  y <- 2
+  c(x, y, z)
+}
+g05()
+```
+
+### Functions versus variables
+
+诚如上述，函数也是普通的对象，在进行函数的查找时，遵循相同的规则。
+
+```{r}
+g07 <- function(x) x + 1
+g08 <- function() {
+  g07 <- function(x) x + 100
+  g07(10)
+}
+g08()
+```
+
+如果，函数名和变量名重复（函数和变量在不同的环境中）时，函数优先于变量，例如下面的`g09`。实际编写代码时，我们要尽可能避免这种情况的发生，因为十分歧义和迷惑。
+
+```{r}
+g09 <- function(x) x + 100
+g10 <- function() {
+  g09 <- 10
+  g09(g09)
+}
+g10()
+```
+
+### A fresh start
+
+下面的例子，每次运行`g11()`结果都是相同的，因为每次运行函数时，都会创建一个变量域（环境），它们之间相互独立。
+
+```{r}
+g11 <- function() {
+  if (!exists("a")) {
+    a <- 1
+  } else {
+    a <- a + 1
+  }
+  a
+}
+
+g11()
+g11()
+```
+
+当你使用`a <- g11()`时，就打破了独立。
+
+```{r}
+a <- g11()
+g11()
+g11()
+```
+
+### Dynamic lookup
+
+词法作用域决定了如何查找，但是没有规定何时查找。函数只有在运行时才会根据名字查找对象，也即前后环境不一致时，函数前后运行值也就不一样。
+
+```{r}
+g12 <- function() x + 1
+x <- 15
+g12()
+
+x <- 20
+g12()
+```
+
+使用`codetools::findGlobals()`可以里列出函数内没有绑定值的名字。
+
+```{r}
+#| error: true
+codetools::findGlobals(g12)
+
+environment(g12) <- emptyenv()
+g12()
+```
+
+### Exercises
+
+...
+
+## Lazy evaluation
+
+词法作用域定义了何时以及如何根据名字查找对象；**延迟评估（Lazy evaluation）**解释了查找哪些名字：函数参数只有在被调用时才会被查找。
+
+```{r}
+h01 <- function(x) {
+  10
+}
+h01(stop("This is an error!"))
+```
+
+这一特性允许我们预先为函数留下额外参数，供未来进行升级。
+
+### Promises
+
+延迟评估由一种被称为`promise`或`thunk`的数据结构赋能（这种数据结构，本人也不是很了解，可以GPT一下）。
+
+### Default arguments
+
+
+### Missing arguments
+
+
+### Exercises
