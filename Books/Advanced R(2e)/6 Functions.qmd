@@ -367,3 +367,60 @@ y
 
 ## `...`(dot-dot-dot)
 
+`...`是R函数的一个特殊参数，它使得R函数可以有任意数目的参数。
+
+### 应用`...`
+
+`...`主要应用在下面两种情况：
+
+-   要传递额外参数给另外一个函数。
+
+```{r}
+i01 <- function(y, z) {
+  list(y = y, z = z)
+}
+
+i02 <- function(x, ...) {
+  i01(...)
+}
+
+str(i02(x = 1, y = 2, z = 3))
+
+# 常见的apply家族函数
+x <- list(c(1, 3, NA), c(4, NA, 6))
+str(lapply(x, mean, na.rm = TRUE))
+```
+
+-   S3面向对象中的方法函数，如下面的`print()`函数，对于不同类使用不同参数。S3面向对象详见第13章。
+
+```{r}
+print(factor(letters), max.levels = 4)
+
+print(y ~ x, showEnv = TRUE)
+```
+
+### 解析`...`
+
+-   可以使用`..N`的形式，来访问`...`中的第`N`个参数。
+
+```{r}
+i03 <- function(...) {
+  list(first = ..1, third = ..3)
+}
+str(i03(1, 2, 3))
+```
+
+-   可以使用`list(...)`将其转换为list，储存起来。
+
+```{r}
+i04 <- function(...) {
+  list(...)
+}
+str(i04(a = 1, b = 2))
+```
+
+```{r}
+rlang::list2()
+rlang::enquos()
+sum()
+```
