@@ -267,7 +267,7 @@ g12()
 
 ## Lazy evaluation
 
-词法作用域定义了何时以及如何根据名字查找对象；**延迟评估（Lazy evaluation）**解释了查找哪些名字：函数参数只有在被调用时才会被查找。
+词法作用域定义了何时以及如何根据名字查找对象；**延迟评估（Lazy evaluation）**解释了何时查找名字：函数参数只有在被调用时才会被查找。
 
 ```{r}
 h01 <- function(x) {
@@ -282,10 +282,88 @@ h01(stop("This is an error!"))
 
 延迟评估由一种被称为`promise`或`thunk`的数据结构赋能（这种数据结构，本人也不是很了解，可以GPT一下）。
 
+**promise**有三种类型：
+
+-   表达式，如`1 + 1`。
+-   函数自己的变量域。
+-
+
+```{r}
+double <- function(x) {
+  message("Calculating...")
+  x * 2
+}
+
+h03 <- function(x) {
+  c(x, x)
+}
+
+h03(double(20))
+#> Calculating...
+#> [1] 40 40
+
+x <- double(20)
+h03(x)
+
+```
+
 ### Default arguments
 
+延迟评估，允许函数在设置默认参数时，引用函数内部变量域，例如下面的例子。在base R中的许多函数都有类似的应用，但是不推荐这样使用，这样会增加函数理解的困难。
+
+```{r}
+h04 <- function(x = 1, y = x * 2, z = a + b) {
+  a <- 10
+  b <- 100
+
+  c(x, y, z)
+}
+
+h04()
+```
+
+另外一个需要注意的是：`评估表达式`作为默认参数，与直接传递给函数，两种情况是不同的。下面的示例中，`ls()`作为默认参数时，评估的是函数内部的变量域，而不是外部环境。
+
+```{r}
+h05 <- function(x = ls()) {
+  a <- 1
+  x
+}
+
+# ls() evaluated inside h05:
+h05()
+
+h05(ls())
+```
 
 ### Missing arguments
 
+函数`missing()`可以用来判断函数参数值，若来自于默认值，那么返回`TRUE`，否则返回`FALSE`。
+
+```{r}
+h06 <- function(x = 10) {
+  list(missing(x), x)
+}
+str(h06())
+str(h06(10))
+```
+
 
 ### Exercises
+
+```{r}
+y <- 10
+f1 <- function(x = {
+                 y <- 1
+                 2
+               }, y = 0) {
+  c(x, y)
+}
+f1()
+y
+
+
+```
+
+## `...`(dot-dot-dot)
+
