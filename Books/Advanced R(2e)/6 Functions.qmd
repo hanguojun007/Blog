@@ -21,7 +21,6 @@ source("_common.R")
 
 在学习本章之前，你一定已经写过很多用来减少重复工作的函数，本章会将你在工作中的一些知识进行整合提升，帮助你从理论的视角看待函数。在本章，你会看到一些有趣的小技巧和复杂技术，请一定要留心，这些内容是后面章节中的基石。
 
-
 ```{r}
 f2 <- function(a, b) {
   a * 10
@@ -40,7 +39,6 @@ f2(10, stop("This is an error!"))
 -   6.8节：
 
 ## Function fundamentals
-
 
 ### Function components
 
@@ -348,7 +346,6 @@ str(h06())
 str(h06(10))
 ```
 
-
 ### Exercises
 
 ```{r}
@@ -424,3 +421,287 @@ rlang::list2()
 rlang::enquos()
 sum()
 ```
+
+## Exiting a function
+
+大多数函数的退出机制有两种：
+
+-   显性或隐性的返回一个值，表示运行成功。
+-   抛出错误信息，表示运行失败。
+
+### Implicit versus explicit returns
+
+-   使用`return()`指定返回值。
+-   如果不使用`return()`指定返回值，默认使用最后运行代码的值作为返回值。
+
+```{r}
+j01 <- function(x) {
+  if (x < 10) {
+    0
+  } else {
+    10
+  }
+}
+j01(5)
+j01(15)
+
+j02 <- function(x) {
+  if (x < 10) {
+    return(0)
+  } else {
+    return(10)
+  }
+}
+j02(5)
+j02(15)
+```
+
+### Invisible values
+
+如果没有将函数的返回值赋值给某个变量，函数会将结果打印出来。
+
+```{r}
+j03 <- function() 1
+x <- j03()
+j03()
+```
+
+使用`invisible()`可以阻止函数自动打印。
+
+```{r}
+j04 <- function() invisible(1)
+j04()
+print(j04())
+(j04())
+```
+
+使用`withVisible()`可以获取函数的返回值和是否可见。
+
+```{r}
+str(withVisible(j04()))
+```
+
+最常见的隐藏返回值的函数就是`<-`。
+
+```{r}
+a <- 2
+(a <- 2)
+```
+
+### Errors
+
+当函数运行失败时，应当使用`stop()`函数抛出错误信息，并终止函数运行。抛出错误信息是为了让使用者知道函数运行失败的原因，以及如何处理。
+
+```{r}
+#| error: true
+j05 <- function() {
+  stop("I'm an error")
+  return(10)
+}
+j05()
+```
+
+### Exit handlers
+
+在函数处理过程中，经常会有更新当前工作路径、绘图参数等全局变量，在函数运行结束后又要复原这些全局变量的操作。此时可以使用`on.exit()`函数来添加函数在退出时的操作。下面的示例显示了：无论函数运行成功还是失败，`on.exit()`函数都会执行。
+
+```{r}
+j06 <- function(x) {
+  cat("Hello\n")
+  on.exit(cat("Goodbye!\n"), add = TRUE)
+
+  if (x) {
+    return(10)
+  } else {
+    stop("Error")
+  }
+}
+
+j06(TRUE)
+
+j06(FALSE)
+```
+
+`on.exit()`函数的另外两个参数：
+
+-   `add`：当有多个退出操作时，如果`add`为`FALSE`则新的操作会覆盖原来的操作，推荐总是设置为`TRUE`。
+-   `after`：当有多个退出操作时，如果`after`为`FALSE`，新的操作会最先执行。
+
+```{r}
+j08 <- function() {
+  on.exit(message("a"), add = TRUE)
+  on.exit(message("b"), add = FALSE)
+}
+j08()
+
+j09 <- function() {
+  on.exit(message("a"), add = TRUE, after = TRUE)
+  on.exit(message("b"), add = TRUE, after = TRUE)
+  on.exit(message("c"), add = TRUE, after = FALSE)
+}
+j09()
+```
+
+### Exercises
+
+了解一下`sink()`,`capture.output()`函数。
+
+## Function forms
+
+::: callout-tip
+R 里面的两句slogan：
+
+-   Everything that exists is an object.
+-   Everything that happens is a function call. — John Chambers
+:::
+
+R 中的函数有四种变体：
+
+-   prefix：函数名在参数前，例如`mean(x)`。
+-   infix：函数名在参数之间，例如`x + y`的`+`；可以使用`%`前后包裹函数名，进行自定义。
+-   replacement：带有`<-`赋值操作的函数，例如`names(df) <- c("a", "b")`。
+-   special：例如`[[`、`if`、`for`等。
+
+### Rewriting to prefix form
+
+任何形式的函数都可以改写成`prefix`形式。
+
+```{r}
+#| eval: false
+x + y
+`+`(x, y)
+
+names(df) <- c("x", "y", "z")
+`names<-`(df, c("x", "y", "z"))
+
+for (i in 1:10) print(i)
+`for`(i, 1:10, print(i))
+```
+
+R 的这种特性，可以让你随意地更改R中的基本函数。下面是一个更新了`(`函数的例子，大约10次中有1次，返回值会加1。
+
+```{r}
+`(` <- function(e1) {
+  if (is.numeric(e1) && runif(1) < 0.1) {
+    e1 + 1
+  } else {
+    e1
+  }
+}
+replicate(50, (1 + 2))
+rm("(")
+```
+
+### Prefix form
+
+prefix 格式的函数可以通过下面三种方式检索参数（也是检索优先级，由高至低）：
+
+1.  使用参数名。
+2.  使用参数名部分匹配。
+3.  使用参数位置。
+
+```{r}
+#| error: true
+k01 <- function(abcdef, bcde1, bcde2) {
+  list(a = abcdef, b1 = bcde1, b2 = bcde2)
+}
+str(k01(1, 2, 3))
+str(k01(2, 3, abcdef = 1)) 3
+
+# Can abbreviate long argument names:
+str(k01(2, 3, a = 1))
+
+# But this doesn't work because abbreviation is ambiguous
+str(k01(1, 3, b = 1))
+```
+
+通常使用位置的参数是函数参数中最常用的几个，不推荐使用部分匹配设置参数。很遗憾，在R中无法禁用模糊匹配，但可以设置`options(warnPartialMatchArgs = TRUE)`，生成警告信息。
+
+```{r}
+options(warnPartialMatchArgs = TRUE)
+x <- k01(a = 1, 2, 3)
+```
+
+### Infix form
+
+infix 格式的函数要求只能有两个参数。在base R中有许多这种格式的函数：`:`, `::`, `:::`, `$`, `@`, `^`, `*`, `/`, `+`, `-`, `>`, `>=`, `<`, `<=`, `==`, `!=`, `!`, `&`, `&&`, `|`, `||`, `~`, `<-`, and `<<-`。也可以使用`%`前后包裹函数名，进行自定义。例如`%*%`,`%in%`等。
+
+```{r}
+`%+%` <- function(a, b) paste0(a, b)
+"new " %+% "string"
+```
+
+`%`之间的函数名可以是除`%`外的任意字符，需要转义的字符只需在定义时进行转义，使用时无须转义。
+
+```{r}
+`% %` <- function(a, b) paste(a, b)
+`%/\\%` <- function(a, b) paste(a, b)
+
+"a" % % "b"
+"a" %/\% "b"
+```
+
+infix 格式的函数总是将其左右两端的参数作为输入。
+
+```{r}
+`%-%` <- function(a, b) paste0("(", a, " %-% ", b, ")")
+"a" %-% "b" %-% "c"
+```
+
+### Replacement form
+
+replacement 格式的函数要求：
+
+-   至少两个参数，分别是待赋值的对象和值。
+-   必须返回更新值后的对象。
+
+```{r}
+`second<-` <- function(x, value) {
+  x[2] <- value
+  x
+}
+
+x <- 1:10
+second(x) <- 5L
+x
+```
+
+如果你要添加额外参数，需要将其放置在`x`和`value`之间。
+
+```{r}
+`modify<-` <- function(x, position, value) {
+  x[position] <- value
+  x
+}
+modify(x, 1) <- 10
+x
+```
+
+使用`tracemem()`追踪内存地址的变化。
+
+```{r}
+x <- 1:10
+tracemem(x)
+
+second(x) <- 6L
+```
+
+### Sepcial forms
+
+下面是一些特殊格式的函数和它转换为prefix后的格式
+
+|        special form         |                 prefix form                 |
+|:---------------------------:|:-----------------------------------------:|
+|            \(x\)            |                  \`(\`(x)                   |
+|             {x}             |                  \`{\`(x)                   |
+|           x\[i\]            |                \`\[\`(x, i)                 |
+|         x\[\[i\]\]          |               \`\[\[\`(x, i)                |
+|       if (cond) true        |             \`if\`(cond, true)              |
+|  if (cond) true else false  |          \`if\`(cond, true, false)          |
+|   for(var in seq) action    |          \`for\`(var, seq, action)          |
+|     while (cond) action     |           \`while\`(cond, action)           |
+|         repeat expr         |              \`repeat\`(expr)               |
+|            next             |                 \`next\`()                  |
+|            break            |                 \`break\`()                 |
+| function(arg1, arg2) {body} | \`function\`(alist(arg1, arg2), body, env ) |
+
