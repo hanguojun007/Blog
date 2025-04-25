@@ -204,7 +204,7 @@ window.Quarto = {
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         
-    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(2)</span></div><div class="category" data-category="cXVhcnRv">quarto <span class="quarto-category-count">(1)</span></div><div class="category" data-category="JUU5JTlEJUEyJUU1JTkwJTkxJUU1JUFGJUI5JUU4JUIxJUEx">面向对象 <span class="quarto-category-count">(1)</span></div></div><div class="quarto-margin-footer"><div class="margin-footer-item">
+    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(5)</span></div><div class="category" data-category="cXVhcnRv">quarto <span class="quarto-category-count">(1)</span></div><div class="category" data-category="dHJpa3klMjBza2lsbA==">triky skill <span class="quarto-category-count">(2)</span></div><div class="category" data-category="JUU5JTlEJUEyJUU1JTkwJTkxJUU1JUFGJUI5JUU4JUIxJUEx">面向对象 <span class="quarto-category-count">(1)</span></div></div><div class="quarto-margin-footer"><div class="margin-footer-item">
 <p><img src="./logo.jpg" class="conditional-footer img-fluid" width="200"></p>
 </div></div></div>
 <!-- main -->
@@ -300,6 +300,128 @@ quarto
 <a href="./Blog/Object in R1.html" class="no-external">
 <div class="listing-date">
 2025-03-16
+</div>
+<div class="listing-author">
+大番薯本薯
+</div>
+</a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="2" data-categories="dHJpa3klMjBza2lsbA==" data-listing-date-sort="1745539200000" data-listing-file-modified-sort="1745583505308" data-listing-date-modified-sort="1745539200000" data-listing-reading-time-sort="1" data-listing-word-count-sort="64">
+<div class="thumbnail">
+<p><a href="./Blog/| and &amp; in R.html" class="no-external"></a></p><a href="./Blog/| and &amp; in R.html" class="no-external">
+<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
+</a><p><a href="./Blog/| and &amp; in R.html" class="no-external"></a></p>
+</div>
+<div class="body">
+<h3 class="no-anchor listing-title">
+<a href="./Blog/| and &amp; in R.html" class="no-external">R 中的 | 与 &amp;</a>
+</h3>
+<div class="listing-subtitle">
+<a href="./Blog/| and &amp; in R.html" class="no-external"></a>
+</div>
+<div class="listing-categories">
+<div class="listing-category" onclick="window.quartoListingCategory('dHJpa3klMjBza2lsbA=='); return false;">
+triky skill
+</div>
+</div>
+<div class="listing-description">
+<a href="./Blog/| and &amp; in R.html" class="no-external">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><span class="st">`</span><span class="at">%||%</span><span class="st">`</span> <span class="ot">&lt;-</span> <span class="cf">function</span>(lhs, rhs) {</span>
+<span id="cb1-2">  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(lhs)) {</span>
+<span id="cb1-3">    lhs</span>
+<span id="cb1-4">  } <span class="cf">else</span> {</span>
+<span id="cb1-5">    rhs</span>
+<span id="cb1-6">  }</span>
+<span id="cb1-7">}</span></code></pre></div>
+</a>
+</div>
+</div>
+<div class="metadata">
+<a href="./Blog/| and &amp; in R.html" class="no-external">
+<div class="listing-date">
+2025-04-25
+</div>
+<div class="listing-author">
+大番薯本薯
+</div>
+</a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="3" data-categories="" data-listing-date-sort="1745539200000" data-listing-file-modified-sort="1745584309401" data-listing-date-modified-sort="1745539200000" data-listing-reading-time-sort="1" data-listing-word-count-sort="41">
+<div class="thumbnail">
+<p><a href="./Blog/capture.output.html" class="no-external"></a></p><a href="./Blog/capture.output.html" class="no-external">
+<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
+</a><p><a href="./Blog/capture.output.html" class="no-external"></a></p>
+</div>
+<div class="body">
+<h3 class="no-anchor listing-title">
+<a href="./Blog/capture.output.html" class="no-external">capture.output</a>
+</h3>
+<div class="listing-subtitle">
+<a href="./Blog/capture.output.html" class="no-external"></a>
+</div>
+<div class="listing-categories">
+
+</div>
+<div class="listing-description">
+<a href="./Blog/capture.output.html" class="no-external">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1">capture.output2 <span class="ot">&lt;-</span> <span class="cf">function</span>(code) {</span>
+<span id="cb1-2">  temp <span class="ot">&lt;-</span> <span class="fu">tempfile</span>()</span>
+<span id="cb1-3">  <span class="fu">on.exit</span>(<span class="fu">file.remove</span>(temp), <span class="at">add =</span> <span class="cn">TRUE</span>, <span class="at">after =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-4"></span>
+<span id="cb1-5">  <span class="fu">sink</span>(temp)</span>
+<span id="cb1-6">  <span class="fu">on.exit</span>(<span class="fu">sink</span>(), <span class="at">add =</span> <span class="cn">TRUE</span>, <span class="at">after =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-7"></span>
+<span id="cb1-8">  <span class="fu">…</span></span><span id="cb1-9"><span class="fu"></span></span><span id="cb1-10"></span><span id="cb1-11"><span class="fu"></span><span class="fu"></span><span class="st"></span><span class="st"></span><span class="st"></span><span class="at"></span><span class="st"></span><span class="sc"></span><span class="st"></span></span><span id="cb1-12"><span class="co"></span></span><span id="cb1-13"><span class="co"></span></span></code></pre></div></a>
+</div>
+</div>
+<div class="metadata">
+<a href="./Blog/capture.output.html" class="no-external">
+<div class="listing-date">
+2025-04-25
+</div>
+<div class="listing-author">
+大番薯本薯
+</div>
+</a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="4" data-categories="dHJpa3klMjBza2lsbA==" data-listing-date-sort="1745539200000" data-listing-file-modified-sort="1745584239866" data-listing-date-modified-sort="1745539200000" data-listing-reading-time-sort="1" data-listing-word-count-sort="3">
+<div class="thumbnail">
+<p><a href="./Blog/dot dot dot.html" class="no-external"></a></p><a href="./Blog/dot dot dot.html" class="no-external">
+<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
+</a><p><a href="./Blog/dot dot dot.html" class="no-external"></a></p>
+</div>
+<div class="body">
+<h3 class="no-anchor listing-title">
+<a href="./Blog/dot dot dot.html" class="no-external">评估参数…</a>
+</h3>
+<div class="listing-subtitle">
+<a href="./Blog/dot dot dot.html" class="no-external"></a>
+</div>
+<div class="listing-categories">
+<div class="listing-category" onclick="window.quartoListingCategory('dHJpa3klMjBza2lsbA=='); return false;">
+triky skill
+</div>
+</div>
+<div class="listing-description">
+<a href="./Blog/dot dot dot.html" class="no-external">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1">rlang<span class="sc">::</span><span class="fu">list2</span>()</span>
+<span id="cb1-2"><span class="co">#&gt; list()</span></span>
+<span id="cb1-3">rlang<span class="sc">::</span><span class="fu">enquos</span>()</span>
+<span id="cb1-4"><span class="co">#&gt; &lt;list_of&lt;quosure&gt;&gt;</span></span>
+<span id="cb1-5"><span class="co">#&gt; </span></span>
+<span id="cb1-6"><span class="co">#&gt; named list()</span></span>
+<span id="cb1-7"><span class="fu">sum</span>()</span>
+<span id="cb1-8"><span class="co">#&gt; [1] 0</span></span></code></pre></div>
+</a>
+</div>
+</div>
+<div class="metadata">
+<a href="./Blog/dot dot dot.html" class="no-external">
+<div class="listing-date">
+2025-04-25
 </div>
 <div class="listing-author">
 大番薯本薯

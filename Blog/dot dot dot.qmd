@@ -1,0 +1,27 @@
+---
+title: "评估参数..."
+author: "大番薯本薯"
+date: "2025-04-25"
+date-modified: "2025-04-25"
+draft: false
+categories: [triky skill]
+execute:
+  warning: false
+  fig-width: 6
+  fig-asp: 0.618
+  out-width: 70%
+  fig-align: center
+---
+
+```{r}
+#| echo: false
+
+source("_common.R")
+```
+
+
+```{r}
+rlang::list2()
+rlang::enquos()
+sum()
+```

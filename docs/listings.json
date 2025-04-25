@@ -3,7 +3,10 @@
     "listing": "/blog.html",
     "items": [
       "/Blog/Code chunks.html",
-      "/Blog/Object in R1.html"
+      "/Blog/Object in R1.html",
+      "/Blog/| and & in R.html",
+      "/Blog/capture.output.html",
+      "/Blog/dot dot dot.html"
     ]
   }
 ]

@@ -722,7 +722,7 @@
     "href": "blog.html",
     "title": "",
     "section": "",
-    "text": "Order By\n       Default\n         \n          Title\n        \n         \n          Date - Oldest\n        \n         \n          Date - Newest\n        \n     \n  \n    \n      \n      \n    \n\n\n\n\n\n\n\n\n\n\nquarto 中R代码块的设置\n\n\n\n\n\n\nquarto\n\n\n\n\n\n\n\n\n\n2025-03-15\n\n\n大番薯本薯\n\n\n\n\n\n\n\n\n\n\n\n\nR 中的面向对象(1)\n\n\n\n\n\n\n面向对象\n\n\n\n\n\n\n\n\n\n2025-03-16\n\n\n大番薯本薯\n\n\n\n\n\n\nNo matching items\n\n Back to top"
+    "text": "Order By\n       Default\n         \n          Title\n        \n         \n          Date - Oldest\n        \n         \n          Date - Newest\n        \n     \n  \n    \n      \n      \n    \n\n\n\n\n\n\n\n\n\n\nquarto 中R代码块的设置\n\n\n\n\n\n\nquarto\n\n\n\n\n\n\n\n\n\n2025-03-15\n\n\n大番薯本薯\n\n\n\n\n\n\n\n\n\n\n\n\nR 中的面向对象(1)\n\n\n\n\n\n\n面向对象\n\n\n\n\n\n\n\n\n\n2025-03-16\n\n\n大番薯本薯\n\n\n\n\n\n\n\n\n\n\n\n\nR 中的 | 与 &\n\n\n\n\n\n\ntriky skill\n\n\n\n\n\n\n\n\n\n2025-04-25\n\n\n大番薯本薯\n\n\n\n\n\n\n\n\n\n\n\n\ncapture.output\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n2025-04-25\n\n\n大番薯本薯\n\n\n\n\n\n\n\n\n\n\n\n\n评估参数…\n\n\n\n\n\n\ntriky skill\n\n\n\n\n\n\n\n\n\n2025-04-25\n\n\n大番薯本薯\n\n\n\n\n\n\nNo matching items\n\n Back to top"
   },
   {
     "objectID": "Books/Advanced R(2e)/4 Subsetting.html",
@@ -823,5 +823,116 @@
     "crumbs": [
       "5 Control flow"
     ]
+  },
+  {
+    "objectID": "Books/Advanced R(2e)/6 Functions.html",
+    "href": "Books/Advanced R(2e)/6 Functions.html",
+    "title": "6 Functions",
+    "section": "",
+    "text": "在学习本章之前，你一定已经写过很多用来减少重复工作的函数，本章会将你在工作中的一些知识进行整合提升，帮助你从理论的视角看待函数。在本章，你会看到一些有趣的小技巧和复杂技术，请一定要留心，这些内容是后面章节中的基石。\n\n\n\n下面的代码运行时会报错吗？\n\n\nf2 &lt;- function(a, b) {\n  a * 10\n}\nf2(10, stop(\"This is an error!\"))\n\n\n无论运行成功或失败，函数如何都执行一些操作？\n\n\n\n\n\n6.2节：构成函数的三要素和原始函数（primitive function）。\n6.3节：函数联合使用的三种方法及其优劣。\n6.4节：词法作用域规则（rules of lexical scoping）——如何根据名字找到对应的值。\n6.5节：参数评估原则：只在第一次使用时评估，避免循环。\n6.6节：特殊参数...。\n6.7节：函数退出机制。\n6.8节：四种函数格式。",
+    "crumbs": [
+      "6 Functions"
+    ]
+  },
+  {
+    "objectID": "Books/Advanced R(2e)/6 Functions.html#introduction",
+    "href": "Books/Advanced R(2e)/6 Functions.html#introduction",
+    "title": "6 Functions",
+    "section": "",
+    "text": "在学习本章之前，你一定已经写过很多用来减少重复工作的函数，本章会将你在工作中的一些知识进行整合提升，帮助你从理论的视角看待函数。在本章，你会看到一些有趣的小技巧和复杂技术，请一定要留心，这些内容是后面章节中的基石。\n\n\n\n下面的代码运行时会报错吗？\n\n\nf2 &lt;- function(a, b) {\n  a * 10\n}\nf2(10, stop(\"This is an error!\"))\n\n\n无论运行成功或失败，函数如何都执行一些操作？\n\n\n\n\n\n6.2节：构成函数的三要素和原始函数（primitive function）。\n6.3节：函数联合使用的三种方法及其优劣。\n6.4节：词法作用域规则（rules of lexical scoping）——如何根据名字找到对应的值。\n6.5节：参数评估原则：只在第一次使用时评估，避免循环。\n6.6节：特殊参数...。\n6.7节：函数退出机制。\n6.8节：四种函数格式。",
+    "crumbs": [
+      "6 Functions"
+    ]
+  },
+  {
+    "objectID": "Books/Advanced R(2e)/6 Functions.html#function-fundamentals",
+    "href": "Books/Advanced R(2e)/6 Functions.html#function-fundamentals",
+    "title": "6 Functions",
+    "section": "Function fundamentals",
+    "text": "Function fundamentals\n\nFunction components\n函数由三部分组成：\n\nformals()：参数和函数名，控制如何调用函数。\nbody()：函数具体实现。\nenvironment()：环境，决定函数如何找到参数对应的值。\n\n在这三部分中，formals和body十分显性，构建出函数时就可以直观地看到；environment相对隐性，需要使用函数environment()。\n\nf02 &lt;- function(x, y) {\n  # A comment\n  x + y\n}\n\nformals(f02)\n#&gt; $x\n#&gt; \n#&gt; \n#&gt; $y\n\nbody(f02)\n#&gt; {\n#&gt;     x + y\n#&gt; }\n\nenvironment(f02)\n#&gt; &lt;environment: R_GlobalEnv&gt;\n\n与R中的其他对象一样，函数也会拥有一些属性。一个常见的属性是srcref（source reference），记录了函数的源代码，如下所示。\n\nattr(f02, \"srcref\")\n#&gt; NULL\n\n\n\nPrimitive functions\n原始函数（primitive function）是一个例外，不包含上面的三要素。\n\nsum\n#&gt; function (..., na.rm = FALSE)  .Primitive(\"sum\")\n`[`\n#&gt; .Primitive(\"[\")\n\n它们的base type不同。（base type 见第12章）\n\ntypeof(sum)\n#&gt; [1] \"builtin\"\ntypeof(`[`)\n#&gt; [1] \"special\"\n\n因为它们的底层是C语言，所以formals()、body()和environment()返回值都是NULL。\n\nformals(sum)\n#&gt; NULL\nbody(sum)\n#&gt; NULL\nenvironment(sum)\n#&gt; NULL\n\n\n\nFirst-class functions\n所谓的first-class，就是指函数本身就是对象，可以用来赋值给变量，可以传递给函数等等。创建函数只需要function()来定义，使用&lt;-进行绑定。\n如果一个函数没有绑定名字，那么它就是匿名函数。匿名函数通常用在lapply()等函数中，用来实现高效的数据处理。\n\nlapply(mtcars, function(x) length(unique(x)))\nFilter(function(x) !is.numeric(x), mtcars)\nintegrate(function(x) sin(x)^2, 0, pi)\n\n有关R函数的闭包特性，见第7章。\n\n\nInvoking a function\n使用函数的常见方式是myfun(param1, param2, ...)，如果你有了一组参数数据，可以使用do.call()来调用函数。\n\nargs &lt;- list(1:10, na.rm = TRUE)\ndo.call(mean, args)\n#&gt; [1] 5.5\n\n\n\nExercises\n\n使用is.function()来判断一个对象是否是函数。对于原始函数，使用is.primitive()。",
+    "crumbs": [
+      "6 Functions"
+    ]
+  },
+  {
+    "objectID": "Books/Advanced R(2e)/6 Functions.html#function-composition",
+    "href": "Books/Advanced R(2e)/6 Functions.html#function-composition",
+    "title": "6 Functions",
+    "section": "Function composition",
+    "text": "Function composition\nbase R 提供了两种函数组合使用的方式。例如，当你想使用sqrt()和mean()计算某个群体的方差：\n\nx &lt;- runif(100)\nsquare &lt;- function(x) x^2\ndeviation &lt;- function(x) x - mean(x)\n\n第一种方法：\n\nsqrt(mean(square(deviation(x))))\n#&gt; [1] 0.2744786\n\n第二种方法：\n\nout &lt;- deviation(x)\nout &lt;- square(out)\nout &lt;- mean(out)\nout &lt;- sqrt(out)\nout\n#&gt; [1] 0.2744786\n\nmagrittr包提供了第三种方式——管道符%&gt;%（R 4.0 之后可以之间使用 |&gt; 代替）。\n\nlibrary(magrittr)\n\nx %&gt;%\n  deviation() %&gt;%\n  square() %&gt;%\n  mean() %&gt;%\n  sqrt()\n#&gt; [1] 0.2744786",
+    "crumbs": [
+      "6 Functions"
+    ]
+  },
+  {
+    "objectID": "Books/Advanced R(2e)/6 Functions.html#lexical-scoping",
+    "href": "Books/Advanced R(2e)/6 Functions.html#lexical-scoping",
+    "title": "6 Functions",
+    "section": "Lexical scoping",
+    "text": "Lexical scoping\n在第二章中，我们讲到为对象命名；在这里，我们介绍它的反面，根据名字找到对象——词法作用域(lexical scoping)。\nR 的词法作用域遵循下面四个规则：\n\nName masking——函数内部的变量优先于函数外部的变量。\nFunctions versus variables——当某个函数与变量同名时，R自动找到对应的对象。\nA fresh start——函数每次执行都是独立的。\nDynamic lookup——函数只有在运行时才会查找对应的对象。\n\n\nName masking\n函数查找变量时，首先查找函数内的变量，然后再查找函数外，即——由内到外逐级查找，直至找到为止。\n\nx &lt;- 10\ny &lt;- 20\nz &lt;- 30\ng05 &lt;- function() {\n  x &lt;- 1\n  y &lt;- 2\n  c(x, y, z)\n}\ng05()\n#&gt; [1]  1  2 30\n\n\n\nFunctions versus variables\n诚如上述，函数也是普通的对象，在进行函数的查找时，遵循相同的规则。\n\ng07 &lt;- function(x) x + 1\ng08 &lt;- function() {\n  g07 &lt;- function(x) x + 100\n  g07(10)\n}\ng08()\n#&gt; [1] 110\n\n如果，函数名和变量名重复（函数和变量在不同的环境中）时，R会自动找到对应类型的对象，例如下面的g09。实际编写代码时，我们要尽可能避免这种情况的发生，因为十分歧义和迷惑。\n\ng09 &lt;- function(x) x + 100\ng10 &lt;- function() {\n  g09 &lt;- 10\n  g09(g09)\n}\ng10()\n#&gt; [1] 110\n\n\n\nA fresh start\n下面的例子，每次运行g11()结果都是相同的，因为每次运行函数时，都会创建一个变量域（环境），它们之间相互独立。\n\ng11 &lt;- function() {\n  if (!exists(\"a\")) {\n    a &lt;- 1\n  } else {\n    a &lt;- a + 1\n  }\n  a\n}\n\ng11()\n#&gt; [1] 1\ng11()\n#&gt; [1] 1\n\n当你使用a &lt;- g11()时，就打破了独立。\n\na &lt;- g11()\ng11()\n#&gt; [1] 2\ng11()\n#&gt; [1] 2\n\n\n\nDynamic lookup\n函数只有在运行时才会根据名字查找对象，也即前后环境不一致时，函数前后运行值也就不一样。\n\ng12 &lt;- function() x + 1\nx &lt;- 15\ng12()\n#&gt; [1] 16\n\nx &lt;- 20\ng12()\n#&gt; [1] 21\n\n使用codetools::findGlobals()可以里列出函数内的外部依赖项。\n\ncodetools::findGlobals(g12)\n#&gt; [1] \"+\" \"x\"\n\nenvironment(g12) &lt;- emptyenv()\ng12()\n#&gt; Error in x + 1: could not find function \"+\"\n\n\n\nExercises\n…",
+    "crumbs": [
+      "6 Functions"
+    ]
+  },
+  {
+    "objectID": "Books/Advanced R(2e)/6 Functions.html#lazy-evaluation",
+    "href": "Books/Advanced R(2e)/6 Functions.html#lazy-evaluation",
+    "title": "6 Functions",
+    "section": "Lazy evaluation",
+    "text": "Lazy evaluation\nR 函数中的参数具有延迟评估（Lazy evaluation）特点：只有参数被使用时，才会对其进行评估（运行）。\n\nh01 &lt;- function(x) {\n  10\n}\nh01(stop(\"This is an error!\"))\n#&gt; [1] 10\n\n这一特性允许解析耗时的参数只有在函数运行且被调用时进行解析。\n\nPromises\n延迟评估由一种被称为promise或thunk的数据结构赋能（这种数据结构，本人也不是很了解，可以GPT一下）。\npromise有三种类型：\n\n表达式，如1 + 1。\n创建的环境，如：函数自己的变量域。\n\n\ny &lt;- 10\nh02 &lt;- function(x) {\n  y &lt;- 100\n  x + 1\n}\n\nh02(y)\n#&gt; [1] 11\nh02(y &lt;- 1000)\n#&gt; [1] 1001\ny\n#&gt; [1] 1000\n\n\n无需重复计算的值，如下面的message结果只打印一次。\n\n\ndouble &lt;- function(x) {\n  message(\"Calculating...\")\n  x * 2\n}\n\nh03 &lt;- function(x) {\n  c(x, x)\n}\n\nh03(double(20))\n#&gt; [1] 40 40\n\nx &lt;- double(20)\nh03(x)\n#&gt; [1] 40 40\n\npromise类型的延迟评估具有一种“薛定谔的猫”的特点，任何尝试用R去评估它的操作都会破坏其promise特性。\n\n\nDefault arguments\n延迟评估，允许函数在设置默认参数时，引用函数内部变量域，例如下面的例子。在base R中的许多函数都有类似的应用，但是不推荐这样使用，这样会增加函数理解的困难。\n\nh04 &lt;- function(x = 1, y = x * 2, z = a + b) {\n  a &lt;- 10\n  b &lt;- 100\n\n  c(x, y, z)\n}\n\nh04()\n#&gt; [1]   1   2 110\n\n另外一个需要注意的是：将要延迟评估的表达式，“作为默认参数”和“直接传递给函数”，是两种不同的情况。下面的示例中，ls()作为默认参数时，评估的是函数内部的变量域，而不是外部环境。\n\nh05 &lt;- function(x = ls()) {\n  a &lt;- 1\n  x\n}\n\n# ls() evaluated inside h05:\nh05()\n#&gt; [1] \"a\" \"x\"\n\nh05(ls())\n#&gt;  [1] \"a\"         \"args\"      \"deviation\" \"double\"    \"f02\"       \"g05\"      \n#&gt;  [7] \"g07\"       \"g08\"       \"g09\"       \"g10\"       \"g11\"       \"g12\"      \n#&gt; [13] \"h01\"       \"h02\"       \"h03\"       \"h04\"       \"h05\"       \"out\"      \n#&gt; [19] \"square\"    \"status\"    \"x\"         \"y\"         \"z\"\n\n\n\nMissing arguments\n函数missing()可以用来判断函数参数值来源，若来自于默认值，那么返回TRUE，否则返回FALSE。\n\nh06 &lt;- function(x = 10) {\n  list(missing(x), x)\n}\nstr(h06())\n#&gt; List of 2\n#&gt;  $ : logi TRUE\n#&gt;  $ : num 10\nstr(h06(10))\n#&gt; List of 2\n#&gt;  $ : logi FALSE\n#&gt;  $ : num 10\n\n\n\nExercises\n\n下面代码发生的过程：\n\npromisex = {y &lt;- 1; 2}在函数f1自己创建的环境中被评估，赋值1给y，返回数值2。\npromise最终的运行结果——2，赋值给函数参数x。\n因为Name masking，不使用函数默认值，使用先前赋值为1的y。\n因为函数内部评估不影响外部变量，所以最外面的y仍为10。\n\n\n\ny &lt;- 10\nf1 &lt;- function(x = {\n                 y &lt;- 1\n                 2\n               }, y = 0) {\n  c(x, y)\n}\nf1()\n#&gt; [1] 2 1\ny\n#&gt; [1] 10",
+    "crumbs": [
+      "6 Functions"
+    ]
+  },
+  {
+    "objectID": "Books/Advanced R(2e)/6 Functions.html#dot-dot-dot",
+    "href": "Books/Advanced R(2e)/6 Functions.html#dot-dot-dot",
+    "title": "6 Functions",
+    "section": "...(dot-dot-dot)",
+    "text": "...(dot-dot-dot)\n...是R函数的一个特殊参数，它使得R函数可以有任意数目的参数。\n\n应用...\n...主要应用在下面两种情况：\n\n要传递额外参数给另外一个函数。\n\n\ni01 &lt;- function(y, z) {\n  list(y = y, z = z)\n}\n\ni02 &lt;- function(x, ...) {\n  i01(...)\n}\n\nstr(i02(x = 1, y = 2, z = 3))\n#&gt; List of 2\n#&gt;  $ y: num 2\n#&gt;  $ z: num 3\n\n# 常见的apply家族函数\nx &lt;- list(c(1, 3, NA), c(4, NA, 6))\nstr(lapply(x, mean, na.rm = TRUE))\n#&gt; List of 2\n#&gt;  $ : num 2\n#&gt;  $ : num 5\n\n\nS3面向对象中的方法函数，如下面的print()函数，对于不同类使用不同参数。S3面向对象详见第13章。\n\n\nprint(factor(letters), max.levels = 4)\n#&gt;  [1] a b c d e f g h i j k l m n o p q r s t u v w x y z\n#&gt; 26 Levels: a b c ... z\n\nprint(y ~ x, showEnv = TRUE)\n#&gt; y ~ x\n#&gt; &lt;environment: R_GlobalEnv&gt;\n\n\n\n解析...\n\n可以使用..N的形式，来访问...中的第N个参数。\n\n\ni03 &lt;- function(...) {\n  list(first = ..1, third = ..3)\n}\nstr(i03(1, 2, 3))\n#&gt; List of 2\n#&gt;  $ first: num 1\n#&gt;  $ third: num 3\n\n\n可以使用list(...)将其转换为list，储存起来。\n\n\ni04 &lt;- function(...) {\n  list(...)\n}\nstr(i04(a = 1, b = 2))\n#&gt; List of 2\n#&gt;  $ a: num 1\n#&gt;  $ b: num 2\n\n\nrlang包提供了额外的解析方法。\n\n\nrlang::list2()\nrlang::enquos()",
+    "crumbs": [
+      "6 Functions"
+    ]
+  },
+  {
+    "objectID": "Books/Advanced R(2e)/6 Functions.html#exiting-a-function",
+    "href": "Books/Advanced R(2e)/6 Functions.html#exiting-a-function",
+    "title": "6 Functions",
+    "section": "Exiting a function",
+    "text": "Exiting a function\n大多数函数的退出机制有两种：\n\n显性或隐性的返回一个值，表示运行成功。\n抛出错误信息，表示运行失败。\n\n\nImplicit versus explicit returns\n\n使用return()指定返回值。\n如果不使用return()指定返回值，默认使用最后运行代码的值作为返回值。\n\n\nj01 &lt;- function(x) {\n  if (x &lt; 10) {\n    0\n  } else {\n    10\n  }\n}\nj01(5)\n#&gt; [1] 0\nj01(15)\n#&gt; [1] 10\n\nj02 &lt;- function(x) {\n  if (x &lt; 10) {\n    return(0)\n  } else {\n    return(10)\n  }\n}\nj02(5)\n#&gt; [1] 0\nj02(15)\n#&gt; [1] 10\n\n\n\nInvisible values\n如果没有将函数的返回值赋值给某个变量，函数会将结果打印出来。\n\nj03 &lt;- function() 1\nx &lt;- j03()\nj03()\n#&gt; [1] 1\n\n使用invisible()可以阻止函数自动打印。\n\nj04 &lt;- function() invisible(1)\nj04()\nprint(j04())\n#&gt; [1] 1\n(j04())\n#&gt; [1] 1\n\n使用withVisible()可以获取函数的返回值和是否可见。\n\nstr(withVisible(j04()))\n#&gt; List of 2\n#&gt;  $ value  : num 1\n#&gt;  $ visible: logi FALSE\n\n最常见的隐藏返回值的函数就是&lt;-。\n\na &lt;- 2\n(a &lt;- 2)\n#&gt; [1] 2\n\n\n\nErrors\n当函数运行失败时，应当使用stop()函数抛出错误信息，并终止函数运行。抛出错误信息是为了让使用者知道函数运行失败的原因，以及如何处理。\n\nj05 &lt;- function() {\n  stop(\"I'm an error\")\n  return(10)\n}\nj05()\n#&gt; Error in j05(): I'm an error\n\n\n\nExit handlers\n在函数处理过程中，经常会有更新当前工作路径、绘图参数等全局变量，在函数运行结束后又要复原这些全局变量的操作。此时可以使用on.exit()函数来添加函数在退出时的操作。下面的示例显示了：无论函数运行成功还是失败，on.exit()函数都会执行。\n\nj06 &lt;- function(x) {\n  cat(\"Hello\\n\")\n  on.exit(cat(\"Goodbye!\\n\"), add = TRUE)\n\n  if (x) {\n    return(10)\n  } else {\n    stop(\"Error\")\n  }\n}\n\nj06(TRUE)\n#&gt; Hello\n#&gt; Goodbye!\n#&gt; [1] 10\n\nj06(FALSE)\n#&gt; Hello\n#&gt; Error in j06(FALSE): Error\n\non.exit()函数的另外两个参数：\n\nadd：当有多个退出操作时，如果add为FALSE则新的操作会覆盖原来的操作，推荐总是设置为TRUE。\nafter：当有多个退出操作时，如果after为FALSE，新的操作会最先执行。\n\n\nj08 &lt;- function() {\n  on.exit(message(\"a\"), add = TRUE)\n  on.exit(message(\"b\"), add = FALSE)\n}\nj08()\n\nj09 &lt;- function() {\n  on.exit(message(\"a\"), add = TRUE, after = TRUE)\n  on.exit(message(\"b\"), add = TRUE, after = TRUE)\n  on.exit(message(\"c\"), add = TRUE, after = FALSE)\n}\nj09()\n\n\n\nExercises\n了解一下sink(),capture.output()函数。",
+    "crumbs": [
+      "6 Functions"
+    ]
+  },
+  {
+    "objectID": "Books/Advanced R(2e)/6 Functions.html#function-forms",
+    "href": "Books/Advanced R(2e)/6 Functions.html#function-forms",
+    "title": "6 Functions",
+    "section": "Function forms",
+    "text": "Function forms\n\n\n\n\n\n\nTip\n\n\n\nR 里面的两句slogan：\n\nEverything that exists is an object.\nEverything that happens is a function call. — John Chambers\n\n\n\nR 中的函数有四种变体：\n\nprefix：函数名在参数前，例如mean(x)。\ninfix：函数名在参数之间，例如x + y的+；可以使用%前后包裹函数名，进行自定义。\nreplacement：带有&lt;-赋值操作的函数，例如names(df) &lt;- c(\"a\", \"b\")。\nspecial：例如[[、if、for等。\n\n\nRewriting to prefix form\n任何形式的函数都可以改写成prefix形式。\n\nx + y\n`+`(x, y)\n\nnames(df) &lt;- c(\"x\", \"y\", \"z\")\n`names&lt;-`(df, c(\"x\", \"y\", \"z\"))\n\nfor (i in 1:10) print(i)\n`for`(i, 1:10, print(i))\n\nR 的这种特性，可以让你随意地更改R中的基本函数。下面是一个更新了(函数的例子，大约10次中有1次，返回值会加1。\n\n`(` &lt;- function(e1) {\n  if (is.numeric(e1) && runif(1) &lt; 0.1) {\n    e1 + 1\n  } else {\n    e1\n  }\n}\nreplicate(50, (1 + 2))\n#&gt;  [1] 3 3 3 3 3 3 3 3 3 3 3 3 4 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3\n#&gt; [37] 3 3 4 3 4 3 3 3 3 4 3 3 3 3\nrm(\"(\")\n\n\n\nPrefix form\nprefix 格式的函数可以通过下面三种方式检索参数（也是检索优先级，由高至低）：\n\n使用参数名。\n使用参数名部分匹配。\n使用参数位置。\n\n\nk01 &lt;- function(abcdef, bcde1, bcde2) {\n  list(a = abcdef, b1 = bcde1, b2 = bcde2)\n}\n\n\nstr(k01(1, 2, 3))\nstr(k01(2, 3, abcdef = 1)) 3\n\n# Can abbreviate long argument names:\nstr(k01(2, 3, a = 1))\n\n# But this doesn't work because abbreviation is ambiguous\nstr(k01(1, 3, b = 1))\n#&gt; Error in parse(text = input): &lt;text&gt;:2:28: unexpected numeric constant\n#&gt; 1: str(k01(1, 2, 3))\n#&gt; 2: str(k01(2, 3, abcdef = 1)) 3\n#&gt;                               ^\n\n通常使用位置的参数是函数参数中最常用的几个，不推荐使用部分匹配设置参数。很遗憾，在R中无法禁用模糊匹配，但可以设置options(warnPartialMatchArgs = TRUE)，生成警告信息。\n\noptions(warnPartialMatchArgs = TRUE)\nx &lt;- k01(a = 1, 2, 3)\n\n\n\nInfix form\ninfix 格式的函数要求只能有两个参数。在base R中有许多这种格式的函数：:, ::, :::, $, @, ^, *, /, +, -, &gt;, &gt;=, &lt;, &lt;=, ==, !=, !, &, &&, |, ||, ~, &lt;-, and &lt;&lt;-。也可以使用%前后包裹函数名，进行自定义。例如%*%,%in%等。\n\n`%+%` &lt;- function(a, b) paste0(a, b)\n\"new \" %+% \"string\"\n#&gt; [1] \"new string\"\n\n%之间的函数名可以是除%外的任意字符，需要转义的字符只需在定义时进行转义，使用时无须转义。\n\n`% %` &lt;- function(a, b) paste(a, b)\n`%/\\\\%` &lt;- function(a, b) paste(a, b)\n\n\"a\" % % \"b\"\n#&gt; [1] \"a b\"\n\"a\" %/\\% \"b\"\n#&gt; [1] \"a b\"\n\ninfix 格式的函数总是将其左右两端的参数作为输入。\n\n`%-%` &lt;- function(a, b) paste0(\"(\", a, \" %-% \", b, \")\")\n\"a\" %-% \"b\" %-% \"c\"\n#&gt; [1] \"((a %-% b) %-% c)\"\n\n\n\nReplacement form\nreplacement 格式的函数要求：\n\n至少两个参数，分别是待赋值的对象和值。\n必须返回更新值后的对象。\n\n\n`second&lt;-` &lt;- function(x, value) {\n  x[2] &lt;- value\n  x\n}\n\nx &lt;- 1:10\nsecond(x) &lt;- 5L\nx\n#&gt;  [1]  1  5  3  4  5  6  7  8  9 10\n\n如果你要添加额外参数，需要将其放置在x和value之间。\n\n`modify&lt;-` &lt;- function(x, position, value) {\n  x[position] &lt;- value\n  x\n}\nmodify(x, 1) &lt;- 10\nx\n#&gt;  [1] 10  5  3  4  5  6  7  8  9 10\n\n使用tracemem()追踪内存地址的变化。\n\nx &lt;- 1:10\ntracemem(x)\n#&gt; [1] \"&lt;0x5586ac400b08&gt;\"\n\nsecond(x) &lt;- 6L\n#&gt; tracemem[0x5586ac400b08 -&gt; 0x5586b3037368]: eval eval withVisible withCallingHandlers eval eval with_handlers doWithOneRestart withOneRestart withRestartList doWithOneRestart withOneRestart withRestartList withRestarts &lt;Anonymous&gt; evaluate in_dir in_input_dir eng_r block_exec call_block process_group withCallingHandlers &lt;Anonymous&gt; process_file &lt;Anonymous&gt; &lt;Anonymous&gt; execute .main \n#&gt; tracemem[0x5586b3037368 -&gt; 0x5586b3036488]: second&lt;- eval eval withVisible withCallingHandlers eval eval with_handlers doWithOneRestart withOneRestart withRestartList doWithOneRestart withOneRestart withRestartList withRestarts &lt;Anonymous&gt; evaluate in_dir in_input_dir eng_r block_exec call_block process_group withCallingHandlers &lt;Anonymous&gt; process_file &lt;Anonymous&gt; &lt;Anonymous&gt; execute .main\n\n\n\nSepcial forms\n下面是一些特殊格式的函数和它转换为prefix后的格式\n\n\n\n\n\n\n\nspecial form\nprefix form\n\n\n\n\n(x)\n`(`(x)\n\n\n{x}\n`{`(x)\n\n\nx[i]\n`[`(x, i)\n\n\nx[[i]]\n`[[`(x, i)\n\n\nif (cond) true\n`if`(cond, true)\n\n\nif (cond) true else false\n`if`(cond, true, false)\n\n\nfor(var in seq) action\n`for`(var, seq, action)\n\n\nwhile (cond) action\n`while`(cond, action)\n\n\nrepeat expr\n`repeat`(expr)\n\n\nnext\n`next`()\n\n\nbreak\n`break`()\n\n\nfunction(arg1, arg2) {body}\n`function`(alist(arg1, arg2), body, env )\n\n\n\n\n\nExercises\n…",
+    "crumbs": [
+      "6 Functions"
+    ]
+  },
+  {
+    "objectID": "Blog/dot dot dot.html",
+    "href": "Blog/dot dot dot.html",
+    "title": "评估参数…",
+    "section": "",
+    "text": "rlang::list2()\n#&gt; list()\nrlang::enquos()\n#&gt; &lt;list_of&lt;quosure&gt;&gt;\n#&gt; \n#&gt; named list()\nsum()\n#&gt; [1] 0\n\n\n\n\n Back to top"
+  },
+  {
+    "objectID": "Blog/capture.output.html",
+    "href": "Blog/capture.output.html",
+    "title": "capture.output",
+    "section": "",
+    "text": "capture.output2 &lt;- function(code) {\n  temp &lt;- tempfile()\n  on.exit(file.remove(temp), add = TRUE, after = TRUE)\n\n  sink(temp)\n  on.exit(sink(), add = TRUE, after = TRUE)\n\n  force(code)\n  readLines(temp)\n}\ncapture.output2(cat(\"a\", \"b\", \"c\", sep = \"\\n\"))\n#&gt; [1] \"a\" \"b\" \"c\"\n#&gt; [1] \"a\" \"b\" \"c\"\n\n\n\n\n Back to top"
+  },
+  {
+    "objectID": "Blog/| and & in R.html",
+    "href": "Blog/| and & in R.html",
+    "title": "R 中的 | 与 &",
+    "section": "",
+    "text": "`%||%` &lt;- function(lhs, rhs) {\n  if (!is.null(lhs)) {\n    lhs\n  } else {\n    rhs\n  }\n}\n\n\nx_ok &lt;- function(x) {\n  !is.null(x) && length(x) == 1 && x &gt; 0\n}\n\nx_ok(NULL)\n#&gt; [1] FALSE\n#&gt; [1] FALSE\nx_ok(1)\n#&gt; [1] TRUE\n#&gt; [1] TRUE\nx_ok(1:3)\n#&gt; [1] FALSE\n#&gt; [1] FALSE\n\nx_ok &lt;- function(x) {\n  !is.null(x) & length(x) == 1 & x &gt; 0\n}\n\nx_ok(NULL)\n#&gt; logical(0)\n#&gt; logical(0)\nx_ok(1)\n#&gt; [1] TRUE\n#&gt; [1] TRUE\nx_ok(1:3)\n#&gt; [1] FALSE FALSE FALSE\n#&gt; [1] FALSE FALSE FALSE\n\n\n\n\n Back to top"
   }
 ]

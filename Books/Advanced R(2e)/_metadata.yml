@@ -11,6 +11,7 @@ website:
         - Books/Advanced R(2e)/3 Vectors.qmd
         - Books/Advanced R(2e)/4 Subsetting.qmd
         - Books/Advanced R(2e)/5 Control flow.qmd
+        - Books/Advanced R(2e)/6 Functions.qmd
         - Object-oriented Programming
         - Books/Advanced R(2e)/12 Base types.qmd
         # - Books/Advanced R(2e)/13 S3.qmd
