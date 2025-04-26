@@ -19,9 +19,87 @@ execute:
 source("_common.R")
 ```
 
+```{r}
+library(tidyverse)
+```
+
+## 什么是data-masking
+
+Data-masking 是一种允许直接调用数据框中的列名作为一个正常环境变量的技术。例如下例，使用`with`函数实现该目的：
+
+```{r}
+#| error: true
+# Unmasked programming
+mean(mtcars$cyl + mtcars$am)
+
+# Referring to columns is an error - Where is the data?
+mean(cyl + am)
+
+# Data-masking
+with(mtcars, mean(cyl + am))
+```
+
+## 函数中使用`{{`避免 data-masking 带来的问题
+
+虽然 data-masking 技术使得操作数据框十分方便，但会增加创造函数的困难。例如下面例子中的`var`,`var2`在函数bodys中并不表示参数，而是被 data-masking 解释为数据`data`中的列。
+
+```{r}
+#| error: true
+my_mean <- function(data, var1, var2) {
+  dplyr::summarise(data, mean(var1 + var2))
+}
+
+my_mean(mtcars, cyl, am)
+```
+
+使用`{{`可以避免 data-masking 带来的问题，因为它会把`var1`和`var2`解释为参数而不是数据`data`中的列。
+
+```{r}
+my_mean <- function(data, var1, var2) {
+  dplyr::summarise(data, mean({{ var1 }} + {{ var2 }}))
+}
+
+my_mean(mtcars, cyl, am)
+```
+
+## masking 具体是什么意思？
+
+从上面的例子中也可以看出，所谓的masking，就是词法作用域的优先级。相同变量名在data-masking中会被优先解释为数据框中的列，而非外部环境中的变量。rlang 包所构建的`tidy eval`框架提供了`pronouns`来声明变量的所属环境。
+
+```{r}
+cyl <- 1000
+
+mtcars %>%
+  dplyr::summarise(
+    mean_data = mean(.data$cyl),
+    mean_env = mean(.env$cyl)
+  )
+```
+
+## data-masking 如何工作？
+
+data-masking 依赖R语言的三个特点：
+
+-   改变变量优先级
+
+-   first class environment。环境在R中一个类似list的特殊对象，R 允许将list或dataframe转换为环境。
+
+```{r}
+as.environment(mtcars)
+```
+
+-   评估函数——`eval()`(base)、`eval_tidy()`(rlang)。
+
+
+# data-masking 编程模式
+
+
+
+
 
 ```{r}
 rlang::list2()
 rlang::enquos()
 sum()
 ```
+
