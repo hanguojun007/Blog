@@ -1,10 +1,10 @@
 ---
-title: "评估参数..."
+title: "Data Masking"
 author: "大番薯本薯"
 date: "2025-04-25"
 date-modified: "2025-04-25"
-draft: false
-categories: [triky skill]
+draft: true
+categories: [rlang]
 execute:
   warning: false
   fig-width: 6
@@ -91,13 +91,69 @@ as.environment(mtcars)
 -   评估函数——`eval()`(base)、`eval_tidy()`(rlang)。
 
 
-# data-masking 编程模式
+## data-masking 编程模式
 
 
+### Argument behaviours
+
+
+##
+
+defuse a expression, then eval this expression within data-masking.
+
+当表达式中包含函数的参数时，需要使用额外的手段保证能正确defuse。例如{{}}
+
+defuse expression 的类型：
+
+-   call
+-   symbol
+-   constant
+
+
+
+quosure 是特殊的defused expression，可以使R追踪对象的来源（命名空间）
+
+```{r}
+rbind(a = 1:2, b = 3:4)
+rows <- list(a = 1:2, b = 3:4)
+
+rbind2 <- function(...) {
+  do.call("rbind", list2(...))
+}
+
+rbind2(a = 1:2, b = 3:4)
+
+rbind2(!!!rows, c = 5:6)
+
+```
 
 
 
 ```{r}
+library(tidyverse)
+library(rlang)
+# Assemble a symbol from a string
+var <- "foo"
+sym(var)
+
+
+# Assemble a call from strings, symbols, and constants
+call("mean", sym(var), na.rm = TRUE)
+
+```
+
+
+```{r}
+#' @param foo <[`data-masked`][dplyr::dplyr_data_masking]> What `foo` does.
+#' @param bar <[`tidy-select`][dplyr::dplyr_tidy_select]> What `bar` does.
+#' @param ... <[`dynamic-dots`][rlang::dyn-dots]> What these dots do.
+#'
+test <- function() {
+
+}
+test()
+
+
 rlang::list2()
 rlang::enquos()
 sum()
