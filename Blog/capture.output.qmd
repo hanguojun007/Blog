@@ -3,7 +3,7 @@ title: "capture.output"
 author: "大番薯本薯"
 date: "2025-04-25"
 date-modified: "2025-04-25"
-draft: false
+draft: true
 categories: []
 execute:
   warning: false

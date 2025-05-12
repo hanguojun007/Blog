@@ -1,9 +1,9 @@
 ---
-title: "Data Masking"
+title: "Data Masking(1)"
 author: "大番薯本薯"
 date: "2025-04-25"
-date-modified: "2025-04-25"
-draft: true
+date-modified: "2025-05-12"
+draft: false
 categories: [rlang]
 execute:
   warning: false
@@ -21,6 +21,7 @@ source("_common.R")
 
 ```{r}
 library(tidyverse)
+library(rlang)
 ```
 
 ## 什么是data-masking
@@ -39,7 +40,7 @@ mean(cyl + am)
 with(mtcars, mean(cyl + am))
 ```
 
-## 函数中使用`{{`避免 data-masking 带来的问题
+## data-masking 带来的问题
 
 虽然 data-masking 技术使得操作数据框十分方便，但会增加创造函数的困难。例如下面例子中的`var`,`var2`在函数bodys中并不表示参数，而是被 data-masking 解释为数据`data`中的列。
 
@@ -80,7 +81,7 @@ mtcars %>%
 
 data-masking 依赖R语言的三个特点：
 
--   改变变量优先级
+-   defuse 变量，如 base R 中的`substitute()`、rlang 中的`enquo()`,`{{`等。
 
 -   first class environment。环境在R中一个类似list的特殊对象，R 允许将list或dataframe转换为环境。
 
@@ -90,72 +91,152 @@ as.environment(mtcars)
 
 -   评估函数——`eval()`(base)、`eval_tidy()`(rlang)。
 
+也即：先将变量名转换为defused状态，变得不可用，然后将dataframe转换为环境，最后在转换后的环境中重新评估变量。
 
 ## data-masking 编程模式
 
+诚如上述，在函数中使用 data-masking，需要特殊处理才能正确解析参数。在[rlang官网](https://rlang.r-lib.org/reference/topic-data-mask-programming.html)上，有四种解决方案。
 
-### Argument behaviours
+### forwarding pattern
 
+### 使用`{{`
 
-##
-
-defuse a expression, then eval this expression within data-masking.
-
-当表达式中包含函数的参数时，需要使用额外的手段保证能正确defuse。例如{{}}
-
-defuse expression 的类型：
-
--   call
--   symbol
--   constant
-
-
-
-quosure 是特殊的defused expression，可以使R追踪对象的来源（命名空间）
+`{{`用来直接解析单个参数，并且不丢失原有的信息（观察下面例子列名）。
 
 ```{r}
-rbind(a = 1:2, b = 3:4)
-rows <- list(a = 1:2, b = 3:4)
-
-rbind2 <- function(...) {
-  do.call("rbind", list2(...))
+my_summarise <- function(data, var) {
+  data %>% dplyr::summarise({{ var }})
 }
 
-rbind2(a = 1:2, b = 3:4)
+mtcars %>% my_summarise(mean(cyl))
 
-rbind2(!!!rows, c = 5:6)
-
+x <- "cyl"
+mtcars %>% my_summarise(mean(.data[[x]]))
 ```
 
+### `...`
 
-
-```{r}
-library(tidyverse)
-library(rlang)
-# Assemble a symbol from a string
-var <- "foo"
-sym(var)
-
-
-# Assemble a call from strings, symbols, and constants
-call("mean", sym(var), na.rm = TRUE)
-
-```
-
+`...` 不要求额外的语法设置，可以直接使用，用来解析多个参数。
 
 ```{r}
-#' @param foo <[`data-masked`][dplyr::dplyr_data_masking]> What `foo` does.
-#' @param bar <[`tidy-select`][dplyr::dplyr_tidy_select]> What `bar` does.
-#' @param ... <[`dynamic-dots`][rlang::dyn-dots]> What these dots do.
-#'
-test <- function() {
-
+my_group_by <- function(.data, ...) {
+  .data %>% dplyr::group_by(...)
 }
-test()
 
+mtcars %>% my_group_by(cyl = cyl * 100, am)
 
-rlang::list2()
-rlang::enquos()
-sum()
+my_select <- function(.data, ...) {
+  .data %>% dplyr::select(...)
+}
+
+mtcars %>% my_select(starts_with("c"), vs:carb)
+```
+
+有些函数会将多个参数同时传递给函数中的一个参数，如下例所示。此时`c()`生成的不是向量，而是tidy-select组合。
+
+```{r}
+my_pivot_longer <- function(.data, ...) {
+  .data %>% tidyr::pivot_longer(c(...))
+}
+
+mtcars %>% my_pivot_longer(starts_with("c"), vs:carb)
+```
+
+### name pattern
+
+使用`tidy eval`框架提供的`pronouns`，可以直接使用参数。
+
+```{r}
+my_mean <- function(data, var) {
+  data %>% dplyr::summarise(mean = mean(.data[[var]]))
+}
+
+my_mean(mtcars, "cyl")
+```
+
+遗憾的是，这种方法只能处理单个参数的情况。
+
+```{r}
+#| error: true
+mtcars %>% dplyr::summarise(.data[c("cyl", "am")])
+```
+
+### bridge pattern
+
+使用中间桥梁函数解析参数，如`across()`、`transmute()`等
+
+#### `across()`
+
+```{r}
+my_group_by <- function(data, var) {
+  data %>% dplyr::group_by(across({{ var }}))
+}
+
+mtcars %>% my_group_by(starts_with("c"))
+```
+
+```{r}
+my_group_by <- function(.data, ...) {
+  .data %>% dplyr::group_by(across(c(...)))
+}
+
+mtcars %>% my_group_by(starts_with("c"), vs:gear)
+```
+
+```{r}
+my_group_by <- function(data, vars) {
+  data %>% dplyr::group_by(across(all_of(vars)))
+}
+
+mtcars %>% my_group_by(c("cyl", "am"))
+```
+
+### `transmute()`
+
+```{r}
+my_pivot_longer <- function(data, ...) {
+  # Forward `...` in data-mask context with `transmute()`
+  # and save the inputs names
+  inputs <- dplyr::transmute(data, ...)
+  names <- names(inputs)
+
+  # Update the data with the inputs
+  data <- dplyr::mutate(data, !!!inputs)
+
+  # Select the inputs by name with `all_of()`
+  tidyr::pivot_longer(data, cols = all_of(names))
+}
+
+mtcars %>% my_pivot_longer(cyl, am = am * 100)
+```
+
+使用`transmute()`创建新的数据框，然后提取name，最后更新数据框。
+
+### Transformation patterns
+
+对多个参数执行相同的操作，有下面两种类型：
+
+#### Transforming inputs with across()
+
+```{r}
+my_mean <- function(data, ...) {
+  data %>% dplyr::summarise(across(c(...), ~ mean(.x, na.rm = TRUE)))
+}
+
+mtcars %>% my_mean(cyl, carb)
+
+mtcars %>% my_mean(foo = cyl, bar = carb)
+
+mtcars %>% my_mean(starts_with("c"), mpg:disp)
+```
+
+#### Transforming inputs with if_all() and if_any()
+
+```{r}
+filter_non_baseline <- function(.data, ...) {
+  .data %>% dplyr::filter(if_all(c(...), ~ .x != min(.x, na.rm = TRUE)))
+}
+
+mtcars %>% filter_non_baseline(vs, am, gear)
 ```
 
