@@ -1,0 +1,29 @@
+---
+title: "00 Preface"
+date: "2025-05-14"
+date-modified: "2025-05-14"
+format: "html"
+execute:
+  warning: false
+  fig-width: 6
+  fig-asp: 0.618
+  out-width: 70%
+  fig-align: center
+---
+
+```{r}
+#| echo: false
+
+source("_common.R")
+```
+
+本书的主要内容是如何将Javascript与R有机结合，使得能在R中书写网页应用。
+
+## 引言
+
+很多R语言使用者对shiny，rmarkdown等或多或少的熟悉，却不熟悉web核心技术——JavaScript，本书旨在通过揭示 JavaScript 在多大程度上能够极大地增强数据科学流水线的各个阶段，从分析到结果传达，来弥补这一缺陷。
+
+## 目录
+
+1.
+

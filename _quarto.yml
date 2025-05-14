@@ -60,6 +60,7 @@ website:
           - sidebar:TiMoR
           - sidebar:AdR2
           - sidebar:quarto
+          - sidebar:Js4R
       - text: Blog
         href: blog.qmd
       - about.qmd
@@ -76,6 +77,7 @@ metadata-files:
   - Books/Tidy Modeling with R/_metadata.yml
   - Books/Advanced R(2e)/_metadata.yml
   - Books/quarto/_metadata.yml
+  - Books/Js4R/_metadata.yml
 
 
 format:

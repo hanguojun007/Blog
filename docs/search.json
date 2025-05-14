@@ -969,5 +969,75 @@
     "title": "R 中的 | 与 &",
     "section": "",
     "text": "`%||%` &lt;- function(lhs, rhs) {\n  if (!is.null(lhs)) {\n    lhs\n  } else {\n    rhs\n  }\n}\n\n\nx_ok &lt;- function(x) {\n  !is.null(x) && length(x) == 1 && x &gt; 0\n}\n\nx_ok(NULL)\n#&gt; [1] FALSE\n#&gt; [1] FALSE\nx_ok(1)\n#&gt; [1] TRUE\n#&gt; [1] TRUE\nx_ok(1:3)\n#&gt; [1] FALSE\n#&gt; [1] FALSE\n\nx_ok &lt;- function(x) {\n  !is.null(x) & length(x) == 1 & x &gt; 0\n}\n\nx_ok(NULL)\n#&gt; logical(0)\n#&gt; logical(0)\nx_ok(1)\n#&gt; [1] TRUE\n#&gt; [1] TRUE\nx_ok(1:3)\n#&gt; [1] FALSE FALSE FALSE\n#&gt; [1] FALSE FALSE FALSE\n\n\n\n\n Back to top"
+  },
+  {
+    "objectID": "Books/Js4R/01 Overview.html",
+    "href": "Books/Js4R/01 Overview.html",
+    "title": "01 Overview",
+    "section": "",
+    "text": "将风马牛不相及的两种语言——R、Javascript 结合使用，目的是为了取长补短，发挥各自优势（实际上我只知道R，Javascript 却完全不懂，我只想单纯想用R写出web）。\n一个直白的原因是：R 想实现的功能可能在Javascript 中已经存在，我们没有必要重新发明轮子，为 R 打包一个调用 JavaScript 的API即可。例如rmapshaper包，提供了调用 JavaScript 对GeoJSON文件进行修改的API。\n\nlibrary(rmapshaper)\n\n# get data\ndata(states, package = \"geojsonio\")\n\nstates_json &lt;- geojsonio::geojson_json(\n  states,\n  geometry = \"polygon\",\n  group = \"group\"\n)\nstates_sp &lt;- geojsonio::geojson_sp(states_json)\n\n# print shape file size\nprint(object.size(states_sp), units = \"Mb\")\n#&gt; 0.4 Mb\n#&gt; 0.4 Mb\n\n# simplify with rmapshaper\nstates_sm &lt;- rmapshaper::ms_simplify(states_sp, keep = 0.05)\n\n# print reduced size\nprint(object.size(states_sm), units = \"Mb\")\n#&gt; 0.2 Mb\n\n另外一个原因是：JavaScript 可以做 R 不能做的事。例如下面的plotly包，生成一个可交互的图形。\n\nlibrary(plotly)\n\nplot_ly(diamonds, x = ~cut, color = ~clarity, width = \"100%\")\n\n\n\n\n\n最后一个原因：JavaScript 可以与 R 协同工作，改进我们交流的方式，例如shiny应用——显示一个等待框。\n\nlibrary(shiny)\nlibrary(waiter)\n\nui &lt;- fluidPage(\n  use_waiter(), # include dependencies\n  actionButton(\"show\", \"Show loading for 3 seconds\")\n)\n\nserver &lt;- function(input, output, session) {\n  # create a waiter\n  w &lt;- Waiter$new()\n\n  # on button click\n  observeEvent(input$show, {\n    w$show()\n    Sys.sleep(3)\n    w$hide()\n  })\n}\n\nshinyApp(ui, server)",
+    "crumbs": [
+      "01 Overview"
+    ]
+  },
+  {
+    "objectID": "Books/Js4R/01 Overview.html#rationale为什么结合r与javascript",
+    "href": "Books/Js4R/01 Overview.html#rationale为什么结合r与javascript",
+    "title": "01 Overview",
+    "section": "",
+    "text": "将风马牛不相及的两种语言——R、Javascript 结合使用，目的是为了取长补短，发挥各自优势（实际上我只知道R，Javascript 却完全不懂，我只想单纯想用R写出web）。\n一个直白的原因是：R 想实现的功能可能在Javascript 中已经存在，我们没有必要重新发明轮子，为 R 打包一个调用 JavaScript 的API即可。例如rmapshaper包，提供了调用 JavaScript 对GeoJSON文件进行修改的API。\n\nlibrary(rmapshaper)\n\n# get data\ndata(states, package = \"geojsonio\")\n\nstates_json &lt;- geojsonio::geojson_json(\n  states,\n  geometry = \"polygon\",\n  group = \"group\"\n)\nstates_sp &lt;- geojsonio::geojson_sp(states_json)\n\n# print shape file size\nprint(object.size(states_sp), units = \"Mb\")\n#&gt; 0.4 Mb\n#&gt; 0.4 Mb\n\n# simplify with rmapshaper\nstates_sm &lt;- rmapshaper::ms_simplify(states_sp, keep = 0.05)\n\n# print reduced size\nprint(object.size(states_sm), units = \"Mb\")\n#&gt; 0.2 Mb\n\n另外一个原因是：JavaScript 可以做 R 不能做的事。例如下面的plotly包，生成一个可交互的图形。\n\nlibrary(plotly)\n\nplot_ly(diamonds, x = ~cut, color = ~clarity, width = \"100%\")\n\n\n\n\n\n最后一个原因：JavaScript 可以与 R 协同工作，改进我们交流的方式，例如shiny应用——显示一个等待框。\n\nlibrary(shiny)\nlibrary(waiter)\n\nui &lt;- fluidPage(\n  use_waiter(), # include dependencies\n  actionButton(\"show\", \"Show loading for 3 seconds\")\n)\n\nserver &lt;- function(input, output, session) {\n  # create a waiter\n  w &lt;- Waiter$new()\n\n  # on button click\n  observeEvent(input$show, {\n    w$show()\n    Sys.sleep(3)\n    w$hide()\n  })\n}\n\nshinyApp(ui, server)",
+    "crumbs": [
+      "01 Overview"
+    ]
+  },
+  {
+    "objectID": "Books/Js4R/01 Overview.html#methods结合r与javascript的方法",
+    "href": "Books/Js4R/01 Overview.html#methods结合r与javascript的方法",
+    "title": "01 Overview",
+    "section": "Methods(结合R与Javascript的方法)",
+    "text": "Methods(结合R与Javascript的方法)\n上面示例，都结合了R与Javascript，但是它们的方法不同。\n\nV8\nV8 是一个基于Chrome的 JavaScript 引擎，它允许我们使用R语言调用JavaScript代码。这是rmapshaper包中调用JavaScript代码的基础。\n\nlibrary(V8)\n\nctx &lt;- v8()\n\nctx$eval(\"2 + 2\") # this is evaluated in JavaScript!\n#&gt; [1] \"4\"\n#&gt; [1] \"4\"\n\n\n\nhtmlwidgets\nhtmlwidgets 调用JavaScript库，生成可交互的图像。上面的plotly包就是基于htmlwidgets包，同时还有DT、highcharts、leaflet等。\n\n\nshiny\nshiny 框架允许创建web应用，使得前后端进行数据传输。",
+    "crumbs": [
+      "01 Overview"
+    ]
+  },
+  {
+    "objectID": "Books/Js4R/01 Overview.html#methods-amiss没有提及的方法",
+    "href": "Books/Js4R/01 Overview.html#methods-amiss没有提及的方法",
+    "title": "01 Overview",
+    "section": "Methods Amiss(没有提及的方法)",
+    "text": "Methods Amiss(没有提及的方法)\n除上面三种框架外，还有两种方法没有提及：\n\nreactR & vueR\nReactR 包，类似于htmlwidgets，但是它适用于 React 框架；而且，它不仅限于可视化输出，还提供了构建输入的功能，例如，下拉菜单等。reactable 包，类似于DT包，生成可交互的表格，但是它使用React框架。\n\nreactable::reactable(iris[1:5, ], showPagination = TRUE)\n\n\n\n\n\nvueR 包与reactR 类似，但是它使用Vue框架。\n\n\nr2d3\nr2d3 包，允许我们使用R语言调用D3 JavaScript库(d3.js)，生成图片，但它的底层逻辑与htmlwidgets完全不同。\n\n# 你需要创建一个 JavaScript 文件 chord.js\n# chord.js 代码见 https://rstudio.github.io/r2d3/articles/gallery/chord/\nlibrary(r2d3)\nr2d3(data = matrix(round(runif(16, 1, 10000)), ncol = 4, nrow = 4), script = \"chord.js\")",
+    "crumbs": [
+      "01 Overview"
+    ]
+  },
+  {
+    "objectID": "Books/Js4R/00 Preface.html",
+    "href": "Books/Js4R/00 Preface.html",
+    "title": "00 Preface",
+    "section": "",
+    "text": "本书的主要内容是如何将Javascript与R有机结合，使得能在R中书写网页应用。",
+    "crumbs": [
+      "00 Preface"
+    ]
+  },
+  {
+    "objectID": "Books/Js4R/00 Preface.html#引言",
+    "href": "Books/Js4R/00 Preface.html#引言",
+    "title": "00 Preface",
+    "section": "引言",
+    "text": "引言\n很多R语言使用者对shiny，rmarkdown等或多或少的熟悉，却不熟悉web核心技术——JavaScript，本书旨在通过揭示 JavaScript 在多大程度上能够极大地增强数据科学流水线的各个阶段，从分析到结果传达，来弥补这一缺陷。",
+    "crumbs": [
+      "00 Preface"
+    ]
+  },
+  {
+    "objectID": "Books/Js4R/00 Preface.html#目录",
+    "href": "Books/Js4R/00 Preface.html#目录",
+    "title": "00 Preface",
+    "section": "目录",
+    "text": "目录",
+    "crumbs": [
+      "00 Preface"
+    ]
   }
 ]

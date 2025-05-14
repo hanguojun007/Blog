@@ -1,0 +1,137 @@
+---
+title: "01 Overview"
+date: "2025-05-14"
+date-modified: "2025-05-14"
+format: "html"
+execute:
+  warning: false
+  fig-width: 6
+  fig-asp: 0.618
+  out-width: 70%
+  fig-align: center
+---
+
+```{r}
+#| echo: false
+
+source("_common.R")
+```
+
+
+## Rationale(为什么结合R与Javascript？)
+
+将风马牛不相及的两种语言——R、Javascript 结合使用，目的是为了取长补短，发挥各自优势（实际上我只知道R，Javascript 却完全不懂，我只想单纯想用R写出web）。
+
+一个直白的原因是：R 想实现的功能可能在Javascript 中已经存在，我们没有必要重新发明轮子，为 R 打包一个调用 JavaScript 的API即可。例如rmapshaper包，提供了调用 JavaScript 对GeoJSON文件进行修改的API。
+
+```{r}
+library(rmapshaper)
+
+# get data
+data(states, package = "geojsonio")
+
+states_json <- geojsonio::geojson_json(
+  states,
+  geometry = "polygon",
+  group = "group"
+)
+states_sp <- geojsonio::geojson_sp(states_json)
+
+# print shape file size
+print(object.size(states_sp), units = "Mb")
+#> 0.4 Mb
+
+# simplify with rmapshaper
+states_sm <- rmapshaper::ms_simplify(states_sp, keep = 0.05)
+
+# print reduced size
+print(object.size(states_sm), units = "Mb")
+```
+
+另外一个原因是：JavaScript 可以做 R 不能做的事。例如下面的plotly包，生成一个可交互的图形。
+
+```{r}
+library(plotly)
+
+plot_ly(diamonds, x = ~cut, color = ~clarity, width = "100%")
+```
+
+最后一个原因：JavaScript 可以与 R 协同工作，改进我们交流的方式，例如shiny应用——显示一个等待框。
+
+```{r}
+#| eval: false
+library(shiny)
+library(waiter)
+
+ui <- fluidPage(
+  use_waiter(), # include dependencies
+  actionButton("show", "Show loading for 3 seconds")
+)
+
+server <- function(input, output, session) {
+  # create a waiter
+  w <- Waiter$new()
+
+  # on button click
+  observeEvent(input$show, {
+    w$show()
+    Sys.sleep(3)
+    w$hide()
+  })
+}
+
+shinyApp(ui, server)
+```
+
+![](image/waiter.png)
+
+## Methods(结合R与Javascript的方法)
+
+上面示例，都结合了R与Javascript，但是它们的方法不同。
+
+### V8
+
+V8 是一个基于Chrome的 JavaScript 引擎，它允许我们使用R语言调用JavaScript代码。这是rmapshaper包中调用JavaScript代码的基础。
+
+```{r}
+library(V8)
+
+ctx <- v8()
+
+ctx$eval("2 + 2") # this is evaluated in JavaScript!
+#> [1] "4"
+```
+
+### htmlwidgets
+
+htmlwidgets 调用JavaScript库，生成可交互的图像。上面的plotly包就是基于htmlwidgets包，同时还有DT、highcharts、leaflet等。
+
+### shiny
+
+shiny 框架允许创建web应用，使得前后端进行数据传输。
+
+## Methods Amiss(没有提及的方法)
+
+除上面三种框架外，还有两种方法没有提及：
+
+### reactR & vueR
+
+ReactR 包，类似于htmlwidgets，但是它适用于 React 框架；而且，它不仅限于可视化输出，还提供了构建输入的功能，例如，下拉菜单等。reactable 包，类似于DT包，生成可交互的表格，但是它使用React框架。
+
+```{r}
+reactable::reactable(iris[1:5, ], showPagination = TRUE)
+```
+
+vueR 包与reactR 类似，但是它使用Vue框架。
+
+### r2d3
+
+r2d3 包，允许我们使用R语言调用D3 JavaScript库(d3.js)，生成图片，但它的底层逻辑与htmlwidgets完全不同。
+
+```{r}
+# 你需要创建一个 JavaScript 文件 chord.js
+# chord.js 代码见 https://rstudio.github.io/r2d3/articles/gallery/chord/
+library(r2d3)
+r2d3(data = matrix(round(runif(16, 1, 10000)), ncol = 4, nrow = 4), script = "chord.js")
+```
+

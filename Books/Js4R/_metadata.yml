@@ -1,0 +1,7 @@
+website:
+  sidebar:
+    - id: Js4R
+      title: Js4R
+      contents:
+        - Books/Js4R/00 Preface.qmd
+        - Books/Js4R/01 Overview.qmd
