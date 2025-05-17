@@ -1,0 +1,30 @@
+---
+title: "02 Prerequisites"
+date: "2025-05-17"
+date-modified: "2025-05-17"
+format: "html"
+execute:
+  warning: false
+  fig-width: 6
+  fig-asp: 0.618
+  out-width: 70%
+  fig-align: center
+---
+
+```{r}
+#| echo: false
+
+source("_common.R")
+```
+
+
+## 构建R包
+
+```{r}
+install.packages(c("devtools", "usethis"))
+```
+
+```{r}
+# creates a package named "test" in root of directory.
+usethis::create_package("F:/Blog/Books/Js4R/test")
+```
