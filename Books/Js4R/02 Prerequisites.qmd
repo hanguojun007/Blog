@@ -1,7 +1,7 @@
 ---
 title: "02 Prerequisites"
 date: "2025-05-17"
-date-modified: "2025-05-17"
+date-modified: "2025-05-26"
 format: "html"
 execute:
   warning: false
@@ -17,14 +17,226 @@ execute:
 source("_common.R")
 ```
 
+本章介绍一些后续会用到的必要知识：
+
+-   使用devtools构建R包
+-   shiny框架
+-   Json数据格式
+-   JavaScript基础
+
+即：以shiny框架为基础，通过Json格式数据，沟通R与JavaScript，将这种沟通方式打包为R包，方便调用与测试。
 
 ## 构建R包
 
+这里简单简绍构建R包的方法，具体可参考 [R Packages](http://r-pkgs.had.co.nz/)
+
 ```{r}
+#| eval: false
 install.packages(c("devtools", "usethis"))
 ```
 
+### 创建R包
+
+使用Rstudio创建R包：`File > New Project > New Directory > R Package`
+
+![](image/rstudio-create-package.png)
+
+使用`usethis`创建R包，Rstudio使用相同的命令创建R包。
+
 ```{r}
-# creates a package named "test" in root of directory.
-usethis::create_package("F:/Blog/Books/Js4R/test")
+# 在当前工作目录下创建名为test的R包，同时自动设置工作目录为test包路径
+usethis::create_package("test")
+# getwd()
+```
+
+### Metadata
+
+每个R包都有`DESCRIPTION`文件，该文件包含包名、版本、作者、依赖等信息。例如下面是test包的默认`DESCRIPTION`文件：
+
+```{text}
+Package: test
+Title: What the Package Does (One Line, Title Case)
+Version: 0.0.0.9000
+Authors@R:
+    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"))
+Description: What the package does (one paragraph).
+License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
+    license
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+```
+
+假如你创建了一个依赖`stringr`包的脚本string.R，那么你需要在`DESCRIPTION`文件中添加依赖项。如果有多个，使用`,`分割。
+
+```{text}
+Imports:
+  stringr,
+  dplyr
+```
+
+也可以使用`usethis`添加依赖项。
+
+```{r}
+# add stringr under Imports
+usethis::use_package("stringr")
+```
+
+`Suggests`与`Imports`类似，但不会强制安装。
+
+### R code
+
+R 包有着严格的结构要求，`R/`目录只能用来存放以`.R`结尾的R文件。上面的`string.R`文件就是在`R/`目录下。
+
+### Documentation
+
+roxygen2包可以识别在R函数前添加`#'`开头的注释，自动生成使用`?`进行查询的函数说明文档。这些说明文档以`.Rd`结尾，存放在`man/`目录下。
+
+在注释中，可以使用一些roxygen2标签，如`@param`、`@example`、`@importFrom`、`@export`等。
+
+-   `@param`: 参数说明，参数类型，参数描述。
+-   `@example`: 函数使用示例。
+-   `@importFrom`: 导入R包，该包中的函数。
+-   `@export`: 导出函数，使得该函数可以被用户调用。
+
+```{r}
+#| eval: false
+#' Strings Length
+#'
+#' Returns the number of characters in strings.
+#'
+#' @param strings A vector of character strings.
+#'
+#' @example string_length(c("hello", "world"))
+#'
+#' @importFrom stringr str_length
+#'
+#' @export
+string_length <- function(strings) {
+  str_length(strings) # namespace removed
+}
+```
+
+roxygen2 包会收集函数名，生成`NAMESPACE`文件，该文件包含了被该包导入和导出的函数。例如将上面的code替换之前的string.R文件，然后使用`devtools::document()`命令，生成`man/`文件夹和`NAMESPACE`文件。
+
+### Installed files
+
+在`inst/`目录下，用来存放一些能够被用户使用`system.file()`获取的文件。在本书中，你会见到很多这种用法。
+
+```{r}
+#| eval: false
+# return path to `inst/dependency.js` in `myPackage`
+path <- system.file("dependency.js", package = "myPackage")
+```
+
+### Build, load and install
+
+在使用`devtools::document()`生成说明文档后，可以使用`devtools::install()`进行本地安装。但在实际开发R包时，通常使用`devtools::load_all()`进行本地加载。下面是一个开发R包的惯用流程：
+
+1.  Write some code
+2.  Run `devtools::document()` (if documentation tags have changed)
+3.  Run `devtools::load_all()`
+4.  Repeat
+
+## Json
+
+JSON (JavaScript Object Notation) 是一种流行的数据交换格式。在R中，我们使用`jsonlite`包进行序列化与反序列化。
+
+### Serialising
+
+Json数据格式类似R中的list，可以存放除`dataframe`外的任何数据。下面是一个简单示例，参数`pretty`控制输出格式是否有空格。
+
+```{r}
+# install.packages("jsonlite")
+library(jsonlite)
+
+lst <- list(
+  a = 1,
+  b = list(
+    c = c("A", "B")
+  ),
+  d = 1:5
+)
+
+toJSON(lst, pretty = TRUE)
+```
+
+仔细观察上面的R list对象和json结果，`a = 1`虽然是单个数字，但其在R中实际是长度为1的向量，所以json中表现为`"a": [1]`。
+
+```{r}
+x <- 1
+length(x)
+is.vector(x)
+```
+
+可以使用参数`auto_unbox = TRUE`来自动去除长度为1的向量中的`[]`，并且转换为json中的特殊数据类型：`integer`、`number`、`boolean`等。
+
+```{r}
+toJSON(lst, pretty = TRUE, auto_unbox = TRUE)
+```
+
+要注意，如果你将`a=1`变为`a=list(1)`，那么`toJSON(lst, pretty = TRUE, auto_unbox = TRUE)`将返回`"a": [1]`，而不是`"a": 1`。
+
+### Tabular Data
+
+如果数据是dataframe，`jsonlite`会逐行将dataframe转换为json。
+
+```{r}
+# subset of built-in dataset
+df <- cars[1:2, ]
+
+toJSON(df, pretty = TRUE)
+```
+
+上面的代码也可以使用下面的步骤实现：去除行名，按行生成list。
+
+```{r}
+row.names(df) <- NULL
+df_list <- apply(df, 1, as.list)
+
+toJSON(df_list, pretty = TRUE, auto_unbox = TRUE)
+```
+
+jsonlite在读取json时，会自动将这种格式的数据转换为dataframe。
+
+```{r}
+class(df_list)
+json <- toJSON(df_list)
+fromJSON(json)
+```
+
+## JavaScript
+
+
+### DOM
+
+
+## Shiny
+
+### Serving Static Files
+
+```{r}
+# run from root of app (where app.R is located)
+dir.create("assets")
+writeLines("console.log('Hello JS!');", con = "assets/script.js")
+```
+
+```{r}
+# app.R
+library(shiny)
+
+# serve the files
+addResourcePath(prefix = "files", directoryPath = "assets")
+
+ui <- fluidPage(
+  tags$head(
+    tags$script(src = "files/script.js")
+  ),
+  h1("R and JavaScript")
+)
+
+server <- function(input, output) {}
+
+shinyApp(ui, server)
+shinyApp(ui, server)
 ```
