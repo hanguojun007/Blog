@@ -1,7 +1,7 @@
 ---
 title: "02 Prerequisites"
 date: "2025-05-17"
-date-modified: "2025-05-26"
+date-modified: "2025-06-02"
 format: "html"
 execute:
   warning: false
@@ -44,6 +44,7 @@ install.packages(c("devtools", "usethis"))
 使用`usethis`创建R包，Rstudio使用相同的命令创建R包。
 
 ```{r}
+#| eval: false
 # 在当前工作目录下创建名为test的R包，同时自动设置工作目录为test包路径
 usethis::create_package("test")
 # getwd()
@@ -53,7 +54,7 @@ usethis::create_package("test")
 
 每个R包都有`DESCRIPTION`文件，该文件包含包名、版本、作者、依赖等信息。例如下面是test包的默认`DESCRIPTION`文件：
 
-```{text}
+```
 Package: test
 Title: What the Package Does (One Line, Title Case)
 Version: 0.0.0.9000
@@ -69,7 +70,7 @@ RoxygenNote: 7.3.2
 
 假如你创建了一个依赖`stringr`包的脚本string.R，那么你需要在`DESCRIPTION`文件中添加依赖项。如果有多个，使用`,`分割。
 
-```{text}
+```
 Imports:
   stringr,
   dplyr
@@ -78,6 +79,7 @@ Imports:
 也可以使用`usethis`添加依赖项。
 
 ```{r}
+#| eval: false
 # add stringr under Imports
 usethis::use_package("stringr")
 ```
@@ -207,21 +209,99 @@ fromJSON(json)
 
 ## JavaScript
 
+JavaScript的简介请自查。
 
-### DOM
+### Variable Declaration and Scope
 
+一个与R显著不同的地方是：Javascript需要使用`var`,`let`,`const`来声明变量。
+
+-  `var`: 可以只声明一个变量但不赋值，后续可以进行赋值更新。
+-  `const`: 声明一个常量，不能进行赋值更新。
+-  `let`: 常用于在`if`,`switch`,`for`和`while`中，声明一个变量，不能进行赋值更新。
+
+```js
+var y; // declare
+y = [1,2,3]; // define it as array
+y = 'string'; // change to character string
+
+const x = 1; // declare constant
+x = 2; // error
+
+if(true){
+  let x = 1;
+  var y = 1;
+}
+
+console.log(x) // error x does not exist
+console.log(y) // works
+```
+
+### Document Object Model
+
+html中的DOM结构会被JavaScript解析为`document`对象，通过`document`对象，JavaScript可以访问和修改HTML结构。例如下面通过`getElementById`方法获取id为`content`的p元素，并修改其内容。
+
+```html
+ <!–– index.html ––>
+<html>
+  <head>
+  </head>
+  <body>
+    <p id="content">Trying JavaScript!</p>
+  </body>
+  <script>
+    var cnt = document.getElementById("content");
+    cnt.innerText = "The text has changed";
+  </script>
+</html>
+```
+
+同CSS一样，使用`quarySelector`选择器来选择元素时，`#`开头表示选择id，`.`开头表示选择class。
+
+```html
+ <!–– index.html ––>
+<html>
+  <head>
+  </head>
+  <body>
+    <p id="content" class="stuff">Trying JavaScript!</p>
+  </body>
+  <script>
+    // select by id
+    var x = document.getElementById("content");
+    var y = document.querySelector("#content");
+
+    console.log(x == y); // true
+
+    // select by class
+    var z = document.querySelector(".stuff");
+  </script>
+</html>
+```
 
 ## Shiny
 
+静态文件指的是会被客户端下载的文件，如图片、css、js等。R包中的`inst`文件夹就是用来存放静态文件的，同样可以用来存放Shiny 应用的静态文件。
+
+有两种将静态文件引入到shiny中的方式：
+
+-   手动引入。
+-   使用`htmltools`包引入。
+
 ### Serving Static Files
 
+使用`addResourcePath()`声明静态文件路径，参数`prefix`为URL中显示的路径名，`directoryPath`为静态文件路径。
+
+运行下面的shiny应用，可以通过`files/script.js`(127.0.0.1:3000/files/script.js)访问到`script.js`文件。
+
 ```{r}
+#| eval: false
 # run from root of app (where app.R is located)
 dir.create("assets")
 writeLines("console.log('Hello JS!');", con = "assets/script.js")
 ```
 
 ```{r}
+#| eval: false
 # app.R
 library(shiny)
 
@@ -239,4 +319,84 @@ server <- function(input, output) {}
 
 shinyApp(ui, server)
 shinyApp(ui, server)
+```
+
+上面的步骤使得客户端可以访问到静态文件。仍需要在代码中添加使用这些静态文件的相关代码。下面的例子会在浏览器终端console中打印"Hello JS!"。
+
+```{r}
+#| eval: false
+# app.R
+library(shiny)
+
+# serve the files
+addResourcePath(prefix = "files", directoryPath = "assets")
+
+ui <- fluidPage(
+  tags$head(
+    tags$script(src = "files/script.js")
+  ),
+  h1("R and JavaScript")
+)
+
+server <- function(input, output) {}
+
+shinyApp(ui, server)
+```
+
+### Htmltools
+
+htmltools中的`htmlDependency()`函数可以创建shiny依赖性并且只加载一次。参数`src`可以是一个URL(href)或者一个本地文件夹路径(file)，文件夹中存放`script`和`stylesheet`参数提供的文件。
+
+```{r}
+#| eval: false
+dependency <- htmltools::htmlDependency(
+  name = "myDependency",
+  version = "1.0.0",
+  src = c(file = "path/to/directory"),
+  script = "script.js",
+  stylesheet = "styles.css"
+)
+```
+
+```{r}
+#| eval: false
+# dependency to the latest jQuery
+dependency <- htmltools::htmlDependency(
+  name = "myDependency",
+  version = "1.0.0",
+  src = c(
+    href = "https://cdn.jsdelivr.net/gh/jquery/jquery/dist/"
+  ),
+  script = "jquery.min.js"
+)
+```
+
+同样地，实际最终地html中会生成如下代码：
+
+```html
+<script
+  src="https://cdn.jsdelivr.net/gh/jquery/jquery/
+    dist/jquery.min.js">
+</script>
+```
+
+`htmltools::htmlDependency`也可以接受一个`package`参数，用来定位R包中地依赖文件。下面例子中最终的路径为`myPackage/inst/assets/script.js`。
+
+```{r}
+dependency <- htmltools::htmlDependency(
+  name = "myDependency",
+  version = "1.0.0",
+  src = "assets",
+  script = c(file = "script.js"),
+  package = "myPackage" # user package
+)
+```
+
+创建好的依赖对象，只需放入到UI中即可使用。
+
+```{r}
+#| eval: false
+ui <- fluidPage(
+  dependency
+)
 ```
