@@ -4,5 +4,8 @@ website:
       title: Js4R
       contents:
         - Books/Js4R/00 Preface.qmd
+        - Basics And Roadmap
         - Books/Js4R/01 Overview.qmd
         - Books/Js4R/02 Prerequisites.qmd
+        - Data Visualisation
+        - Books/Js4R/03 Introduction to Widgets.qmd

@@ -1074,5 +1074,45 @@
     "title": "02 Prerequisites",
     "section": "Shiny",
     "text": "Shiny\n静态文件指的是会被客户端下载的文件，如图片、css、js等。R包中的inst文件夹就是用来存放静态文件的，同样可以用来存放Shiny 应用的静态文件。\n有两种将静态文件引入到shiny中的方式：\n\n手动引入。\n使用htmltools包引入。\n\n\nServing Static Files\n使用addResourcePath()声明静态文件路径，参数prefix为URL中显示的路径名，directoryPath为静态文件路径。\n运行下面的shiny应用，可以通过files/script.js(127.0.0.1:3000/files/script.js)访问到script.js文件。\n\n# run from root of app (where app.R is located)\ndir.create(\"assets\")\nwriteLines(\"console.log('Hello JS!');\", con = \"assets/script.js\")\n\n\n# app.R\nlibrary(shiny)\n\n# serve the files\naddResourcePath(prefix = \"files\", directoryPath = \"assets\")\n\nui &lt;- fluidPage(\n  tags$head(\n    tags$script(src = \"files/script.js\")\n  ),\n  h1(\"R and JavaScript\")\n)\n\nserver &lt;- function(input, output) {}\n\nshinyApp(ui, server)\nshinyApp(ui, server)\n\n上面的步骤使得客户端可以访问到静态文件。仍需要在代码中添加使用这些静态文件的相关代码。下面的例子会在浏览器终端console中打印”Hello JS!“。\n\n# app.R\nlibrary(shiny)\n\n# serve the files\naddResourcePath(prefix = \"files\", directoryPath = \"assets\")\n\nui &lt;- fluidPage(\n  tags$head(\n    tags$script(src = \"files/script.js\")\n  ),\n  h1(\"R and JavaScript\")\n)\n\nserver &lt;- function(input, output) {}\n\nshinyApp(ui, server)\n\n\n\nHtmltools\nhtmltools中的htmlDependency()函数可以创建shiny依赖性并且只加载一次。参数src可以是一个URL(href)或者一个本地文件夹路径(file)，文件夹中存放script和stylesheet参数提供的文件。\n\ndependency &lt;- htmltools::htmlDependency(\n  name = \"myDependency\",\n  version = \"1.0.0\",\n  src = c(file = \"path/to/directory\"),\n  script = \"script.js\",\n  stylesheet = \"styles.css\"\n)\n\n\n# dependency to the latest jQuery\ndependency &lt;- htmltools::htmlDependency(\n  name = \"myDependency\",\n  version = \"1.0.0\",\n  src = c(\n    href = \"https://cdn.jsdelivr.net/gh/jquery/jquery/dist/\"\n  ),\n  script = \"jquery.min.js\"\n)\n\n同样地，实际最终地html中会生成如下代码：\n&lt;script\n  src=\"https://cdn.jsdelivr.net/gh/jquery/jquery/\n    dist/jquery.min.js\"&gt;\n&lt;/script&gt;\nhtmltools::htmlDependency也可以接受一个package参数，用来定位R包中地依赖文件。下面例子中最终的路径为myPackage/inst/assets/script.js。\n\ndependency &lt;- htmltools::htmlDependency(\n  name = \"myDependency\",\n  version = \"1.0.0\",\n  src = \"assets\",\n  script = c(file = \"script.js\"),\n  package = \"myPackage\" # user package\n)\n\n创建好的依赖对象，只需放入到UI中即可使用。\n\nui &lt;- fluidPage(\n  dependency\n)"
+  },
+  {
+    "objectID": "Books/Js4R/03 Introduction to Widgets.html",
+    "href": "Books/Js4R/03 Introduction to Widgets.html",
+    "title": "03 Introduction to Widgets",
+    "section": "",
+    "text": "本书此部分介绍如何通过htmlwidgets包整合R与JavaScript。htmlwidgets包起源于2012年的rCharts包，该包常用来数据可视化，但不限于此。在学习如何编写自己的第一个widget前，本章先介绍一些已经在CRAN上存在的widgets，通过它们，了解htmlwidgets包如何工作。",
+    "crumbs": [
+      "03 Introduction to Widgets"
+    ]
+  },
+  {
+    "objectID": "Books/Js4R/03 Introduction to Widgets.html#plotly-package",
+    "href": "Books/Js4R/03 Introduction to Widgets.html#plotly-package",
+    "title": "03 Introduction to Widgets",
+    "section": "plotly package",
+    "text": "plotly package\nplotly包提供了plotly.js在R中的API接口，可以绘制超40种，包括3D，统计，地理等方面的图形。\n有关plotly包的更多介绍见：Interactive web-based data visualization with R, plotly, and shiny。\n下面是一个可以交互的简单示例：\n\nlibrary(plotly)\n\nplot_ly(cars, x = ~speed, y = ~dist) %&gt;%\n  add_markers()\n\n\n\nplotly scatter plot\n\n\nplotly包也可以使用ggplotly()函数将ggplot2绘制的静态图进行转换（仅支持部分类型图）：\n\np &lt;- ggplot(diamonds, aes(x = log(carat), y = log(price))) +\n  geom_hex(bins = 100)\nggplotly(p)\n\n\n\nInteractive ggplot2 with plotly\n\n\nplotly包使用类似ggplot2包中的geom语法——add_*添加图层。\n\nplot_ly(mtcars, x = ~disp) %&gt;%\n  add_markers(y = ~mpg, text = rownames(mtcars)) %&gt;%\n  add_lines(y = ~ fitted(loess(mpg ~ disp)))\n\n\n\nMultiple layers with plotly",
+    "crumbs": [
+      "03 Introduction to Widgets"
+    ]
+  },
+  {
+    "objectID": "Books/Js4R/03 Introduction to Widgets.html#dt-package",
+    "href": "Books/Js4R/03 Introduction to Widgets.html#dt-package",
+    "title": "03 Introduction to Widgets",
+    "section": "DT package",
+    "text": "DT package\nDT package 可以根据data.frame创建交互表格。\n\nDT::datatable(cars)\n\n\n\nInteractive table with DT\n\n\nDT 创建的表格也十分常见地用在shiny中。\n\nlibrary(DT)\nlibrary(shiny)\n\nui &lt;- fluidPage(\n  fluidRow(\n    column(8, DTOutput(\"myTable\")),\n    column(\n      4,\n      h4(\"Indices of selected rows\"),\n      verbatimTextOutput(\"selected\")\n    )\n  )\n)\n\nserver &lt;- function(input, output) {\n  output$myTable &lt;- renderDT({\n    datatable(mtcars)\n  })\n\n  output$selected &lt;- renderPrint({\n    input$myTable_rows_selected\n  })\n}\n\nshinyApp(ui, server)",
+    "crumbs": [
+      "03 Introduction to Widgets"
+    ]
+  },
+  {
+    "objectID": "Books/Js4R/03 Introduction to Widgets.html#crosstalk",
+    "href": "Books/Js4R/03 Introduction to Widgets.html#crosstalk",
+    "title": "03 Introduction to Widgets",
+    "section": "Crosstalk",
+    "text": "Crosstalk\ncrosstalk包允许多个htmlwidgets之间进行数据交流。下面是一个共享数据的图标与散点图的示例。更多支持的widgets见：Crosstalk.\n\nlibrary(DT)\nlibrary(plotly)\nlibrary(crosstalk)\n\nsd &lt;- SharedData$new(iris[, c(\"Sepal.Length\", \"Sepal.Width\")])\n\nbscols(\n  device = \"lg\",\n  datatable(sd, width = \"100%\"),\n  plot_ly(sd, x = ~Sepal.Length, y = ~Sepal.Width)\n)\n\n\n\n\n\n\n\n\n\n\n\n\n\nDT and plotly with crosstalk",
+    "crumbs": [
+      "03 Introduction to Widgets"
+    ]
   }
 ]
