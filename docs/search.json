@@ -1114,5 +1114,52 @@
     "crumbs": [
       "03 Introduction to Widgets"
     ]
+  },
+  {
+    "objectID": "Books/Js4R/04 Basics of Building Widgets.html",
+    "href": "Books/Js4R/04 Basics of Building Widgets.html",
+    "title": "04 Basics of Building Widgets",
+    "section": "",
+    "text": "将某个JavaScript库整合到R中的第一步就是：学习这个JavaScript库。\n\n阅读库的简介，了解这个库的功能，输入，输出。\n阅读安装文档，了解这个库的依赖。\n以某个例子为切入点，深入了解将库整合到R中的难易程度。\n阅读API文档，准确把握API的使用。\n多使用库，实现对库API的精简与提升。",
+    "crumbs": [
+      "04 Basics of Building Widgets"
+    ]
+  },
+  {
+    "objectID": "Books/Js4R/04 Basics of Building Widgets.html#read-and-study",
+    "href": "Books/Js4R/04 Basics of Building Widgets.html#read-and-study",
+    "title": "04 Basics of Building Widgets",
+    "section": "",
+    "text": "将某个JavaScript库整合到R中的第一步就是：学习这个JavaScript库。\n\n阅读库的简介，了解这个库的功能，输入，输出。\n阅读安装文档，了解这个库的依赖。\n以某个例子为切入点，深入了解将库整合到R中的难易程度。\n阅读API文档，准确把握API的使用。\n多使用库，实现对库API的精简与提升。",
+    "crumbs": [
+      "04 Basics of Building Widgets"
+    ]
+  },
+  {
+    "objectID": "Books/Js4R/04 Basics of Building Widgets.html#candidate-libraries",
+    "href": "Books/Js4R/04 Basics of Building Widgets.html#candidate-libraries",
+    "title": "04 Basics of Building Widgets",
+    "section": "Candidate Libraries",
+    "text": "Candidate Libraries\n下面介绍一些htmlwidgets中常见的JavaScript库，并展示这些库在html中使用的共通点：\n\n引入js库\n声明一个展示图片的div。\njs获取图片的div位置，使用绘图结果替代div中的内容。\n\n\nPlotly.js\nplotly.js是plotlyR包的底层依赖库。其官方文档地址为：https://plotly.com/javascript 。下面是一个在html文本中简单使用的例子。\n&lt;html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"\" xml:lang=\"\"&gt;\n\n&lt;head&gt;\n  &lt;!-- Import library --&gt;\n  &lt;script src=\"https://cdn.plot.ly/plotly-3.0.1.min.js\" charset=\"utf-8\"&gt;&lt;/script&gt;\n&lt;/head&gt;\n\n&lt;body&gt;\n  &lt;!-- div to hold visualisation --&gt;\n  &lt;div id=\"chart\" style=\"width:600px;height:400px;\"&gt;&lt;/div&gt;\n  &lt;!-- Script to create visualisation --&gt;\n  &lt;script&gt;\n    el = document.getElementById('chart');\n    Plotly.newPlot(el, [{\n      x: [1, 2, 3, 4, 5],\n      y: [1, 2, 4, 8, 16]\n    }]\n    );\n  &lt;/script&gt;\n&lt;/body&gt;\n\n&lt;/html&gt;\n\n\nHighchart.js\nhighchart.js 是另外一个常见的绘图库，但不是全部免费，其官网为：https://www.highcharts.com 。\n&lt;html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"\" xml:lang=\"\"&gt;\n&lt;head&gt;\n  &lt;!-- Import library --&gt;\n  &lt;script src=\"https://code.highcharts.com/highcharts.js\"&gt;&lt;/script&gt;\n&lt;/head&gt;\n&lt;body&gt;\n  &lt;!-- div to hold visualisation --&gt;\n  &lt;div id=\"chart\" style=\"width:100%;height:400px;\"&gt;&lt;/div&gt;\n  &lt;!-- Script to create visualisation --&gt;\n  &lt;script&gt;\n    var myChart = Highcharts.chart('chart', {\n        xAxis: {\n            categories: ['Apples', 'Bananas', 'Oranges']\n        },\n        series: [{\n            name: 'Jane',\n            data: [1, 0, 4]\n        }, {\n            name: 'John',\n            data: [5, 7, 3]\n        }]\n    });\n  &lt;/script&gt;\n&lt;/body&gt;\n&lt;/html&gt;\n\n\nChart.js\nchart.js 以免费和便捷API出名，其官网为：https://www.chartjs.org 。\n&lt;html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"\" xml:lang=\"\"&gt;\n&lt;head&gt;\n  &lt;!-- Import library --&gt;\n  &lt;script src=\"https://cdn.jsdelivr.net/npm/chart.js\"&gt;&lt;/script&gt;\n&lt;/head&gt;\n&lt;body&gt;\n  &lt;!-- canvas to hold visualisation --&gt;\n  &lt;canvas id=\"chart\"&gt;&lt;/canvas&gt;\n  &lt;!-- Script to create visualisation --&gt;\n  &lt;script&gt;\n    var el = document.getElementById('chart').getContext('2d');\n    var myChart = new Chart(el, {\n      type: 'bar',\n      data: {\n        labels: [\n          'Red', 'Blue', 'Yellow', 'Green',\n          'Purple', 'Orange'],\n        datasets: [{\n          label: '# of Votes',\n          data: [12, 19, 3, 5, 2, 3]\n        }]\n      }\n    });\n  &lt;/script&gt;\n&lt;/body&gt;\n&lt;/html&gt;",
+    "crumbs": [
+      "04 Basics of Building Widgets"
+    ]
+  },
+  {
+    "objectID": "Books/Js4R/04 Basics of Building Widgets.html#plotly-chart",
+    "href": "Books/Js4R/04 Basics of Building Widgets.html#plotly-chart",
+    "title": "04 Basics of Building Widgets",
+    "section": "Plotly Chart",
+    "text": "Plotly Chart\n\nPlotly = await require(\"@observablehq/plotly\")\n\n// 绘制图表\nPlotly.newPlot([{\n  x: [1, 2, 3, 4, 5],\n  y: [1, 2, 4, 8, 16]\n}]);"
+  },
+  {
+    "objectID": "Books/Js4R/04 Basics of Building Widgets.html#how-it-works",
+    "href": "Books/Js4R/04 Basics of Building Widgets.html#how-it-works",
+    "title": "04 Basics of Building Widgets",
+    "section": "How it works",
+    "text": "How it works\n\n创建一个html文件。\n在html文件中引入Chart.js库。\n创建一个html元素（例如div），用于绘制图表。\nR将绘图数据转换为能被绘图模块使用的JSON格式，并嵌入到html文件中。\n上述所有元素能在Rmarkdown，Shiny或其他环境中运行。\n\n\n\n\n\n\nflowchart LR\n    subgraph i1[R environment]\n        A[Data]\n        B[Chart options]\n    end\n    subgraph i2[HTML]\n        C[JSON]\n        D[Dependencies]\n        E[JavaScript]\n        F[HTML element]\n    end\n    A --&gt;C\n    B --&gt;C\n    C --&gt;E\n    D --&gt;E\n    E --&gt;F\n    style i1 fill:#FFF\n    style i2 fill:#FFF",
+    "crumbs": [
+      "04 Basics of Building Widgets"
+    ]
   }
 ]

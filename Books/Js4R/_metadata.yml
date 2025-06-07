@@ -9,3 +9,4 @@ website:
         - Books/Js4R/02 Prerequisites.qmd
         - Data Visualisation
         - Books/Js4R/03 Introduction to Widgets.qmd
+        - Books/Js4R/04 Basics of Building Widgets.qmd
