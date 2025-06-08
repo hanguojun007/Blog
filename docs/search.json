@@ -1161,5 +1161,45 @@
     "crumbs": [
       "04 Basics of Building Widgets"
     ]
+  },
+  {
+    "objectID": "Books/Js4R/05 Your First Widget.html",
+    "href": "Books/Js4R/05 Your First Widget.html",
+    "title": "05 Your First Widget",
+    "section": "",
+    "text": "通过R包的形式创建widget可以使事情变得简单一些，下面我们以一个playgroundR包例，创建一个widget。\n首先使用usethis::create_package()创建一个R包。\nusethis::create_package(\"playground\")\n使用htmlwidgets::scaffoldWidget()函数自动创建一个widget脚手架——“play”：生成play.R，play.js，play.yaml三个文件。你可以在一个包中使用该函数创建多个widget。\nplay.R脚本中定义了三个函数：\n\nplay()：widget的核心API。\nrender*()：在shiny服务器中处理widget的函数。\n*output()：在shinyUI界面处理widget的函数。\n\n.js脚本包含生成可视化结果的JavaScript函数。\nhtmlwidgets::scaffoldWidget(\"play\")\n生成R包说明文档并加载函数，此时已经可以初步使用“play”widget了（虽然此时只能显示文本信息）。\ndevtools::document()\ndevtools::load_all()\nplay(message = \"This is a widget!\")\n\n在Rstudio中，你可以点击“Viewer”中的，在浏览器中打开生成的网页，然后使用浏览器调试工具进行调试，十分方便后续开发。同样地，在vscode中，你可以使用htmlwidgets::saveWidget()函数将widget保存为HTML文件，然后在浏览器中进行调试。",
+    "crumbs": [
+      "05 Your First Widget"
+    ]
+  },
+  {
+    "objectID": "Books/Js4R/05 Your First Widget.html#the-scaffold",
+    "href": "Books/Js4R/05 Your First Widget.html#the-scaffold",
+    "title": "05 Your First Widget",
+    "section": "",
+    "text": "通过R包的形式创建widget可以使事情变得简单一些，下面我们以一个playgroundR包例，创建一个widget。\n首先使用usethis::create_package()创建一个R包。\nusethis::create_package(\"playground\")\n使用htmlwidgets::scaffoldWidget()函数自动创建一个widget脚手架——“play”：生成play.R，play.js，play.yaml三个文件。你可以在一个包中使用该函数创建多个widget。\nplay.R脚本中定义了三个函数：\n\nplay()：widget的核心API。\nrender*()：在shiny服务器中处理widget的函数。\n*output()：在shinyUI界面处理widget的函数。\n\n.js脚本包含生成可视化结果的JavaScript函数。\nhtmlwidgets::scaffoldWidget(\"play\")\n生成R包说明文档并加载函数，此时已经可以初步使用“play”widget了（虽然此时只能显示文本信息）。\ndevtools::document()\ndevtools::load_all()\nplay(message = \"This is a widget!\")\n\n在Rstudio中，你可以点击“Viewer”中的，在浏览器中打开生成的网页，然后使用浏览器调试工具进行调试，十分方便后续开发。同样地，在vscode中，你可以使用htmlwidgets::saveWidget()函数将widget保存为HTML文件，然后在浏览器中进行调试。",
+    "crumbs": [
+      "05 Your First Widget"
+    ]
+  },
+  {
+    "objectID": "Books/Js4R/05 Your First Widget.html#the-html-output",
+    "href": "Books/Js4R/05 Your First Widget.html#the-html-output",
+    "title": "05 Your First Widget",
+    "section": "The HTML Output",
+    "text": "The HTML Output\n下面是上面play(\"This is a widget!\")生成的html文件中body标签的内容。生成内容的逻辑同上一章的内容。\n&lt;div id=\"htmlwidget_container\"&gt;\n  &lt;div\n    id=\"htmlwidget-c21cca0e76e520b46fc7\"\n    style=\"width:960px;height:500px;\"\n    class=\"play html-widget\"&gt;\n    This is a widget!\n  &lt;/div&gt;\n&lt;/div&gt;\n&lt;script\n  type=\"application/json\"\n  data-for=\"htmlwidget-c21cca0e76e520b46fc7\"&gt;\n  {\"x\":{\"message\":\"This is a widget!\"},\"evals\":[],\"jsHooks\":[]}\n&lt;/script&gt;\n上面的html源码中，div元素由play()函数创建，它的class属性与widget（play）相关，id属性由elementId参数指定，如果没有指定，则生成随机id。script中JSON数据的x与play()函数中的x参数一致。\n# specify the id\nplay(\"This is another widget\", elementId = \"myViz\")\n&lt;!-- div bears id specified in R --&gt;\n&lt;div id=\"myViz\"\n  style=\"width:960px;height:500px;\"\n  class=\"play html-widget\"&gt;\n  This is another widget\n&lt;/div&gt;\n仔细观察script，会发现它的data-for属性与elementId相关。\n&lt;script type=\"application/json\"\n  data-for=\"myViz\"&gt;\n  {\"x\":{\"message\":\"This is a widget!\"},\"evals\":[],\"jsHooks\":[]}\n&lt;/script&gt;",
+    "crumbs": [
+      "05 Your First Widget"
+    ]
+  },
+  {
+    "objectID": "Books/Js4R/05 Your First Widget.html#javascript-files",
+    "href": "Books/Js4R/05 Your First Widget.html#javascript-files",
+    "title": "05 Your First Widget",
+    "section": "JavaScript Files",
+    "text": "JavaScript Files\nhtmlwidgets::scaffoldWidget(\"play\")自动生成的play.js文件包含以下内容：\nHTMLWidgets.widget({\n\n  name: 'play',\n\n  type: 'output',\n\n  factory: function(el, width, height) {\n\n    // TODO: define shared variables for this instance\n\n    return {\n\n      renderValue: function(x) {\n\n        // TODO: code to render the widget, e.g.\n        el.innerText = x.message;\n\n      },\n\n      resize: function(width, height) {\n\n        // TODO: code to re-render the widget with a new size\n\n      }\n\n    };\n  }\n});\n结合play.R文件中的htmlwidgets::createWidget()内容，我们可以大致将htmlwidgets在创建和渲染的过程描述如下：\n\n\n\n\n\nflowchart LR\n  subgraph i1[R]\n    A[\"play(id)\"]\n  end\n  subgraph i2[HTML]\n    B[\"&lt;scipt data-for=id&gt;\"]\n    C[\"dependencies(play.js)\"]\n    D[JavaScript]\n    E[\"&lt;div class=play id=id&gt;\"]\n    B--&gt;|import|D\n    C--&gt;|use|D\n    D--&gt;|Generate viz|E\n  end\n  A--&gt;|id|B\n  A--&gt;|id and class|E\n  style i1 fill:#FFF\n  style i2 fill:#FFF\n\n\n\n\n\n\nfactory函数的返回值是两个函数resize和renderValue。前者用来动态调整结果框的大小，后者用来生成结果框，我们先关注renderValue函数。该函数使用参数x中的message值来替代html中的元素el.innerText，其中x.message是JSON格式的提取元素方式，类似R中list的x$message。\n你可以在play.js中添加如下代码，并重新加载函数，重新生成网页，然后使用浏览器调试工具查看结果。\n// el.innerText = x.message; 后续添加\nconsole.log(x);\nel.innerText = x.message;\n\n使用相同的方法，我们可以查看一下el对象的具体信息。\nconsole.log(el);\n\n可以发现，el对象就是play()函数同时创建的div元素。如果你熟悉JavaScript，你可以使用document.getElementById来获取el对象，同时修改元素的位置，颜色，大小等。\n// print the id of the element\nconsole.log(el.id);\nel.innerText = x.message;\n\n在play.js中使用的innerText只能替换文本，而innerHTML则可以替换任何HTML元素。将el.innerText = x.message;修改为el.innerHTML = x.message;，重新加载函数后运行play(\"&lt;h1&gt;Using HTML!&lt;/h1&gt;\")。生成下图：\n\n上面的例子使得play()函数更加灵活，但是使用\"&lt;h1&gt;Using HTML!&lt;/h1&gt;\"未免有些麻烦。好在shiny和htmltools提供了一些工具，使得创建HTML元素更加容易。\n\nhtml &lt;- shiny::h1(\"HTML tag\")\n\nclass(html)\n#&gt; [1] \"shiny.tag\"\n\n# returns string\nas.character(html)\n#&gt; [1] \"&lt;h1&gt;HTML tag&lt;/h1&gt;\"\n\n修改play()函数中对message的处理:\n# forward options using x\nx = list(\n  message = as.character(message)\n)\n重新加载函数后，就可以直接使用shiny或htmltools创建的HTML元素作为message了。\nplay(\n  shiny::h2(\"Chocolate is a colour\", style = \"color:chocolate;\")\n)\n\n综上，play()函数的内容会通过对象x传递到html中，并被JavaScript解析，然后替换同时由play()生成的div中的内容。",
+    "crumbs": [
+      "05 Your First Widget"
+    ]
   }
 ]

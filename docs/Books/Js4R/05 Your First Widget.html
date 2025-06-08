@@ -6,9 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="dcterms.date" content="2025-05-14">
+<meta name="dcterms.date" content="2025-06-07">
 
-<title>00 Preface</title>
+<title>05 Your First Widget</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -21,6 +21,40 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -30,7 +64,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
-<link href="../../Books/Js4R/01 Overview.html" rel="next">
+<link href="../../Books/Js4R/04 Basics of Building Widgets.html" rel="prev">
 <script src="../../site_libs/quarto-html/quarto.js"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -66,6 +100,9 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
+<script src="../../site_libs/quarto-diagram/mermaid.min.js"></script>
+<script src="../../site_libs/quarto-diagram/mermaid-init.js"></script>
+<link href="../../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
 
 
 <link rel="stylesheet" href="../../styles.css">
@@ -148,7 +185,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../Books/Js4R/00 Preface.html">00 Preface</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../Books/Js4R/05 Your First Widget.html">05 Your First Widget</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -162,7 +199,7 @@ ul.task-list li input[type="checkbox"] {
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../Books/Js4R/00 Preface.html" class="sidebar-item-text sidebar-link active">
+  <a href="../../Books/Js4R/00 Preface.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">00 Preface</span></a>
   </div>
 </li>
@@ -198,7 +235,7 @@ ul.task-list li input[type="checkbox"] {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../Books/Js4R/05 Your First Widget.html" class="sidebar-item-text sidebar-link">
+  <a href="../../Books/Js4R/05 Your First Widget.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">05 Your First Widget</span></a>
   </div>
 </li>
@@ -212,8 +249,9 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#引言" id="toc-引言" class="nav-link active" data-scroll-target="#引言">引言</a></li>
-  <li><a href="#目录" id="toc-目录" class="nav-link" data-scroll-target="#目录">目录</a></li>
+  <li><a href="#the-scaffold" id="toc-the-scaffold" class="nav-link active" data-scroll-target="#the-scaffold">The Scaffold</a></li>
+  <li><a href="#the-html-output" id="toc-the-html-output" class="nav-link" data-scroll-target="#the-html-output">The HTML Output</a></li>
+  <li><a href="#javascript-files" id="toc-javascript-files" class="nav-link" data-scroll-target="#javascript-files">JavaScript Files</a></li>
   </ul>
 </nav>
     <div class="quarto-margin-footer"><div class="margin-footer-item">
@@ -224,7 +262,7 @@ ul.task-list li input[type="checkbox"] {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">00 Preface</h1>
+<h1 class="title">05 Your First Widget</h1>
 </div>
 
 
@@ -235,14 +273,14 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">May 14, 2025</p>
+      <p class="date">June 7, 2025</p>
     </div>
   </div>
   
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">May 14, 2025</p>
+      <p class="date-modified">June 7, 2025</p>
     </div>
   </div>
     
@@ -253,16 +291,156 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>本书的主要内容是如何将Javascript与R有机结合，使得能在R中书写网页应用。</p>
-<section id="引言" class="level2">
-<h2 class="anchored" data-anchor-id="引言">引言</h2>
-<p>很多R语言使用者对shiny，rmarkdown等或多或少的熟悉，却不熟悉web核心技术——JavaScript，本书旨在通过揭示 JavaScript 在多大程度上能够极大地增强数据科学流水线的各个阶段，从分析到结果传达，来弥补这一缺陷。</p>
+<section id="the-scaffold" class="level2">
+<h2 class="anchored" data-anchor-id="the-scaffold">The Scaffold</h2>
+<p>通过R包的形式创建widget可以使事情变得简单一些，下面我们以一个<code>playground</code>R包例，创建一个widget。</p>
+<p>首先使用<code>usethis::create_package()</code>创建一个R包。</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>usethis<span class="sc">::</span><span class="fu">create_package</span>(<span class="st">"playground"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>使用<code>htmlwidgets::scaffoldWidget()</code>函数自动创建一个widget脚手架——“play”：生成<code>play.R</code>，<code>play.js</code>，<code>play.yaml</code>三个文件。你可以在一个包中使用该函数创建多个widget。</p>
+<p><code>play.R</code>脚本中定义了三个函数：</p>
+<ul>
+<li><code>play()</code>：widget的核心API。</li>
+<li><code>render*()</code>：在shiny服务器中处理widget的函数。</li>
+<li><code>*output()</code>：在shinyUI界面处理widget的函数。</li>
+</ul>
+<p><code>.js</code>脚本包含生成可视化结果的JavaScript函数。</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>htmlwidgets<span class="sc">::</span><span class="fu">scaffoldWidget</span>(<span class="st">"play"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>生成R包说明文档并加载函数，此时已经可以初步使用“play”widget了（虽然此时只能显示文本信息）。</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">document</span>()</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">load_all</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">play</span>(<span class="at">message =</span> <span class="st">"This is a widget!"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><img src="image/playground-1.png" class="img-fluid"></p>
+<p>在Rstudio中，你可以点击“Viewer”中的<img src="image/open-in-browser.png" class="img-fluid">，在浏览器中打开生成的网页，然后使用浏览器调试工具进行调试，十分方便后续开发。同样地，在vscode中，你可以使用<code>htmlwidgets::saveWidget()</code>函数将widget保存为HTML文件，然后在浏览器中进行调试。</p>
 </section>
-<section id="目录" class="level2">
-<h2 class="anchored" data-anchor-id="目录">目录</h2>
-<ol type="1">
-<li></li>
-</ol>
+<section id="the-html-output" class="level2">
+<h2 class="anchored" data-anchor-id="the-html-output">The HTML Output</h2>
+<p>下面是上面<code>play("This is a widget!")</code>生成的html文件中<code>body</code>标签的内容。生成内容的逻辑同上一章的内容。</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode html code-with-copy"><code class="sourceCode html"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">div</span><span class="ot"> id</span><span class="op">=</span><span class="st">"htmlwidget_container"</span><span class="dt">&gt;</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;</span><span class="kw">div</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="ot">    id</span><span class="op">=</span><span class="st">"htmlwidget-c21cca0e76e520b46fc7"</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="ot">    style</span><span class="op">=</span><span class="st">"width:960px;height:500px;"</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="ot">    class</span><span class="op">=</span><span class="st">"play html-widget"</span><span class="dt">&gt;</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    This is a widget!</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="dt">&lt;/</span><span class="kw">div</span><span class="dt">&gt;</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">div</span><span class="dt">&gt;</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">script</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="ot">  type=</span><span class="st">"application/json"</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="ot">  data-for</span><span class="op">=</span><span class="st">"htmlwidget-c21cca0e76e520b46fc7"</span><span class="dt">&gt;</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  {<span class="st">"x"</span><span class="op">:</span>{<span class="st">"message"</span><span class="op">:</span><span class="st">"This is a widget!"</span>}<span class="op">,</span><span class="st">"evals"</span><span class="op">:</span>[]<span class="op">,</span><span class="st">"jsHooks"</span><span class="op">:</span>[]}</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">script</span><span class="dt">&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>上面的html源码中，<code>div</code>元素由<code>play()</code>函数创建，它的class属性与widget（play）相关，id属性由<code>elementId</code>参数指定，如果没有指定，则生成随机id。<code>script</code>中JSON数据的<code>x</code>与<code>play()</code>函数中的<code>x</code>参数一致。</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># specify the id</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">play</span>(<span class="st">"This is another widget"</span>, <span class="at">elementId =</span> <span class="st">"myViz"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode html code-with-copy"><code class="sourceCode html"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">&lt;!-- div bears id specified in R --&gt;</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">div</span><span class="ot"> id</span><span class="op">=</span><span class="st">"myViz"</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="ot">  style</span><span class="op">=</span><span class="st">"width:960px;height:500px;"</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="ot">  class</span><span class="op">=</span><span class="st">"play html-widget"</span><span class="dt">&gt;</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  This is another widget</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">div</span><span class="dt">&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>仔细观察<code>script</code>，会发现它的<code>data-for</code>属性与<code>elementId</code>相关。</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode html code-with-copy"><code class="sourceCode html"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">script</span><span class="ot"> type=</span><span class="st">"application/json"</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ot">  data-for</span><span class="op">=</span><span class="st">"myViz"</span><span class="dt">&gt;</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  {<span class="st">"x"</span><span class="op">:</span>{<span class="st">"message"</span><span class="op">:</span><span class="st">"This is a widget!"</span>}<span class="op">,</span><span class="st">"evals"</span><span class="op">:</span>[]<span class="op">,</span><span class="st">"jsHooks"</span><span class="op">:</span>[]}</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">script</span><span class="dt">&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="javascript-files" class="level2">
+<h2 class="anchored" data-anchor-id="javascript-files">JavaScript Files</h2>
+<p><code>htmlwidgets::scaffoldWidget("play")</code>自动生成的<code>play.js</code>文件包含以下内容：</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode javascript code-with-copy"><code class="sourceCode javascript"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>HTMLWidgets<span class="op">.</span><span class="fu">widget</span>({</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="dt">name</span><span class="op">:</span> <span class="st">'play'</span><span class="op">,</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">type</span><span class="op">:</span> <span class="st">'output'</span><span class="op">,</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  <span class="dt">factory</span><span class="op">:</span> <span class="kw">function</span>(el<span class="op">,</span> width<span class="op">,</span> height) {</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    <span class="co">// </span><span class="al">TODO</span><span class="co">: define shared variables for this instance</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> {</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>      <span class="dt">renderValue</span><span class="op">:</span> <span class="kw">function</span>(x) {</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>        <span class="co">// </span><span class="al">TODO</span><span class="co">: code to render the widget, e.g.</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>        el<span class="op">.</span><span class="at">innerText</span> <span class="op">=</span> x<span class="op">.</span><span class="at">message</span><span class="op">;</span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>      }<span class="op">,</span></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>      <span class="dt">resize</span><span class="op">:</span> <span class="kw">function</span>(width<span class="op">,</span> height) {</span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>        <span class="co">// </span><span class="al">TODO</span><span class="co">: code to re-render the widget with a new size</span></span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>    }<span class="op">;</span></span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>})<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>结合<code>play.R</code>文件中的<code>htmlwidgets::createWidget()</code>内容，我们可以大致将htmlwidgets在创建和渲染的过程描述如下：</p>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart LR
+  subgraph i1[R]
+    A["play(id)"]
+  end
+  subgraph i2[HTML]
+    B["&amp;lt;scipt data-for=id&amp;gt;"]
+    C["dependencies(play.js)"]
+    D[JavaScript]
+    E["&amp;lt;div class=play id=id&amp;gt;"]
+    B--&gt;|import|D
+    C--&gt;|use|D
+    D--&gt;|Generate viz|E
+  end
+  A--&gt;|id|B
+  A--&gt;|id and class|E
+  style i1 fill:#FFF
+  style i2 fill:#FFF
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p><code>factory</code>函数的返回值是两个函数<code>resize</code>和<code>renderValue</code>。前者用来动态调整结果框的大小，后者用来生成结果框，我们先关注<code>renderValue</code>函数。该函数使用参数<code>x</code>中的message值来替代html中的元素<code>el.innerText</code>，其中<code>x.message</code>是JSON格式的提取元素方式，类似R中list的<code>x$message</code>。</p>
+<p>你可以在<code>play.js</code>中添加如下代码，并重新加载函数，重新生成网页，然后使用浏览器调试工具查看结果。</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode javascript code-with-copy"><code class="sourceCode javascript"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">// el.innerText = x.message; 后续添加</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(x)<span class="op">;</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>el<span class="op">.</span><span class="at">innerText</span> <span class="op">=</span> x<span class="op">.</span><span class="at">message</span><span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><img src="image/console1.png" class="img-fluid"></p>
+<p>使用相同的方法，我们可以查看一下<code>el</code>对象的具体信息。</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode javascript code-with-copy"><code class="sourceCode javascript"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(el)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><img src="image/console2.png" class="img-fluid"></p>
+<p>可以发现，<code>el</code>对象就是<code>play()</code>函数同时创建的<code>div</code>元素。如果你熟悉JavaScript，你可以使用<code>document.getElementById</code>来获取<code>el</code>对象，同时修改元素的位置，颜色，大小等。</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode javascript code-with-copy"><code class="sourceCode javascript"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co">// print the id of the element</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="bu">console</span><span class="op">.</span><span class="fu">log</span>(el<span class="op">.</span><span class="at">id</span>)<span class="op">;</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>el<span class="op">.</span><span class="at">innerText</span> <span class="op">=</span> x<span class="op">.</span><span class="at">message</span><span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><img src="image/console3.png" class="img-fluid"></p>
+<p>在<code>play.js</code>中使用的<code>innerText</code>只能替换文本，而<code>innerHTML</code>则可以替换任何HTML元素。将<code>el.innerText = x.message;</code>修改为<code>el.innerHTML = x.message;</code>，重新加载函数后运行<code>play("&lt;h1&gt;Using HTML!&lt;/h1&gt;")</code>。生成下图：</p>
+<p><img src="image/playground-h1.png" class="img-fluid"></p>
+<p>上面的例子使得<code>play()</code>函数更加灵活，但是使用<code>"&lt;h1&gt;Using HTML!&lt;/h1&gt;"</code>未免有些麻烦。好在shiny和htmltools提供了一些工具，使得创建HTML元素更加容易。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>html <span class="ot">&lt;-</span> shiny<span class="sc">::</span><span class="fu">h1</span>(<span class="st">"HTML tag"</span>)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(html)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "shiny.tag"</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="co"># returns string</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="fu">as.character</span>(html)</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "&lt;h1&gt;HTML tag&lt;/h1&gt;"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>修改<code>play()</code>函数中对message的处理:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># forward options using x</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>x <span class="ot">=</span> <span class="fu">list</span>(</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">message =</span> <span class="fu">as.character</span>(message)</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>重新加载函数后，就可以直接使用shiny或htmltools创建的HTML元素作为message了。</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">play</span>(</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  shiny<span class="sc">::</span><span class="fu">h2</span>(<span class="st">"Chocolate is a colour"</span>, <span class="at">style =</span> <span class="st">"color:chocolate;"</span>)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><img src="image/playground-color.png" class="img-fluid"></p>
+<p>综上，<code>play()</code>函数的内容会通过对象<code>x</code>传递到html中，并被JavaScript解析，然后替换同时由<code>play()</code>生成的div中的内容。</p>
 
 
 </section>
@@ -689,11 +867,11 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
+      <a href="../../Books/Js4R/04 Basics of Building Widgets.html" class="pagination-link" aria-label="04 Basics of Building Widgets">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">04 Basics of Building Widgets</span>
+      </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../../Books/Js4R/01 Overview.html" class="pagination-link" aria-label="01 Overview">
-        <span class="nav-page-text">01 Overview</span> <i class="bi bi-arrow-right-short"></i>
-      </a>
   </div>
 </nav>
 </div> <!-- /content -->
