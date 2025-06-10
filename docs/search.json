@@ -1201,5 +1201,52 @@
     "crumbs": [
       "05 Your First Widget"
     ]
+  },
+  {
+    "objectID": "Books/Js4R/06 A Realistic Widget.html",
+    "href": "Books/Js4R/06 A Realistic Widget.html",
+    "title": "06 A Realistic Widget",
+    "section": "",
+    "text": "本章我们创建一个名为peity的R包，它以peity.js为基础，创建内联图（类似小图标的东西）。\n具体工作原理是：先加载JavaScript库，然后$(\"#bar\").peity(\"bar\")将span标签中的数据转换成图表。",
+    "crumbs": [
+      "06 A Realistic Widget"
+    ]
+  },
+  {
+    "objectID": "Books/Js4R/06 A Realistic Widget.html#示例图表",
+    "href": "Books/Js4R/06 A Realistic Widget.html#示例图表",
+    "title": "06 A Realistic Widget",
+    "section": "示例图表",
+    "text": "示例图表\n以下是一个使用 peity 创建的简单条形图：\n\n5,3,9,6,5,9,7,3,5,2"
+  },
+  {
+    "objectID": "Books/Js4R/06 A Realistic Widget.html#dependencies",
+    "href": "Books/Js4R/06 A Realistic Widget.html#dependencies",
+    "title": "06 A Realistic Widget",
+    "section": "Dependencies",
+    "text": "Dependencies\n创建好包和scaffold后，我们需要为包添加JavaScript依赖库。分别为上述两个依赖库peity.js和jQuery创建单独目录，并放置源文件，这样可以使包变得更加鲁棒。\ndir.create(\"./inst/htmlwidgets/jquery\")\ndir.create(\"./inst/htmlwidgets/peity\")\n\npeity &lt;- paste0(\n  \"https://raw.githubusercontent.com/benpickles/\",\n  \"peity/master/jquery.peity.min.js\"\n)\njquery &lt;- paste0(\n  \"https://code.jquery.com/jquery-3.5.1.min.js\"\n)\n\ndownload.file(\n  jquery, \"./inst/htmlwidgets/jquery/jquery.min.js\"\n)\ndownload.file(\n  peity, \"./inst/htmlwidgets/peity/jquery.peity.min.js\"\n)\n完成后，R包目录下的结构大致如下：\n.\n├── DESCRIPTION\n├── NAMESPACE\n├── R\n│   └── peity.R\n└── inst\n    └── htmlwidgets\n        ├── jquery\n        │   └── jquery.min.js\n        ├── peity\n        │   └── jquery.peity.min.js\n        ├── peity.js\n        └── peity.yaml\n配置依赖的文件为inst/htmlwidgets/peity.yaml文件，它的最开始几行是一个模板。\n# (uncomment to add a dependency)\n# dependencies:\n#  - name:\n#    version:\n#    src:\n#    script:\n#    stylesheet:\n正确添加依赖项：依赖性的顺序很重要，因为peity.js依赖jquery.js，所以它最后被添加。scr自动指向R包目录中的inst/文件夹。\ndependencies:\n  - name: jQuery\n    version: 3.5.1\n    src: htmlwidgets/jquery\n    script: jquery.min.js\n  - name: peity\n    version: 3.3.0\n    src: htmlwidgets/peity\n    script: jquery.peity.min.js\n加载peity包，使用peity(\"test\")函数生成测试网页，点击Rstudio中Viewer处的，使用浏览器工具，你可以看到在网页&lt;head&gt;处加载了jquery.min.js和jquery.peity.min.js\ndevtools::load_all()\nsystem.file(\"htmlwidgets/peity\", package = \"peity\")\n#&gt; \"/home/me/packages/peity/inst/htmlwidgets/peity\"\npeity(\"test\")",
+    "crumbs": [
+      "06 A Realistic Widget"
+    ]
+  },
+  {
+    "objectID": "Books/Js4R/06 A Realistic Widget.html#implementation",
+    "href": "Books/Js4R/06 A Realistic Widget.html#implementation",
+    "title": "06 A Realistic Widget",
+    "section": "Implementation",
+    "text": "Implementation\npeity.js的使用方法相对简单：piety函数应用到id = 'elementId'块，函数第一个参数使绘图类型，第二个参数是可选的JSON参数。\n$(\"#elementId\").peity(\"bar\", {\n  fill: [\"red\", \"green\", \"blue\"]\n})\npiety函数使用的数据不是由参数传入，而是由块提供：\n&lt;span id=\"elementId\"&gt;5,3,9,6&lt;/span&gt;\n那么，要想实现R调用JavaScript，我们需要R：\n\n创建一个有数据的块，传递块给peity函数。\n传递peity函数的参数。\n\n上一章节中，我们讲到playground包会自动创建一个块，并传递message给块，最终显示在网页上；peity包同样：\npeity(c(1,5,6,2))\n&lt;div\n  id=\"htmlwidget-495cf47d1a2a4a56c851\"\n  style=\"width:960px;height:500px;\"\n  class=\"play html-widget\"&gt;\n  1,5,6,2\n&lt;/div&gt;\n与message相同的传递方式，我们可以将数据和参数通过x对象进行传递。更新./R/peity.R文件中的函数，如下所示：\npeity &lt;- function(data, type = c(\"bar\", \"line\", \"pie\", \"donut\"),\n  ..., width = NULL, height = NULL, elementId = NULL) {\n\n  type &lt;- match.arg(type)\n\n  # forward options using x\n  x = list(\n    data = data,\n    type = type,\n    options = list(...)\n  )\n\n  # create widget\n  htmlwidgets::createWidget(\n    name = 'peity',\n    x,\n    width = width,\n    height = height,\n    package = 'peity',\n    elementId = elementId\n  )\n}\n与message相同的处理方式，在./inst/htmlwidgets/peity.js文件中，添加对传入的x对象处理，运行js中的peity函数。\nrenderValue: function(x) {\n\n  // insert data\n  el.innerText = x.data;\n\n  // run peity\n  // $(\"#\" + el.id).peity(x.type, x.options)\n  $(el).peity(x.type, x.options)\n\n}\n重新加载函数，运行如下代码会显示\n\n  5,3,9,6,7\n\n\n  2, 1.8198638, 0.9582295, 0.2660590, 1.1532798\n\n\n  1/4\n\n\n  3,5\n\n\n\nlibrary(htmltools)\n\nbrowsable(\n  tagList(\n    peity(runif(5)),\n    peity(runif(5), type = \"line\"),\n    peity(\"1/4\", type = \"pie\", fill = c(\"#c6d9fd\", \"#4d89f9\")),\n    peity(c(3,5), type = \"donut\")\n  )\n)",
+    "crumbs": [
+      "06 A Realistic Widget"
+    ]
+  },
+  {
+    "objectID": "Books/Js4R/06 A Realistic Widget.html#html-element",
+    "href": "Books/Js4R/06 A Realistic Widget.html#html-element",
+    "title": "06 A Realistic Widget",
+    "section": "HTML Element",
+    "text": "HTML Element\npiety.js生成的图像用来插入到某行中，通常搭配&lt;span&gt;标签。如果你检查上例中html源码，会发现生成的图是被&lt;div&gt;标签包裹。\n\n为了实现被&lt;span&gt;标签包裹，我们需要在./R/piety.R中定义一个函数，将&lt;div&gt;标签替换为&lt;span&gt;标签，示例如下：\npeity_html &lt;- function(...){\n  htmltools::tags$span(...)\n}\n你可以重新加载函数，再次检查html源码中使用的标签。\n函数名peity_html是一种固定的格式——widgetName_html。该函数会被htmlwidgets自动搜索，如果有就使用函数中的标签，如果没有就使用默认的&lt;div&gt;。参数...为固定参数，用来传递id,class,style等不确定参数。你也可以写出如下具有固定参数的格式。\nmyWidget_html &lt;- function(..., class){\n  htmltools::tags$div(..., class = c(class, \"my-class\"))\n}\n重新运行下面的代码会生成\nWe can now 5,3,9,6,7 use peity 2, 1.8198638, 0.9582295, 0.2660590, 1.1532798 inline with text! 4,2\n\nbrowsable(\n  tagList(\n    p(\n      \"We can now\", peity(runif(5)),\n      \"use peity\", peity(runif(5), type = \"line\"),\n      \"inline with text!\",\n      peity(c(4,2), type = \"donut\")\n    )\n  )\n)",
+    "crumbs": [
+      "06 A Realistic Widget"
+    ]
   }
 ]
