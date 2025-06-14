@@ -17,7 +17,7 @@ execute:
 source("_common.R")
 ```
 
-本章以[gio.js](https://giojs.org/)库为基础，学习构建更加完备。gio.js用来在三维地球图上，通过曲线绘制国家之间的联系。下面是该库的一个简单示例：
+本章以[gio.js](https://giojs.org/)库为基础，学习输入数据的处理方式。gio.js用来在三维地球图上，通过曲线绘制国家之间的联系。下面是该库的一个简单示例：
 
 ```html
 <!DOCTYPE html>
