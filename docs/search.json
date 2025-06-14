@@ -1248,5 +1248,65 @@
     "crumbs": [
       "06 A Realistic Widget"
     ]
+  },
+  {
+    "objectID": "Books/Js4R/07 The Full Monty.html",
+    "href": "Books/Js4R/07 The Full Monty.html",
+    "title": "07 The Full Monty",
+    "section": "",
+    "text": "本章以gio.js库为基础，学习构建更加完备。gio.js用来在三维地球图上，通过曲线绘制国家之间的联系。下面是该库的一个简单示例：",
+    "crumbs": [
+      "07 The Full Monty"
+    ]
+  },
+  {
+    "objectID": "Books/Js4R/07 The Full Monty.html#creating-package",
+    "href": "Books/Js4R/07 The Full Monty.html#creating-package",
+    "title": "07 The Full Monty",
+    "section": "Creating Package",
+    "text": "Creating Package\n同上一章一样：\n\n首先创建gioR包及scaffold：\n\nusethis::create_package(\"gio\")\nhtmlwidgets::scaffoldWidget(\"gio\")\n\n然后下载依赖JS库，修改inst/htmlwidgets/gio.yaml文件\n\n# create directories for JS dependencies\ndir.create(\"./inst/htmlwidgets/three\", recursive = TRUE)\ndir.create(\"./inst/htmlwidgets/gio\", recursive = TRUE)\n\n# download JS dependencies\nthree &lt;- paste0(\n  \"https://cdnjs.cloudflare.com/ajax/\",\n  \"libs/three.js/110/three.min.js\"\n)\ngio &lt;- paste0(\n  \"https://raw.githubusercontent.com/\",\n  \"syt123450/giojs/master/build/gio.min.js\"\n)\n\ndownload.file(three, \"./inst/htmlwidgets/three/three.min.js\")\ndownload.file(gio, \"./inst/htmlwidgets/gio/gio.min.js\")\ndependencies:\n  - name: three\n    version: 110\n    src: htmlwidgets/three\n    script: three.min.js\n  - name: gio\n    version: 2.0\n    src: htmlwidgets/gio\n    script: gio.min.js\n\n修改int/htmlwidgets/gio.js文件中的函数：因为gio.js直接使用widget创建的el对象，所以我们无需使用var container = document.getElementById(\"globe\")来获取el对象，而是直接使用el对象；同时需要的数据由x对象传入。\n\n// gio.js\nHTMLWidgets.widget({\n\n  name: 'gio',\n\n  type: 'output',\n\n  factory: function(el, width, height) {\n\n    // TODO: define shared variables for this instance\n\n    return {\n\n      renderValue: function(x) {\n\n        // var container = document.getElementById(\"globe\");\n        var controller = new GIO.Controller(el);\n        controller.addData(x.data);\n        controller.init();\n\n      },\n\n      resize: function(width, height) {\n\n        // TODO: code to re-render the widget with a new size\n\n      }\n\n    };\n  }\n});\n\n最后修改R/gio.R文件：上面的js需要输入对象x要有data属性，所以这里需要修改gio函数的参数和x的数据结构。\n\n# 注意：将message修改为data\ngio &lt;- function(data, width = NULL, height = NULL, elementId = NULL) {\n\n  # forward options using x\n  x = list(\n    data = data\n  )\n\n  # create widget\n  htmlwidgets::createWidget(\n    name = 'gio',\n    x,\n    width = width,\n    height = height,\n    package = 'gio',\n    elementId = elementId\n  )\n}\n\n最后运行devtools::document();devtools::load_all()加载函数，使用gio(data)创建widget。",
+    "crumbs": [
+      "07 The Full Monty"
+    ]
+  },
+  {
+    "objectID": "Books/Js4R/07 The Full Monty.html#working-with-data",
+    "href": "Books/Js4R/07 The Full Monty.html#working-with-data",
+    "title": "07 The Full Monty",
+    "section": "Working with Data",
+    "text": "Working with Data\n现在只需要我们创建gio.js需要的json数据，即可创建gio.js的widget。阅读jio.js的文档，其要求的数据结构为：e——exporting country, i——importing country, v——value。\n[\n  {\n    \"e\": \"CN\",\n    \"i\": \"US\",\n    \"v\": 3300000\n  },\n  {\n    \"e\": \"CN\",\n    \"i\": \"RU\",\n    \"v\": 10000\n  }\n]\n我们使用R读取该JSON数据，会发现数据结构转为data.frame。\n\n# data.frame to test\narcs &lt;- jsonlite::fromJSON(\n  '[\n    {\n      \"e\": \"CN\",\n      \"i\": \"US\",\n      \"v\": 3300000\n    },\n    {\n      \"e\": \"CN\",\n      \"i\": \"RU\",\n      \"v\": 10000\n    }\n  ]'\n)\n\nprint(arcs)\n#&gt;    e  i       v\n#&gt; 1 CN US 3300000\n#&gt; 2 CN RU   10000\n\n当我们直接将arcs传入gio函数时，会发现只有一个空白的widget。使用console.log或查看HTML源码，会发现传入的数据结构和预期的不符。\n{\n  \"x\":{\n    \"data\":{\n      \"e\":[\"CN\",\"CN\"],\n      \"i\":[\"US\",\"RU\"],\n      \"v\":[3300000,10000]\n    }\n  },\n  \"evals\":[],\n  \"jsHooks\":[]\n}\n\n出现上述情况的原因是：row-wise的JSON被jsonlite::fromJSON自动转换为了dataframe，而htmlwidgets的createWidget函数会自动将dataframe转为column-wise的JSON，从而导致数据结构不符。\n\n# column-wise\njsonlite::toJSON(arcs, dataframe = \"columns\")\n#&gt; {\"e\":[\"CN\",\"CN\"],\"i\":[\"US\",\"RU\"],\"v\":[3300000,10000]}\n# row-wise\njsonlite::toJSON(arcs, dataframe = \"rows\")\n#&gt; [{\"e\":\"CN\",\"i\":\"US\",\"v\":3300000},{\"e\":\"CN\",\"i\":\"RU\",\"v\":10000}]",
+    "crumbs": [
+      "07 The Full Monty"
+    ]
+  },
+  {
+    "objectID": "Books/Js4R/07 The Full Monty.html#transforming-data",
+    "href": "Books/Js4R/07 The Full Monty.html#transforming-data",
+    "title": "07 The Full Monty",
+    "section": "Transforming Data",
+    "text": "Transforming Data\n下面介绍一些确保dataframe被row-wise的方法。\n\nUsing JavaScript\nhtmlwidgets JavaScript 库提供了dataframeToD3函数，将column-wise的JSON转为row-wise的JSON。\n// gio.js\nrenderValue: function(x) {\n\n  // long to wide\n  x.data = HTMLWidgets.dataframeToD3(x.data);\n\n  var controller = new GIO.Controller(el);\n  controller.addData(x.data);\n  controller.init();\n\n}\n\n\nModify Serialiser\n正如前面讲到的那样，我们可以设置htmlwidgets的createWidget函数自动将dataframe转为row-wise的JSON。\n下面是createWidget函数的底层逻辑，可以看到只要修改dataframe参数为\"rows\"即可。\nfunction (x, ..., dataframe = \"columns\", null = \"null\",\nna = \"null\", auto_unbox = TRUE, use_signif = TRUE,\n  digits = getOption(\"shiny.json.digits\", 16), force = TRUE,\n  POSIXt = \"ISO8601\", UTC = TRUE, rownames = FALSE,\n  keep_vec_names = TRUE, strict_atomic = TRUE)\n{\n  if (strict_atomic)\n      x &lt;- I(x)\n  jsonlite::toJSON(x, dataframe = dataframe, null = null, na = na,\n    auto_unbox = auto_unbox, digits = digits, force = force,\n    use_signif = use_signif, POSIXt = POSIXt, UTC = UTC,\n    rownames = rownames, keep_vec_names = keep_vec_names,\n    json_verbatim = TRUE, ...)\n}\nhtmlwidgets巧妙地利用了属性，可以将rows设置为x对象的TOJSON_ARGS属性，从而实现row-wise处理。\ngio &lt;- function(data, width = NULL, height = NULL,\n  elementId = NULL) {\n\n  # forward options using x\n  x = list(\n    data = data\n  )\n\n  # serialise data.frames to wide (not long as default)\n  attr(x, 'TOJSON_ARGS') &lt;- list(dataframe = \"rows\")\n\n  # create widget\n  htmlwidgets::createWidget(\n    name = 'gio',\n    x,\n    width = width,\n    height = height,\n    package = 'gio',\n    elementId = elementId\n  )\n}\n\n\nReplace Serialiser\n也可以为x对象添加TOJSON_FUNC属性值，直接替换serialiser函数。\ngio &lt;- function(data, width = NULL, height = NULL,\n  elementId = NULL) {\n\n  # forward options using x\n  x = list(\n    data = data\n  )\n\n  # replace serialiser\n  attr(x, 'TOJSON_FUNC') &lt;- gio_serialiser\n\n  # create widget\n  htmlwidgets::createWidget(\n    name = 'gio',\n    x,\n    width = width,\n    height = height,\n    package = 'gio',\n    elementId = elementId\n  )\n}\n\n# serialiser\ngio_serialiser &lt;- function(x){\n  jsonify::to_json(x, unbox = TRUE)\n}\n\n\nModify the Data\n我们也可以直接修改data数据类型。\nx = list(\n  data = apply(data, 1, as.list)\n)\n\n\nPros and Cons\n上述每种方法都有其优缺点。最好的方法可能是仅在需要的地方修改默认序列化器（Modify Serialiser），这是本书其余部分使用的方法。完全替换序列化器（Replace Serialiser）应该是不必要的，只有在你非常熟悉序列化并真正看到需要它时才这样做。此外，HTMLWidgets 的序列化器扩展了 jsonlite, 允许转换 JavaScript 代码，这将在后面派上用场。在 JavaScript 中转换 data （Using JavaScript）有一个缺点，HTMLWidgets.dataframeToD3 不能应用于整个 x 对象，它只会作用于包含column-wise data (x.data) 的子集，这往往会导致代码笨拙，因为在不同地方使用该函数。",
+    "crumbs": [
+      "07 The Full Monty"
+    ]
+  },
+  {
+    "objectID": "Books/Js4R/07 The Full Monty.html#on-print-method",
+    "href": "Books/Js4R/07 The Full Monty.html#on-print-method",
+    "title": "07 The Full Monty",
+    "section": "On Print Method",
+    "text": "On Print Method\ngio.js提供了一些themes，我们可以为其x对象添加style`属性。\n// gio.js\nrenderValue: function(x) {\n\n  var controller = new GIO.Controller(el);\n  controller.addData(x.data);\n\n  controller.setStyle(x.style); // set style\n\n  controller.init();\n\n}\n此时，我们除了前面讲到的修改R/gio.R文件中函数的data对象，还可以直接为x对象添加style。使用print()我们可以清楚地看到数据结构。\n\ng &lt;- gio(arcs) # nothing renders\ng # visualisation renders\n\n\n\n\n\n\nprint(g$x)\n#&gt; $data\n#&gt;    e  i       v\n#&gt; 1 CN US 3300000\n#&gt; 2 CN RU   10000\n#&gt; \n#&gt; attr(,\"TOJSON_ARGS\")\n#&gt; attr(,\"TOJSON_ARGS\")$dataframe\n#&gt; [1] \"rows\"\n\n在R/gio.R文件中，创建添加属性的函数：\n#' @export\ngio_style &lt;- function(g, style = \"magic\"){\n  g$x$style &lt;- style\n  return(g)\n}\ng1 &lt;- gio(arcs)\ng2 &lt;- gio_style(g1, \"juicyCake\")\n\ng2\nhtmlwidgets系列包也可以被magrittr包支持，使用usethis::use_pipe()可以方便的实现管道符操作。\n\nlibrary(magrittr)\n\ngio(arcs) %&gt;%\n  gio_style(\"juicyCake\")",
+    "crumbs": [
+      "07 The Full Monty"
+    ]
+  },
+  {
+    "objectID": "Books/Js4R/00 Preface.html#总结",
+    "href": "Books/Js4R/00 Preface.html#总结",
+    "title": "00 Preface",
+    "section": "总结",
+    "text": "总结\n\nmyWidget()函数中包含的htmlwidgets::createWidget会：\n\n自动创建element，默认是div，可以通过myWidget_html()函数进行修改。\n解析x对象的属性，如TOJSON_ARGS, TOJSON_FUNC，配置数据转换方式。\n\nhtmlwidgets::createWidget创建的x对象，可以直接在外部进行赋值。如gio$x$style &lt;- \"juicyCake\"。\nusethis::use_pipe()可以实现管道符操作。",
+    "crumbs": [
+      "00 Preface"
+    ]
   }
 ]

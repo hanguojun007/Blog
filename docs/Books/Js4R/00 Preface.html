@@ -208,6 +208,12 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text">06 A Realistic Widget</span></a>
   </div>
 </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Js4R/07 The Full Monty.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">07 The Full Monty</span></a>
+  </div>
+</li>
     </ul>
     </div>
 </nav>
@@ -220,6 +226,7 @@ ul.task-list li input[type="checkbox"] {
   <ul>
   <li><a href="#引言" id="toc-引言" class="nav-link active" data-scroll-target="#引言">引言</a></li>
   <li><a href="#目录" id="toc-目录" class="nav-link" data-scroll-target="#目录">目录</a></li>
+  <li><a href="#总结" id="toc-总结" class="nav-link" data-scroll-target="#总结">总结</a></li>
   </ul>
 </nav>
     <div class="quarto-margin-footer"><div class="margin-footer-item">
@@ -268,6 +275,18 @@ ul.task-list li input[type="checkbox"] {
 <h2 class="anchored" data-anchor-id="目录">目录</h2>
 <ol type="1">
 <li></li>
+</ol>
+</section>
+<section id="总结" class="level2">
+<h2 class="anchored" data-anchor-id="总结">总结</h2>
+<ol type="1">
+<li><p><code>myWidget()</code>函数中包含的<code>htmlwidgets::createWidget</code>会：</p>
+<ul>
+<li>自动创建element，默认是<code>div</code>，可以通过<code>myWidget_html()</code>函数进行修改。</li>
+<li>解析<code>x</code>对象的属性，如<code>TOJSON_ARGS</code>, <code>TOJSON_FUNC</code>，配置数据转换方式。</li>
+</ul></li>
+<li><p><code>htmlwidgets::createWidget</code>创建的<code>x</code>对象，可以直接在外部进行赋值。如<code>gio$x$style &lt;- "juicyCake"</code>。</p></li>
+<li><p><code>usethis::use_pipe()</code>可以实现管道符操作。</p></li>
 </ol>
 
 

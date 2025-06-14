@@ -27,3 +27,13 @@ source("_common.R")
 
 1.
 
+
+## 总结
+
+1.  `myWidget()`函数中包含的`htmlwidgets::createWidget`会：
+    -   自动创建element，默认是`div`，可以通过`myWidget_html()`函数进行修改。
+    -   解析`x`对象的属性，如`TOJSON_ARGS`, `TOJSON_FUNC`，配置数据转换方式。
+
+2.  `htmlwidgets::createWidget`创建的`x`对象，可以直接在外部进行赋值。如`gio$x$style <- "juicyCake"`。
+
+3.  `usethis::use_pipe()`可以实现管道符操作。
