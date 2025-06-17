@@ -7,6 +7,7 @@ HTMLWidgets.widget({
   factory: function(el, width, height) {
 
     // TODO: define shared variables for this instance
+    var controller
 
     return {
 
@@ -17,9 +18,14 @@ HTMLWidgets.widget({
         // var container = document.getElementById("globe");
         // long to wide
         // x.data = HTMLWidgets.dataframeToD3(x.data);
-        var controller = new GIO.Controller(el);
+        controller = new GIO.Controller(el);
         controller.addData(x.data);
         controller.setStyle(x.style); // set style
+
+        // gio.js
+        if(x.stats)
+          controller.enableStats();
+
         controller.init();
 
       },
@@ -27,6 +33,7 @@ HTMLWidgets.widget({
       resize: function(width, height) {
 
         // TODO: code to re-render the widget with a new size
+        controller.resizeUpdate();
 
       }
 

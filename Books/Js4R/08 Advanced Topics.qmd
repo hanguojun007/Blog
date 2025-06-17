@@ -1,0 +1,373 @@
+---
+title: "08 Advanced Topics"
+date: "2025-06-15"
+date-modified: "2025-06-17"
+format: "html"
+execute:
+  warning: false
+  fig-width: 6
+  fig-asp: 0.618
+  out-width: 70%
+  fig-align: center
+---
+
+```{r}
+#| echo: false
+
+source("_common.R")
+```
+
+本章在gio包的基础上，主要讨论下面几点：
+-   widget的大小调控
+-   输入数据的格式控制
+-   第二种JS库依赖配置方法
+-   使用R传递JS代码
+-   在widget前后插入其他内容
+
+## Shared Variables
+
+在此之前，需要先了解如何共享变量。以gio包为例，将`controller`变量定义在'factory`函数内，`renderValue`函数外时，`controller`变量就可以被定义在`factory`中的函数访问，例如`resize`函数。
+
+```javascript
+HTMLWidgets.widget({
+
+  name: 'gio',
+
+  type: 'output',
+
+  factory: function(el, width, height) {
+
+    // TODO: define shared variables for this instance
+    var controller;
+
+    return {
+
+      renderValue: function(x) {
+
+        controller = new GIO.Controller(el); // declared outside
+
+        // add data
+        controller.addData(x.data);
+
+        // define style
+        controller.setStyle(x.style);
+
+        // render
+        controller.init();
+
+      },
+
+      resize: function(width, height) {
+
+        // TODO: code to re-render the widget with a new size
+
+      }
+
+    };
+  }
+});
+```
+
+## Sizing
+
+widget的大小有两种调控方式：一种是绝对大小——px，另一种是相对（窗口）占比——x%，为了适配不同设备，通常宽度使用百分比设置，高度自适应。
+
+gio包中的`gio()`函数有`width`和`height`参数，分别调控widget的宽度和高度，其中`width`参数默认为400px，高度自适应。
+
+```r
+arcs <- jsonlite::fromJSON(
+  '[
+    {
+      "e": "CN",
+      "i": "US",
+      "v": 3300000
+    },
+    {
+      "e": "CN",
+      "i": "RU",
+      "v": 10000
+    }
+  ]'
+)
+
+gio(arcs)
+```
+
+![](image/gio-size-issue.png)
+
+你可以试着改变宽度：
+
+```r
+gio(arcs, width = 500) # 500 pixels wide
+gio(arcs, width = "100%") # fits width
+```
+
+这种调控方式适用于使用者，下面是针对开发者设置默认大小的方法。
+
+### Sizing Policy
+
+在`htmlwidgets::createWidget()`函数中，添加`sizingPolicy`参数，设置widget的默认大小和填充；参数值由`htmlwidgets::sizingPolicy()`函数配置。不同的配置可以适配不同的使用环境，如：RStudio viewer，Web browser，R markdown等。
+
+```r
+# create widget
+htmlwidgets::createWidget(
+  name = 'gio',
+  x,
+  width = width,
+  height = height,
+  package = 'gio',
+  elementId = elementId,
+  sizingPolicy = htmlwidgets::sizingPolicy(
+    defaultWidth = "100%",
+    padding = 0,
+    browser.fill = TRUE
+  )
+)
+```
+
+![](image/gio-fit.png)
+
+### Resizing
+
+前面我们讲过gio.js中的`renderValue`函数，当`controller`变量共享后，我们可以在`resize`函数中，对widget的大小进行重新渲染。gio.js由于底层自动调整widget大小，所以调整大小的函数`resizeUpdate`没有参数。
+
+```javascript
+...
+resize: function(width, height) {
+  controller.resizeUpdate();
+}
+...
+```
+
+![](image/gio-small.png)
+
+此处控制widget大小的函数由JS库决定，例如gio.js库是`resizeUpdate`，plotly.js库是`relayout`，highcharts.js库是`setSize`，charts.js库是`resize`。
+
+```javascript
+// plotly.js
+Plotly.relayout('chartid', {width: width, height: height});
+// highcharts.js
+chart.setSize(width, height);
+// charts.js
+chart.resize();
+```
+
+## Pre Render Hooks and Security
+
+`htmlwidgets::createWidget()`函数通过参数`preRenderHook`接受一个函数，用来在生成widget前执行预处理。该函数接受一个完整的widget对象，输出一个修改过后的widget对象。这种操作不是很常见，但有时十分有用。
+
+例如，`gio()`函数的输入数据除了必要的`e`,`v`,`i`列外，如果存在其他列导致无法正确生成widget（实际无影响）时，我们需要确保输入数据的格式正确。
+
+```r
+# add a variable that should not be shared
+arcs$secret_id <- 1:2
+```
+
+定义一个`render_gio()`函数，对输入数据进行格式控制。
+
+```r
+# preRenderHook function
+render_gio <- function(g){
+  # only keep relevant variables
+  g$x$data <- g$x$data[,c("e", "v", "i")]
+  return(g)
+}
+
+# create widget
+htmlwidgets::createWidget(
+  name = 'gio',
+  x,
+  width = width,
+  height = height,
+  package = 'gio',
+  elementId = elementId,
+  sizingPolicy = htmlwidgets::sizingPolicy(
+    defaultWidth = "100%",
+    padding = 0,
+    browser.fill = TRUE
+  ),
+  preRenderHook = render_gio # pass renderer
+)
+```
+
+## JavaScript Code
+
+JavaScript 代码无法通过JSON数据进行传递，需要特殊函数`htmlwidgets::JS()`进行转换。该函数为JavaScript代码字符串添加`JS_EVAL`属性，使其在被浏览器评估时可以被视作JavaScript代码。
+
+```{r}
+# serialised as string
+jsonlite::toJSON("var x = 3;")
+htmlwidgets::JS("var x = 3;")
+```
+
+## Prepend and Append Content
+
+使用`htmlwidgets::prependContent()`和`htmlwidgets::appendContent()`函数，可以在widget的前面或结尾添加额外的HTML内容（shiny，htmltools tags，a list of those）。注意：这两个函数在shiny中不起作用。
+
+```r
+#' @export
+gio_title <- function(g, title){
+  title <- htmltools::h3(title)
+  htmlwidgets::prependContent(g, title)
+}
+```
+
+```r
+gio(arcs) %>%
+  gio_title("Gio.js htmlwidget!")
+```
+
+![](image/gio-title.png)
+
+## Dependencies
+
+前面讲到在`inst/htmlwidgets/gio.yaml`中添加JS库依赖，但这种方法适合添加通用型库，如果某些库仅是某些功能需要，则可以使用`htmltools::htmlDependency()`函数为widget对象单独添加依赖（dependencies）。如果全部使用第一种方法，会导致widget特别大，影响widget的加载速度，某些依赖库甚至可以只将某些使用的函数单独打包，减少加载时的大小。
+
+下面我们使用JavaScript性能监控器[stats.js](https://github.com/mrdoob/stats.js/)库，为gio包添加展示诸如渲染帧率 (FPS) 或渲染可视化所需的毫秒数等信息。
+
+```r
+dir.create("htmlwidgets/stats")
+url <- paste0(
+  "https://raw.githubusercontent.com/mrdoob/",
+  "stats.js/master/build/stats.min.js"
+)
+download.file(url, destfile = "htmlwidgets/stats/stats.min.js")
+```
+
+gio.js对stats.js的使用方法见[这里](https://giojs.org/html/docs/interfaceStats.html)。
+
+```javascript
+// enable stats
+controller.enableStats();
+```
+
+参数`dependencies`由`htmlwidgets::createWidget()`生成，可以在函数内为widget添加该参数值，也可以直接在外部添加。
+
+1.  通过`system.file()`获取stats.js的文件路径。
+2.  `htmltools::htmlDependency()`创建依赖项。
+3.  将依赖项追加到widget对象的`dependencies`参数中。
+4.  为x对象添加启动项。
+5.  返回widget对象。
+
+```r
+#' @export
+gio_stats <- function(g){
+
+  # create dependency
+  path <- system.file("htmlwidgets/stats", package = "gio")
+  dep <- htmltools::htmlDependency(
+    name = "stats",
+    version = "17",
+    src = c(file = path),
+    script = "stats.min.js"
+  )
+
+  # append dependency to gio.js
+  g$dependencies <- append(g$dependencies, list(dep))
+
+  # add stats variable
+  g$x$stats <- TRUE
+
+  return(g)
+}
+```
+
+同时修改`inst/htmlwidgets/gio.js`，将启动stat的代码添加到`controller.init()`之前。
+
+```javascript
+// gio.js
+if(x.stats)
+  controller.enableStats();
+
+controller.init();
+```
+
+允许下面代码，可以看到左上角的实时信息。
+
+```{r}
+#| echo: false
+devtools::load_all("/root/UbuntuData/gio")
+
+arcs <- jsonlite::fromJSON(
+  '[
+    {
+      "e": "CN",
+      "i": "US",
+      "v": 3300000
+    },
+    {
+      "e": "CN",
+      "i": "RU",
+      "v": 10000
+    }
+  ]'
+)
+```
+
+```{r}
+# create gio object
+arcs %>%
+  gio() %>%
+  gio_stats()
+```
+
+可以将上面两种方法类比于R包`DESCRIPTION`文件中的`Imports`和`Suggests`。
+
+## Compatibility
+
+`htmlwidgets::getDependency()`函数可以提取widget R包中的依赖项，方便不同widget之间进行兼容，避免冲突。提取到的依赖项中第一个是`htmlwidgets`，最后一个是`gio`。
+
+```{r}
+# get dependencies of the gio package
+htmlwidgets::getDependency("gio")
+```
+
+## Unit Tests
+
+使用`devtools::install()`安装好gio包后，可以使用`testthat`包进行单元测试。
+
+```r
+library(gio)
+library(testthat)
+
+test_that("gio has correct data", {
+  g <- gio(arcs)
+
+  # internally stored as data.frame
+  expect_is(g$x$data, "data.frame")
+
+  # gio does not work without data
+  expect_error(gio())
+})
+```
+
+## Performances
+
+使用widget R包时，数据的传输过程为：
+
+1.  加载到R中
+2.  R将数据转换为JOSN格式
+3.  JSON数据嵌入到HTML中
+4.  JS解析JSON数据
+
+当数据较小时，不会影响浏览器的响应速度，但是当数据较大时，会拖慢浏览器的响应速度。可以使用额外的技术加快数据加载过程。例如下面的AJAX技术。
+
+```r
+# this would placed in the shiny UI
+load_json_from_ui <- function(path_to_json){
+  script <- paste0("
+    $.ajax({
+        url: '", path_to_json, "',
+        dataType: 'json',
+        async: true,
+        success: function(data){
+          console.log(data);
+          window.globalData = data;
+        }
+      });"
+    )
+  shiny::tags$script(
+    script
+  )
+}
+```

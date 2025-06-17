@@ -396,7 +396,7 @@ renderValue: function(x) {
 此时，我们除了前面讲到的修改`R/gio.R`文件中函数的`data`对象，还可以直接为`x`对象添加style。使用`print()`我们可以清楚地看到数据结构。
 
 ```{r}
-#| echo: FALSE
+#| echo: false
 devtools::load_all("/root/UbuntuData/gio")
 ```
 

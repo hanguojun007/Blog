@@ -1254,7 +1254,7 @@
     "href": "Books/Js4R/07 The Full Monty.html",
     "title": "07 The Full Monty",
     "section": "",
-    "text": "本章以gio.js库为基础，学习构建更加完备。gio.js用来在三维地球图上，通过曲线绘制国家之间的联系。下面是该库的一个简单示例：",
+    "text": "本章以gio.js库为基础，学习输入数据的处理方式。gio.js用来在三维地球图上，通过曲线绘制国家之间的联系。下面是该库的一个简单示例：",
     "crumbs": [
       "07 The Full Monty"
     ]
@@ -1307,6 +1307,106 @@
     "text": "总结\n\nmyWidget()函数中包含的htmlwidgets::createWidget会：\n\n自动创建element，默认是div，可以通过myWidget_html()函数进行修改。\n解析x对象的属性，如TOJSON_ARGS, TOJSON_FUNC，配置数据转换方式。\n\nhtmlwidgets::createWidget创建的x对象，可以直接在外部进行赋值。如gio$x$style &lt;- \"juicyCake\"。\nusethis::use_pipe()可以实现管道符操作。",
     "crumbs": [
       "00 Preface"
+    ]
+  },
+  {
+    "objectID": "Books/Js4R/08 Advanced Topics.html",
+    "href": "Books/Js4R/08 Advanced Topics.html",
+    "title": "08 Advanced Topics",
+    "section": "",
+    "text": "本章在gio包的基础上，主要讨论下面几点： - widget的大小调控 - 输入数据的格式控制 - 第二种JS库依赖配置方法 - 使用R传递JS代码 - 在widget前后插入其他内容",
+    "crumbs": [
+      "08 Advanced Topics"
+    ]
+  },
+  {
+    "objectID": "Books/Js4R/08 Advanced Topics.html#shared-variables",
+    "href": "Books/Js4R/08 Advanced Topics.html#shared-variables",
+    "title": "08 Advanced Topics",
+    "section": "Shared Variables",
+    "text": "Shared Variables\n在此之前，需要先了解如何共享变量。以gio包为例，将controller变量定义在’factory函数内，renderValue函数外时，controller变量就可以被定义在factory中的函数访问，例如resize`函数。\nHTMLWidgets.widget({\n\n  name: 'gio',\n\n  type: 'output',\n\n  factory: function(el, width, height) {\n\n    // TODO: define shared variables for this instance\n    var controller;\n\n    return {\n\n      renderValue: function(x) {\n\n        controller = new GIO.Controller(el); // declared outside\n\n        // add data\n        controller.addData(x.data);\n\n        // define style\n        controller.setStyle(x.style);\n\n        // render\n        controller.init();\n\n      },\n\n      resize: function(width, height) {\n\n        // TODO: code to re-render the widget with a new size\n\n      }\n\n    };\n  }\n});",
+    "crumbs": [
+      "08 Advanced Topics"
+    ]
+  },
+  {
+    "objectID": "Books/Js4R/08 Advanced Topics.html#sizing",
+    "href": "Books/Js4R/08 Advanced Topics.html#sizing",
+    "title": "08 Advanced Topics",
+    "section": "Sizing",
+    "text": "Sizing\nwidget的大小有两种调控方式：一种是绝对大小——px，另一种是相对（窗口）占比——x%，为了适配不同设备，通常宽度使用百分比设置，高度自适应。\ngio包中的gio()函数有width和height参数，分别调控widget的宽度和高度，其中width参数默认为400px，高度自适应。\narcs &lt;- jsonlite::fromJSON(\n  '[\n    {\n      \"e\": \"CN\",\n      \"i\": \"US\",\n      \"v\": 3300000\n    },\n    {\n      \"e\": \"CN\",\n      \"i\": \"RU\",\n      \"v\": 10000\n    }\n  ]'\n)\n\ngio(arcs)\n\n你可以试着改变宽度：\ngio(arcs, width = 500) # 500 pixels wide\ngio(arcs, width = \"100%\") # fits width\n这种调控方式适用于使用者，下面是针对开发者设置默认大小的方法。\n\nSizing Policy\n在htmlwidgets::createWidget()函数中，添加sizingPolicy参数，设置widget的默认大小和填充；参数值由htmlwidgets::sizingPolicy()函数配置。不同的配置可以适配不同的使用环境，如：RStudio viewer，Web browser，R markdown等。\n# create widget\nhtmlwidgets::createWidget(\n  name = 'gio',\n  x,\n  width = width,\n  height = height,\n  package = 'gio',\n  elementId = elementId,\n  sizingPolicy = htmlwidgets::sizingPolicy(\n    defaultWidth = \"100%\",\n    padding = 0,\n    browser.fill = TRUE\n  )\n)\n\n\n\nResizing\n前面我们讲过gio.js中的renderValue函数，当controller变量共享后，我们可以在resize函数中，对widget的大小进行重新渲染。gio.js由于底层自动调整widget大小，所以调整大小的函数resizeUpdate没有参数。\n...\nresize: function(width, height) {\n  controller.resizeUpdate();\n}\n...\n\n此处控制widget大小的函数由JS库决定，例如gio.js库是resizeUpdate，plotly.js库是relayout，highcharts.js库是setSize，charts.js库是resize。\n// plotly.js\nPlotly.relayout('chartid', {width: width, height: height});\n// highcharts.js\nchart.setSize(width, height);\n// charts.js\nchart.resize();",
+    "crumbs": [
+      "08 Advanced Topics"
+    ]
+  },
+  {
+    "objectID": "Books/Js4R/08 Advanced Topics.html#pre-render-hooks-and-security",
+    "href": "Books/Js4R/08 Advanced Topics.html#pre-render-hooks-and-security",
+    "title": "08 Advanced Topics",
+    "section": "Pre Render Hooks and Security",
+    "text": "Pre Render Hooks and Security\nhtmlwidgets::createWidget()函数通过参数preRenderHook接受一个函数，用来在生成widget前执行预处理。该函数接受一个完整的widget对象，输出一个修改过后的widget对象。这种操作不是很常见，但有时十分有用。\n例如，gio()函数的输入数据除了必要的e,v,i列外，如果存在其他列导致无法正确生成widget（实际无影响）时，我们需要确保输入数据的格式正确。\n# add a variable that should not be shared\narcs$secret_id &lt;- 1:2\n定义一个render_gio()函数，对输入数据进行格式控制。\n# preRenderHook function\nrender_gio &lt;- function(g){\n  # only keep relevant variables\n  g$x$data &lt;- g$x$data[,c(\"e\", \"v\", \"i\")]\n  return(g)\n}\n\n# create widget\nhtmlwidgets::createWidget(\n  name = 'gio',\n  x,\n  width = width,\n  height = height,\n  package = 'gio',\n  elementId = elementId,\n  sizingPolicy = htmlwidgets::sizingPolicy(\n    defaultWidth = \"100%\",\n    padding = 0,\n    browser.fill = TRUE\n  ),\n  preRenderHook = render_gio # pass renderer\n)",
+    "crumbs": [
+      "08 Advanced Topics"
+    ]
+  },
+  {
+    "objectID": "Books/Js4R/08 Advanced Topics.html#javascript-code",
+    "href": "Books/Js4R/08 Advanced Topics.html#javascript-code",
+    "title": "08 Advanced Topics",
+    "section": "JavaScript Code",
+    "text": "JavaScript Code\nJavaScript 代码无法通过JSON数据进行传递，需要特殊函数htmlwidgets::JS()进行转换。该函数为JavaScript代码字符串添加JS_EVAL属性，使其在被浏览器评估时可以被视作JavaScript代码。\n\n# serialised as string\njsonlite::toJSON(\"var x = 3;\")\n#&gt; [\"var x = 3;\"]\nhtmlwidgets::JS(\"var x = 3;\")\n#&gt; [1] \"var x = 3;\"\n#&gt; attr(,\"class\")\n#&gt; [1] \"JS_EVAL\"",
+    "crumbs": [
+      "08 Advanced Topics"
+    ]
+  },
+  {
+    "objectID": "Books/Js4R/08 Advanced Topics.html#prepend-and-append-content",
+    "href": "Books/Js4R/08 Advanced Topics.html#prepend-and-append-content",
+    "title": "08 Advanced Topics",
+    "section": "Prepend and Append Content",
+    "text": "Prepend and Append Content\n使用htmlwidgets::prependContent()和htmlwidgets::appendContent()函数，可以在widget的前面或结尾添加额外的HTML内容（shiny，htmltools tags，a list of those）。注意：这两个函数在shiny中不起作用。\n#' @export\ngio_title &lt;- function(g, title){\n  title &lt;- htmltools::h3(title)\n  htmlwidgets::prependContent(g, title)\n}\ngio(arcs) %&gt;%\n  gio_title(\"Gio.js htmlwidget!\")",
+    "crumbs": [
+      "08 Advanced Topics"
+    ]
+  },
+  {
+    "objectID": "Books/Js4R/08 Advanced Topics.html#dependencies",
+    "href": "Books/Js4R/08 Advanced Topics.html#dependencies",
+    "title": "08 Advanced Topics",
+    "section": "Dependencies",
+    "text": "Dependencies\n前面讲到在inst/htmlwidgets/gio.yaml中添加JS库依赖，但这种方法适合添加通用型库，如果某些库仅是某些功能需要，则可以使用htmltools::htmlDependency()函数为widget对象单独添加依赖（dependencies）。如果全部使用第一种方法，会导致widget特别大，影响widget的加载速度，某些依赖库甚至可以只将某些使用的函数单独打包，减少加载时的大小。\n下面我们使用JavaScript性能监控器stats.js库，为gio包添加展示诸如渲染帧率 (FPS) 或渲染可视化所需的毫秒数等信息。\ndir.create(\"htmlwidgets/stats\")\nurl &lt;- paste0(\n  \"https://raw.githubusercontent.com/mrdoob/\",\n  \"stats.js/master/build/stats.min.js\"\n)\ndownload.file(url, destfile = \"htmlwidgets/stats/stats.min.js\")\ngio.js对stats.js的使用方法见这里。\n// enable stats\ncontroller.enableStats();\n参数dependencies由htmlwidgets::createWidget()生成，可以在函数内为widget添加该参数值，也可以直接在外部添加。\n\n通过system.file()获取stats.js的文件路径。\nhtmltools::htmlDependency()创建依赖项。\n将依赖项追加到widget对象的dependencies参数中。\n为x对象添加启动项。\n返回widget对象。\n\n#' @export\ngio_stats &lt;- function(g){\n\n  # create dependency\n  path &lt;- system.file(\"htmlwidgets/stats\", package = \"gio\")\n  dep &lt;- htmltools::htmlDependency(\n    name = \"stats\",\n    version = \"17\",\n    src = c(file = path),\n    script = \"stats.min.js\"\n  )\n\n  # append dependency to gio.js\n  g$dependencies &lt;- append(g$dependencies, list(dep))\n\n  # add stats variable\n  g$x$stats &lt;- TRUE\n\n  return(g)\n}\n同时修改inst/htmlwidgets/gio.js，将启动stat的代码添加到controller.init()之前。\n// gio.js\nif(x.stats)\n  controller.enableStats();\n\ncontroller.init();\n允许下面代码，可以看到左上角的实时信息。\n\n# create gio object\narcs %&gt;%\n  gio() %&gt;%\n  gio_stats()\n\n\n\n\n\n可以将上面两种方法类比于R包DESCRIPTION文件中的Imports和Suggests。",
+    "crumbs": [
+      "08 Advanced Topics"
+    ]
+  },
+  {
+    "objectID": "Books/Js4R/08 Advanced Topics.html#compatibility",
+    "href": "Books/Js4R/08 Advanced Topics.html#compatibility",
+    "title": "08 Advanced Topics",
+    "section": "Compatibility",
+    "text": "Compatibility\nhtmlwidgets::getDependency()函数可以提取widget R包中的依赖项，方便不同widget之间进行兼容，避免冲突。提取到的依赖项中第一个是htmlwidgets，最后一个是gio。\n\n# get dependencies of the gio package\nhtmlwidgets::getDependency(\"gio\")\n#&gt; [[1]]\n#&gt; List of 10\n#&gt;  $ name      : chr \"htmlwidgets\"\n#&gt;  $ version   : chr \"1.6.4\"\n#&gt;  $ src       :List of 1\n#&gt;   ..$ file: chr \"www\"\n#&gt;  $ meta      : NULL\n#&gt;  $ script    : chr \"htmlwidgets.js\"\n#&gt;  $ stylesheet: NULL\n#&gt;  $ head      : NULL\n#&gt;  $ attachment: NULL\n#&gt;  $ package   : chr \"htmlwidgets\"\n#&gt;  $ all_files : logi TRUE\n#&gt;  - attr(*, \"class\")= chr \"html_dependency\"\n#&gt; \n#&gt; [[2]]\n#&gt; List of 10\n#&gt;  $ name      : chr \"three\"\n#&gt;  $ version   : chr \"110\"\n#&gt;  $ src       :List of 1\n#&gt;   ..$ file: chr \"htmlwidgets/three\"\n#&gt;  $ meta      : NULL\n#&gt;  $ script    : chr \"three.min.js\"\n#&gt;  $ stylesheet: NULL\n#&gt;  $ head      : NULL\n#&gt;  $ attachment: NULL\n#&gt;  $ package   : chr \"gio\"\n#&gt;  $ all_files : logi TRUE\n#&gt;  - attr(*, \"class\")= chr \"html_dependency\"\n#&gt; \n#&gt; [[3]]\n#&gt; List of 10\n#&gt;  $ name      : chr \"gio\"\n#&gt;  $ version   : chr \"2\"\n#&gt;  $ src       :List of 1\n#&gt;   ..$ file: chr \"htmlwidgets/gio\"\n#&gt;  $ meta      : NULL\n#&gt;  $ script    : chr \"gio.min.js\"\n#&gt;  $ stylesheet: NULL\n#&gt;  $ head      : NULL\n#&gt;  $ attachment: NULL\n#&gt;  $ package   : chr \"gio\"\n#&gt;  $ all_files : logi TRUE\n#&gt;  - attr(*, \"class\")= chr \"html_dependency\"\n#&gt; \n#&gt; [[4]]\n#&gt; List of 10\n#&gt;  $ name      : chr \"gio-binding\"\n#&gt;  $ version   : chr \"0.1.0\"\n#&gt;  $ src       :List of 1\n#&gt;   ..$ file: chr \"htmlwidgets\"\n#&gt;  $ meta      : NULL\n#&gt;  $ script    : chr \"gio.js\"\n#&gt;  $ stylesheet: NULL\n#&gt;  $ head      : NULL\n#&gt;  $ attachment: NULL\n#&gt;  $ package   : chr \"gio\"\n#&gt;  $ all_files : logi FALSE\n#&gt;  - attr(*, \"class\")= chr \"html_dependency\"",
+    "crumbs": [
+      "08 Advanced Topics"
+    ]
+  },
+  {
+    "objectID": "Books/Js4R/08 Advanced Topics.html#unit-tests",
+    "href": "Books/Js4R/08 Advanced Topics.html#unit-tests",
+    "title": "08 Advanced Topics",
+    "section": "Unit Tests",
+    "text": "Unit Tests\n使用devtools::install()安装好gio包后，可以使用testthat包进行单元测试。\nlibrary(gio)\nlibrary(testthat)\n\ntest_that(\"gio has correct data\", {\n  g &lt;- gio(arcs)\n\n  # internally stored as data.frame\n  expect_is(g$x$data, \"data.frame\")\n\n  # gio does not work without data\n  expect_error(gio())\n})",
+    "crumbs": [
+      "08 Advanced Topics"
+    ]
+  },
+  {
+    "objectID": "Books/Js4R/08 Advanced Topics.html#performances",
+    "href": "Books/Js4R/08 Advanced Topics.html#performances",
+    "title": "08 Advanced Topics",
+    "section": "Performances",
+    "text": "Performances\n使用widget R包时，数据的传输过程为：\n\n加载到R中\nR将数据转换为JOSN格式\nJSON数据嵌入到HTML中\nJS解析JSON数据\n\n当数据较小时，不会影响浏览器的响应速度，但是当数据较大时，会拖慢浏览器的响应速度。可以使用额外的技术加快数据加载过程。例如下面的AJAX技术。\n# this would placed in the shiny UI\nload_json_from_ui &lt;- function(path_to_json){\n  script &lt;- paste0(\"\n    $.ajax({\n        url: '\", path_to_json, \"',\n        dataType: 'json',\n        async: true,\n        success: function(data){\n          console.log(data);\n          window.globalData = data;\n        }\n      });\"\n    )\n  shiny::tags$script(\n    script\n  )\n}",
+    "crumbs": [
+      "08 Advanced Topics"
     ]
   }
 ]
