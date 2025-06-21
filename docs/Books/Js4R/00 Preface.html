@@ -220,6 +220,12 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text">08 Advanced Topics</span></a>
   </div>
 </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Js4R/09 Linking Widgets.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">09 Linking Widgets</span></a>
+  </div>
+</li>
     </ul>
     </div>
 </nav>
@@ -293,6 +299,12 @@ ul.task-list li input[type="checkbox"] {
 </ul></li>
 <li><p><code>htmlwidgets::createWidget</code>创建的<code>x</code>对象，可以直接在外部进行赋值。如<code>gio$x$style &lt;- "juicyCake"</code>。</p></li>
 <li><p><code>usethis::use_pipe()</code>可以实现管道符操作。</p></li>
+<li><p>实现<code>crosstalk</code>支持的步骤：</p>
+<ul>
+<li>R脚本改造为能接收共享数据对象，获取数据的data，group，key信息，添加<code>crosstalk</code>依赖库。</li>
+<li>根据JS依赖库获取key信息，然后JS脚本使用<code>sel_handle.set</code>发送key信息</li>
+<li>JS脚本使用<code>sel_handle.on</code>监听事件发送改变后，获取key信息。</li>
+</ul></li>
 </ol>
 
 

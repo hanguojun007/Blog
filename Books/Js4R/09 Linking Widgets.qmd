@@ -1,0 +1,470 @@
+---
+title: "09 Linking Widgets"
+date: "2025-06-17"
+date-modified: "2025-06-22"
+format: "html"
+execute:
+  warning: false
+  fig-width: 6
+  fig-asp: 0.618
+  out-width: 70%
+  fig-align: center
+---
+
+```{r}
+#| echo: false
+
+source("_common.R")
+```
+
+`crosstalk`包可以实现widget包之间数据共享，从而进行联动。例如选择图中的点，表格自动过滤出选择的点的相关数据。更多关于crosstalk见[官网](https://rstudio.github.io/crosstalk)。
+
+## Crosstalk Examples
+
+R包plotly和DT支持crosstalk，可以创建一个共享数据的散点图与表格，表格中的数据根据选择的点自动过滤显示。共享数据由`crosstalk::SharedData()`创建，是一个R6类对象。下面的`bscols()`函数用来布局排列两个widget。
+
+```{r}
+library(DT)
+library(plotly)
+library(crosstalk)
+
+shared <- SharedData$new(cars)
+
+bscols(
+  plot_ly(shared, x = ~speed, y = ~dist),
+  datatable(shared, width = "100%")
+)
+```
+
+在shiny中使用crosstalk也十分方便，因为它可以接受`reactive`表达式创建共享数据。
+
+``` r
+library(DT)
+library(shiny)
+library(plotly)
+library(crosstalk)
+
+ui <- fluidPage(
+  selectInput(
+    "specie", "Specie",
+    choices = c("setosa", "versicolor", "virginica")
+  ),
+  fluidRow(
+    column(6, DTOutput("table")),
+    column(6, plotlyOutput("plot"))
+  )
+)
+
+server <- function(input, output) {
+  reactive_data <- reactive({
+    iris[iris$Species == input$specie, ]
+  })
+
+  sd <- SharedData$new(reactive_data)
+
+  output$table <- renderDT(
+    {
+      datatable(sd)
+    },
+    server = FALSE
+  )
+
+  output$plot <- renderPlotly({
+    plot_ly(sd, x = ~Sepal.Length, y = ~Sepal.Width)
+  })
+}
+
+shinyApp(ui, server)
+```
+
+`SharedData`对象的`data`方法有参数`withSelection`，当为TRUE时，数据会添加一列`selected_`，值为TRUE或FALSE，表示该行是否被选中。
+
+``` r
+library(DT)
+library(shiny)
+library(crosstalk)
+
+ui <- fluidPage(
+  fluidRow(
+    column(4, uiOutput("text")),
+    column(8, DTOutput("table"))
+  )
+)
+
+server <- function(input, output) {
+  sd <- SharedData$new(cars)
+
+  output$text <- renderUI({
+    # get selected rows
+    n_selected <- sd$data(withSelection = TRUE) %>%
+      dplyr::filter(selected_ == TRUE) %>%
+      nrow()
+
+    h3(n_selected, "selected items")
+  })
+
+  output$table <- renderDT(
+    {
+      datatable(sd)
+    },
+    server = FALSE
+  )
+}
+
+shinyApp(ui, server)
+```
+
+![](image/crosstalk-shiny.png)
+
+`SharedData`对象也有`selection`方法，可以主动过滤选中的行。
+
+``` r
+library(DT)
+library(shiny)
+library(crosstalk)
+
+ui <- fluidPage(
+  fluidRow(
+    column(4, actionButton("random", "Select a random row")),
+    column(8, DTOutput("table"))
+  )
+)
+
+server <- function(input, output) {
+  sd <- SharedData$new(cars)
+
+  output$table <- renderDT(
+    {
+      datatable(sd)
+    },
+    server = FALSE
+  )
+
+  selected <- c()
+  observeEvent(input$random, {
+    smp <- c(1:50)[!1:50 %in% selected]
+    selected <<- append(selected, sample(smp, 1))
+    sd$selection(selected)
+  })
+}
+
+shinyApp(ui, server)
+```
+
+## Crosstalk Requirements
+
+crosstalk包适用于长数据格式，即每行是一个特征，数据的交互是对行进行筛选。直白地讲，它支持散点图似的特征数据，不支持直方图似的总结数据。
+
+## How it Works
+
+crosstalk包实现widgets之间数据共享的底层逻辑是JavaScript。事实上，无论在Rstudio的Viewer中，shiny中，还是Rmarkdown中，crosstalk包都可以适用。
+
+```{mermaid}
+flowchart LR
+    subgraph i1[R]
+        direction LR
+        A[DataFrame]
+        B[Shared Dataset]
+        A -->B
+    end
+    subgraph i2[JavaScript]
+        direction LR
+        C[Widget1]
+        D[Widget2]
+        C <--> D
+    end
+    i1 -->i2
+    style i1 fill:#FFF
+    style i2 fill:#FFF
+```
+
+### Keys
+
+`SharedData$new()`在创建共享数据时，会为数据中的每一行添加键（key）。如果dataframe有行名，使用行名作为键，否则自动创建行数索引作为键。你可以将创建过程想象为添加了`key`列，但实际上这一列并不存在。key可以重复。
+
+```{r}
+sd_cars <- SharedData$new(cars[1:2, ])
+```
+
+![](image/crosstalk-key.png)
+
+共享数据中的`key`你可以使用`key`方法获取，也可以在创建时指定`key`。
+
+```{r}
+sd_cars$key()
+```
+
+```{r}
+# assign keys
+df <- data.frame(x = runif(5))
+sd <- SharedData$new(df, key = letters[1:5])
+sd$key()
+```
+
+### Communication Lines
+
+在某种意义上，虽然crosstalk建立了通信线路来传输键值，但各自开发的组件必须处理发送到其他组件的键值以及如何处理接收到的键值（这些键值是在其他组件中被选择或过滤的）。即，有两种这样的通信线路：一种用于筛选要显示的数据点的行键值，另一种用于选择（crosstalk称为“链接刷选”）以突出显示特定数据点（使其他数据点淡出）。
+
+在JavaScript中，一个组件会接收所选和过滤的数据点的键值，并且当观察到过滤或选择时，必须将这些选定或过滤的键值“发送”给其他组件。因此，crosstalk可以实现在多个组件之间共享数据并实现交互式可视化分析的功能。
+
+### Groups
+
+`SharedData$new()`在创建共享数据时，会给数据添加`group`属性，用来共享`key`。
+
+![](image/crosstalk-diagram.png)
+
+下例中，虽然创建了两个`SharedData`对象，但它们都共享了同一组`key`。
+
+```{r}
+shared_cars <- SharedData$new(mtcars, group = "cars")
+shared_cars_head <- SharedData$new(head(mtcars), group = "cars")
+```
+
+## Crosstalk with Gio
+
+考虑到gio.js使用的数据格式略有不同：每一行是一条边，整个数据是一个网络，前端更新某个节点时，会带出不同的相连节点，也即选中某个节点实际会返回多行值。我们需要提醒使用者：创建共享数据时，指定数据中的`e`列或`i`列作为`key`，使用其他列作为`key`也可以，但是会增加额外的步骤，使机制更加复杂。
+
+```{r}
+#| echo: false
+arcs <- jsonlite::fromJSON(
+  '[
+    {
+      "e": "CN",
+      "i": "US",
+      "v": 3300000
+    },
+    {
+      "e": "CN",
+      "i": "RU",
+      "v": 10000
+    }
+  ]'
+)
+```
+
+```{r}
+#  keys = target
+shared_arcs <- crosstalk::SharedData$new(arcs, key = arcs$e)
+# keys = source
+shared_arcs <- crosstalk::SharedData$new(arcs, key = arcs$i)
+```
+
+## R code
+
+为了适配crosstalk，`R/gio.R`文件中的函数`gio()`需要修改为能使用由`crosstalk::SharedData$new()`创建的共享数据对象。该对象是R6类，有三个属性，可以用三个函数分别提取属性内容。
+
+-   `origData`：原始数据
+-   `groupName`：所属组
+-   `key`：分配给每一行的key
+
+```{r}
+class(shared_arcs)
+
+# original data
+shared_arcs$origData()
+# groupName
+shared_arcs$groupName()
+# keys
+shared_arcs$key()
+```
+
+每个构件都必须使用`origData`和`groupName`方法，`key`方法可能不适用于每个构件，但如果可视化库包含 key/id 系统，它将非常有用。gio.js没有这样的系统，所以我们不使用`key`方法。group的信息需要传递给`x`对象，以便在需要时可以被JavaScript端访问；同时还需要用`crosstalkLibs`获取crosstalk所需的JavaScript依赖库。
+
+``` r
+gio <- function(data, width = NULL, height = NULL,
+  elementId = NULL) {
+
+  # defaults to NULL
+  group <- NULL
+  deps <- NULL
+
+  # uses crosstalk
+  if (crosstalk::is.SharedData(data)) {
+    group <- data$groupName()
+    data <- data$origData()
+    deps <- crosstalk::crosstalkLibs()
+  }
+
+  # forward options using x
+  x = list(
+    data = data,
+    style = "default",
+    crosstalk = list(group = group) # pass group
+  )
+
+  attr(x, 'TOJSON_ARGS') <- list(dataframe = "rows")
+
+  # create widget
+  htmlwidgets::createWidget(
+    name = 'gio',
+    x,
+    width = width,
+    height = height,
+    package = 'gio',
+    elementId = elementId,
+    sizingPolicy = htmlwidgets::sizingPolicy(
+      padding = 0,
+      browser.fill = TRUE,
+      defaultWidth = "100%"
+    ),
+    preRenderHook = render_gio,
+    # add crosstalk dependency
+    dependencies = deps
+  )
+}
+```
+
+## JavaScript Code
+
+`inst/htmlwidgets/gio.js`中需要在`factory`函数中添加key的选择处理器。
+
+``` javascript
+var sel_handle = new crosstalk.SelectionHandle();
+```
+
+接着在`renderValue`函数中为处理器添加group信息（上述R code处理后结果）。
+
+一定要注意的是：我们不仅需要将key信息发送到其他组件中，还需要接收其他组件传入的key信息。
+
+### Send Selected Keys
+
+为了将选择的key信息发送出去，我们首先要获取被客户选择的key信息（callback）。获取方式因不同的JS库而不同，JS库通常都会提供callback函数或者触发事件来获取key信息。gio.js[获取key信息方式](https://giojs.org/html/docs/callbackPicked.html)如下，通过定义`callback`函数，可以返回：选中的国家及其关联的国家。
+
+``` javascript
+// define callback function
+function callback (selectedCountry, relatedCountries) {
+  console.log(selectedCountry);
+  // console.log(relatedCountries);
+}
+
+// use callback function
+controller.onCountryPicked(callback);
+```
+
+``` json
+{name: "LIBYA", lat: 25, lon: 17, center: n, ISOCode: "LY"}
+```
+
+因为我们要将选中的key信息发送给其他组件，所以需要修改callback函数；考虑到crosstalk创建的共享数据使用的key最好是ISOcode，所以直接返回JSON对象的ISOcode字段。注意`sel_handle.set`需要的输入是`null`或array，`selectedCountry.ISOCode`必须用`[]`包裹起来。
+
+``` javascript
+function callback (selectedCountry) {
+  sel_handle.set([selectedCountry.ISOCode]);
+}
+
+controller.onCountryPicked(callback);
+```
+
+### Set Selected Keys
+
+除了要发送key信息，组件也需要接收其他组件发送的key信息。使用`sel_handle.on()`来监听其他组件发送的key信息。
+
+``` javascript
+// placed in factory function
+sel_handle.on("change", function(e) {
+  console.log(e);
+});
+```
+
+返回的`e`包含下面信息：
+
+-   oldValue： 之前选中的key
+-   sender：变更key的组件
+-   value： 当前选中的key
+
+``` json
+{
+  oldValue: [],
+  sender: n {
+    _eventRelay: e,
+    _emitter: t,
+    _group: "SharedDatac7682f87",
+    _var: r,
+    _varOnChangeSub: "sub1",
+    …
+  },
+  value: ["AE"]
+}
+```
+
+当监听到变更时，可以将变更的key传递给`controller.switchCountry()`进行变更处理。通常需要清除之前的key，但gio.js始终都需要一个key，所以此处不作处理。
+
+``` javascript
+// placed in factory function
+sel_handle.on("change", function(e) {
+
+  // selection comes from another widget
+  if (e.sender !== sel_handle) {
+    // clear the selection
+    // not possible with gio.js
+  }
+  controller.switchCountry(e.value[0]);
+});
+```
+
+## Using Crosstalk with Gio
+
+现在，`gio`包已经支持crosstalk了，下面是两个例子。
+
+```{r}
+library(DT)
+library(gio)
+library(crosstalk)
+
+# url <- paste0(
+#   "https://raw.githubusercontent.com/JohnCoene/",
+#   "javascript-for-r/master/data/countries.json"
+# )
+url <- "countries.json"
+arcs <- jsonlite::fromJSON(url)
+
+# Wrap data frame in SharedData
+# key is importing country
+sd <- SharedData$new(arcs, key = arcs$i)
+
+bscols(
+  gio(sd),
+  datatable(sd, width = "100%", selection = "single")
+)
+```
+
+使用`group`参数，将数据中的边与节点进行关联。
+
+![](image/crosstalk-share.png)
+
+```{r}
+library(gio)
+library(plotly)
+library(crosstalk)
+
+# url <- paste0(
+#   "https://raw.githubusercontent.com/JohnCoene/",
+#   "javascript-for-r/master/data/countries.json"
+# )
+url <- "countries.json"
+arcs <- jsonlite::fromJSON(url)
+
+# Wrap data frame in SharedData
+edges_sd <- SharedData$new(
+  arcs,
+  key = arcs$i, group = "sharedGroup"
+)
+
+# create nodes
+iso2c <- unique(arcs$i)
+nodes <- data.frame(
+  country = iso2c,
+  y = rnorm(length(iso2c))
+)
+nodes_sd <- SharedData$new(
+  nodes,
+  key = nodes$country,
+  group = "sharedGroup"
+)
+
+bscols(
+  plot_ly(data = nodes_sd, type = "bar", x = ~country, y = ~y) %>%
+    config(displayModeBar = FALSE),
+  gio(edges_sd)
+)
+```
