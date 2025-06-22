@@ -1,0 +1,168 @@
+---
+title: "10 Final Revisions"
+date: "2025-06-22"
+date-modified: "2025-06-22"
+format: "html"
+execute:
+  warning: false
+  fig-width: 6
+  fig-asp: 0.618
+  out-width: 70%
+  fig-align: center
+---
+
+```{r}
+#| echo: false
+
+source("_common.R")
+```
+
+本章我们将完善gio包中面向使用者的API。
+
+## Htmlwidgets and Data
+
+仔细观察前面`R/gio.R`的gio函数，我们会发现：如果面向使用者，gio函数的‘要求’过于严格了，必须每一行是一条边，而且有三列，列名必须是`e`，`i`，`v`。与编写其他R包类型，我们需要优化gio函数参数，使其更加鲁棒。一种方法是使用类似`ggplot2::aes()`函数的非标准性评估，如下示例。
+
+``` r
+gio <- function(data, source, target, value, ...,
+  width = NULL, height = NULL, elementId = NULL) {
+
+  # defaults to NULL
+  group <- NULL
+
+  if (crosstalk::is.SharedData(data)) {
+    group <- data$groupName()
+    data <- data$origData()
+  }
+
+  # non-standard evaluation
+  data <- dplyr::select(
+    data,
+    i = {{ source }},
+    e = {{ target }},
+    v = {{ value }}
+  )
+
+  # forward options using x
+  x = list(
+    configs = list(...),
+    data = data,
+    style = "default",
+    crosstalk = list(group = group)
+  )
+
+  attr(x, 'TOJSON_ARGS') <- list(dataframe = "rows")
+
+  # create widget
+  htmlwidgets::createWidget(
+    name = 'gio',
+    x,
+    width = width,
+    height = height,
+    package = 'gio',
+    elementId = elementId,
+    sizingPolicy = htmlwidgets::sizingPolicy(
+      padding = 0,
+      browser.fill = TRUE,
+      defaultWidth = "100%"
+    ),
+    preRenderHook = render_gio,
+    dependencies = crosstalk::crosstalkLibs()
+  )
+}
+```
+
+改造过的函数使用起来会更加上手：参数名含义直接明了，第一个参数提供数据，后面三个参数提供对应列。
+
+``` r
+# mock up data
+countries <- c("US", "BE", "FR", "DE")
+df <- data.frame(
+  from = countries,
+  to = rev(countries),
+  traded = runif(4)
+)
+
+# use gio
+gio(df, source = from, target = to, value = traded)
+```
+
+## Plethora of Options
+
+gio.js有许多配置项参数，如：
+
+``` javascript
+var configs = {
+  control: {
+    stats: false,
+    disableUnmentioned: false,
+    lightenMentioned: false,
+    inOnly: false,
+    outOnly: false,
+    initCountry: "CN",
+    halo: true
+  },
+  color: {
+    surface: 0xFFFFFF,
+    selected: null,
+    in: 0x154492,
+    out: 0xDD380C,
+    halo: 0xFFFFFF,
+    background: null
+  },
+  brightness: {
+    ocean: 0.5,
+    mentioned: 0.5,
+    related: 0.5
+  }
+}
+
+controller = new Gio.controller(el, configs);
+```
+
+不仅gio.js，JS库通常都会有丰富的配置项参数，我们不可能一一通过具体参数呈现，此时可以考虑`...`；如上例中的额外参数`...`，以`list`的格式传递给了`x`对象。
+
+在`inst/htmlwidgets/gio.js`中，可以将解析到的参数配置传递给`controller`。
+
+``` javascript
+// use x.configs
+controller = new GIO.controller(el, x.configs);
+```
+
+``` {r}
+#| echo: false
+
+# devtools::install("/root/UbuntuData/gio")
+library(gio)
+countries <- c("US", "BE", "FR", "DE")
+df <- data.frame(
+  from = countries,
+  to = rev(countries),
+  traded = runif(4)
+)
+```
+
+``` {r}
+gio(
+  df, from, to, traded,
+  control = list(initCountry = "US"),
+  color = list(selected = "#ff4d4d")
+)
+```
+
+## Interface Design
+
+-   始终记住你为客户开发的使用界面。
+
+-   你可以额外配置底层JS依赖库的选项，使其更加适配自己的风格。
+
+-   学习借鉴其他优秀R包的API风格，但也不要奉为金科玉律。
+
+## Exercises
+
+学习下面的js库，练习创建一个简单的可视化应用。
+
+-   [chart.js](https://www.chartjs.org/)
+-   [cytoscape.js](https://js.cytoscape.org/)
+-   [Toast UI charts](https://ui.toast.com/tui-chart/)
+-   [amcharts](https://www.amcharts.com/)

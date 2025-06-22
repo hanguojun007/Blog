@@ -1488,5 +1488,55 @@
     "crumbs": [
       "09 Linking Widgets"
     ]
+  },
+  {
+    "objectID": "Books/Js4R/10 Final Revisions.html",
+    "href": "Books/Js4R/10 Final Revisions.html",
+    "title": "10 Final Revisions",
+    "section": "",
+    "text": "本章我们将完善gio包中面向使用者的API。",
+    "crumbs": [
+      "10 Final Revisions"
+    ]
+  },
+  {
+    "objectID": "Books/Js4R/10 Final Revisions.html#htmlwidgets-and-data",
+    "href": "Books/Js4R/10 Final Revisions.html#htmlwidgets-and-data",
+    "title": "10 Final Revisions",
+    "section": "Htmlwidgets and Data",
+    "text": "Htmlwidgets and Data\n仔细观察前面R/gio.R的gio函数，我们会发现：如果面向使用者，gio函数的‘要求’过于严格了，必须每一行是一条边，而且有三列，列名必须是e，i，v。与编写其他R包类型，我们需要优化gio函数参数，使其更加鲁棒。一种方法是使用类似ggplot2::aes()函数的非标准性评估，如下示例。\ngio &lt;- function(data, source, target, value, ...,\n  width = NULL, height = NULL, elementId = NULL) {\n\n  # defaults to NULL\n  group &lt;- NULL\n\n  if (crosstalk::is.SharedData(data)) {\n    group &lt;- data$groupName()\n    data &lt;- data$origData()\n  }\n\n  # non-standard evaluation\n  data &lt;- dplyr::select(\n    data,\n    i = {{ source }},\n    e = {{ target }},\n    v = {{ value }}\n  )\n\n  # forward options using x\n  x = list(\n    configs = list(...),\n    data = data,\n    style = \"default\",\n    crosstalk = list(group = group)\n  )\n\n  attr(x, 'TOJSON_ARGS') &lt;- list(dataframe = \"rows\")\n\n  # create widget\n  htmlwidgets::createWidget(\n    name = 'gio',\n    x,\n    width = width,\n    height = height,\n    package = 'gio',\n    elementId = elementId,\n    sizingPolicy = htmlwidgets::sizingPolicy(\n      padding = 0,\n      browser.fill = TRUE,\n      defaultWidth = \"100%\"\n    ),\n    preRenderHook = render_gio,\n    dependencies = crosstalk::crosstalkLibs()\n  )\n}\n改造过的函数使用起来会更加上手：参数名含义直接明了，第一个参数提供数据，后面三个参数提供对应列。\n# mock up data\ncountries &lt;- c(\"US\", \"BE\", \"FR\", \"DE\")\ndf &lt;- data.frame(\n  from = countries,\n  to = rev(countries),\n  traded = runif(4)\n)\n\n# use gio\ngio(df, source = from, target = to, value = traded)",
+    "crumbs": [
+      "10 Final Revisions"
+    ]
+  },
+  {
+    "objectID": "Books/Js4R/10 Final Revisions.html#plethora-of-options",
+    "href": "Books/Js4R/10 Final Revisions.html#plethora-of-options",
+    "title": "10 Final Revisions",
+    "section": "Plethora of Options",
+    "text": "Plethora of Options\ngio.js有许多配置项参数，如：\nvar configs = {\n  control: {\n    stats: false,\n    disableUnmentioned: false,\n    lightenMentioned: false,\n    inOnly: false,\n    outOnly: false,\n    initCountry: \"CN\",\n    halo: true\n  },\n  color: {\n    surface: 0xFFFFFF,\n    selected: null,\n    in: 0x154492,\n    out: 0xDD380C,\n    halo: 0xFFFFFF,\n    background: null\n  },\n  brightness: {\n    ocean: 0.5,\n    mentioned: 0.5,\n    related: 0.5\n  }\n}\n\ncontroller = new Gio.controller(el, configs);\n不仅gio.js，JS库通常都会有丰富的配置项参数，我们不可能一一通过具体参数呈现，此时可以考虑...；如上例中的额外参数...，以list的格式传递给了x对象。\n在inst/htmlwidgets/gio.js中，可以将解析到的参数配置传递给controller。\n// use x.configs\ncontroller = new GIO.controller(el, x.configs);\n\ngio(\n  df, from, to, traded,\n  control = list(initCountry = \"US\"),\n  color = list(selected = \"#ff4d4d\")\n)",
+    "crumbs": [
+      "10 Final Revisions"
+    ]
+  },
+  {
+    "objectID": "Books/Js4R/10 Final Revisions.html#interface-design",
+    "href": "Books/Js4R/10 Final Revisions.html#interface-design",
+    "title": "10 Final Revisions",
+    "section": "Interface Design",
+    "text": "Interface Design\n\n始终记住你为客户开发的使用界面。\n你可以额外配置底层JS依赖库的选项，使其更加适配自己的风格。\n学习借鉴其他优秀R包的API风格，但也不要奉为金科玉律。",
+    "crumbs": [
+      "10 Final Revisions"
+    ]
+  },
+  {
+    "objectID": "Books/Js4R/10 Final Revisions.html#exercises",
+    "href": "Books/Js4R/10 Final Revisions.html#exercises",
+    "title": "10 Final Revisions",
+    "section": "Exercises",
+    "text": "Exercises\n学习下面的js库，练习创建一个简单的可视化应用。\n\nchart.js\ncytoscape.js\nToast UI charts\namcharts",
+    "crumbs": [
+      "10 Final Revisions"
+    ]
   }
 ]
