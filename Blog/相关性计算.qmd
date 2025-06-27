@@ -1,0 +1,102 @@
+---
+title: "相关性计算"
+author: "大番薯本薯"
+date: "2025-06-27"
+date-modified: "2025-06-27"
+draft: false
+categories: [triky skill]
+execute:
+  warning: false
+  fig-width: 6
+  fig-asp: 0.618
+  out-width: 70%
+  fig-align: center
+---
+
+```{r}
+#| echo: false
+
+source("_common.R")
+```
+
+近日，就相关性及其显著性的计算发生了一些讨论，现记录总结如下。
+
+## 计算相关性及显著性
+
+共分为四步：
+
+-   `stats::cor()`计算相关性`r`。
+-   计算自由度`n`。
+-   构建正态分布统计量`t`。
+-   计算相关性显著性`p`。
+
+``` r
+# x is matrix
+# 代码源于 psych::corr.test
+r <- cor(x, use = use, method = method)
+n <- t(!is.na(x)) %*% (!is.na(x))
+t <- (r * sqrt(n - 2)) / sqrt(1 - r^2)
+p <- -2 * expm1(pt(abs(t), (n - 2), log.p = TRUE))
+se <- sqrt((1 - r * r) / (n - 2))
+```
+
+## `cor`函数参数`use`
+
+在上面四个步骤中，`use`参数往往会被忽略，但是它及其重要。`use`参数用来处理输入数据中的NA值，是大型数据处理时的主要限速步骤。
+
+`use`参数的取值有：
+
+-   `"everything"`: 忽略NA值，数据中的NA值导致相关性为NA值。
+-   `"all.obs"`: 数据中有NA值时报错，只计算有完整数据对之间的相关性。
+-   `"complete.obs"`: 允许数据中有NA值，计算前会整体地删除有NA值的行，删除后无法计算相关性时报错。
+-   `"na.or.complete"`: 允许数据中有NA值，计算前会整体地删除有NA值的行，删除后无法计算相关性时输出NA值。
+-   `"pairwise.complete.obs"`: 允许数据中有NA值，计算前会按变量单独地删除有NA值的行，删除后无法计算相关性时输出NA值。
+
+```{r}
+#| error: true
+x <- c(1, 2, NA, NA, NA)
+y <- c(NA, 2, 5, 6, 6)
+z <- c(NA, NA, 4, 7, 8)
+
+dat <- data.frame(x, y, z)
+
+cor(dat, use = "everything")
+cor(dat, use = "all.obs")
+cor(dat, use = "complete.obs")
+cor(dat, use = "na.or.complete")
+cor(dat, use = "pairwise.complete.obs")
+```
+
+## 显著性计算
+
+显著性的计算基于`pt`函数，该函数依据数据构建的统计量和自由度，计算该数据点出现的概率。上面的代码使用了对数化操作，能够提高计算的精度。
+
+考虑到`use = "pairwise"`时，每对相关性数据的自由度会不同，所以上面的代码采取了矩阵的计算方法。生成每对相关性数据的自由度和统计量。
+
+虽然当`use = "everything"`时，每对数据点之间自由度相同，可以使用标量进行计算，但是实际上`矩阵 * 标量 = 矩阵`，`矩阵 * 矩阵 = 矩阵`，并不会造成计算浪费。
+
+## 测试
+
+```{r}
+# 生成一个100行，10000列的随机矩阵，用来测试相关性
+x <- matrix(rnorm(100 * 10000), nrow = 100)
+
+system.time({
+  r <- cor(x, use = "pairwise", method = "pearson")
+})
+system.time({
+  r <- cor(x, use = "everything", method = "pearson")
+})
+system.time({
+  n <- t(!is.na(x)) %*% (!is.na(x))
+})
+system.time({
+  t <- (r * sqrt(n - 2)) / sqrt(1 - r^2)
+})
+system.time({
+  p <- -2 * expm1(pt(abs(t), (n - 2), log.p = TRUE))
+})
+system.time({
+  p <- -2 * expm1(pt(abs(t), (dim(x)[1] - 2), log.p = TRUE))
+})
+```

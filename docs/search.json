@@ -722,7 +722,7 @@
     "href": "blog.html",
     "title": "",
     "section": "",
-    "text": "Order By\n       Default\n         \n          Title\n        \n         \n          Date - Oldest\n        \n         \n          Date - Newest\n        \n     \n  \n    \n      \n      \n    \n\n\n\n\n\n\n\n\n\n\nquarto 中R代码块的设置\n\n\n\n\n\n\nquarto\n\n\n\n\n\n\n\n\n\n2025-03-15\n\n\n大番薯本薯\n\n\n\n\n\n\n\n\n\n\n\n\nR 中的面向对象(1)\n\n\n\n\n\n\n面向对象\n\n\n\n\n\n\n\n\n\n2025-03-16\n\n\n大番薯本薯\n\n\n\n\n\n\n\n\n\n\n\n\nData Masking(1)\n\n\n\n\n\n\nrlang\n\n\n\n\n\n\n\n\n\n2025-04-25\n\n\n大番薯本薯\n\n\n\n\n\n\nNo matching items\n\n Back to top"
+    "text": "Order By\n       Default\n         \n          Title\n        \n         \n          Date - Oldest\n        \n         \n          Date - Newest\n        \n     \n  \n    \n      \n      \n    \n\n\n\n\n\n\n\n\n\n\nquarto 中R代码块的设置\n\n\n\n\n\n\nquarto\n\n\n\n\n\n\n\n\n\n2025-03-15\n\n\n大番薯本薯\n\n\n\n\n\n\n\n\n\n\n\n\nR 中的面向对象(1)\n\n\n\n\n\n\n面向对象\n\n\n\n\n\n\n\n\n\n2025-03-16\n\n\n大番薯本薯\n\n\n\n\n\n\n\n\n\n\n\n\nData Masking(1)\n\n\n\n\n\n\nrlang\n\n\n\n\n\n\n\n\n\n2025-04-25\n\n\n大番薯本薯\n\n\n\n\n\n\n\n\n\n\n\n\nR 中的 | 与 &\n\n\n\n\n\n\ntriky skill\n\n\n\n\n\n\n\n\n\n2025-04-25\n\n\n大番薯本薯\n\n\n\n\n\n\n\n\n\n\n\n\ncapture.output\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n2025-04-25\n\n\n大番薯本薯\n\n\n\n\n\n\n\n\n\n\n\n\n相关性计算\n\n\n\n\n\n\ntriky skill\n\n\n\n\n\n\n\n\n\n2025-06-27\n\n\n大番薯本薯\n\n\n\n\n\n\nNo matching items\n\n Back to top"
   },
   {
     "objectID": "Books/Advanced R(2e)/4 Subsetting.html",
@@ -1538,5 +1538,75 @@
     "crumbs": [
       "10 Final Revisions"
     ]
+  },
+  {
+    "objectID": "Blog/相关性计算.html",
+    "href": "Blog/相关性计算.html",
+    "title": "相关性计算",
+    "section": "",
+    "text": "近日，就相关性及其显著性的计算发生了一些讨论，现记录总结如下。"
+  },
+  {
+    "objectID": "Blog/相关性计算.html#计算相关性及显著性",
+    "href": "Blog/相关性计算.html#计算相关性及显著性",
+    "title": "相关性计算",
+    "section": "计算相关性及显著性",
+    "text": "计算相关性及显著性\n共分为四步：\n\nstats::cor()计算相关性r。\n计算自由度n。\n构建正态分布统计量t。\n计算相关性显著性p。\n\n# x is matrix\n# 代码源于 psych::corr.test\nr &lt;- cor(x, use = use, method = method)\nn &lt;- t(!is.na(x)) %*% (!is.na(x))\nt &lt;- (r * sqrt(n - 2)) / sqrt(1 - r^2)\np &lt;- -2 * expm1(pt(abs(t), (n - 2), log.p = TRUE))\nse &lt;- sqrt((1 - r * r) / (n - 2))"
+  },
+  {
+    "objectID": "Blog/相关性计算.html#cor函数参数use",
+    "href": "Blog/相关性计算.html#cor函数参数use",
+    "title": "相关性计算",
+    "section": "cor函数参数use",
+    "text": "cor函数参数use\n在上面四个步骤中，use参数往往会被忽略，但是它及其重要。use参数用来处理输入数据中的NA值，是大型数据处理时的主要限速步骤。\nuse参数的取值有：\n\n\"everything\": 忽略NA值，数据中的NA值导致相关性为NA值。\n\"all.obs\": 数据中有NA值时报错，只计算有完整数据对之间的相关性。\n\"complete.obs\": 允许数据中有NA值，计算前会整体地删除有NA值的行，删除后无法计算相关性时报错。\n\"na.or.complete\": 允许数据中有NA值，计算前会整体地删除有NA值的行，删除后无法计算相关性时输出NA值。\n\"pairwise.complete.obs\": 允许数据中有NA值，计算前会按变量单独地删除有NA值的行，删除后无法计算相关性时输出NA值。\n\n\nx &lt;- c(1, 2, NA, NA, NA)\ny &lt;- c(NA, 2, 5, 6, 6)\nz &lt;- c(NA, NA, 4, 7, 8)\n\ndat &lt;- data.frame(x, y, z)\n\ncor(dat, use = \"everything\")\n#&gt;    x  y  z\n#&gt; x  1 NA NA\n#&gt; y NA  1 NA\n#&gt; z NA NA  1\ncor(dat, use = \"all.obs\")\n#&gt; Error in cor(dat, use = \"all.obs\"): missing observations in cov/cor\ncor(dat, use = \"complete.obs\")\n#&gt; Error in cor(dat, use = \"complete.obs\"): no complete element pairs\ncor(dat, use = \"na.or.complete\")\n#&gt;    x  y  z\n#&gt; x NA NA NA\n#&gt; y NA NA NA\n#&gt; z NA NA NA\ncor(dat, use = \"pairwise.complete.obs\")\n#&gt;    x         y         z\n#&gt; x  1        NA        NA\n#&gt; y NA 1.0000000 0.9707253\n#&gt; z NA 0.9707253 1.0000000"
+  },
+  {
+    "objectID": "Blog/相关性计算.html#显著性计算",
+    "href": "Blog/相关性计算.html#显著性计算",
+    "title": "相关性计算",
+    "section": "显著性计算",
+    "text": "显著性计算\n显著性的计算基于pt函数，该函数依据数据构建的统计量和自由度，计算该数据点出现的概率。上面的代码使用了对数化操作，能够提高计算的精度。\n考虑到use = \"pairwise\"时，每对相关性数据的自由度会不同，所以上面的代码采取了矩阵的计算方法。生成每对相关性数据的自由度和统计量。\n虽然当use = \"everything\"时，每对数据点之间自由度相同，可以使用标量进行计算，但是实际上矩阵 * 标量 = 矩阵，矩阵 * 矩阵 = 矩阵，并不会造成计算浪费。"
+  },
+  {
+    "objectID": "Blog/相关性计算.html#测试",
+    "href": "Blog/相关性计算.html#测试",
+    "title": "相关性计算",
+    "section": "测试",
+    "text": "测试\n\n# 生成一个100行，10000列的随机矩阵，用来测试相关性\nx &lt;- matrix(rnorm(100 * 10000), nrow = 100)\n\nsystem.time({\n  r &lt;- cor(x, use = \"pairwise\", method = \"pearson\")\n})\n#&gt;    user  system elapsed \n#&gt;  40.554   0.774  42.857\nsystem.time({\n  r &lt;- cor(x, use = \"everything\", method = \"pearson\")\n})\n#&gt;    user  system elapsed \n#&gt;   7.001   0.698   7.057\nsystem.time({\n  n &lt;- t(!is.na(x)) %*% (!is.na(x))\n})\n#&gt;    user  system elapsed \n#&gt;   1.853   2.383   0.188\nsystem.time({\n  t &lt;- (r * sqrt(n - 2)) / sqrt(1 - r^2)\n})\n#&gt;    user  system elapsed \n#&gt;   1.054   1.131   2.003\nsystem.time({\n  p &lt;- -2 * expm1(pt(abs(t), (n - 2), log.p = TRUE))\n})\n#&gt;    user  system elapsed \n#&gt;  15.832   1.617  15.996\nsystem.time({\n  p &lt;- -2 * expm1(pt(abs(t), (dim(x)[1] - 2), log.p = TRUE))\n})\n#&gt;    user  system elapsed \n#&gt;  15.632   1.111  15.522"
+  },
+  {
+    "objectID": "Books/Advanced R(2e)/7 Environments.html",
+    "href": "Books/Advanced R(2e)/7 Environments.html",
+    "title": "7 Environments",
+    "section": "",
+    "text": "环境是赋予作用域（scoping）能力的数据结构。本章会详细地介绍环境的数据结构，来提高对于作用域地理解。\n\n\n\n7.2节介绍环境地基本属性及如何创建一个自己的环境。\n7.3节介绍函数于环境的关系。\n7.4节介绍环境的特殊用法：R包\n7.5节介绍caller环境。\n7.6节介绍environment函数。\n\n\n\n\n本章将使用 rlang 函数来处理环境，因为它允许我们关注环境的本质，而不是偶然的细节。\n\nlibrary(rlang)\n\nrlang中的env_*()函数被设计用来在工作流中使用。所有的函数都接收一个环境作为参数，大多数会返回一个环境。"
+  },
+  {
+    "objectID": "Books/Advanced R(2e)/7 Environments.html#introduction",
+    "href": "Books/Advanced R(2e)/7 Environments.html#introduction",
+    "title": "7 Environments",
+    "section": "",
+    "text": "环境是赋予作用域（scoping）能力的数据结构。本章会详细地介绍环境的数据结构，来提高对于作用域地理解。\n\n\n\n7.2节介绍环境地基本属性及如何创建一个自己的环境。\n7.3节介绍函数于环境的关系。\n7.4节介绍环境的特殊用法：R包\n7.5节介绍caller环境。\n7.6节介绍environment函数。\n\n\n\n\n本章将使用 rlang 函数来处理环境，因为它允许我们关注环境的本质，而不是偶然的细节。\n\nlibrary(rlang)\n\nrlang中的env_*()函数被设计用来在工作流中使用。所有的函数都接收一个环境作为参数，大多数会返回一个环境。"
+  },
+  {
+    "objectID": "Books/Advanced R(2e)/7 Environments.html#environment-basics",
+    "href": "Books/Advanced R(2e)/7 Environments.html#environment-basics",
+    "title": "7 Environments",
+    "section": "Environment basics",
+    "text": "Environment basics\n环境与有name属性的list很相似，但是有4点差异：\n\n要求name唯一。\nname不会被排序，即无法使用顺序来提取环境中的变量。\n总有一个父环境，除了根环境。\n被修改时不会在内存中复制。\n\n\nBasics\n使用rlang::env()创建一个环境，与list类似，接收一个键值对集合。base::new.env()函数也可以创建环境，但是不能直接传递键值对集合，需要使用$&lt;-赋值。\n\ne1 &lt;- env(\n  a = FALSE,\n  b = \"a\",\n  c = 2.3,\n  d = 1:3,\n)\n\ne2 &lt;- new.env()\ne2$a &lt;- FALSE\ne2$b &lt;- \"a\"\ne2$c &lt;- 2.3\ne2$d &lt;- 1:3\n\n\nidentical(e1, e2)\n#&gt; [1] FALSE\n\n\n环境具有引用语义：与大多数R对象不同，当你修改环境时，你是在原地修改它们，而不是创建副本。一个重要的含义是，环境可以自我包含。\n\ne1$d &lt;- e1\n\n\n在终端中直接运行环境仅会显示内存地址，使用env_print()可以打印更多环境信息，也可以使用env_names()直接输出目前环境中绑定过的变量名。\n\ne1\n#&gt; &lt;environment: 0x63154161e4b8&gt;\nenv_print(e1)\n#&gt; &lt;environment: 0x63154161e4b8&gt;\n#&gt; Parent: &lt;environment: global&gt;\n#&gt; Bindings:\n#&gt; • a: &lt;lgl&gt;\n#&gt; • b: &lt;chr&gt;\n#&gt; • c: &lt;dbl&gt;\n#&gt; • d: &lt;env&gt;\nenv_names(e1)\n#&gt; [1] \"a\" \"b\" \"c\" \"d\"\n\n\n\nImportant environments\n这里介绍两个特殊环境，更多特殊的环境会在之后详细讲到：\n\n全局环境：就是当前交互终端的环境，global_env()或globalenv()获取。\n当前环境：当前执行代码的环境，current_env()或environment()获取，如果在终端中执行，那么等于全局环境。\n\n使用identical()判断两个环境是否相等，不能使用==，因为环境不是atomic或list类型。\n\nidentical(global_env(), current_env())\n#&gt; [1] TRUE\n\nglobal_env() == current_env()\n#&gt; Error in global_env() == current_env(): comparison (==) is possible only for atomic and list types\n\n\n\nParents\n使用env()创建环境时，提供一个没有name的参数即可设定环境的父环境。使用env_parent()或parent.env可以查看父环境。\n\ne2a &lt;- env(d = 4, e = 5)\ne2b &lt;- env(e2a, a = 1, b = 2, c = 3)\nenv_parent(e2b)\n#&gt; &lt;environment: 0x631540eab7b8&gt;\nparent.env(e2b)\n#&gt; &lt;environment: 0x631540eab7b8&gt;\nenv_parent(e2a)\n#&gt; &lt;environment: R_GlobalEnv&gt;\nparent.env(e2a)\n#&gt; &lt;environment: R_GlobalEnv&gt;\n\n\n每个环境都有父环境，除了空环境（empty environment）。使用env_parents()可以查看所有父环境。\n\ne2c &lt;- env(empty_env(), d = 4, e = 5)\ne2d &lt;- env(e2c, a = 1, b = 2, c = 3)\nenv_parents(e2b)\n#&gt; [[1]]   &lt;env: 0x631540eab7b8&gt;\n#&gt; [[2]] $ &lt;env: global&gt;\nenv_parents(e2d)\n#&gt; [[1]]   &lt;env: 0x631540abed00&gt;\n#&gt; [[2]] $ &lt;env: empty&gt;\n\n\nenv_parents()通常只返回到全局环境。设置last = empty_env()可以返回所有父环境。\n\nenv_parents(e2b, last = empty_env())\n#&gt;  [[1]]   &lt;env: 0x631540eab7b8&gt;\n#&gt;  [[2]] $ &lt;env: global&gt;\n#&gt;  [[3]] $ &lt;env: package:rlang&gt;\n#&gt;  [[4]] $ &lt;env: package:stats&gt;\n#&gt;  [[5]] $ &lt;env: package:graphics&gt;\n#&gt;  [[6]] $ &lt;env: package:grDevices&gt;\n#&gt;  [[7]] $ &lt;env: package:datasets&gt;\n#&gt;  [[8]] $ &lt;env: renv:shims&gt;\n#&gt;  [[9]] $ &lt;env: package:utils&gt;\n#&gt; [[10]] $ &lt;env: package:methods&gt;\n#&gt; [[11]] $ &lt;env: Autoloads&gt;\n#&gt; [[12]] $ &lt;env: package:base&gt;\n#&gt; [[13]] $ &lt;env: empty&gt;\n\n\n\nSuper assignment, &lt;&lt;-\n常规赋值&lt;-会在当前环境中创建变量。超赋值&lt;&lt;-从不会在当前环境中创建变量，只是会修改变量，当前环境中没有就依次在父环境中搜索，直到全局环境。如果全局环境中也没有这个变量，就会在全局环境中创建这个变量。\n\nx &lt;- 0\nf &lt;- function() {\n  x &lt;&lt;- 1\n}\nf()\nx\n#&gt; [1] 1\n\n\n\nGetting and setting\n获取环境中的变量方法有$，[[，env_get()。\n\ne3 &lt;- env(x = 1, y = 2)\ne3$x\n#&gt; [1] 1\ne3$z &lt;- 3\ne3[[\"z\"]]\n#&gt; [1] 3\nenv_get(e3, \"z\")\n#&gt; [1] 3\n\n需要注意的是：[[不适用于数字索引，也不可以使用[。\n\ne3[[1]]\n#&gt; Error in e3[[1]]: wrong arguments for subsetting an environment\n\ne3[c(\"x\", \"y\")]\n#&gt; Error in e3[c(\"x\", \"y\")]: object of type 'environment' is not subsettable\n\n变量不存在时，$，[[会返回NULL，env_get()会返回错误。env_get()设置参数default后，可以给定默认值而不报错。\n\ne3$xyz\n#&gt; NULL\n\nenv_get(e3, \"xyz\")\n#&gt; Error in `env_get()`:\n#&gt; ! Can't find `xyz` in environment.\n\nenv_get(e3, \"xyz\", default = NA)\n#&gt; [1] NA\n\nrlang包还提供两种额外的设定变量值的方法：\n\nenv_poke()：只设置一个变量。\nenv_bind()：设置多个变量。\n\n\nenv_poke(e3, \"a\", 100)\ne3$a\n#&gt; [1] 100\n\nenv_bind(e3, a = 10, b = 20)\nenv_names(e3)\n#&gt; [1] \"x\" \"y\" \"z\" \"a\" \"b\"\n\n与list不同，当设置变量值为NULL时，并不会移除这个变量，而是实际有一个变量指向了NULL。env_has()可以用来检测环境中是否存在某个变量。env_unbind()会真实地解绑一个变量。\n\ne3$a &lt;- NULL\nenv_has(e3, \"a\")\n#&gt;    a \n#&gt; TRUE\n\nenv_unbind(e3, \"a\")\nenv_has(e3, \"a\")\n#&gt;     a \n#&gt; FALSE\n\n需要注意地是：env_unbind()不会删除变量，只是解绑变量与值的关系。删除变量是gc()的任务。在R base中存在功能与上述类似的函数：get()，assign()，exists()，rm()，这些函数被设计用来在当前环境中工作，其他环境中会略显不足。\n\n\nAdvanced bindings\nenv_bind()函数有两个变体：\n\nenv_bind_lazy()可以创建延迟绑定。在首次绑定前会先运行导致延迟的代码，然后再绑定。延迟绑定主要应用于R包中的autoload()，预先将数据集加载到内存中。\n\n\nenv_bind_lazy(current_env(), b = {\n  Sys.sleep(1)\n  1\n})\n\nsystem.time(print(b))\n#&gt; [1] 1\n#&gt;    user  system elapsed \n#&gt;   0.000   0.000   1.001\nsystem.time(print(b))\n#&gt; [1] 1\n#&gt;    user  system elapsed \n#&gt;       0       0       0\n\n\nenv_bind_active()可以创建实时绑定，每次重新绑定值。\n\n\nenv_bind_active(current_env(), z1 = function(val) runif(1))\n\nz1\n#&gt; [1] 0.08075014\nz1\n#&gt; [1] 0.834333\n\n更多见?delayedAssign()和?makeActiveBinding()。"
+  },
+  {
+    "objectID": "Books/Advanced R(2e)/7 Environments.html#recursing-over-environments",
+    "href": "Books/Advanced R(2e)/7 Environments.html#recursing-over-environments",
+    "title": "7 Environments",
+    "section": "Recursing over environments",
+    "text": "Recursing over environments"
+  },
+  {
+    "objectID": "Books/Advanced R(2e)/7 Environments.html#special-environments",
+    "href": "Books/Advanced R(2e)/7 Environments.html#special-environments",
+    "title": "7 Environments",
+    "section": "Special environments",
+    "text": "Special environments\n许多环境是由R自行创建，例如：包环境，函数环境。\n\nPackage environments and the search path"
   }
 ]
