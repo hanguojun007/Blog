@@ -1,7 +1,7 @@
 ---
 title: "7 Environments"
 date: "2025-06-23"
-date-modified: "2025-06-24"
+date-modified: "2025-06-29"
 format: "html"
 execute:
   warning: false
@@ -237,6 +237,91 @@ z1
 
 ## Recursing over environments
 
+由于每个环境都会有一个父环境，可以利用这一特点，递归遍历环境，执行某些操作。下面是一个用来递归找到变量函数——`where()`的实现。
+
+```{r}
+where <- function(name, env = caller_env()) {
+  if (identical(env, empty_env())) {
+    # Base case
+    stop("Can't find ", name, call. = FALSE)
+  } else if (env_has(env, name)) {
+    # Success case
+    env
+  } else {
+    # Recursive case
+    where(name, env_parent(env))
+  }
+}
+```
+
+-   首先判断是否是`empty_env()`，如果是则返回“找不到变量”，如果不是
+-   则判断当前环境是否包含这个变量，如果有则返回当前环境，如果没有
+-   则递归查询父环境。
+
+```{r}
+#| error: true
+where("yyy")
+
+x <- 5
+where("x")
+
+where("mean")
+```
+
+用一幅图来展示上面的逻辑，想象下面两个环境：
+
+```{r}
+e4a <- env(empty_env(), a = 1, b = 2)
+e4a
+e4b <- env(e4a, x = 10, a = 11)
+e4b
+```
+
+![](images/where-ex.png)
+
+-   `where("a", e4b)`的结果是`e4b`。
+-   `where("b", e4b)`的结果是`e4a`。
+-   `where("c", e4b)`的结果是`error`。
+
+```{r}
+where("a", e4b)
+where("b", e4b)
+where("c", e4b)
+```
+
+总结这种递归查询环境的逻辑如下：
+
+``` r
+f <- function(..., env = caller_env()) {
+  if (identical(env, empty_env())) {
+    # base case
+  } else if (success) {
+    # success case
+  } else {
+    # recursive case
+    f(..., env = env_parent(env))
+  }
+}
+```
+
+#### Iteration versus recursion
+
+使用while循环改写上面的函数：
+
+``` r
+f2 <- function(..., env = caller_env()) {
+  while (!identical(env, empty_env())) {
+    if (success) {
+      # success case
+      return()
+    }
+    # inspect parent
+    env <- env_parent(env)
+  }
+
+  # base case
+}
+```
 
 ## Special environments
 
@@ -244,4 +329,72 @@ z1
 
 ### Package environments and the search path
 
+每次使用`library()`或`require()`时，都会将包环境变成全局环境的父环境，最先加载的包环境是后加载包环境的父环境。
+
+![](images/search-path-2.png)
+
+![](images/search-path.png)
+
+这些环境的关系也被称作搜索路径。你可以使用`base::search()`或`rlang::search_envs()`查看搜索路径。搜索路径的最后两个环境是固定的——`Autoloads`和`base`。
+
+```{r}
+search()
+
+search_envs()
+```
+
+### The function environment
+
+函数在被创建时，会自动绑定当前环境，这个环境被称作函数环境。函数与函数环境一起构成了“闭包”。
+
+使用`rlang::fn_env()`或`base::environment()`可以查看函数环境。
+
+```{r}
+y <- 1
+f <- function(x) x + y
+fn_env(f)
+environment(f)
+```
+
+![](images/binding.png)
+
+上面的例子中，函数`f()`的函数环境是当前环境，其绑定的变量`f`在当前环境中。但实际上，这两种情况的环境并不总是相同。例如下面的例子，函数`g()`的函数环境是当前环境，但其绑定的变量`g`在环境`e`中。这两种的区别在于，前者定义了函数`g`如何寻找参数变量，后者定义了如何寻找函数`g`。
+
+```{r}
+e <- env()
+e$g <- function(x) x
+```
+
+![](images/binding-7-2.png)
+
+### Namespaces
+
+命名空间规定了R包中的函数如何正确找到自己引用的函数。
+
+```{r}
+sd
+```
+
+
+![](images/namespace-bind.png)
+
+
+每个命名空间环境都有一套相同的祖先环境：
+
+-   都有一个`import`环境，定义了
+
+
+![](images/namespace-env.png)
+
+![](images/namespace.png)
+
+当`sd()`函数寻找`var`时，会由包的开发者定义
+
+包和命名空间环境之间没有直接的链接；这种链接是由函数环境定义的。
+
+### Execution environments
+
+
+
+## Call stacks
 
