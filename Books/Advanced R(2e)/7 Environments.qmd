@@ -1,7 +1,7 @@
 ---
 title: "7 Environments"
 date: "2025-06-23"
-date-modified: "2025-06-29"
+date-modified: "2025-07-01"
 format: "html"
 execute:
   warning: false
@@ -65,7 +65,6 @@ e2$a <- FALSE
 e2$b <- "a"
 e2$c <- 2.3
 e2$d <- 1:3
-
 
 identical(e1, e2)
 ```
@@ -325,7 +324,7 @@ f2 <- function(..., env = caller_env()) {
 
 ## Special environments
 
-许多环境是由R自行创建，例如：包环境，函数环境。
+许多环境是由R自行创建，例如：包环境，函数环境等，本节介绍四种特殊的环境——包环境，函数环境，函数运行环境，命名空间。
 
 ### Package environments and the search path
 
@@ -358,7 +357,7 @@ environment(f)
 
 ![](images/binding.png)
 
-上面的例子中，函数`f()`的函数环境是当前环境，其绑定的变量`f`在当前环境中。但实际上，这两种情况的环境并不总是相同。例如下面的例子，函数`g()`的函数环境是当前环境，但其绑定的变量`g`在环境`e`中。这两种的区别在于，前者定义了函数`g`如何寻找参数变量，后者定义了如何寻找函数`g`。
+上面的例子中，函数`f()`的函数环境是当前环境，其绑定的变量`f`在当前环境中。但实际上，这两种情况的环境并不总是相同。例如下面的例子，函数`g()`的函数环境是当前环境，但其绑定的变量`g`在环境`e`中。这两种的区别在于，前者定义了函数`g`如何寻找参数变量，后者定义了如何寻找函数`g`。（将`e`环境视作包环境，是不是更容易理解？）
 
 ```{r}
 e <- env()
@@ -367,34 +366,163 @@ e$g <- function(x) x
 
 ![](images/binding-7-2.png)
 
+### Execution environments
+
+运行下面的函数，第一次，第二次，第n次的结果会怎样？
+
+```{r}
+g <- function(x) {
+  if (!env_has(current_env(), "a")) {
+    message("Defining a")
+    a <- 1
+  } else {
+    a <- a + 1
+  }
+  a
+}
+```
+
+```{r}
+g(10)
+g(10)
+```
+
+结果如上所示，每次的运行结果都相同。这是因为函数的执行环境在每次运行结束后，都会被清除，然后重新创建一个。它的父环境是函数环境。
+
+下面是一个各个环境之间关系的示意图：上面灰色方框表示执行环境，淡黄色框表示函数，右侧灰色框表示函数环境。
+
+```{r}
+h <- function(x) {
+  # 1.
+  a <- 2 # 2.
+  x + a
+}
+y <- h(1) # 3.
+```
+
+![](images/execution.png)
+
+有些方法可以将执行环境保存下来。
+
+第一种就是直接返回：
+
+```{r}
+h2 <- function(x) {
+  a <- x * 2
+  current_env()
+}
+
+e <- h2(x = 10)
+env_print(e)
+```
+
+另一种是将执行环境绑定到某个对象上，例如函数，成为函数环境：
+
+```{r}
+plus <- function(x) {
+  function(y) x + y
+}
+
+plus_one <- plus(1)
+plus_one
+```
+
+![](images/closure.png)
+
+```{r}
+plus_one(2)
+```
+
+![](images/closure-call.png)
+
 ### Namespaces
 
-命名空间规定了R包中的函数如何正确找到自己引用的函数。
+命名空间规定了R包中的函数如何正确找到自己引用的函数。而不会因为前面加载的R包导致引用错误。
+
+例如下面的`sd()`函数：通过命名空间`namespace`指定`var()`函数来自于`stats`包。
 
 ```{r}
 sd
 ```
 
+R包中的函数都绑定一对环境——R包环境与命名空间。
+
+-   R包环境：针对使用者（user），告诉使用者如何引用函数。
+-   命名空间：针对R包自己，告诉R包中的函数如何引用其他函数。
+
+命名空间中的函数名集合包含R包环境中的，那些存在命名空间，但不存在R包环境中的函数，就是R包未导出的函数。
 
 ![](images/namespace-bind.png)
 
+前面说过，每个环境都有一个父环境。同样，每个命名空间环境都有一套相同的父环境：
 
-每个命名空间环境都有一套相同的祖先环境：
-
--   都有一个`import`环境，定义了
-
+-   都有一个`imports`环境，定义了所有被R包使用的函数。R包开发者可以通过`NAMESPACE`文件来定义这个环境。
+-   `imports`环境的父环境是`base`包的命名空间。
+-   `base`包的命名空间的父环境是全局环境`R_GlobalEnv`。
 
 ![](images/namespace-env.png)
 
+最终父环境是全局环境，这一规则由于历史原因存在。按道理将不应该存在这一规则，因为这会导致在命名空间中不存在某个函数时，R会自动搜索全局环境。鉴于此，`R CMD check`会检查这种行为，并警告。
+
+将上述所有环境整合到一起，得到：
+
 ![](images/namespace.png)
 
-当`sd()`函数寻找`var`时，会由包的开发者定义
-
-包和命名空间环境之间没有直接的链接；这种链接是由函数环境定义的。
-
-### Execution environments
-
-
+函数和命名空间环境之间的绑定，是在加载R包时，因为创建了函数，触发创建函数环境导致的。也就是说，R包中函数的函数环境就是命名空间。
 
 ## Call stacks
 
+最后一个特殊的环境时`caller`环境，可以通过`rlang::caller_env()`查看。
+
+```{r}
+caller_env()
+parent.frame()
+```
+
+### Simple call stacks
+
+```{r}
+f <- function(x) {
+  g(x = 2)
+}
+g <- function(x) {
+  h(x = 3)
+}
+h <- function(x) {
+  stop()
+}
+```
+
+```{r}
+#| error: true
+f(x = 1)
+traceback()
+```
+
+```{r}
+h <- function(x) {
+  lobstr::cst()
+}
+f(x = 1)
+```
+
+
+### Lazy evaluation
+
+```{r}
+a <- function(x) b(x)
+b <- function(x) c(x)
+c <- function(x) x
+
+a(f())
+```
+
+### Frames
+
+![](images/calling.png)
+
+### Dynamic scope
+
+
+
+## As data structures
