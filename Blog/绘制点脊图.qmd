@@ -25,7 +25,6 @@ source("_common.R")
 
 最后想到了`ggridges`包中可以分组单独绘制密度图，稍加修改得到最总的绘制结果。
 
-
 ```{r}
 library(ggplot2)
 library(ggridges)

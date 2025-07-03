@@ -722,7 +722,7 @@
     "href": "blog.html",
     "title": "",
     "section": "",
-    "text": "Order By\n       Default\n         \n          Title\n        \n         \n          Date - Oldest\n        \n         \n          Date - Newest\n        \n     \n  \n    \n      \n      \n    \n\n\n\n\n\n\n\n\n\n\nquarto 中R代码块的设置\n\n\n\n\n\n\nquarto\n\n\n\n\n\n\n\n\n\n2025-03-15\n\n\n大番薯本薯\n\n\n\n\n\n\n\n\n\n\n\n\nR 中的面向对象(1)\n\n\n\n\n\n\n面向对象\n\n\n\n\n\n\n\n\n\n2025-03-16\n\n\n大番薯本薯\n\n\n\n\n\n\n\n\n\n\n\n\nData Masking(1)\n\n\n\n\n\n\nrlang\n\n\n\n\n\n\n\n\n\n2025-04-25\n\n\n大番薯本薯\n\n\n\n\n\n\n\n\n\n\n\n\nR 中的 | 与 &\n\n\n\n\n\n\ntriky skill\n\n\n\n\n\n\n\n\n\n2025-04-25\n\n\n大番薯本薯\n\n\n\n\n\n\n\n\n\n\n\n\ncapture.output\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n2025-04-25\n\n\n大番薯本薯\n\n\n\n\n\n\n\n\n\n\n\n\n相关性计算\n\n\n\n\n\n\ntriky skill\n\n\n\n\n\n\n\n\n\n2025-06-27\n\n\n大番薯本薯\n\n\n\n\n\n\nNo matching items\n\n Back to top"
+    "text": "Order By\n       Default\n         \n          Title\n        \n         \n          Date - Oldest\n        \n         \n          Date - Newest\n        \n     \n  \n    \n      \n      \n    \n\n\n\n\n\n\n\n\n\n\nquarto 中R代码块的设置\n\n\n\n\n\n\nquarto\n\n\n\n\n\n\n\n\n\n2025-03-15\n\n\n大番薯本薯\n\n\n\n\n\n\n\n\n\n\n\n\nR 中的面向对象(1)\n\n\n\n\n\n\n面向对象\n\n\n\n\n\n\n\n\n\n2025-03-16\n\n\n大番薯本薯\n\n\n\n\n\n\n\n\n\n\n\n\nData Masking(1)\n\n\n\n\n\n\nrlang\n\n\n\n\n\n\n\n\n\n2025-04-25\n\n\n大番薯本薯\n\n\n\n\n\n\n\n\n\n\n\n\nR 中的 | 与 &\n\n\n\n\n\n\ntriky skill\n\n\n\n\n\n\n\n\n\n2025-04-25\n\n\n大番薯本薯\n\n\n\n\n\n\n\n\n\n\n\n\ncapture.output\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n2025-04-25\n\n\n大番薯本薯\n\n\n\n\n\n\n\n\n\n\n\n\n相关性计算\n\n\n\n\n\n\ntriky skill\n\n\n\n\n\n\n\n\n\n2025-06-27\n\n\n大番薯本薯\n\n\n\n\n\n\n\n\n\n\n\n\n绘制点脊图\n\n\n\n\n\n\nggplot2\n\n\n\n\n\n\n\n\n\n2025-07-03\n\n\n大番薯本薯\n\n\n\n\n\n\nNo matching items\n\n Back to top"
   },
   {
     "objectID": "Books/Advanced R(2e)/4 Subsetting.html",
@@ -1643,5 +1643,12 @@
     "crumbs": [
       "7 Environments"
     ]
+  },
+  {
+    "objectID": "Blog/绘制点脊图.html",
+    "href": "Blog/绘制点脊图.html",
+    "title": "绘制点脊图",
+    "section": "",
+    "text": "最近在绘制气泡图时，发现点太密集了，想再绘制一个核密度图，来展示数据的分布。\n最先考虑的方案是：将geom_density()和geom_point()合并，创建一个新的geom。由于没有创建过自定义的geom，AI生成的结果不易修改，最终放弃。\n最后想到了ggridges包中可以分组单独绘制密度图，稍加修改得到最总的绘制结果。\n\nlibrary(ggplot2)\nlibrary(ggridges)\n\nset.seed(123)\ndf &lt;- data.frame(\n  category = factor(rep(LETTERS[1:3], each = 100)),\n  value = c(rnorm(100, 0), rnorm(100, 1), rnorm(100, 2))\n)\n\n# 调整 density_ridges 的 scale 参数，并设置点的位置\nggplot(df, aes(x = value, y = category)) +\n  geom_density_ridges(\n    aes(fill = category),\n    scale = 0.4, # 控制密度图的高度（较小值会使密度图更扁平）\n    rel_min_height = 0.01 # 设置最小高度以避免尾部过长\n  ) +\n  geom_point(aes(color = category), size = 5, position = position_nudge(y = -0.2))\n\n\n\n\n\n\n\n\n\n\n\n Back to top"
   }
 ]
