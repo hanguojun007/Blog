@@ -1,0 +1,47 @@
+---
+title: "绘制点脊图"
+author: "大番薯本薯"
+date: "2025-07-03"
+date-modified: "2025-07-03"
+draft: false
+categories: [ggplot2]
+execute:
+  warning: false
+  fig-width: 6
+  fig-asp: 0.618
+  out-width: 70%
+  fig-align: center
+---
+
+```{r}
+#| echo: false
+
+source("_common.R")
+```
+
+最近在绘制气泡图时，发现点太密集了，想再绘制一个核密度图，来展示数据的分布。
+
+最先考虑的方案是：将`geom_density()`和`geom_point()`合并，创建一个新的`geom`。由于没有创建过自定义的`geom`，AI生成的结果不易修改，最终放弃。
+
+最后想到了`ggridges`包中可以分组单独绘制密度图，稍加修改得到最总的绘制结果。
+
+
+```{r}
+library(ggplot2)
+library(ggridges)
+
+set.seed(123)
+df <- data.frame(
+  category = factor(rep(LETTERS[1:3], each = 100)),
+  value = c(rnorm(100, 0), rnorm(100, 1), rnorm(100, 2))
+)
+
+# 调整 density_ridges 的 scale 参数，并设置点的位置
+ggplot(df, aes(x = value, y = category)) +
+  geom_density_ridges(
+    aes(fill = category),
+    scale = 0.4, # 控制密度图的高度（较小值会使密度图更扁平）
+    rel_min_height = 0.01 # 设置最小高度以避免尾部过长
+  ) +
+  geom_point(aes(color = category), size = 5, position = position_nudge(y = -0.2))
+```
