@@ -1,7 +1,7 @@
 ---
 title: "7 Environments"
 date: "2025-06-23"
-date-modified: "2025-07-01"
+date-modified: "2025-07-03"
 format: "html"
 execute:
   warning: false
@@ -19,19 +19,19 @@ source("_common.R")
 
 ## Introduction
 
-环境是赋予作用域（scoping）能力的数据结构。本章会详细地介绍环境的数据结构，来提高对于作用域地理解。
+环境(enviroment, Env)是赋予作用域(scoping)能力的数据结构。本章会详细地介绍环境的数据结构，来提高对于作用域的理解。
 
 ### Outline
 
--   7.2节介绍环境地基本属性及如何创建一个自己的环境。
--   7.3节介绍函数于环境的关系。
--   7.4节介绍环境的特殊用法：R包
--   7.5节介绍`caller`环境。
--   7.6节介绍`environment`函数。
+-   7.2节介绍环境的基本属性及如何创建一个自己的环境。
+-   7.3节通过一个模板函数，介绍与环境进行交互的方法。
+-   7.4节介绍4种特殊环境：R包环境，函数环境，函数执行换行，命名空间。
+-   7.5节介绍调用环境（caller）。
+-   7.6节简单讨论如何使用环境这一数据结构来解决一些特定问题。
 
 ### Prerequisites
 
-本章将使用 rlang 函数来处理环境，因为它允许我们关注环境的本质，而不是偶然的细节。
+本章将使用 rlang 中的函数来处理环境。
 
 ```{r}
 library(rlang)
@@ -45,7 +45,7 @@ rlang中的`env_*()`函数被设计用来在工作流中使用。所有的函数
 
 -   要求name唯一。
 -   name不会被排序，即无法使用顺序来提取环境中的变量。
--   总有一个父环境，除了根环境。
+-   赋值`NULL`时，环境会更改变量值，而不是删除变量。
 -   被修改时不会在内存中复制。
 
 ### Basics
@@ -70,7 +70,6 @@ identical(e1, e2)
 ```
 
 ![](images/bindings.png)
-
 
 环境具有引用语义：与大多数R对象不同，当你修改环境时，你是在原地修改它们，而不是创建副本。一个重要的含义是，环境可以自我包含。
 
@@ -120,7 +119,7 @@ parent.env(e2a)
 
 ![](images/parents.png)
 
-每个环境都有父环境，除了空环境（empty environment）。使用`env_parents()`可以查看所有父环境。
+每个环境都有父环境，除了空环境（empty environment）。使用`env_parents()`可以查看所有父环境，空环境是根环境。
 
 ```{r}
 e2c <- env(empty_env(), d = 4, e = 5)
@@ -171,7 +170,7 @@ e3[[1]]
 e3[c("x", "y")]
 ```
 
-变量不存在时，`$`，`[[`会返回`NULL`，`env_get()`会返回错误。`env_get()`设置参数`default`后，可以给定默认值而不报错。
+变量不存在时，`$`，`[[`会返回`NULL`，但`NULL`在环境中有实际意义。 `env_get()`会返回错误，`env_get()`设置参数`default`后，可以给定默认值而不报错。
 
 ```{r}
 #| error: true
@@ -205,7 +204,7 @@ env_unbind(e3, "a")
 env_has(e3, "a")
 ```
 
-需要注意地是：`env_unbind()`不会删除变量，只是解绑变量与值的关系。删除变量是`gc()`的任务。在R base中存在功能与上述类似的函数：`get()`，`assign()`，`exists()`，`rm()`，这些函数被设计用来在当前环境中工作，其他环境中会略显不足。
+需要注意地是：`env_unbind()`不会删除变量，只是解绑变量与值的关系，删除变量是`gc()`的任务。在R base中存在功能与上述类似的函数：`get()`，`assign()`，`exists()`，`rm()`，这些函数被设计用来在当前环境中工作，其他环境中会略显不足。
 
 ### Advanced bindings
 
@@ -213,7 +212,7 @@ env_has(e3, "a")
 
 -   `env_bind_lazy()`可以创建延迟绑定。在首次绑定前会先运行导致延迟的代码，然后再绑定。延迟绑定主要应用于R包中的`autoload()`，预先将数据集加载到内存中。
 
-``` {r}
+```{r}
 env_bind_lazy(current_env(), b = {
   Sys.sleep(1)
   1
@@ -225,7 +224,7 @@ system.time(print(b))
 
 -   `env_bind_active()`可以创建实时绑定，每次重新绑定值。
 
-``` {r}
+```{r}
 env_bind_active(current_env(), z1 = function(val) runif(1))
 
 z1
@@ -283,6 +282,7 @@ e4b
 -   `where("c", e4b)`的结果是`error`。
 
 ```{r}
+#| error: true
 where("a", e4b)
 where("b", e4b)
 where("c", e4b)
@@ -330,9 +330,9 @@ f2 <- function(..., env = caller_env()) {
 
 每次使用`library()`或`require()`时，都会将包环境变成全局环境的父环境，最先加载的包环境是后加载包环境的父环境。
 
-![](images/search-path-2.png)
-
 ![](images/search-path.png)
+
+![](images/search-path-2.png)
 
 这些环境的关系也被称作搜索路径。你可以使用`base::search()`或`rlang::search_envs()`查看搜索路径。搜索路径的最后两个环境是固定的——`Autoloads`和`base`。
 
@@ -472,7 +472,7 @@ R包中的函数都绑定一对环境——R包环境与命名空间。
 
 ## Call stacks
 
-最后一个特殊的环境时`caller`环境，可以通过`rlang::caller_env()`查看。
+最后一个特殊的环境是调用环境，可以通过`rlang::caller_env()`或`base::parent.frame()`查看。所谓调用环境就是调用函数的环境，如果你在函数A中调用函数B，那么B的调用环境就是函数A的函数环境。
 
 ```{r}
 caller_env()
@@ -480,6 +480,8 @@ parent.frame()
 ```
 
 ### Simple call stacks
+
+函数之间的调用，会形成调用栈。下面是一个简单的函数调用栈。
 
 ```{r}
 f <- function(x) {
@@ -493,36 +495,75 @@ h <- function(x) {
 }
 ```
 
+使用`traceback()`可以查看调用栈。
+
 ```{r}
 #| error: true
 f(x = 1)
 traceback()
 ```
 
+除了搭配`stop()` + `traceback()`，也可以使用`lobstr::cst()`直接查看调用栈。二者不同点在于栈的顺序相反。
+
 ```{r}
+#| error: true
 h <- function(x) {
   lobstr::cst()
 }
 f(x = 1)
 ```
 
-
 ### Lazy evaluation
 
+当函数的参数是函数返回值时，会触发延迟评估。调用栈会首先显示外层的调用，再显示内层的调用。
+
 ```{r}
+#| error: true
 a <- function(x) b(x)
-b <- function(x) c(x)
-c <- function(x) x
+b <- function(x) d(x)
+d <- function(x) x
 
 a(f())
 ```
 
 ### Frames
 
+调用栈的每一层都被称为frame，是一种极其重要的内部数据结构，R代码只能访问其中部分数据，篡改frame会导致R崩溃。
+
+每个frame都三个关键点：
+
+-   `expr`：调用的函数表达式，即在终端打印出的信息。
+-   `env`：通常是函数表达式的执行环境。有两个例外：全局环境的frame是全局环境，`eval()`函数中的环境是任意的。
+-   `parent`：调用栈的栈（图中灰色线）。
+
 ![](images/calling.png)
+
+除此，frame还有退出机制`on.exit()`,`return()`等细节。
 
 ### Dynamic scope
 
-
+在调用栈中检索变量的行为被称为动态作用域（**dynamic scope**）。动态作用域主要用于开发有助于交互式数据分析的函数，这是第 20 章讨论的主题之一。
 
 ## As data structures
+
+环境的数据结构可以作为一种参考语义，帮助解决下面三个常见的问题：
+
+-   **避免大型数据的复制**：在环境中，你永远也不会意外地创建副本。但是直接使用环境十分地不方便，推荐在第14章中讲到地R6类。
+
+-   **管理R包的状态**：创建一个额外的环境，在环境中记录状态。
+
+```{r}
+my_env <- new.env(parent = emptyenv())
+my_env$a <- 1
+
+get_a <- function() {
+  my_env$a
+}
+set_a <- function(value) {
+  old <- my_env$a
+  my_env$a <- value
+  invisible(old)
+}
+```
+
+-   **哈希映射** ：环境的数据结构就是一种哈希映射，可以缩短检索时间。
