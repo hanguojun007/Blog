@@ -1,0 +1,115 @@
+---
+title: "8 Conditions.qmd"
+author: "大番薯本薯"
+date: "2025-07-05"
+date-modified: "2025-07-05"
+format: "html"
+fig-width: 4
+fig-height: 4
+fig-align: center
+execute:
+  error: true
+  warning: false
+---
+```{r}
+#| echo: false
+
+source("_common.R")
+```
+
+## Introduction
+
+条件系统（Condition System）包含两部分，一方面是函数内部根据不同情况生成不同等级的信息，另一方面是函数使用者根据返回的信息进行不同的处理。
+
+R 提供了一个基于 Common Lisp 思想的非常强大的条件系统。本章介绍 R 条件系统的主要思想，以及一些实用工具，这些工具将使你的代码更加健壮。
+
+### Outline
+
+-   8.2 节介绍了信号条件的基本工具，并讨论了何时适合使用每种类型。
+-   8.3 节介绍最简单的条件处理工具：像`try()`和`suppressMessages()`这样的函数，它们会吞噬条件并阻止其达到顶层。
+-   8.4 节介绍了条件对象，以及两个基本的条件处理工具：用于错误条件的`tryCatch()`和用于其他一切的`withCallingHandlers()`。
+-   8.5 节展示了如何扩展内置条件对象，以存储条件处理程序可用于做出更明智决策的有用数据。
+-   8.6 节以一系列基于前面章节中提到的低级工具的实际应用程序作为本章的结尾。
+
+### Prerequisites
+
+本章使用rlang包中的状态信号与处理函数。
+
+```{r}
+library(rlang)
+```
+
+## Signalling conditions
+
+R 提供了三种信号条件：errors，warnings，messages。
+
+-   error：最严重，表示函数无法继续执行，必须终止。
+-   warning：次之，表示函数内部某些是错的，但是不影响函数运行。
+-   message：仅用于显示函数内某些动作的状态。
+
+条件系统的信息同时是瞩目的，例如加粗，红色等。
+
+```{r}
+stop("This is what an error looks like")
+
+warning("This is what a warning looks like")
+
+message("This is what a message looks like")
+```
+
+### Errors
+
+base R 通过`stop()`函数抛出错误信息。
+
+```{r}
+f <- function() g()
+g <- function() h()
+h <- function() stop("This is an error!")
+
+f()
+```
+
+`stop()`函数有参数`.call`，控制是否进行调用栈朔源（`traceback()`也可以）。
+
+```{r}
+h <- function() stop("This is an error!", call. = FALSE)
+f()
+```
+
+rlang 包中的`abort()`与`stop()`等价，但其功能更加全面，后面我们会继续介绍它。
+
+```{r}
+h <- function() abort("This is an error!")
+f()
+```
+
+错误信息最好可以指出哪里处了问题，引导用户改进。但是编写好的错误信息很困难，因为错误通常发生在用户对函数有一个有缺陷的心理模型时。作为开发人员，很难想象用户会如何错误地思考你的函数，因此很难编写一条能够引导用户走向正确方向的信息。
+
+### Warnings
+
+警告信息比错误信息弱，它表示程序某些地方出错，但不影响程序正常运行。函数内可以有多条警告信息。
+
+```{r}
+fw <- function() {
+  cat("1\n")
+  warning("W1")
+  cat("2\n")
+  warning("W2")
+  cat("3\n")
+  warning("W3")
+}
+```
+
+与错误信息不同，警告信息默认在程序运行中缓存，结束后显示。
+
+```{r}
+fw()
+```
+
+`options()`可以设置警告信息的行为。
+
+-   `options(warn = 0)`：默认设置。
+-   `options(warn = 1)`：警告信息会立即显示。
+-   `options(warn = 0)`：警告信息视作错误信息。
+
+rlang 提供了类似函数`rlang::warn()`。同样地，`warn
