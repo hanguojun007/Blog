@@ -3,19 +3,31 @@ title: "8 Conditions.qmd"
 author: "大番薯本薯"
 date: "2025-07-05"
 date-modified: "2025-07-05"
+
 format: "html"
 fig-width: 4
 fig-height: 4
 fig-align: center
+
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: "#>"
+    R.options:
+      dplyr.print_min: 6
+      dplyr.print_max: 6
+      pillar.max_footer_lines: 2
+      pillar.min_chars: 15
+      stringr.view_n:6
+      cli.num_colors: 0
+      cli.hyperlink: FALSE
+      pillar.bold: TRUE
+      width: 77
+
 execute:
   error: true
   warning: true
 ---
-```{r}
-#| echo: false
-
-source("_common.R")
-```
 
 ## Introduction
 
@@ -231,7 +243,7 @@ suppressWarnings({
 
 每种情况都有默认行为：错误信息终止程序运行，警告信息在程序运行结束后打印，提示信息即时打印。情况处理系统允许我们暂时压制或补充这些默认行为。
 
-base R 提供了两个函数 `tryCatch()` 和 `withCallingHandlers()` 来处理情况。前者适合处理错误情况，后者适合处理警告和提示情况。
+base R 提供了两个函数 `tryCatch()` 和 `withCallingHandlers()` 来处理情况。前者在情况触发时进入到退出函数（exiting handlers），适合处理错误情况；后者在情况触发时会接着运行（calling handlers），适合处理警告和提示情况。
 
 ```r
 tryCatch(
@@ -254,3 +266,186 @@ withCallingHandlers(
 
 ### Condition objects
 
+每种情况触发时，都会创建一个不被我们看到的`condition`对象，使用`rlang::catch_cnd()`函数可以查看此对象。
+
+```{r}
+# cnd <- stop("An error") # 也可以，但是会显示报错信息
+cnd <- catch_cnd(stop("An error"))
+str(cnd)
+
+conditionMessage(cnd)
+conditionCall(cnd)
+```
+
+`condition`对象包含两个元素：
+
+-   `message`：长度为1的字符串，用来展示信息。可以使用`conditionMessage()`函数查看。
+-   `call`：触发情况的函数调用，如果参数`call. = FALSE`则为`NULL`。可以使用`conditionCall()`函数查看。
+
+自定义的`condition`对象也可以包含其他元素。
+
+该对象同时具有`class`属性，表示对象属于`S3`类。
+
+### Exiting handlers
+
+`tryCatch()`函数通常用在错误情况处理中，能够覆盖默认的错误行为。例如下面的函数在错误时返回`NA`。
+
+```{r}
+f3 <- function(x) {
+  tryCatch(
+    error = function(cnd) NA,
+    log(x)
+  )
+}
+
+f3("x")
+```
+
+如果情况没有被触发或不符合定义的`condition`对象，则会正常运行。
+
+```{r}
+tryCatch(
+  error = function(cnd) 10,
+  1 + 1
+)
+
+tryCatch(
+  error = function(cnd) 10,
+  {
+    message("Hi!")
+    1 + 1
+  }
+)
+```
+
+`tryCatch()`定义的handler称作 **exiting** handler，因为在情况触发后，程序不会再运行触发情况的代码。
+
+```{r}
+tryCatch(
+  message = function(cnd) "There",
+  {
+    message("Here")
+    stop("This code is never run!")
+  }
+)
+```
+
+注意：定义的handler是一个函数，它的运行环境与外面代码的运行环境不用。
+
+handler函数只接受一个参数——`condition`对象，可以提取对象中的信息，这对后续介绍的自定义`condition`对象十分有用。
+
+```{r}
+tryCatch(
+  error = function(cnd) {
+    paste0("--", conditionMessage(cnd), "--")
+  },
+  stop("This is an error")
+)
+```
+
+#### finally
+
+`tryCatch()`函数还有一个`finally`参数，接受一个代码块。其功能类似于`on.exit()`，无论情况是否触发，都会运行这段代码，通常用来清理缓存，删除临时文件或关闭链接等。
+
+```r
+path <- tempfile()
+tryCatch(
+  {
+    writeLines("Hi!", path)
+    # ...
+  },
+  finally = {
+    # always run
+    unlink(path)
+  }
+)
+```
+
+### Calling handlers
+
+`withCallingHandlers()`函数通常用来处理警告或提示情况。与`tryCatch()`不同，代码触发情况后，会执行handler函数，待handler函数运行结束后接着运行。这好像中间插入了一段运行代码。
+
+下面是`tryCatch()`和`withCallingHandlers()`的比较：
+
+```{r}
+tryCatch(
+  message = function(cnd) cat("Caught a message!\n"),
+  {
+    message("Someone there?")
+    message("Why, yes!")
+  }
+)
+
+withCallingHandlers(
+  message = function(cnd) cat("Caught a message!\n"),
+  {
+    message("Someone there?")
+    message("Why, yes!")
+  }
+)
+```
+
+handler函数按顺序执行，不必担心内部情况被捕捉，造成死循环。但是要注意：如果有多个handler函数，某些handler函数的情况可能会被其他handler函数捕获，要考虑handler函数的顺序。
+
+```{r}
+withCallingHandlers(
+  message = function(cnd) message("Second message"),
+  message("First message")
+)
+```
+
+#### muffle
+
+`withCallingHandlers()`中的handler函数也会返回值，但是与`tryCatch()`不同，它的返回值没有被使用，**calling** handler 函数只发挥了它的副作用。其中一个重要副作用就是屏蔽信息。
+
+当情况处理函数发生嵌套时，会自动触发父级handler函数。
+
+```{r}
+# Bubbles all the way up to default handler which generates the message
+withCallingHandlers(
+  message = function(cnd) cat("Level 2\n"),
+  withCallingHandlers(
+    message = function(cnd) cat("Level 1\n"),
+    message("Hello")
+  )
+)
+
+# Bubbles up to tryCatch
+tryCatch(
+  message = function(cnd) cat("Level 2\n"),
+  withCallingHandlers(
+    message = function(cnd) cat("Level 1\n"),
+    message("Hello")
+  )
+)
+```
+
+可以使用`rlang::cnd_muffle()`来屏蔽信息。
+
+```{r}
+# Muffles the default handler which prints the messages
+withCallingHandlers(
+  message = function(cnd) {
+    cat("Level 2\n")
+    cnd_muffle(cnd)
+  },
+  withCallingHandlers(
+    message = function(cnd) cat("Level 1\n"),
+    message("Hello")
+  )
+)
+
+# Muffles level 2 handler and the default handler
+withCallingHandlers(
+  message = function(cnd) cat("Level 2\n"),
+  withCallingHandlers(
+    message = function(cnd) {
+      cat("Level 1\n")
+      cnd_muffle(cnd)
+    },
+    message("Hello")
+  )
+)
+```
+
+## Call stacks
