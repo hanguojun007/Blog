@@ -1,8 +1,8 @@
 ---
-title: "8 Conditions.qmd"
+title: "8 Conditions"
 author: "大番薯本薯"
 date: "2025-07-05"
-date-modified: "2025-07-05"
+date-modified: "2025-07-15"
 
 format: "html"
 fig-width: 4
@@ -18,7 +18,7 @@ knitr:
       dplyr.print_max: 6
       pillar.max_footer_lines: 2
       pillar.min_chars: 15
-      stringr.view_n:6
+      stringr.view_n: 6
       cli.num_colors: 0
       cli.hyperlink: FALSE
       pillar.bold: TRUE
@@ -219,7 +219,7 @@ default <- NULL
 try(default <- read.csv("possibly-bad-input.csv"), silent = TRUE)
 ```
 
-### suppress*
+### suppress\*
 
 ```{r}
 suppressWarnings({
@@ -245,7 +245,7 @@ suppressWarnings({
 
 base R 提供了两个函数 `tryCatch()` 和 `withCallingHandlers()` 来处理情况。前者在情况触发时进入到退出函数（exiting handlers），适合处理错误情况；后者在情况触发时会接着运行（calling handlers），适合处理警告和提示情况。
 
-```r
+``` r
 tryCatch(
   error = function(cnd) {
     # code to run when error is thrown
@@ -347,7 +347,7 @@ tryCatch(
 
 `tryCatch()`函数还有一个`finally`参数，接受一个代码块。其功能类似于`on.exit()`，无论情况是否触发，都会运行这段代码，通常用来清理缓存，删除临时文件或关闭链接等。
 
-```r
+``` r
 path <- tempfile()
 tryCatch(
   {
@@ -689,7 +689,7 @@ try2(stop("Hi"), silent = TRUE)
 
 将上面的模式再进一步改写为：成功返回一个值，失败返回另一个值。
 
-```r
+``` r
 foo <- function(expr) {
   tryCatch(
     error = function(cnd) error_val,
@@ -703,7 +703,7 @@ foo <- function(expr) {
 
 也可以改写为检测是否成功：
 
-```r
+``` r
 does_error <- function(expr) {
   tryCatch(
     error = function(cnd) TRUE,
@@ -717,7 +717,7 @@ does_error <- function(expr) {
 
 还可以捕获`condtion`对象，类似于`rlang::catch_cnd()`：
 
-```r
+``` r
 catch_cnd <- function(expr) {
   tryCatch(
     condition = function(cnd) cnd,
@@ -832,6 +832,8 @@ catch_cnds({
 
 ### No default behaviour
 
+使用`rlang::signal()`函数可以创建不基于`message`,`warning`,`error`的`condition`类。
+
 ```{r}
 log <- function(message, level = c("info", "error", "fatal")) {
   level <- match.arg(level)
@@ -839,9 +841,13 @@ log <- function(message, level = c("info", "error", "fatal")) {
 }
 ```
 
+因为没有默认的handler函数，`log()`函数不会打印任何信息。
+
 ```{r}
 log("This code was run")
 ```
+
+搭配`withCallingHandlers()`函数，可以定义一个`log`的handler函数。
 
 ```{r}
 record_log <- function(expr, path = stdout()) {
@@ -860,6 +866,8 @@ record_log <- function(expr, path = stdout()) {
 record_log(log("Hello"))
 ```
 
+也可以创建一个不显示某个日志级别信息的handler函数。
+
 ```{r}
 ignore_log_levels <- function(expr, levels) {
   withCallingHandlers(
@@ -875,7 +883,8 @@ ignore_log_levels <- function(expr, levels) {
 record_log(ignore_log_levels(log("Hello"), "info"))
 ```
 
+如果你手动创建了一个`condition`对象，并且通过`signalCondition()`触发，`rlang::cnd_muffle()`将不会工作。需要搭配`withRestarts()`。
 
-```{r}
+``` r
 withRestarts(signalCondition(cond), muffle = function() NULL)
 ```
