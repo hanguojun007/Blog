@@ -385,12 +385,24 @@ withCallingHandlers(
 )
 ```
 
-handler函数按顺序执行，不必担心内部情况被捕捉，造成死循环。但是要注意：如果有多个handler函数，某些handler函数的情况可能会被其他handler函数捕获，要考虑handler函数的顺序。
+handler函数按顺序执行，不必担心内部情况被捕捉，造成死循环。
 
 ```{r}
 withCallingHandlers(
   message = function(cnd) message("Second message"),
   message("First message")
+)
+```
+
+但是要注意：如果有多个handler函数，某些handler函数的情况可能会被其他handler函数捕获，要考虑handler函数的顺序。
+
+```{r}
+withCallingHandlers( # (1)
+  message = function(cnd) message("b"),
+  withCallingHandlers( # (2)
+    message = function(cnd) message("a"),
+    message("c")
+  )
 )
 ```
 
@@ -409,6 +421,7 @@ withCallingHandlers(
     message("Hello")
   )
 )
+
 
 # Bubbles up to tryCatch
 tryCatch(
@@ -449,3 +462,420 @@ withCallingHandlers(
 ```
 
 ## Call stacks
+
+exiting handler 函数与 calling handler 函数的调用栈不同。
+
+```{r}
+f <- function() g()
+g <- function() h()
+h <- function() message("!")
+```
+
+**calling handler 是在函数`f()`的调用栈中被调用**
+
+```{r}
+withCallingHandlers(
+  f(),
+  message = function(cnd) {
+    lobstr::cst()
+    cnd_muffle(cnd)
+  }
+)
+```
+
+**exiting handler 是在函数`tryCatch()`的调用栈中被调用**
+
+```{r}
+tryCatch(
+  f(),
+  message = function(cnd) lobstr::cst()
+)
+```
+
+```{r}
+catch_cnd(stop("An error"))
+catch_cnd(abort("An error"))
+```
+
+## Custom conditions
+
+base R 内置的`condition`对象包含的信息有限——`message`和`call`。rlang包提供了额外的函数——`abort()`,`warn()`,`inform()`,`singal()`，帮助自定义`condition`对象。它们的使用方法和base R 中的一样，例如：`rlang::abort()`通过参数`class`添加额外的类和附加信息。
+
+```{r}
+abort(
+  class = "error_not_found",
+  message = "Path `blah.csv` not found",
+  path = "blah.csv"
+)
+```
+
+### Motivation
+
+下面以`base::log()`函数为例，阐述自定义`condition`对象的优势。
+
+当参数不符合标准时，`log()`会返回一个错误。
+
+```{r}
+log(letters)
+log(1:10, base = letters)
+```
+
+上面的报错信息不是很友好，因为它没有具体指出那个参数错误，原因是什么。我们可以进行下面的修改：
+
+```{r}
+my_log <- function(x, base = exp(1)) {
+  if (!is.numeric(x)) {
+    abort(paste0(
+      "`x` must be a numeric vector; not ", typeof(x), "."
+    ))
+  }
+  if (!is.numeric(base)) {
+    abort(paste0(
+      "`base` must be a numeric vector; not ", typeof(base), "."
+    ))
+  }
+
+  base::log(x, base = base)
+}
+```
+
+```{r}
+my_log(letters)
+my_log(1:10, base = letters)
+```
+
+现在的报错信息就显得用户友好了，但是对于开发者来说不够友好，所有关键信息都被储存在了报错信息中，我们无法函数式地编写这类报错。
+
+### Signalling
+
+为了实现上述功能，我们先自定义一个`abort()`函数：函数通过`glue::glue()`将附加信息拼接到错误信息中，然后传递到`abort()`函数中。注意我们定义了一个新`condition`类型——`error_bad_argument`。
+
+```{r}
+abort_bad_argument <- function(arg, must, not = NULL) {
+  msg <- glue::glue("`{arg}` must {must}")
+  if (!is.null(not)) {
+    not <- typeof(not)
+    msg <- glue::glue("{msg}; not {not}.")
+  }
+
+  abort("error_bad_argument",
+    message = msg,
+    arg = arg,
+    must = must,
+    not = not
+  )
+}
+```
+
+不基于rlang包，也可以实现上面的功能：
+
+```{r}
+stop_custom <- function(.subclass, message, call = NULL, ...) {
+  err <- structure(
+    list(
+      message = message,
+      call = call,
+      ...
+    ),
+    class = c(.subclass, "error", "condition")
+  )
+  stop(err)
+}
+
+err <- catch_cnd(
+  stop_custom("error_new", "This is a custom error", x = 10)
+)
+class(err)
+err$x
+```
+
+现在我们可以重新改写`my_log()`：
+
+```{r}
+my_log <- function(x, base = exp(1)) {
+  if (!is.numeric(x)) {
+    abort_bad_argument("x", must = "be numeric", not = x)
+  }
+  if (!is.numeric(base)) {
+    abort_bad_argument("base", must = "be numeric", not = base)
+  }
+
+  base::log(x, base = base)
+}
+```
+
+```{r}
+my_log(letters)
+my_log(1:10, base = letters)
+```
+
+### Handling
+
+自定义的`condition`类十分利于编程。
+
+我们可以使用`testthat`中的函数来检测这个类包含的内容是否符合预期：
+
+```{r}
+library(testthat)
+
+err <- catch_cnd(my_log("a"))
+expect_s3_class(err, "error_bad_argument")
+expect_equal(err$arg, "x")
+expect_equal(err$not, "character")
+```
+
+自定义的类也可以用在handler函数中：
+
+```{r}
+tryCatch(
+  error_bad_argument = function(cnd) "bad_argument",
+  error = function(cnd) "other error",
+  my_log("a")
+)
+```
+
+需要注意的是，因为自定义的类属于子类，所以无法完美的进行类判断。handler函数的顺序会直接影响类的判断结果。
+
+```{r}
+tryCatch(
+  error = function(cnd) "other error",
+  error_bad_argument = function(cnd) "bad_argument",
+  my_log("a")
+)
+```
+
+## Applications
+
+本节介绍一些使用`tryCatch()`和`withCallingHandlers()`的常见模式。
+
+### Failure value
+
+`tryCatch()`的`error`handler函数返回默认值。
+
+```{r}
+fail_with <- function(expr, value = NULL) {
+  tryCatch(
+    error = function(cnd) value,
+    expr
+  )
+}
+
+fail_with(log(10), NA_real_)
+fail_with(log("x"), NA_real_)
+```
+
+创建`base::try()`的类似函数`try2()`。
+
+```{r}
+try2 <- function(expr, silent = FALSE) {
+  tryCatch(
+    error = function(cnd) {
+      msg <- conditionMessage(cnd)
+      if (!silent) {
+        message("Error: ", msg)
+      }
+      structure(msg, class = "try-error")
+    },
+    expr
+  )
+}
+
+try2(1)
+try2(stop("Hi"))
+try2(stop("Hi"), silent = TRUE)
+```
+
+### Success and failure values
+
+将上面的模式再进一步改写为：成功返回一个值，失败返回另一个值。
+
+```r
+foo <- function(expr) {
+  tryCatch(
+    error = function(cnd) error_val,
+    {
+      expr
+      success_val
+    }
+  )
+}
+```
+
+也可以改写为检测是否成功：
+
+```r
+does_error <- function(expr) {
+  tryCatch(
+    error = function(cnd) TRUE,
+    {
+      expr
+      FALSE
+    }
+  )
+}
+```
+
+还可以捕获`condtion`对象，类似于`rlang::catch_cnd()`：
+
+```r
+catch_cnd <- function(expr) {
+  tryCatch(
+    condition = function(cnd) cnd,
+    {
+      expr
+      NULL
+    }
+  )
+}
+```
+
+利用这一模式，我们可以创建一个`try()`变体，同时返回错误对象和结果：
+
+```{r}
+safety <- function(expr) {
+  tryCatch(
+    error = function(cnd) {
+      list(result = NULL, error = cnd)
+    },
+    list(result = expr, error = NULL)
+  )
+}
+
+str(safety(1 + 10))
+str(safety(stop("Error!")))
+```
+
+上面的`safety()`函数类似于`purrr::safely()`，我们将在11章中讨论它。
+
+### Resignal
+
+前面讲到可以通过`options(warn = 2)`将警告转为错误。但这种做法是全局修改，我们可以构造下面的函数，单独将警告转为错误。
+
+```{r}
+warning2error <- function(expr) {
+  withCallingHandlers(
+    warning = function(cnd) abort(conditionMessage(cnd)),
+    expr
+  )
+}
+```
+
+```{r}
+warning2error({
+  x <- 2^4
+  warn("Hello")
+})
+```
+
+这个函数也可以用来查找那些经常出现但有不知道来源的信息，更多信息见22章。
+
+### Record
+
+修改handler函数，实现记录每条信息。
+
+```{r}
+catch_cnds <- function(expr) {
+  conds <- list()
+  add_cond <- function(cnd) {
+    conds <<- append(conds, list(cnd))
+    cnd_muffle(cnd)
+  }
+
+  withCallingHandlers(
+    message = add_cond,
+    warning = add_cond,
+    expr
+  )
+
+  conds
+}
+
+catch_cnds({
+  inform("a")
+  warn("b")
+  inform("c")
+})
+```
+
+如果想捕获错误信息，需要将`withCallingHandlers()`置于`tryCatch()`中。
+
+```{r}
+catch_cnds <- function(expr) {
+  conds <- list()
+  add_cond <- function(cnd) {
+    conds <<- append(conds, list(cnd))
+    cnd_muffle(cnd)
+  }
+
+  tryCatch(
+    error = function(cnd) {
+      conds <<- append(conds, list(cnd))
+    },
+    withCallingHandlers(
+      message = add_cond,
+      warning = add_cond,
+      expr
+    )
+  )
+
+  conds
+}
+
+catch_cnds({
+  inform("a")
+  warn("b")
+  abort("C")
+})
+```
+
+这种模式同时也是`evaluate`包的主要思想，该包用于knitr中。
+
+### No default behaviour
+
+```{r}
+log <- function(message, level = c("info", "error", "fatal")) {
+  level <- match.arg(level)
+  signal(message, "log", level = level)
+}
+```
+
+```{r}
+log("This code was run")
+```
+
+```{r}
+record_log <- function(expr, path = stdout()) {
+  withCallingHandlers(
+    log = function(cnd) {
+      cat(
+        "[", cnd$level, "] ", cnd$message, "\n",
+        sep = "",
+        file = path, append = TRUE
+      )
+    },
+    expr
+  )
+}
+
+record_log(log("Hello"))
+```
+
+```{r}
+ignore_log_levels <- function(expr, levels) {
+  withCallingHandlers(
+    log = function(cnd) {
+      if (cnd$level %in% levels) {
+        cnd_muffle(cnd)
+      }
+    },
+    expr
+  )
+}
+
+record_log(ignore_log_levels(log("Hello"), "info"))
+```
+
+
+```{r}
+withRestarts(signalCondition(cond), muffle = function() NULL)
+```
