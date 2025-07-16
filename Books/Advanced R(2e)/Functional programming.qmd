@@ -1,0 +1,63 @@
+---
+title: "Introduction"
+date: "2025-07-16"
+date-modified: "2025-07-16"
+
+format: "html"
+fig-width: 6
+fig-asp: 0.618
+out-width: 70%
+fig-align: center
+
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: "#>"
+    R.options:
+      dplyr.print_min: 6
+      dplyr.print_max: 6
+      pillar.max_footer_lines: 2
+      pillar.min_chars: 15
+      stringr.view_n: 6
+      cli.num_colors: 0
+      cli.hyperlink: FALSE
+      pillar.bold: TRUE
+      width: 77
+
+execute:
+  warning: true
+  error: true
+---
+
+R 在本质上是一种函数式（functional）语言，呈现出一种以函数为中心的问题解决风格。下面我简要概述函数式语言的技术定义，重点讲解函数式编程风格作，这对于日常的数据分析十分有用。
+
+函数式编程风格倾向于创建能够单独运行，便于自动优化或并行化的函数。它的传统缺点，如性能较差和有时不可预测的内存使用，近年来已经大大减少，可以作为面向对象编程的一种补充。
+
+## Functional programming languages
+
+每种编程语言都有函数，那么是什么使一种编程语言具有函数式呢？原因有很多，但有两个比较重要：
+
+#### **first-class functions**
+
+所谓第一类函数即是具有其他数据结构特点的函数。在R中，它可以被当作是一个向量：可以被赋值给其他变量，储存在list中，传递到其他函数中，被其他函数创建，甚至被函数返回。
+
+#### **pure function**
+
+纯函数需要满足两个条件：
+
+-   输入决定输出：只要输入一样，输出就一样。反例：`runif()`,`read.csv()`,`Sys.time()`。
+-   没有副作用：比如改变全局变量，写入磁盘，在屏幕上显示。反例：`print()`,`write.csv()`,`<-`。
+
+严格将，R 并不是一种函数式编程语言，因为它并不要求你的函数是纯函数。但是当你在编写函数式风格的代码时，你应当尽可能书写纯函数。通常，极端的纯函数或非纯函数更容易理解和改写。
+
+## Functional style
+
+通俗的讲，函数式编程风格就是讲大问题分割为小问题，每个小问题编写一个函数去解决。解决小问题的函数是简单明了且能独立运行的，你需要做的是按照不同需求组合这些函数。
+
+接下来的三个章节分别讨论了三种函数式编程技巧：
+
+-   第9章（**functional**）：使用函数式编程改写for循环，如`lapply()`等函数。
+-   第10章（**function factories**）：输入向量，输出函数。
+-   第11章（**function operators**）：输入函数，输出函数。
+
+![](images/fp.png)
