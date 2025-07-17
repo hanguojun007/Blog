@@ -1,0 +1,110 @@
+---
+title: "9 Functionals"
+date: "2025-07-17"
+date-modified: "2025-07-17"
+
+format: "html"
+fig-width: 6
+fig-asp: 0.618
+out-width: 70%
+fig-align: center
+
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: "#>"
+    R.options:
+      dplyr.print_min: 6
+      dplyr.print_max: 6
+      pillar.max_footer_lines: 2
+      pillar.min_chars: 15
+      stringr.view_n: 6
+      cli.num_colors: 0
+      cli.hyperlink: FALSE
+      pillar.bold: TRUE
+      width: 77
+
+execute:
+  warning: true
+  error: true
+---
+
+## Introduction
+
+泛函是一种以函数作为输入，输出向量的函数。下面是一个简单的泛函函数示例：
+
+```{r}
+randomise <- function(f) f(runif(1e3))
+randomise(mean)
+randomise(mean)
+randomise(sum)
+```
+
+base R 中常见的`apply`家族函数就属于泛函，还有purrr包中的map系列函数，以及一些数学泛函——`integrate()`,`optim()`。
+
+base R 中的for循环优先级：泛函 > for > while > repeat。如果你对for循环很熟悉，转换到泛函时，只需要从for循环中的提取函数，将其作为参数传入符合要求的泛函即可。当你找不到符合要求的泛函时，首先不要硬适配某种泛函，优先使用for循环，当类似的循环逻辑被重复使用时，考虑编写自己的泛函。
+
+### Outline
+
+-   9.2节：介绍`purrr::map()`。
+-   9.3节：讲解如何使用多个简单的泛函组合解决一个复杂问题，并且讨论purrr系列函数的使用风格。
+-   9.4节：介绍18个`purrr::map()`变体。
+-   9.5节：介绍另外一种风格的泛函——`purrr::reduce()`。
+-   9.6节：
+-   9.7节：介绍 base R 中的泛函。
+
+### Prerequisites
+
+本章主要关注purrr包中的泛函，它们有着一致的使用风格，比较容易理解掌握。
+
+```{r}
+library(purrr)
+```
+
+## My first functional: `map()`
+
+`purrr::map()`函数接受一个‘list’或‘atomic vector’（`.x`）和函数（`.f`）作为输入，向量中的每个元素会被应用到函数中，最终返回一个list。即：`map(1:3, f)`等价于`list(f(1), f(2), f(3))`。
+
+```{r}
+triple <- function(x) x * 3
+map(1:3, triple)
+```
+
+![](images/map.png)
+
+这里的map不是“地图”的意思，而是“映射”，意味着‘map’将输入中的向量与结果通过函数进行了映射。
+
+下面是`map()`函数的核心逻辑：创建一个与输入等长的list，for循环处理向量，并把结果赋给list的元素。
+
+```r
+simple_map <- function(x, f, ...) {
+  out <- vector("list", length(x))
+  for (i in seq_along(x)) {
+    out[[i]] <- f(x[[i]], ...)
+  }
+  out
+}
+```
+
+为了提高性能，`map()`函数其实是用C语言实现的。base R 中的`lapply()`函数与`purrr::map()`函数类似，但是`lapply()`函数不提供下面涉及到的额外功能。
+
+### Producing atomic vectors
+
+`map()`函数结果返回一个list，这赋予了其极大的灵活性，因为任何数据类型都可以储存在list中。但是有时返回的数据类型足够简单，我们无需再使用list储存。purrr 提供了四种特殊的变体函数——`map_lgl()`,`map_int()`,`map_dbl()`和`map_chr()`——分别返回布尔、整数、浮点数和字符向量。
+
+```{r}
+# map_chr() always returns a character vector
+map_chr(mtcars, typeof)
+
+# map_lgl() always returns a logical vector
+map_lgl(mtcars, is.double)
+
+# map_int() always returns a integer vector
+n_unique <- function(x) length(unique(x))
+map_int(mtcars, n_unique)
+
+# map_dbl() always returns a double vector
+map_dbl(mtcars, mean)
+```
+
+上面四个函数的要求
