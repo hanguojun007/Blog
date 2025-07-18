@@ -722,7 +722,7 @@
     "href": "blog.html",
     "title": "",
     "section": "",
-    "text": "Order By\n       Default\n         \n          Title\n        \n         \n          Date - Oldest\n        \n         \n          Date - Newest\n        \n     \n  \n    \n      \n      \n    \n\n\n\n\n\n\n\n\n\n\nquarto 中R代码块的设置\n\n\n\n\n\n\nquarto\n\n\n\n\n\n\n\n\n\n2025-03-15\n\n\n大番薯本薯\n\n\n\n\n\n\n\n\n\n\n\n\nR 中的面向对象(1)\n\n\n\n\n\n\n面向对象\n\n\n\n\n\n\n\n\n\n2025-03-16\n\n\n大番薯本薯\n\n\n\n\n\n\n\n\n\n\n\n\nData Masking(1)\n\n\n\n\n\n\nrlang\n\n\n\n\n\n\n\n\n\n2025-04-25\n\n\n大番薯本薯\n\n\n\n\n\n\n\n\n\n\n\n\nR 中的 | 与 &\n\n\n\n\n\n\ntriky skill\n\n\n\n\n\n\n\n\n\n2025-04-25\n\n\n大番薯本薯\n\n\n\n\n\n\n\n\n\n\n\n\ncapture.output\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n2025-04-25\n\n\n大番薯本薯\n\n\n\n\n\n\n\n\n\n\n\n\n相关性计算\n\n\n\n\n\n\ntriky skill\n\n\n\n\n\n\n\n\n\n2025-06-27\n\n\n大番薯本薯\n\n\n\n\n\n\n\n\n\n\n\n\n绘制点脊图\n\n\n\n\n\n\nggplot2\n\n\n\n\n\n\n\n\n\n2025-07-03\n\n\n大番薯本薯\n\n\n\n\n\n\nNo matching items\n\n Back to top"
+    "text": "Order By\n       Default\n         \n          Title\n        \n         \n          Date - Oldest\n        \n         \n          Date - Newest\n        \n     \n  \n    \n      \n      \n    \n\n\n\n\n\n\n\n\n\n\nquarto 中R代码块的设置\n\n\n\n\n\n\nquarto\n\n\n\n\n\n\n\n\n\n2025-03-15\n\n\n大番薯本薯\n\n\n\n\n\n\n\n\n\n\n\n\nR 中的面向对象(1)\n\n\n\n\n\n\n面向对象\n\n\n\n\n\n\n\n\n\n2025-03-16\n\n\n大番薯本薯\n\n\n\n\n\n\n\n\n\n\n\n\nData Masking(1)\n\n\n\n\n\n\nrlang\n\n\ntidyverse\n\n\n\n\n\n\n\n\n\n2025-04-25\n\n\n大番薯本薯\n\n\n\n\n\n\n\n\n\n\n\n\n相关性计算\n\n\n\n\n\n\ntriky skill\n\n\n\n\n\n\n\n\n\n2025-06-27\n\n\n大番薯本薯\n\n\n\n\n\n\n\n\n\n\n\n\n绘制点脊图\n\n\n\n\n\n\nggplot2\n\n\n\n\n\n\n\n\n\n2025-07-03\n\n\n大番薯本薯\n\n\n\n\n\n\nNo matching items\n\n Back to top"
   },
   {
     "objectID": "Books/Advanced R(2e)/4 Subsetting.html",
@@ -954,7 +954,7 @@
     "href": "Blog/Data Masking.html#data-masking-如何工作",
     "title": "Data Masking(1)",
     "section": "data-masking 如何工作？",
-    "text": "data-masking 如何工作？\ndata-masking 依赖R语言的三个特点：\n\ndefuse 变量，如 base R 中的substitute()、rlang 中的enquo(),{{等。\nfirst class environment。环境在R中一个类似list的特殊对象，R 允许将list或dataframe转换为环境。\n\n\nas.environment(mtcars)\n#&gt; &lt;environment: 0x564b1f41a790&gt;\n\n\n评估函数——eval()(base)、eval_tidy()(rlang)。\n\n也即：先将变量名转换为defused状态，变得不可用，然后将dataframe转换为环境，最后在转换后的环境中重新评估变量。"
+    "text": "data-masking 如何工作？\ndata-masking 依赖R语言的三个特点：\n\ndefuse 变量，如 base R 中的substitute()、rlang 中的enquo(),{{等。\nfirst class environment。环境在R中一个类似list的特殊对象，R 允许将list或dataframe转换为环境。\n\n\nas.environment(mtcars)\n#&gt; &lt;environment: 0x000001e1585adca0&gt;\n\n\n评估函数——eval()(base)、eval_tidy()(rlang)。\n\n也即：先将变量名转换为defused状态，变得不可用，然后将dataframe转换为环境，最后在转换后的环境中重新评估变量。"
   },
   {
     "objectID": "Blog/Data Masking.html#data-masking-编程模式",

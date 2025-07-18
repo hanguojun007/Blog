@@ -107,4 +107,96 @@ map_int(mtcars, n_unique)
 map_dbl(mtcars, mean)
 ```
 
-上面四个函数的要求
+所有`map_*()`系列函数要求返回的list长度与输入`.x`长度一致，所以`.f`必须返回一个值的结果，否则报错。
+
+```{r}
+pair <- function(x) c(x, x)
+map_dbl(1:2, pair)
+```
+
+类似的，如果`map_*()`系列函数要求返回特定类型的值时，`.f`必须返回该类型的结果，否则报错。
+
+```{r}
+map_dbl(1:2, as.character)
+```
+
+`map()`函数则没有上面的要求：
+
+```{r}
+map(1:2, pair)
+map(1:2, as.character)
+```
+
+在 base R 中，有两个函数类似`map_*()`系列函数，可以返回原子向量——`sapply()`和`vapply()`。作者不建议使用`sapply()`，因为它会对结果进行整理，导致生成不确定的或向量，或list，或矩阵的结果。相反，`vapply()`通过参数`FUN.VALUE`要求用户指定结果的数据类型。例如`vapply(x, mean, na.rm = TRUE, FUN.VALUE = double(1))`，其等价于`map_dbl(x, mean, na.rm = TRUE)`。
+
+### Anonymous functions and shortcuts
+
+参数`.f`除提供函数名外，更多的是使用匿名函数或`~ f(.x, ...)`形式的公式。`~ f(.x, ...)`在传递其他参数时十分有用，也是最常用的方法。
+
+```{r}
+map_dbl(mtcars, function(x) length(unique(x)))
+map_dbl(mtcars, ~ length(unique(.x)))
+```
+
+`~ f(.x, ...)`形式的背后是 rlang 支持的lambda表达式。表达式会将`map*()`系列函数的参数`.x`解析为`f()`的第一个参数，参数`.y`解析为第二个，依次类推.其他`map*()`系列函数未定义，但函数`f()`需要的参数会通过`...`传递。只有一个参数时可以使用`.`替换`.x`，但是不建议，`.`仅作为向下兼容的牺牲写法，会与其他功能的`.`冲突。
+
+```{r}
+as_mapper(~ length(unique(.x)))
+```
+
+`map_*()`系列函数可以用来批量提取数据中的某个元素（通过`purrr::pluck()`函数）。通过name信息，位置信息，或二者组合来提取数据，这在从JSON数据中提取数据时特别有用。
+
+```{r}
+x <- list(
+  list(-1, x = 1, y = c(2), z = "a"),
+  list(-2, x = 4, y = c(5, 6), z = "b"),
+  list(-3, x = 8, y = c(9, 10, 11))
+)
+
+# Select by name
+map_dbl(x, "x")
+
+# Or by position
+map_dbl(x, 1)
+
+# Or by both
+map_dbl(x, list("y", 1))
+
+# You'll get an error if a component doesn't exist:
+map_chr(x, "z")
+
+# Unless you supply a .default value
+map_chr(x, "z", .default = NA)
+```
+
+### Passing arguments with `...`
+
+诚如上述，你可以使用`...`来传递参数给函数。例如`na.rm = TRUE`，既可以使用`~ f(.x, ...)`形式直接传递参数，也可以通过map函数进行传递。
+
+```{r}
+x <- list(1:5, c(1:10, NA))
+map_dbl(x, ~ mean(.x, na.rm = TRUE))
+map_dbl(x, mean, na.rm = TRUE)
+```
+
+![](images/map-arg.png)
+
+注意：`...`传入的参数不会被map函数解析，而是直接传递。map函数的其他变体会对参数进行解析，详见9.4节。
+
+![](images/map-arg-recycle.png)
+
+::: {.callout-note}
+注意：使用`~ f(.x, ...)`形式直接传递参数和通过map函数进行传递，这两种方式有些许不同。前者会在每次调用函数`f`时都评估参数，后者只会在map函数中评估一次。当参数需要延迟评估时要特别注意，例如下面的参数是有`runif()`随机生成。
+
+```{r}
+plus <- function(x, y) x + y
+
+x <- c(0, 0, 0, 0)
+map_dbl(x, plus, runif(1))
+map_dbl(x, ~ plus(.x, runif(1)))
+```
+:::
+
+### Argument names
+
+

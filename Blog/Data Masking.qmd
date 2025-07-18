@@ -4,7 +4,7 @@ author: "大番薯本薯"
 date: "2025-04-25"
 date-modified: "2025-05-12"
 draft: false
-categories: [rlang]
+categories: [rlang,tidyverse]
 execute:
   warning: false
   fig-width: 6
