@@ -76,7 +76,7 @@ map(1:3, triple)
 
 下面是`map()`函数的核心逻辑：创建一个与输入等长的list，for循环处理向量，并把结果赋给list的元素。
 
-```r
+```{r}
 simple_map <- function(x, f, ...) {
   out <- vector("list", length(x))
   for (i in seq_along(x)) {
@@ -199,4 +199,24 @@ map_dbl(x, ~ plus(.x, runif(1)))
 
 ### Argument names
 
+当使用`...`传递参数时，推荐使用参数名称，而不是位置。例如，`map(x, mean, trim = 0.1)`要比`map(x, mean, 0.1)`更好。
+
+`map()`函数的参数有两个——输入Vector，函数。考虑到尽量不与函数需要的参数名冲突，purrr 包分别使用了`.x`和`.f`作为参数名。如果使用了`x`,`f`（如最前面的`simple_map()`）作为参数名，那么就可能导致错误。此时只能使用匿名函数的形式来避免冲突。
+
+```{r}
+bootstrap_summary <- function(x, f) {
+  f(sample(x, replace = TRUE))
+}
+
+simple_map(mtcars, bootstrap_summary, f = mean)
+
+# simple_map(mtcars, f = function(x) bootstrap_summary(x, mean))
+```
+
+base R 中，也有类似`.x`和`.f`的处理，如：
+
+-   aplly 系函数使用大写字母`X`和`FUN`作为参数名。
+-   `transform()`函数参数前使用前缀`_`。
+
+### Varying another argument
 
