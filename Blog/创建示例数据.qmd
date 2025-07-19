@@ -1,23 +1,35 @@
 ---
 title: "创建示例数据"
 author: "大番薯本薯"
-date: "2025-07-18"
-date-modified: "2025-07-18"
+date: "2025-07-19"
+date-modified: "2025-07-19"
 draft: true
 categories: [purrr,tidyverse]
+
+fig-width: 6
+fig-asp: 0.618
+out-width: 70%
+fig-align: center
+
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: "#>"
+    R.options:
+      dplyr.print_min: 6
+      dplyr.print_max: 6
+      pillar.max_footer_lines: 2
+      pillar.min_chars: 15
+      stringr.view_n: 6
+      cli.num_colors: 0
+      cli.hyperlink: FALSE
+      pillar.bold: TRUE
+      width: 77
+
 execute:
-  warning: false
-  fig-width: 6
-  fig-asp: 0.618
-  out-width: 70%
-  fig-align: center
+  warning: true
+  error: true
 ---
-
-```{r}
-#| echo: false
-
-source("_common.R")
-```
 
 ```{r}
 x <- map(1:3, ~ runif(2))
@@ -28,3 +40,10 @@ str(x)
 #>  $ : num [1:2] 0.0275 0.8249
 
 ```
+
+```{r}
+trials <- map(1:100, ~ t.test(rpois(10, 10), rpois(10, 7)))
+
+```
+
+
