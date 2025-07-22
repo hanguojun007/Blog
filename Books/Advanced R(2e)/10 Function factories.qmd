@@ -1,0 +1,357 @@
+---
+title: "10 Function factories"
+date: "2025-07-22"
+date-modified: "2025-07-22"
+
+format: "html"
+fig-width: 6
+fig-asp: 0.618
+out-width: 70%
+fig-align: center
+
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: "#>"
+    R.options:
+      dplyr.print_min: 6
+      dplyr.print_max: 6
+      pillar.max_footer_lines: 2
+      pillar.min_chars: 15
+      stringr.view_n: 6
+      cli.num_colors: 0
+      cli.hyperlink: FALSE
+      pillar.bold: TRUE
+      width: 77
+
+execute:
+  warning: true
+  error: true
+---
+
+## Introduction
+
+**function factories**就是能创建函数的函数。下面是一个示例：使用`power1()`函数生成`square()`和`cube()`函数。
+
+```{r}
+power1 <- function(exp) {
+  function(x) {
+    x^exp
+  }
+}
+
+square <- power1(2)
+cube <- power1(3)
+```
+
+`square()`和`cube()`函数被称为**manufactured functions**，与**factory functions**相对，这种叫称呼的唯一意义就是区分函数的来源，本质都是函数，没有区别。在本章最后，我们会重点介绍这类函数的意义。
+
+```{r}
+square(3)
+cube(3)
+```
+
+我们以及在之前章节中分别介绍了**factory functions**能够实现的三大基石：
+
+-   6.2.3节，介绍了R中的函数都是第一类函数（first-class functions），使用`<-`直接将`function()`创建的函数赋值给变量。
+
+-   7.4.2节，介绍了在创建函数时会绑定创建时的环境，形成闭包。
+
+-   7.4.4节，介绍了函数每次运行时都会创建临时运行环境——最终变成**manufactory functions**的闭包环境。
+
+本章，我们介绍如何使用上述的三个概念，创建**function factories**，并将其应用到可视化与统计处理中。
+
+在三种主要的泛函编程工具(functionals, function factories, and function operators)中，**function factories**是使用最少的。总的来说，它们并不倾向于降低整体代码复杂度，而是将复杂度分割成更容易理解的块。函数工厂也是非常有用的函数运算符的重要组成部分，你将在第 11 章中学习。
+
+### Outline
+
+-   10.2节：如何工作和使用
+-   10.3节：可视化应用
+-   10.4节：统计应用
+-   10.5节：与泛函联用
+
+### Prerequisites
+
+熟悉6.2.3，7.4.2，7.4.4章节中的内容。
+
+我们使用rlang包检视函数工厂；使用ggplot2，scale包创建可视化示例。
+
+```{r}
+library(rlang)
+library(ggplot2)
+library(scales)
+```
+
+## Factory fundamental
+
+实现**function factory**的关键原理可以表述为：**function factory**的执行环境是**manufactured function**的创建（闭包）环境。本节将通过互动探索和一些图表帮助你更深刻地理解这一原理。
+
+### Environments
+
+首先查看一下`square()`和`cube()`函数。
+
+```{r}
+square
+
+cube
+```
+
+从两个函数的结构中，我们可以清晰地知道参数`x`的值来源，但参数`exp`的值来源呢？仔细观察会发现，两个函数的主体结构是相同的，它们绑定的创建环境不同。
+
+下面我们使用`rlang::env_print()`函数查看各自的创建环境。
+
+```{r}
+env_print(square)
+
+env_print(cube)
+```
+
+从结果中，我们可以看到两个函数的创建函数的父环境都是全局环境，同时都绑定了变量`exp`。
+
+我们使用`rlang::fn_env()`函数查看环境中变量的值。
+
+```{r}
+fn_env(square)$exp
+
+fn_env(cube)$exp
+```
+
+终于，我们找到了`square`和`cube`函数的不同之处：`square`函数的创建环境绑定了变量`exp`的值为`2`，而`cube`函数的创建环境绑定了变量`exp`的值为`3`。
+
+### Diagram conventions
+
+`power1()`，`square()`，`cube()`三个函数的关系可以用下面示意图表示：
+
+![](images/power-full.png)
+
+不考虑过多细节，我们可以抽象出下面两条规律：
+
+-   任何自由浮动的变量都存在于全局变量（**function factory**的创建环境）中。
+
+-   任何没有显式父级的环境都继承自全局环境（**function factory**的创建环境）。
+
+![](images/power-simple.png)
+
+当执行`square(10)`时，我们可以预料到：`x^exp`中的`x`在函数的执行环境中，`exp`在函数的创建环境中。
+
+![](images/power-exec.png)
+
+### Forcing evaluation
+
+在实际使用过程中，`power1()`函数会因为延迟评估造成bug。
+
+```{r}
+x <- 2
+square <- power1(x)
+x <- 3
+```
+
+此时运行`square(2)`，不会返回4，而是8。
+
+```{r}
+square(2)
+```
+
+因为`power1()`中的`x`只有在`square()`被调用时才会被评估。这种由于延迟评估造成的bug，广泛存在任何一个由**function factory**生成的**manufactured function**中。
+
+我们可以使用`force()`函数来强制在创建`square()`时，`power1()`的参数`x`就被评估。
+
+```{r}
+power2 <- function(exp) {
+  force(exp)
+  function(x) {
+    x^exp
+  }
+}
+
+x <- 2
+square <- power2(x)
+x <- 3
+square(2)
+```
+
+在创建任何**function factory**时，对只有被**manufactured function**调用的参数使用`force()`。
+
+### Stateful functions
+
+6.4.3节中讲到，函数每次执行都会创建执行环境，我们无法将函数的第一次调用与第二次调用进行关联。但是**function factory**可以允许我们进行关联，保持每次调用时的状态。
+
+-   **manufactured function**的执行环境是**function factory**的创建环境——唯一且固定。
+
+-   R 中的`<<-`允许修改创建环境中的变量。
+
+下面是一个记录函数被调用次数的状态函数例子：
+
+```{r}
+new_counter <- function() {
+  i <- 0
+
+  function() {
+    i <<- i + 1
+    i
+  }
+}
+
+counter_one <- new_counter()
+counter_two <- new_counter()
+```
+
+`counter_one()`和`counter_two()`创建时，`i`的初始值是0。
+
+![](images/counter-1.png)
+
+每被调用一次，`i`的值都会加1。
+
+```{r}
+counter_one()
+counter_one()
+counter_two()
+```
+
+![](images/counter-2.png)
+
+状态函数最好用于调节。一旦函数开始管理多个变量的状态，最好切换到 R6 面向对象, 我们会在第14章中介绍。
+
+### Garbage collection
+
+因为**manufactured function**的执行环境是唯一且固定的，我们无法在全局环境中删除其创建的变量，当它内部创建了内存消耗过大的变量时，我们要手动定义删除这些变量。
+
+```{r}
+f1 <- function(n) {
+  x <- runif(n)
+  m <- mean(x)
+  function() m
+}
+
+g1 <- f1(1e6)
+lobstr::obj_size(g1)
+
+f2 <- function(n) {
+  x <- runif(n)
+  m <- mean(x)
+  rm(x)
+  function() m
+}
+
+g2 <- f2(1e6)
+lobstr::obj_size(g2)
+```
+
+## Graphical factories
+
+本节我们给出一些应用**function factory**到ggplot2的例子。
+
+### Labelling
+
+scales 包提供了许多**function factory**，例如其中的formatter函数：它根据参数返回一个函数，用来生成不同格式的标签。
+
+```{r}
+y <- c(12345, 123456, 1234567)
+comma_format()(y)
+
+number_format(scale = 1e-3, suffix = " K")(y)
+```
+
+scales 包的这些**function factory**，可以说就是为了ggplot2服务的，例如`laebls`参数需要提供的值就是一个函数，用来对轴标签进行格式化。
+
+```{r}
+df <- data.frame(x = 1, y = y)
+core <- ggplot(df, aes(x, y)) +
+  geom_point() +
+  scale_x_continuous(breaks = 1, labels = NULL) +
+  labs(x = NULL, y = NULL)
+
+core
+core + scale_y_continuous(
+  labels = comma_format()
+)
+core + scale_y_continuous(
+  labels = number_format(scale = 1e-3, suffix = " K")
+)
+core + scale_y_continuous(
+  labels = scientific_format()
+)
+```
+
+### Histogram bins
+
+```{r}
+# construct some sample data with very different numbers in each cell
+sd <- c(1, 5, 15)
+n <- 100
+
+df <- data.frame(x = rnorm(3 * n, sd = sd), sd = rep(sd, n))
+
+ggplot(df, aes(x)) +
+  geom_histogram(binwidth = 2) +
+  facet_wrap(~sd, scales = "free_x") +
+  labs(x = NULL)
+```
+
+```{r}
+binwidth_bins <- function(n) {
+  force(n)
+
+  function(x) {
+    (max(x) - min(x)) / n
+  }
+}
+
+ggplot(df, aes(x)) +
+  geom_histogram(binwidth = binwidth_bins(20)) +
+  facet_wrap(~sd, scales = "free_x") +
+  labs(x = NULL)
+```
+
+```{r}
+base_bins <- function(type) {
+  fun <- switch(type,
+    Sturges = nclass.Sturges,
+    scott = nclass.scott,
+    FD = nclass.FD,
+    stop("Unknown type", call. = FALSE)
+  )
+
+  function(x) {
+    (max(x) - min(x)) / fun(x)
+  }
+}
+
+ggplot(df, aes(x)) +
+  geom_histogram(binwidth = base_bins("FD")) +
+  facet_wrap(~sd, scales = "free_x") +
+  labs(x = NULL)
+```
+
+### ggsave()
+
+```{r}
+plot_dev <- function(ext, dpi = 96) {
+  force(dpi)
+
+  switch(ext,
+    eps = ,
+    ps = function(path, ...) {
+      grDevices::postscript(
+        file = filename, ..., onefile = FALSE,
+        horizontal = FALSE, paper = "special"
+      )
+    },
+    pdf = function(filename, ...) grDevices::pdf(file = filename, ...),
+    svg = function(filename, ...) svglite::svglite(file = filename, ...),
+    emf = ,
+    wmf = function(...) grDevices::win.metafile(...),
+    png = function(...) grDevices::png(..., res = dpi, units = "in"),
+    jpg = ,
+    jpeg = function(...) grDevices::jpeg(..., res = dpi, units = "in"),
+    bmp = function(...) grDevices::bmp(..., res = dpi, units = "in"),
+    tiff = function(...) grDevices::tiff(..., res = dpi, units = "in"),
+    stop("Unknown graphics extension: ", ext, call. = FALSE)
+  )
+}
+
+plot_dev("pdf")
+plot_dev("png")
+```
+
+## Statistical factories
