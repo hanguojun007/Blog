@@ -1,7 +1,7 @@
 ---
 title: "10 Function factories"
 date: "2025-07-22"
-date-modified: "2025-07-22"
+date-modified: "2025-07-24"
 
 format: "html"
 fig-width: 6
@@ -44,14 +44,14 @@ square <- power1(2)
 cube <- power1(3)
 ```
 
-`square()`和`cube()`函数被称为**manufactured functions**，与**factory functions**相对，这种叫称呼的唯一意义就是区分函数的来源，本质都是函数，没有区别。在本章最后，我们会重点介绍这类函数的意义。
+`square()`和`cube()`函数被称为**manufactured functions**，与**factory functions**相对，这种叫称呼的唯一意义就是区分函数的来源，本质都是函数，没有区别。
 
 ```{r}
 square(3)
 cube(3)
 ```
 
-我们以及在之前章节中分别介绍了**factory functions**能够实现的三大基石：
+我们在之前章节中分别介绍了能够实现**factory functions**的三大基石：
 
 -   6.2.3节，介绍了R中的函数都是第一类函数（first-class functions），使用`<-`直接将`function()`创建的函数赋值给变量。
 
@@ -59,22 +59,22 @@ cube(3)
 
 -   7.4.4节，介绍了函数每次运行时都会创建临时运行环境——最终变成**manufactory functions**的闭包环境。
 
-本章，我们介绍如何使用上述的三个概念，创建**function factories**，并将其应用到可视化与统计处理中。
+本章，我们介绍如何使用上述的三个概念，创建**factory functions**，并将其应用到可视化与统计处理中。
 
-在三种主要的泛函编程工具(functionals, function factories, and function operators)中，**function factories**是使用最少的。总的来说，它们并不倾向于降低整体代码复杂度，而是将复杂度分割成更容易理解的块。函数工厂也是非常有用的函数运算符的重要组成部分，你将在第 11 章中学习。
+在三种主要的泛函编程工具(functionals, function factories, and function operators)中，**factory functions**是使用最少的。总的来说，它们并不倾向于降低整体代码复杂度，而是将复杂度分割成更容易理解的块。函数工厂也是非常有用的函数运算符的重要组成部分，你将在第 11 章中学习。
 
 ### Outline
 
--   10.2节：如何工作和使用
--   10.3节：可视化应用
--   10.4节：统计应用
+-   10.2节：**factory functions**如何工作和使用
+-   10.3节：在可视化中的应用
+-   10.4节：在统计分析中的应用
 -   10.5节：与泛函联用
 
 ### Prerequisites
 
 熟悉6.2.3，7.4.2，7.4.4章节中的内容。
 
-我们使用rlang包检视函数工厂；使用ggplot2，scale包创建可视化示例。
+我们使用rlang包检视**factory functions**；使用ggplot2，scale包创建可视化示例。
 
 ```{r}
 library(rlang)
@@ -84,7 +84,7 @@ library(scales)
 
 ## Factory fundamental
 
-实现**function factory**的关键原理可以表述为：**function factory**的执行环境是**manufactured function**的创建（闭包）环境。本节将通过互动探索和一些图表帮助你更深刻地理解这一原理。
+实现**factory functions**的关键原理可以表述为：**factory functions**的执行环境是**manufactured functions**的创建（闭包）环境。本节将通过互动探索和一些图表帮助你更深刻地理解这一原理。
 
 ### Environments
 
@@ -116,7 +116,7 @@ fn_env(square)$exp
 fn_env(cube)$exp
 ```
 
-终于，我们找到了`square`和`cube`函数的不同之处：`square`函数的创建环境绑定了变量`exp`的值为`2`，而`cube`函数的创建环境绑定了变量`exp`的值为`3`。
+终于，我们找到了`square`和`cube`函数的不同之处：`square`函数的创建环境绑定的变量`exp`的值为`2`，而`cube`函数的创建环境绑定的变量`exp`的值为`3`。
 
 ### Diagram conventions
 
@@ -126,9 +126,9 @@ fn_env(cube)$exp
 
 不考虑过多细节，我们可以抽象出下面两条规律：
 
--   任何自由浮动的变量都存在于全局变量（**function factory**的创建环境）中。
+-   任何自由浮动的变量都存在于全局变量（**factory functions**的创建环境）中。
 
--   任何没有显式父级的环境都继承自全局环境（**function factory**的创建环境）。
+-   任何没有显式父级的环境都继承自全局环境（**factory functions**的创建环境）。
 
 ![](images/power-simple.png)
 
@@ -152,7 +152,7 @@ x <- 3
 square(2)
 ```
 
-因为`power1()`中的`x`只有在`square()`被调用时才会被评估。这种由于延迟评估造成的bug，在由**function factory**生成**manufactured function**时广泛存在。
+因为`power1()`中的`x`只有在`square()`被调用时才会被评估。这种由于延迟评估造成的bug，在由**factory functions**生成**manufactured functions**时广泛存在。
 
 我们可以使用`force()`函数来强制在创建`square()`时，`power1()`的参数`x`就被评估。
 
@@ -187,9 +187,9 @@ square(2)
 
 ### Stateful functions
 
-6.4.3节中讲到，函数每次执行都会创建执行环境，我们无法将函数的第一次调用与第二次调用进行关联。但是**function factory**可以允许我们进行关联，保持每次调用时的状态。
+6.4.3节中讲到，函数每次执行都会创建执行环境，我们无法将函数的第一次调用与第二次调用进行关联。但是**factory functions**可以允许我们进行关联，保持每次调用时的状态。
 
--   **manufactured function**的执行环境是**function factory**的创建环境——唯一且固定。
+-   **manufactured functions**的执行环境是**factory functions**的创建环境——唯一且固定。
 
 -   R 中的`<<-`允许修改创建环境中的变量。
 
@@ -227,7 +227,7 @@ counter_two()
 
 ### Garbage collection
 
-因为**manufactured function**的执行环境是唯一且固定的，我们无法在全局环境中删除其创建的变量，当它内部创建了内存消耗过大的变量时，我们要手动定义删除这些变量。
+因为**manufactured functions**的执行环境是唯一且固定的，我们无法在全局环境中删除其创建的变量，当它内部创建了内存消耗过大的变量时，我们要手动定义删除这些变量。
 
 ```{r}
 f1 <- function(n) {
@@ -252,11 +252,11 @@ lobstr::obj_size(g2)
 
 ## Graphical factories
 
-本节我们给出一些应用**function factory**到ggplot2的例子。
+本节我们给出一些应用**factory functions**到ggplot2的例子。
 
 ### Labelling
 
-scales 包提供了许多**function factory**，例如其中的formatter函数：它根据参数返回一个函数，用来生成不同格式的标签。
+scales 包提供了许多**factory functions**，例如其中的formatter函数：它根据参数返回一个函数，用来生成不同格式的标签。
 
 ```{r}
 y <- c(12345, 123456, 1234567)
@@ -265,7 +265,7 @@ comma_format()(y)
 number_format(scale = 1e-3, suffix = " K")(y)
 ```
 
-scales 包的这些**function factory**，可以说就是为了ggplot2服务的，例如`laebls`参数需要提供的值就是一个函数，用来对轴标签进行格式化。
+scales 包的这些**factory functions**，可以说就是为了ggplot2服务的，例如`laebls`参数需要提供的值就是一个函数，用来对轴标签进行格式化。
 
 ```{r}
 df <- data.frame(x = 1, y = y)
@@ -320,7 +320,7 @@ ggplot(df, aes(x)) +
   labs(x = NULL)
 ```
 
-base R 提供了一些计算最优binwidth的函数，例如`nclass.Sturges()`,`nclass.scott()`,`nclass.FD()`，我们可以将其打包成一个**function factory**。
+base R 提供了一些计算最优binwidth的函数，例如`nclass.Sturges()`,`nclass.scott()`,`nclass.FD()`，我们可以将其打包成一个**factory functions**。
 
 ```{r}
 base_bins <- function(type) {
@@ -344,7 +344,7 @@ ggplot(df, aes(x)) +
 
 ### ggsave()
 
-gglot2 中的`ggsave()`函数，其内部使用了一个**function factory**——`plot_dev()`。 其根据文件后缀判断图片类型，选择合适的绘图设备。下面是`plot_dev()`的简化示例：
+gglot2 中的`ggsave()`函数，其内部使用了一个**factory functions**——`plot_dev()`。 其根据文件后缀判断图片类型，选择合适的绘图设备。下面是`plot_dev()`的简化示例：
 
 ```{r}
 plot_dev <- function(ext, dpi = 96) {
@@ -377,7 +377,7 @@ plot_dev("png")
 
 ## Statistical factories
 
-本节介绍一些统计分析中运用到的**factory fcuntion**例子。
+本节介绍一些统计分析中运用到的**factory functions**例子。
 
 ### Box-Cox transformation
 
@@ -395,7 +395,7 @@ boxcox1 <- function(x, lambda) {
 }
 ```
 
-我们将上面的函数转换为一个**function factory**，用其探索不同λ对数据的影响。
+我们将上面的函数转换为一个**factory functions**，用其探索不同λ对数据的影响。
 
 ```{r}
 #| layout-ncol: 2
@@ -422,7 +422,7 @@ ggplot(data.frame(x = c(0.01, 1)), aes(x)) +
 
 ### Bootstrap generators
 
-在统计分析工作中，我们经常需要多个Bootstrap生成器，这个时候构建一个Bootsrap生成器的**function factory**就显得很有必要。
+在统计分析工作中，我们经常需要多个Bootstrap生成器，这个时候构建一个Bootsrap生成器的**factory functions**就显得很有必要。
 
 下面是一个对数据框中某列进行随机抽样的例子：
 
@@ -463,7 +463,7 @@ head(boot_mtcars2())
 
 ### Maximum likelihood estimation
 
-最大似然估计（MLE）用来找到某个分布的参数，使得观测数据在该分布下出现概率最大。下面我们使用泊松分布来演示如何通过**factory function**优雅的实现最大似然估计。
+最大似然估计（MLE）用来找到某个分布的参数，使得观测数据在该分布下出现概率最大。下面我们使用泊松分布来演示如何通过**factory functions**优雅的实现最大似然估计。
 
 泊松分布的公式如下，当已知参数λ后，我们可以计算观察数据$X$的概率：
 
@@ -514,7 +514,7 @@ mle_poisson(20, x1)
 mle_poisson(30, x1)
 ```
 
-虽然我们可以计算已知λ下的观察数据$X$的概率，但是最大似然估计要求我们找到一个λ，使得该概率最大。我们可以构造一个观察数据$X$的**function factory**，并使用`optimize()`函数来寻找最大概率的λ。
+虽然我们可以计算已知λ下的观察数据$X$的概率，但是最大似然估计要求我们找到一个λ，使得该概率最大。我们可以构造一个观察数据$X$的**factory functions**，并使用`optimize()`函数来寻找最大概率的λ。
 
 ```{r}
 mle_poisson2 <- function(x) {
@@ -535,7 +535,7 @@ optimise(mle_poisson, interval = c(0, 100), x = x1, maximum = TRUE)
 
 ## Function factories + functionals
 
-组合使用**factory function**和**functionals**，可以通过map系函数传递参数，构造出一个函数集合。如果你的**factory function**需要多个参数，就使用相应的map系函数。
+组合使用**factory functions**和**functionals**，可以通过map系函数传递参数，构造出一个函数集合。如果你的**factory functions**需要多个参数，就使用相应的map系函数。
 
 ```{r}
 names <- list(
