@@ -1,0 +1,152 @@
+---
+title: "11 Function operators"
+date: "2025-07-25"
+date-modified: "2025-07-25"
+
+format: "html"
+fig-width: 6
+fig-asp: 0.618
+out-width: 70%
+fig-align: center
+
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: "#>"
+    R.options:
+      dplyr.print_min: 6
+      dplyr.print_max: 6
+      pillar.max_footer_lines: 2
+      pillar.min_chars: 15
+      stringr.view_n: 6
+      cli.num_colors: 0
+      cli.hyperlink: FALSE
+      pillar.bold: TRUE
+      width: 77
+
+execute:
+  warning: true
+  error: true
+---
+
+## Introduction
+
+**function operators** 本质也是一个**function factories**，只是规定输入是一个函数。下面的简单示例——`chatty()`函数，接受一个函数`f`，返回一个能打印`f`的输入的函数。
+
+```{r}
+chatty <- function(f) {
+  force(f)
+
+  function(x, ...) {
+    message("Processing ", x)
+    f(x, ...)
+  }
+}
+f <- function(x) x^2
+s <- c(3, 2, 1)
+
+purrr::map_dbl(s, chatty(f))
+```
+
+**function operators** 与 python 中的装饰器相同，遵循开放封闭原则，即对扩展开放，对修改封闭。它允许我们在不修改原有函数代码的情况下增加额外的功能，例如：为函数添加日志、权限检查、参数检查等多种功能，这使得代码更加模块化，易于维护和扩展。
+
+### Outline
+
+-   11.2节介绍一些极其有用的 **function operators** 函数。
+
+-   11.2节介绍如何根据实际问题，创建自己的 **function operators** 函数。
+
+### Prerequisites
+
+**function operators** 本质是**function factories**，请先了解 **function factory** 函数。
+
+本章会用到purrr包中的泛函和其提供的**function operators**函数，及 memoise 包中的`memoise()`函数。
+
+```{r}
+library(purrr)
+library(memoise)
+```
+
+## Existing function operators
+
+### Capturing errors with `purrr::safely()`
+
+在使用`map()`等函数替代for-loop时，我们通常会困扰于：如果函数执行过程中发生错误，那么`map()`函数会直接停止，不会返回已运行成功的部分结果，而for-loop则会保留部分结果。
+
+```{r}
+x <- list(
+  c(0.512, 0.165, 0.717),
+  c(0.064, 0.781, 0.427),
+  "oops",
+  c(0.890, 0.785, 0.495)
+)
+
+out <- rep(NA_real_, length(x))
+for (i in seq_along(x)) {
+  out[[i]] <- sum(x[[i]])
+}
+
+out
+
+map_dbl(x, sum)
+```
+
+上面的例子中，虽然最后会失败，但`out`会保留前面成功的结果，但`map_dbl()`则不会。如果我们使用`safely()`修改`sum()`，就会始终返回一个同时包含正确结果和错误信息的list。仔细观察结果，会进一步发现：for-loop在第三个循环失败后不再允许，map则会继续执行，它返回了第四个结果。
+
+```{r}
+out <- map(x, safely(sum))
+str(out)
+```
+
+那么，`safely()`函数做了什么？打印`safe_sum()`，我们会发现它调用了`capture_error()`函数，捕获错误信息并返回。
+
+```{r}
+safe_sum <- safely(sum)
+safe_sum
+
+str(safe_sum(x[[1]]))
+str(safe_sum(x[[3]]))
+```
+
+由于`safely()`后的函数始终返回一个list——包含两个元素：result，error，我们可以使用`purrr::transpose()`函数，将`map()`的输出结果转置，得到一个包含两个元素的list，第一个元素是正常结果，第二个元素是错误信息。
+
+```{r}
+out <- transpose(map(x, safely(sum)))
+str(out)
+```
+
+现在我们可以轻易地找到结果和错误原因。
+
+```{r}
+ok <- map_lgl(out$error, is.null)
+ok
+
+x[!ok]
+
+out$result[ok]
+```
+
+`safely()`函数的使用场景有很多，我们可以总结出下面的使用规律：
+
+```r
+f <- fcuntion (x, ...) {
+  # do something
+}
+
+out <- transpose(map(x, safely(f)))
+ok <- map_lgl(out$error, is.null)
+
+# which data failed to converge?
+x[!ok]
+
+# which models were successful?
+out$result[ok]
+```
+
+### Other **function operators** in purrr
+
+#### `possibly()`
+
+#### `quietly()`
+
+#### `as_browse()`

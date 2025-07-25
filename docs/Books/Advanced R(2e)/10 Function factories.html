@@ -405,25 +405,25 @@ window.Quarto = {
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>square <span class="ot">&lt;-</span> <span class="fu">power1</span>(<span class="dv">2</span>)</span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>cube <span class="ot">&lt;-</span> <span class="fu">power1</span>(<span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p><code>square()</code>和<code>cube()</code>函数被称为<strong>manufactured functions</strong>，与<strong>factory functions</strong>相对，这种叫称呼的唯一意义就是区分函数的来源，本质都是函数，没有区别。</p>
+<p><code>square()</code>和<code>cube()</code>函数被称为<strong>manufactured functions</strong>，与<strong>function factories</strong>相对，这种叫称呼的唯一意义就是区分函数的来源，本质都是函数，没有区别。</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">square</span>(<span class="dv">3</span>)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 9</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">cube</span>(<span class="dv">3</span>)</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 27</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>我们在之前章节中分别介绍了能够实现<strong>factory functions</strong>的三大基石：</p>
+<p>我们在之前章节中分别介绍了能够实现<strong>function factories</strong>的三大基石：</p>
 <ul>
 <li><p>6.2.3节，介绍了R中的函数都是第一类函数（first-class functions），使用<code>&lt;-</code>直接将<code>function()</code>创建的函数赋值给变量。</p></li>
 <li><p>7.4.2节，介绍了在创建函数时会绑定创建时的环境，形成闭包。</p></li>
-<li><p>7.4.4节，介绍了函数每次运行时都会创建临时运行环境——最终变成<strong>manufactory functions</strong>的闭包环境。</p></li>
+<li><p>7.4.4节，介绍了函数每次运行时都会创建临时运行环境——最终变成<strong>manufunction factories</strong>的闭包环境。</p></li>
 </ul>
-<p>本章，我们介绍如何使用上述的三个概念，创建<strong>factory functions</strong>，并将其应用到可视化与统计处理中。</p>
-<p>在三种主要的泛函编程工具(functionals, function factories, and function operators)中，<strong>factory functions</strong>是使用最少的。总的来说，它们并不倾向于降低整体代码复杂度，而是将复杂度分割成更容易理解的块。函数工厂也是非常有用的函数运算符的重要组成部分，你将在第 11 章中学习。</p>
+<p>本章，我们介绍如何使用上述的三个概念，创建<strong>function factories</strong>，并将其应用到可视化与统计处理中。</p>
+<p>在三种主要的泛函编程工具(functionals, function factories, and function operators)中，<strong>function factories</strong>是使用最少的。总的来说，它们并不倾向于降低整体代码复杂度，而是将复杂度分割成更容易理解的块。函数工厂也是非常有用的函数运算符的重要组成部分，你将在第 11 章中学习。</p>
 <section id="outline" class="level3">
 <h3 class="anchored" data-anchor-id="outline">Outline</h3>
 <ul>
-<li>10.2节：<strong>factory functions</strong>如何工作和使用</li>
+<li>10.2节：<strong>function factories</strong>如何工作和使用</li>
 <li>10.3节：在可视化中的应用</li>
 <li>10.4节：在统计分析中的应用</li>
 <li>10.5节：与泛函联用</li>
@@ -432,7 +432,7 @@ window.Quarto = {
 <section id="prerequisites" class="level3">
 <h3 class="anchored" data-anchor-id="prerequisites">Prerequisites</h3>
 <p>熟悉6.2.3，7.4.2，7.4.4章节中的内容。</p>
-<p>我们使用rlang包检视<strong>factory functions</strong>；使用ggplot2，scale包创建可视化示例。</p>
+<p>我们使用rlang包检视<strong>function factories</strong>；使用ggplot2，scale包创建可视化示例。</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rlang)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
@@ -442,7 +442,7 @@ window.Quarto = {
 </section>
 <section id="factory-fundamental" class="level2">
 <h2 class="anchored" data-anchor-id="factory-fundamental">Factory fundamental</h2>
-<p>实现<strong>factory functions</strong>的关键原理可以表述为：<strong>factory functions</strong>的执行环境是<strong>manufactured functions</strong>的创建（闭包）环境。本节将通过互动探索和一些图表帮助你更深刻地理解这一原理。</p>
+<p>实现<strong>function factories</strong>的关键原理可以表述为：<strong>function factories</strong>的执行环境是<strong>manufactured functions</strong>的创建（闭包）环境。本节将通过互动探索和一些图表帮助你更深刻地理解这一原理。</p>
 <section id="environments" class="level3">
 <h3 class="anchored" data-anchor-id="environments">Environments</h3>
 <p>首先查看一下<code>square()</code>和<code>cube()</code>函数。</p>
@@ -452,27 +452,27 @@ window.Quarto = {
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; {</span></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     x^exp</span></span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; }</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &lt;environment: 0x000002262c5bd7e8&gt;</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &lt;environment: 0x000002bf1dd66e08&gt;</span></span>
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>cube</span>
 <span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; function (x) </span></span>
 <span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; {</span></span>
 <span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     x^exp</span></span>
 <span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; }</span></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &lt;bytecode: 0x000002262c74ab68&gt;</span></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &lt;environment: 0x000002262c6284a8&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &lt;bytecode: 0x000002bf1deac278&gt;</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &lt;environment: 0x000002bf1dd86ac8&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>从两个函数的结构中，我们可以清晰地知道参数<code>x</code>的值来源，但参数<code>exp</code>的值来源呢？仔细观察会发现，两个函数的主体结构是相同的，它们绑定的创建环境不同。</p>
 <p>下面我们使用<code>rlang::env_print()</code>函数查看各自的创建环境。</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">env_print</span>(square)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &lt;environment: 0x000002262c5bd7e8&gt;</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &lt;environment: 0x000002bf1dd66e08&gt;</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Parent: &lt;environment: global&gt;</span></span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Bindings:</span></span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; • exp: &lt;dbl&gt;</span></span>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="fu">env_print</span>(cube)</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &lt;environment: 0x000002262c6284a8&gt;</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &lt;environment: 0x000002bf1dd86ac8&gt;</span></span>
 <span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Parent: &lt;environment: global&gt;</span></span>
 <span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Bindings:</span></span>
 <span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; • exp: &lt;dbl&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -494,8 +494,8 @@ window.Quarto = {
 <p><img src="images/power-full.png" class="img-fluid"></p>
 <p>不考虑过多细节，我们可以抽象出下面两条规律：</p>
 <ul>
-<li><p>任何自由浮动的变量都存在于全局变量（<strong>factory functions</strong>的创建环境）中。</p></li>
-<li><p>任何没有显式父级的环境都继承自全局环境（<strong>factory functions</strong>的创建环境）。</p></li>
+<li><p>任何自由浮动的变量都存在于全局变量（<strong>function factories</strong>的创建环境）中。</p></li>
+<li><p>任何没有显式父级的环境都继承自全局环境（<strong>function factories</strong>的创建环境）。</p></li>
 </ul>
 <p><img src="images/power-simple.png" class="img-fluid"></p>
 <p>当执行<code>square(10)</code>时，我们可以预料到：<code>x^exp</code>中的<code>x</code>在函数的执行环境中，<code>exp</code>在函数的创建环境中。</p>
@@ -514,7 +514,7 @@ window.Quarto = {
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">square</span>(<span class="dv">2</span>)</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 8</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>因为<code>power1()</code>中的<code>x</code>只有在<code>square()</code>被调用时才会被评估。这种由于延迟评估造成的bug，在由<strong>factory functions</strong>生成<strong>manufactured functions</strong>时广泛存在。</p>
+<p>因为<code>power1()</code>中的<code>x</code>只有在<code>square()</code>被调用时才会被评估。这种由于延迟评估造成的bug，在由<strong>function factories</strong>生成<strong>manufactured functions</strong>时广泛存在。</p>
 <p>我们可以使用<code>force()</code>函数来强制在创建<code>square()</code>时，<code>power1()</code>的参数<code>x</code>就被评估。</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>power2 <span class="ot">&lt;-</span> <span class="cf">function</span>(exp) {</span>
@@ -547,9 +547,9 @@ window.Quarto = {
 </section>
 <section id="stateful-functions" class="level3">
 <h3 class="anchored" data-anchor-id="stateful-functions">Stateful functions</h3>
-<p>6.4.3节中讲到，函数每次执行都会创建执行环境，我们无法将函数的第一次调用与第二次调用进行关联。但是<strong>factory functions</strong>可以允许我们进行关联，保持每次调用时的状态。</p>
+<p>6.4.3节中讲到，函数每次执行都会创建执行环境，我们无法将函数的第一次调用与第二次调用进行关联。但是<strong>function factories</strong>可以允许我们进行关联，保持每次调用时的状态。</p>
 <ul>
-<li><p><strong>manufactured functions</strong>的执行环境是<strong>factory functions</strong>的创建环境——唯一且固定。</p></li>
+<li><p><strong>manufactured functions</strong>的执行环境是<strong>function factories</strong>的创建环境——唯一且固定。</p></li>
 <li><p>R 中的<code>&lt;&lt;-</code>允许修改创建环境中的变量。</p></li>
 </ul>
 <p>下面是一个记录函数被调用次数的状态函数例子：</p>
@@ -609,10 +609,10 @@ window.Quarto = {
 </section>
 <section id="graphical-factories" class="level2">
 <h2 class="anchored" data-anchor-id="graphical-factories">Graphical factories</h2>
-<p>本节我们给出一些应用<strong>factory functions</strong>到ggplot2的例子。</p>
+<p>本节我们给出一些应用<strong>function factories</strong>到ggplot2的例子。</p>
 <section id="labelling" class="level3">
 <h3 class="anchored" data-anchor-id="labelling">Labelling</h3>
-<p>scales 包提供了许多<strong>factory functions</strong>，例如其中的formatter函数：它根据参数返回一个函数，用来生成不同格式的标签。</p>
+<p>scales 包提供了许多<strong>function factories</strong>，例如其中的formatter函数：它根据参数返回一个函数，用来生成不同格式的标签。</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">12345</span>, <span class="dv">123456</span>, <span class="dv">1234567</span>)</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">comma_format</span>()(y)</span>
@@ -621,7 +621,7 @@ window.Quarto = {
 <span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="fu">number_format</span>(<span class="at">scale =</span> <span class="fl">1e-3</span>, <span class="at">suffix =</span> <span class="st">" K"</span>)(y)</span>
 <span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "12 K"    "123 K"   "1 235 K"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>scales 包的这些<strong>factory functions</strong>，可以说就是为了ggplot2服务的，例如<code>laebls</code>参数需要提供的值就是一个函数，用来对轴标签进行格式化。</p>
+<p>scales 包的这些<strong>function factories</strong>，可以说就是为了ggplot2服务的，例如<code>laebls</code>参数需要提供的值就是一个函数，用来对轴标签进行格式化。</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">x =</span> <span class="dv">1</span>, <span class="at">y =</span> y)</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>core <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(df, <span class="fu">aes</span>(x, y)) <span class="sc">+</span></span>
@@ -713,7 +713,7 @@ window.Quarto = {
 </div>
 </div>
 </div>
-<p>base R 提供了一些计算最优binwidth的函数，例如<code>nclass.Sturges()</code>,<code>nclass.scott()</code>,<code>nclass.FD()</code>，我们可以将其打包成一个<strong>factory functions</strong>。</p>
+<p>base R 提供了一些计算最优binwidth的函数，例如<code>nclass.Sturges()</code>,<code>nclass.scott()</code>,<code>nclass.FD()</code>，我们可以将其打包成一个<strong>function factories</strong>。</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>base_bins <span class="ot">&lt;-</span> <span class="cf">function</span>(type) {</span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  fun <span class="ot">&lt;-</span> <span class="cf">switch</span>(type,</span>
@@ -743,7 +743,7 @@ window.Quarto = {
 </section>
 <section id="ggsave" class="level3">
 <h3 class="anchored" data-anchor-id="ggsave">ggsave()</h3>
-<p>gglot2 中的<code>ggsave()</code>函数，其内部使用了一个<strong>factory functions</strong>——<code>plot_dev()</code>。 其根据文件后缀判断图片类型，选择合适的绘图设备。下面是<code>plot_dev()</code>的简化示例：</p>
+<p>gglot2 中的<code>ggsave()</code>函数，其内部使用了一个<strong>function factories</strong>——<code>plot_dev()</code>。 其根据文件后缀判断图片类型，选择合适的绘图设备。下面是<code>plot_dev()</code>的简化示例：</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>plot_dev <span class="ot">&lt;-</span> <span class="cf">function</span>(ext, <span class="at">dpi =</span> <span class="dv">96</span>) {</span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">force</span>(dpi)</span>
@@ -772,19 +772,19 @@ window.Quarto = {
 <span id="cb22-25"><a href="#cb22-25" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_dev</span>(<span class="st">"pdf"</span>)</span>
 <span id="cb22-26"><a href="#cb22-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; function (filename, ...) </span></span>
 <span id="cb22-27"><a href="#cb22-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; grDevices::pdf(file = filename, ...)</span></span>
-<span id="cb22-28"><a href="#cb22-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &lt;bytecode: 0x0000022635288f60&gt;</span></span>
-<span id="cb22-29"><a href="#cb22-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &lt;environment: 0x0000022634f27778&gt;</span></span>
+<span id="cb22-28"><a href="#cb22-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &lt;bytecode: 0x000002bf26845b70&gt;</span></span>
+<span id="cb22-29"><a href="#cb22-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &lt;environment: 0x000002bf264bcd30&gt;</span></span>
 <span id="cb22-30"><a href="#cb22-30" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_dev</span>(<span class="st">"png"</span>)</span>
 <span id="cb22-31"><a href="#cb22-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; function (...) </span></span>
 <span id="cb22-32"><a href="#cb22-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; grDevices::png(..., res = dpi, units = "in")</span></span>
-<span id="cb22-33"><a href="#cb22-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &lt;bytecode: 0x000002262deb2c00&gt;</span></span>
-<span id="cb22-34"><a href="#cb22-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &lt;environment: 0x000002262da28960&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb22-33"><a href="#cb22-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &lt;bytecode: 0x000002bf1f72e618&gt;</span></span>
+<span id="cb22-34"><a href="#cb22-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &lt;environment: 0x000002bf1f30c928&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 </section>
 <section id="statistical-factories" class="level2">
 <h2 class="anchored" data-anchor-id="statistical-factories">Statistical factories</h2>
-<p>本节介绍一些统计分析中运用到的<strong>factory functions</strong>例子。</p>
+<p>本节介绍一些统计分析中运用到的<strong>function factories</strong>例子。</p>
 <section id="box-cox-transformation" class="level3">
 <h3 class="anchored" data-anchor-id="box-cox-transformation">Box-Cox transformation</h3>
 <p>Box-Cox变换是一种常用的数据变换方法，用于处理非正态数据正态化。唯一参数是λ，用来控制转换强度。Box-Cox变换可以用下面的函数实现：</p>
@@ -799,7 +799,7 @@ window.Quarto = {
 <span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>  }</span>
 <span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>我们将上面的函数转换为一个<strong>factory functions</strong>，用其探索不同λ对数据的影响。</p>
+<p>我们将上面的函数转换为一个<strong>function factories</strong>，用其探索不同λ对数据的影响。</p>
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>boxcox2 <span class="ot">&lt;-</span> <span class="cf">function</span>(lambda) {</span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (lambda <span class="sc">==</span> <span class="dv">0</span>) {</span>
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">function</span>(x) <span class="fu">log</span>(x)</span>
@@ -832,7 +832,7 @@ window.Quarto = {
 </section>
 <section id="bootstrap-generators" class="level3">
 <h3 class="anchored" data-anchor-id="bootstrap-generators">Bootstrap generators</h3>
-<p>在统计分析工作中，我们经常需要多个Bootstrap生成器，这个时候构建一个Bootsrap生成器的<strong>factory functions</strong>就显得很有必要。</p>
+<p>在统计分析工作中，我们经常需要多个Bootstrap生成器，这个时候构建一个Bootsrap生成器的<strong>function factories</strong>就显得很有必要。</p>
 <p>下面是一个对数据框中某列进行随机抽样的例子：</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>boot_sample <span class="ot">&lt;-</span> <span class="cf">function</span>(df, var) {</span>
@@ -847,9 +847,9 @@ window.Quarto = {
 <span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>boot_mtcars1 <span class="ot">&lt;-</span> <span class="fu">boot_sample</span>(mtcars, <span class="st">"mpg"</span>)</span>
 <span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">boot_mtcars1</span>())</span>
-<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 15.8 15.2 18.1 13.3 21.4 21.4</span></span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 33.9 18.1 33.9 24.4 13.3 26.0</span></span>
 <span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">boot_mtcars1</span>())</span>
-<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 33.9 27.3 14.3 19.7 14.7 17.3</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 22.8 15.2 33.9 21.4 17.8 10.4</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>有时我们需要构建一个根据模型生成随机样本的Bootstrap生成器。</p>
 <div class="cell">
@@ -866,14 +866,14 @@ window.Quarto = {
 <span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>boot_mtcars2 <span class="ot">&lt;-</span> <span class="fu">boot_model</span>(mtcars, mpg <span class="sc">~</span> wt <span class="sc">+</span> disp)</span>
 <span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">boot_mtcars2</span>())</span>
-<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 24.74279 20.28502 24.00932 25.96311 19.24767 16.30660</span></span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 29.69387 22.45676 22.68264 17.29761 14.38976 18.10000</span></span>
 <span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">boot_mtcars2</span>())</span>
-<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 20.68247 24.25868 26.91956 21.01202 13.98078 19.72113</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 25.54030 20.17392 25.23816 19.83821 18.45017 18.10000</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="maximum-likelihood-estimation" class="level3">
 <h3 class="anchored" data-anchor-id="maximum-likelihood-estimation">Maximum likelihood estimation</h3>
-<p>最大似然估计（MLE）用来找到某个分布的参数，使得观测数据在该分布下出现概率最大。下面我们使用泊松分布来演示如何通过<strong>factory functions</strong>优雅的实现最大似然估计。</p>
+<p>最大似然估计（MLE）用来找到某个分布的参数，使得观测数据在该分布下出现概率最大。下面我们使用泊松分布来演示如何通过<strong>function factories</strong>优雅的实现最大似然估计。</p>
 <p>泊松分布的公式如下，当已知参数λ后，我们可以计算观察数据<span class="math inline">\(X\)</span>的概率：</p>
 <p><span class="math display">\[
 P(\lambda,{\bf x})=\prod_{i=1}^{n}\frac{\lambda^{x_{i}}e^{-\lambda}}{x_{i}!}
@@ -916,7 +916,7 @@ P(\lambda,{\bf x})=\prod_{i=1}^{n}\frac{\lambda^{x_{i}}e^{-\lambda}}{x_{i}!}
 <span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a><span class="fu">mle_poisson</span>(<span class="dv">30</span>, x1)</span>
 <span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] -30.98598</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>虽然我们可以计算已知λ下的观察数据<span class="math inline">\(X\)</span>的概率，但是最大似然估计要求我们找到一个λ，使得该概率最大。我们可以构造一个观察数据<span class="math inline">\(X\)</span>的<strong>factory functions</strong>，并使用<code>optimize()</code>函数来寻找最大概率的λ。</p>
+<p>虽然我们可以计算已知λ下的观察数据<span class="math inline">\(X\)</span>的概率，但是最大似然估计要求我们找到一个λ，使得该概率最大。我们可以构造一个观察数据<span class="math inline">\(X\)</span>的<strong>function factories</strong>，并使用<code>optimize()</code>函数来寻找最大概率的λ。</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>mle_poisson2 <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">force</span>(x)</span>
@@ -945,7 +945,7 @@ P(\lambda,{\bf x})=\prod_{i=1}^{n}\frac{\lambda^{x_{i}}e^{-\lambda}}{x_{i}!}
 </section>
 <section id="function-factories-functionals" class="level2">
 <h2 class="anchored" data-anchor-id="function-factories-functionals">Function factories + functionals</h2>
-<p>组合使用<strong>factory functions</strong>和<strong>functionals</strong>，可以通过map系函数传递参数，构造出一个函数集合。如果你的<strong>factory functions</strong>需要多个参数，就使用相应的map系函数。</p>
+<p>组合使用<strong>function factories</strong>和<strong>functionals</strong>，可以通过map系函数传递参数，构造出一个函数集合。如果你的<strong>function factories</strong>需要多个参数，就使用相应的map系函数。</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>names <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
 <span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">square =</span> <span class="dv">2</span>,</span>
@@ -963,8 +963,8 @@ P(\lambda,{\bf x})=\prod_{i=1}^{n}\frac{\lambda^{x_{i}}e^{-\lambda}}{x_{i}!}
 <span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; {</span></span>
 <span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     x^exp</span></span>
 <span id="cb31-16"><a href="#cb31-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; }</span></span>
-<span id="cb31-17"><a href="#cb31-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &lt;bytecode: 0x000002262c74ab68&gt;</span></span>
-<span id="cb31-18"><a href="#cb31-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &lt;environment: 0x0000022632e73f60&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb31-17"><a href="#cb31-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &lt;bytecode: 0x000002bf1deac278&gt;</span></span>
+<span id="cb31-18"><a href="#cb31-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &lt;environment: 0x000002bf24488780&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>在上面的例子中，你需要使用<code>funs$</code>来提取函数，下面有三种方法可以直接使用<code>funs</code>内部的函数：</p>
 <ul>
