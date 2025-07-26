@@ -1,7 +1,7 @@
 ---
 title: "11 Function operators"
 date: "2025-07-25"
-date-modified: "2025-07-25"
+date-modified: "2025-07-26"
 
 format: "html"
 fig-width: 6
@@ -145,8 +145,167 @@ out$result[ok]
 
 ### Other **function operators** in purrr
 
-#### `possibly()`
+-   `possibly()`：当函数报错时，返回默认值，无法判断是否发生了错误。
 
-#### `quietly()`
+-   `quietly()`：返回函数中除报错的其他信息。
 
-#### `as_browse()`
+```{r}
+f <- function() {
+  print("Hi!")
+  message("Hello")
+  warning("How are ya?")
+  "Gidday"
+}
+f()
+
+f_quiet <- quietly(f)
+str(f_quiet())
+```
+
+-   `as_browse()`：当函数报错时，进入断点调试模式。
+
+### Caching computations with `memoise::memoise()`
+
+**memoises** 使函数可以缓存之前的输入和输出。这种缓存能力势必会增加内存的消耗，但却会提高计算的速度。
+
+```{r}
+slow_function <- function(x) {
+  Sys.sleep(1)
+  x * 10 * runif(1)
+}
+system.time(print(slow_function(1)))
+
+system.time(print(slow_function(1)))
+```
+
+上面的例子中，每次运行结果都会不同，但是当被**memoises**后，第一次的结果就会被缓存，当输入相同时，就会直接返回缓存的结果。
+
+```{r}
+fast_function <- memoise::memoise(slow_function)
+system.time(print(fast_function(1)))
+
+system.time(print(fast_function(1)))
+```
+
+另外一个例子是计算斐波那契数列（f(0) = 0, f(1) = 1, f(n) = f(n-1) + f(n-2)）。
+
+```{r}
+fib <- function(n) {
+  if (n < 2) {
+    return(n)
+  }
+  fib(n - 2) + fib(n - 1)
+}
+system.time(fib(23))
+system.time(fib(24))
+```
+
+将`fib()`**memoises**化后， 当计算完`fib2(23)`后，`fib2(24)`的计算速度会非常快。
+
+```{r}
+fib2 <- memoise::memoise(function(n) {
+  if (n < 2) {
+    return(n)
+  }
+  fib2(n - 2) + fib2(n - 1)
+})
+system.time(fib2(23))
+system.time(fib2(24))
+```
+
+在动态规划中（**dynamic programming**），**memoises**更加常见。
+
+但在**memoises**化函数之前，要检查函数是否是**pure**的。
+
+## Case study: Creating your own function operators
+
+下面我们以一个下载数据的例子，介绍如何编写自己的**function operator**。
+
+假设你有很多书籍的网址，你想要下载这些书籍。使用前面章节中的`walk2()`和`file.download()`，可以简单地写为：
+
+```r
+urls <- c(
+  "adv-r" = "https://adv-r.hadley.nz",
+  "r4ds" = "http://r4ds.had.co.nz/"
+  # and many many more
+)
+path <- paste0(tempdir(), names(urls), ".html")
+
+walk2(urls, path, download.file, quiet = TRUE)
+```
+
+上面的方法在`urls`不是很长时，确实足够。但当`urls`变得很长时，你就需要考虑：
+
+-   每本书下载后要添加一个延时，避免阻塞服务器。
+
+-   显示下载的进度。
+
+使用for-loop可以轻松解决上面两点，但for-loop将“下载”、“延时”，“显示进度”三个不同目的的东西都放在了一起，会让代码难于阅读。
+
+```r
+for (i in seq_along(urls)) {
+  Sys.sleep(0.1)
+  if (i %% 10 == 0) cat(".")
+  download.file(urls[[i]], path[[i]], quiet = TRUE)
+}
+```
+
+我们使用**function operators**来将这三个目的分开。首先创建“延时”函数`delay_by()`：接受两个参数——函数，延时时长
+
+```{r}
+delay_by <- function(f, amount) {
+  force(f)
+  force(amount)
+
+  function(...) {
+    Sys.sleep(amount)
+    f(...)
+  }
+}
+system.time(runif(100))
+system.time(delay_by(runif, 0.1)(100))
+```
+
+将`delay_by()`应用到`download.file()`中：
+
+```r
+walk2(urls, path, delay_by(download.file, 0.1), quiet = TRUE)
+```
+
+接下来创建“显示进度”函数`dot_every()`：接受两个参数——函数，显示点的间隔
+
+```{r}
+dot_every <- function(f, n) {
+  force(f)
+  force(n)
+
+  i <- 0
+  function(...) {
+    i <<- i + 1
+    if (i %% n == 0) cat(".")
+    f(...)
+  }
+}
+walk(1:100, runif)
+walk(1:100, dot_every(runif, 10))
+```
+
+将`dot_every()`应用到`download.file()`中：
+
+```r
+walk2(
+  urls, path,
+  dot_every(delay_by(download.file, 0.1), 10),
+  quiet = TRUE
+)
+```
+
+我们也可以使用管道符`%>%`将函数串起来写：
+
+```r
+walk2(
+  urls, path,
+  download.file %>% delay_by(0.1) %>% dot_every(10),
+  quiet = TRUE
+)
+```
