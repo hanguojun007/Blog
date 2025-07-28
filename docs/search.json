@@ -1947,5 +1947,55 @@
     "crumbs": [
       "11 Function operators"
     ]
+  },
+  {
+    "objectID": "Books/Advanced R(2e)/Object-oriented Programming.html",
+    "href": "Books/Advanced R(2e)/Object-oriented Programming.html",
+    "title": "Introduction",
+    "section": "",
+    "text": "与其他语言相比，R 中的面向对象编程（object-oriented programming(OOP)）更有挑战性。\n在R语言中，泛函编程要比面向对象编程更重要，因为在解决复杂问题时，我们通常会使用多个函数而非多个对象进行解决。",
+    "crumbs": [
+      "Introduction"
+    ]
+  },
+  {
+    "objectID": "Books/Advanced R(2e)/Object-oriented Programming.html#outline",
+    "href": "Books/Advanced R(2e)/Object-oriented Programming.html#outline",
+    "title": "Introduction",
+    "section": "Outline",
+    "text": "Outline\n\n12章：介绍所有OOP系统依赖的底层概念——base types。\n13章：介绍S3系统。\n14章：介绍R6系统。\n15章：介绍S4系统。\n16章：对比三种OOP系统。\n\n本书侧重于OOP的“机制”，而非其“高效使用”。",
+    "crumbs": [
+      "Introduction"
+    ]
+  },
+  {
+    "objectID": "Books/Advanced R(2e)/Object-oriented Programming.html#oop-systems",
+    "href": "Books/Advanced R(2e)/Object-oriented Programming.html#oop-systems",
+    "title": "Introduction",
+    "section": "OOP systems",
+    "text": "OOP systems\n使用OOP系统的主要原因是——polymorphism或encapsulation。\n\npolymorphism：函数接受不同类型的输入，根据输入类型执行不同的操作，返回对应的结果。\nencapsulation：封装函数，隐藏数据，只提供接口，接口的调用者不需要知道数据如何实现。\n\npolymorphism在R中的直接感受就是——summary()函数可以根据输入类型的不同，返回不同结果。\n\ndiamonds &lt;- ggplot2::diamonds\n\nsummary(diamonds$carat)\n#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. \n#&gt;  0.2000  0.4000  0.7000  0.7979  1.0400  5.0100\n\nsummary(diamonds$cut)\n#&gt;      Fair      Good Very Good   Premium     Ideal \n#&gt;      1610      4906     12082     13791     21551\n\nOOP系统通过对象的class属性为对象分配其可用的方法method。class属性同时也定义了域field。class之间是层级结构，具有继承inherit关系，当对象所属的class没有定义method时，会向上查找父类中的method，这个过程叫做method dispatch。\n在R中主要有两种类型的OOP系统：\n\nencapsulated OOP：对象包含了数据（field）和方法（method），调用方法类似object.method(arg1, arg2)。\nfunctional OOP：方法属于泛型函数，使用方法与常规函数无异：generic(object, arg2, arg3)。",
+    "crumbs": [
+      "Introduction"
+    ]
+  },
+  {
+    "objectID": "Books/Advanced R(2e)/Object-oriented Programming.html#oop-in-r",
+    "href": "Books/Advanced R(2e)/Object-oriented Programming.html#oop-in-r",
+    "title": "Introduction",
+    "section": "OOP in R",
+    "text": "OOP in R\nbase R 提供了三种OOP系统：S3，S4，RC。\n\nS3系统会使函数返回丰富的结果，具有用户友好的显示和程序员友好的内部功能。S3系统贯穿于整个base R，因此如果你想扩展base R中的函数以处理新的输入类型，掌握S3系统非常重要。\nS4系统由method包支持，是一个严格的系统，会迫使你仔细思考程序设计。它特别适合构建随时间推移不断演变并且接受其他程序员贡献的的大型系统。它也是Bioconductor项目的主要框架。\nRC系统是一种特殊类型的S4系统，它们也可以被原地修改，但不使用R的“复制后修改”语义，实现了封装（encapsulated OOP）。\n\n其他R包提供的OOP系统：\n\nR6包系统提供了一种标准化的方式来规避R中的的“复制后修改”语义。这意味着在使用R6系统时，对象的属性不会被复制，而是直接引用原始数据；将对象传递给其他函数或程序，不需要担心它们被意外地修改。\nR.oo包提供了修改S3对象的机制。\nproto包提供了一种基于prototype思想的OOP系统，是ggplot2包使用的OOP。",
+    "crumbs": [
+      "Introduction"
+    ]
+  },
+  {
+    "objectID": "Books/Advanced R(2e)/Object-oriented Programming.html#sloop",
+    "href": "Books/Advanced R(2e)/Object-oriented Programming.html#sloop",
+    "title": "Introduction",
+    "section": "sloop",
+    "text": "sloop\n后续我们会经常使用到sloop(sail the seas of OOP)包，这个包提供了一些工具来查看R对象。例如sloop::otype()用来查看对象的OOP类型。\n\nlibrary(sloop)\n\notype(1:10)\n#&gt; [1] \"base\"\n\notype(mtcars)\n#&gt; [1] \"S3\"\n\nmle_obj &lt;- stats4::mle(function(x = 1) (x - 2)^2)\notype(mle_obj)\n#&gt; [1] \"S4\"",
+    "crumbs": [
+      "Introduction"
+    ]
   }
 ]

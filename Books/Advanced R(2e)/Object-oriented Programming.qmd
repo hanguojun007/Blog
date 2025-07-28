@@ -1,0 +1,102 @@
+---
+title: "Introduction"
+date: "2025-07-28"
+date-modified: "2025-07-28"
+
+format: "html"
+fig-width: 6
+fig-asp: 0.618
+out-width: 70%
+fig-align: center
+
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: "#>"
+    R.options:
+      dplyr.print_min: 6
+      dplyr.print_max: 6
+      pillar.max_footer_lines: 2
+      pillar.min_chars: 15
+      stringr.view_n: 6
+      cli.num_colors: 0
+      cli.hyperlink: FALSE
+      pillar.bold: TRUE
+      width: 77
+
+execute:
+  warning: true
+  error: true
+---
+
+与其他语言相比，R 中的面向对象编程（**object-oriented programming**(OOP)）更有挑战性。
+
+-   在 R 语言中有多种面向对象编程系统——S3，S4，R6，S7等。本书重点关注 base R 提供的S3，S4与“R6包”提供的R6。
+-   不同人对系统的重要性看法不同，导致组织内重点关注的系统不同。
+-   与其他封装式OOP相比，S3，S4属于泛型函数OOP，你很难将主流的封装式OOP的技巧应用到泛型函数OOP中。
+
+在R语言中，泛函编程要比面向对象编程更重要，因为在解决复杂问题时，我们通常会使用多个函数而非多个对象进行解决。
+
+## Outline
+
+-   12章：介绍所有OOP系统依赖的底层概念——**base types**。
+-   13章：介绍S3系统。
+-   14章：介绍R6系统。
+-   15章：介绍S4系统。
+-   16章：对比三种OOP系统。
+
+本书侧重于OOP的“机制”，而非其“高效使用”。
+
+## OOP systems
+
+使用OOP系统的主要原因是——**polymorphism**或**encapsulation**。
+
+-   **polymorphism**：函数接受不同类型的输入，根据输入类型执行不同的操作，返回对应的结果。
+-   **encapsulation**：封装函数，隐藏数据，只提供接口，接口的调用者不需要知道数据如何实现。
+
+**polymorphism**在R中的直接感受就是——`summary()`函数可以根据输入类型的不同，返回不同结果。
+
+```{r}
+diamonds <- ggplot2::diamonds
+
+summary(diamonds$carat)
+
+summary(diamonds$cut)
+```
+
+OOP系统通过对象的**class**属性为对象分配其可用的方法**method**。class属性同时也定义了域**field**。class之间是层级结构，具有继承**inherit**关系，当对象所属的class没有定义method时，会向上查找父类中的method，这个过程叫做**method dispatch**。
+
+在R中主要有两种类型的OOP系统：
+
+-   encapsulated OOP：对象包含了数据（field）和方法（method），调用方法类似`object.method(arg1, arg2)`。
+
+-   functional OOP：方法属于泛型函数，使用方法与常规函数无异：`generic(object, arg2, arg3)`。
+
+## OOP in R
+
+base R 提供了三种OOP系统：S3，S4，RC。
+
+-   S3系统会使函数返回丰富的结果，具有用户友好的显示和程序员友好的内部功能。S3系统贯穿于整个base R，因此如果你想扩展base R中的函数以处理新的输入类型，掌握S3系统非常重要。
+-   S4系统由**method**包支持，是一个严格的系统，会迫使你仔细思考程序设计。它特别适合构建随时间推移不断演变并且接受其他程序员贡献的的大型系统。它也是Bioconductor项目的主要框架。
+-   RC系统是一种特殊类型的S4系统，它们也可以被原地修改，但不使用R的“复制后修改”语义，实现了封装（encapsulated OOP）。
+
+其他R包提供的OOP系统：
+
+-   R6包系统提供了一种标准化的方式来规避R中的的“复制后修改”语义。这意味着在使用R6系统时，对象的属性不会被复制，而是直接引用原始数据；将对象传递给其他函数或程序，不需要担心它们被意外地修改。
+-   R.oo包提供了修改S3对象的机制。
+-   proto包提供了一种基于**prototype**思想的OOP系统，是ggplot2包使用的OOP。
+
+## sloop
+
+后续我们会经常使用到`sloop`(sail the seas of OOP)包，这个包提供了一些工具来查看R对象。例如`sloop::otype()`用来查看对象的OOP类型。
+
+```{r}
+library(sloop)
+
+otype(1:10)
+
+otype(mtcars)
+
+mle_obj <- stats4::mle(function(x = 1) (x - 2)^2)
+otype(mle_obj)
+```
