@@ -1,36 +1,64 @@
 ---
 title: "13 S3"
-date: "2025-03-20"
-date-modified: "2025-03-20"
+date: "2025-07-29"
+date-modified: "2025-07-29"
+
 format: "html"
+fig-width: 6
+fig-asp: 0.618
+out-width: 70%
+fig-align: center
+
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: "#>"
+    R.options:
+      dplyr.print_min: 6
+      dplyr.print_max: 6
+      pillar.max_footer_lines: 2
+      pillar.min_chars: 15
+      stringr.view_n: 6
+      cli.num_colors: 0
+      cli.hyperlink: FALSE
+      pillar.bold: TRUE
+      width: 77
+
 execute:
-  warning: false
-  fig-width: 6
-  fig-asp: 0.618
-  out-width: 70%
-  fig-align: center
+  warning: true
+  error: true
 ---
-
-```{r}
-#| echo: false
-
-source("_common.R")
-```
 
 ## Introduction
 
-R base 和`stats`包只使用了S3面向对象。S3面向对象不像其他语言中那么严格，R编程人员有很大的自由，这是危险的；为了能更好的使用S3对象，本章会介绍使用S3面向对象时约定的惯例。
+R 的第一个OOP是S3面向对象，它的唯一优点是极其简单——无法再扔掉它的任何一部分来实现OOP。S3面向对象是R `base`和`stats`包中唯一使用的OOP。
+
+S3面向对象不像其他语言中那么严格，赋予了R编程人员很大的自由，这是危险的；为了能更好的使用S3面向对象，本章会介绍使用S3面向对象时约定的惯例。
+
+本章的目的也仅是对S3面向对象如何工作进行介绍，不涉及如何有效地创建新的S3类。
+
+### Outline
+
+-   13.2节：
+-   13.3节：创建新的S3类时的细节，三个函数：**constructor**，**helper**，**validator**
+-   13.4节：介绍类与方法如何工作（方法派发），**method dispatch**
+-   13.5节：S3类的四种主要风格：vector，record，data frame，scalar
+-   13.6节：介绍S3的继承及如何添加类的关系
+-   13.7节：详细介绍类方法分派
+
+### Prerequisites
+
+S3类与`class`属性密不可分，我们需要使用`sloop`包来查看S3类的内部结构。
 
 ```{r}
 library(sloop)
 ```
 
-
 ## Basics
 
-### S3 对象
+### 类，属性
 
-一个S3对象是一个至少有1个`class`属性的base type。例如factor，它的base type是`integer`，除此之外还有`class`属性和`levels`属性。
+S3对象是一个至少有1个`class`属性的base type。例如factor，它的base type是`integer`，除此之外还有`class`属性和`levels`属性。
 
 ```{r}
 f <- factor(c("a", "b", "c"))
@@ -45,9 +73,17 @@ attributes(f)
 unclass(f)
 ```
 
-### 泛型函数
+### 方法
 
-同一个泛型函数对不同S3对象根据对象的`class`属性，具有不同的实现结果。
+S3类方法的实现是基于“泛型函数”的。识别泛型函数的一种简单方法是使用`sloop::ftype()`，如果结果中有"generic"字样，就是泛型函数。
+
+```{r}
+ftype(print)
+ftype(str)
+ftype(unclass)
+```
+
+不同S3对象输入到同一个泛型函数时会产生不同的结果（**多态**）。底层逻辑是，根据对象`class`属性，选择对应的方法。许多R函数属于泛型函数，例如`print()`。
 
 ```{r}
 print(f)
@@ -56,15 +92,7 @@ print(f)
 print(unclass(f))
 ```
 
-识别泛型函数的一种简单方法是使用`sloop::ftype()`，如果结果中有"generic"字样，就是泛型函数。上面的`print()`也是泛型3函数。
-
-```{r}
-ftype(print)
-ftype(str)
-ftype(unclass)
-```
-
-诚如前面所讲，泛型函数作为S3系统实现面向对象的工具，它具有封装的特性，会隐藏对象中的细节。例如常用的`str()`泛型函数，虽然用来查看对象的结构，但你所看到的是对象想让你看到的，没有展示对象内部详细的细节。`POSIXlt`类用来表示时间，使用`str()`只能看到年月日，但其底层是一个`list`。
+我们知道面向对象系统有一个重要特征——“**封装**”。S3系统的泛型函数同样具有封装的特性，会隐藏对象中的细节。例如常用的泛型函数`str()`，虽然是用来查看对象的结构，但你所看到的是对象想让你看到的，没有展示对象内部详细的细节。`POSIXlt`类用来表示时间，使用`str()`只能看到年月日，但其底层是一个`list`。
 
 ```{r}
 time <- strptime(c("2017-01-01", "2020-05-04 03:21"), "%Y-%m-%d")
@@ -73,9 +101,11 @@ str(time)
 str(unclass(time))
 ```
 
-泛型函数就像一个中间人：它定义接口 (即参数) ，然后为不同类找到正确的实现。特定类的实现称为方法（method），泛型通过执行方法分派（method dispatch）来找到该方法。
+### 方法派发
 
-可以使用`sloop::s3_dispatch()`函数查看方法分派的过程。如下面所示，找到了当前print的多个实现`print.factor`和`print.default`，最终选择了`print.factor`。
+泛型函数会为不同类找到正确的实现，类的特定实现称为方法（**method**），泛型函数通过执行方法分派（**method dispatch**）来找到对应的方法。
+
+可以使用`sloop::s3_dispatch()`函数查看方法派发的过程。如下面所示，找到了当前print的多个方法`print.factor`和`print.default`，最终选择了`print.factor`。
 
 ```{r}
 s3_dispatch(print(f))
@@ -99,7 +129,7 @@ s3_get_method(weighted.mean.Date)
 
 ## Classes
 
-S3 面向对象类的正式定义和实例化，只能使用`structure()`或`calss<-()`函数通过设置`class`属性的方法。
+S3面向对象实例化一个对象只能使用`structure()`或`calss<-()`函数——通过设置`class`属性的方法实现。
 
 ```{r}
 # Create and assign class in one step
@@ -120,10 +150,9 @@ inherits(x, "your_class")
 
 classname 可以是任意字符串，但是推荐使用字姆和`_`，杜绝使用`.`。在package中使用class时，推荐加上包名。
 
-S3 面向对象没有类正确性检查，意味着可以随意更改一个对象的类：
+S3面向对象没有类正确性检查，意味着可以随意更改一个对象的类：
 
 ```{r}
-#| error: true
 # Create a linear model
 mod <- lm(log(mpg) ~ log(disp), data = mtcars)
 class(mod)
@@ -144,7 +173,7 @@ print(mod)
 
 ### Constructors
 
-S3 面向对象创建类的随意性，无法保证类的结构统一，构造函数可以很好地避免。构造函数应当遵循下面三条原则：
+S3 面向对象没有提供正式的类定义函数，无法保证类的结构统一，我们需要自行创建一个构造函数，保证类的构造正确。构造函数应当遵循下面三条原则：
 
 -   函数命名为`new_myclass()`样式。
 -   一个参数服务于构成类的base type；每个属性一个参数。
@@ -167,6 +196,8 @@ new_difftime(c(1, 10, 3600), "secs")
 
 new_difftime(52, "weeks")
 ```
+
+构造函数面向的是开发者，这意味着，有些时候，我们可以牺牲一些安全性来换取高效性，例如避免耗时项的检查。
 
 ### Validators
 
@@ -220,7 +251,7 @@ validate_factor(new_factor(0:1, "a"))
 
 ### Helpers
 
-提供一个方便使用者创建类的函数，遵循以下原则：
+为了方便使用者创建类对象，我们需要提供一个帮助函数。其遵循以下原则：
 
 -   函数名和类名相同，`myclass()`。
 -   如果存在constructor和validator，函数要使用它们。
@@ -234,7 +265,6 @@ validate_factor(new_factor(0:1, "a"))
 例如上面的`new_difftime()`对输入十分严格，当输入是integer时报错。
 
 ```{r}
-#| error: true
 new_difftime(1:10)
 ```
 

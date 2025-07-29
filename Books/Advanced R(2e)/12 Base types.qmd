@@ -1,25 +1,39 @@
 ---
 title: "12 Base types"
 date: "2025-03-18"
-date-modified: "2025-03-18"
+date-modified: "2025-07-29"
+
 format: "html"
+fig-width: 6
+fig-asp: 0.618
+out-width: 70%
+fig-align: center
+
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: "#>"
+    R.options:
+      dplyr.print_min: 6
+      dplyr.print_max: 6
+      pillar.max_footer_lines: 2
+      pillar.min_chars: 15
+      stringr.view_n: 6
+      cli.num_colors: 0
+      cli.hyperlink: FALSE
+      pillar.bold: TRUE
+      width: 77
+
 execute:
-  warning: false
-  fig-width: 6
-  fig-asp: 0.618
-  out-width: 70%
-  fig-align: center
+  warning: true
+  error: true
 ---
-
-```{r}
-#| echo: false
-
-source("_common.R")
-```
 
 ## Introduction
 
-在R中，流传着这么一句话——R里的一切都是对象。但此`对象`非彼`对象`，前者指得是来自于S语言的`base object`，同我们研究的面向对象(OO object)不是一回事。
+在R中，流传着这么一句话——R里的一切都是对象。但此“对象”与面向对象（OOP）中的“对象”不同，前者指得是来自于S语言的`base object`，它比面向对象出现得更早。它们的关系可以表示为：
+
+![](images/oo-venn.png)
 
 下面我们介绍如何区分`base object`和`OO object`及所有`base object`的类别。
 
@@ -40,6 +54,14 @@ sloop::otype(mtcars)
 
 attr(1:10, "class")
 attr(mtcars, "class")
+```
+
+从技术上讲，base object 与 OO object 的本质区别就是OO object具有class`属性。但是仅限于`attr()`函数，`class()`函数会返回结果。
+
+```{r}
+x <- 1:10
+class(x)
+sloop::s3_class(x)
 ```
 
 ## Base types
@@ -145,16 +167,16 @@ typeof(expression(1 + 0:9))
 
 -   在S3和S4系统中，"numeric"用作"integer type"或"double type"的缩写：
 
-    ```{r}
+```{r}
 sloop::s3_class(1)
 sloop::s3_class(1L)
-    ```
+```
 
--   `is.numeric()`用来检测那些行为类似number的对象。例如，因子的本质是"integer type"，但是没有number的行为（求取一个因子的均值毫无意义）。
+-   `is.numeric()`用来检测那些行为类似number的对象。例如，因子(factor)的本质是"integer type"，但是没有number的行为（求取一个因子的均值毫无意义）。
 
-    ```{r}
+```{r}
 typeof(factor("x"))
 is.numeric(factor("x"))
-    ```
+```
 
 本书中的`numeric`表示`integer`或`double`。
