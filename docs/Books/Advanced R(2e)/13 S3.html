@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="dcterms.date" content="2025-03-20">
+<meta name="dcterms.date" content="2025-07-29">
 
 <title>13 S3</title>
 <style>
@@ -64,6 +64,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
+<link href="../../Books/Advanced R(2e)/12 Base types.html" rel="prev">
 <script src="../../site_libs/quarto-html/quarto.js"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -104,7 +105,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link rel="stylesheet" href="../../styles.css">
 </head>
 
-<body class="nav-fixed">
+<body class="nav-sidebar floating nav-fixed">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -150,6 +151,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="dropdown-item" href="../../Books/quarto/Project Basics.html">
  <span class="dropdown-text">Quarto</span></a>
   </li>  
+        <li>
+    <a class="dropdown-item" href="../../Books/Js4R/00 Preface.html">
+ <span class="dropdown-text">Js4R</span></a>
+  </li>  
     </ul>
   </li>
   <li class="nav-item">
@@ -172,21 +177,154 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           </div> <!-- /navcollapse -->
       </div> <!-- /container-fluid -->
     </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../Books/Advanced R(2e)/13 S3.html">13 S3</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
 </header>
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">index</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/1 Introduction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1 Introduction</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+ <span class="menu-text">Foundations</span>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/Foundations Introduction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Introduction</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/2 Names and values.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2 Names and values</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/3 Vectors.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">3 Vectors</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/4 Subsetting.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">4 Subsetting</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/5 Control flow.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">5 Control flow</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/6 Functions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">6 Functions</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/7 Environments.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">7 Environments</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/8 Conditions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">8 Conditions</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+ <span class="menu-text">Functional programming</span>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/Functional programming.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Introduction</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/9 Functionals.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">9 Functionals</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/10 Function factories.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">10 Function factories</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/11 Function operators.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">11 Function operators</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+ <span class="menu-text">Object-oriented Programming</span>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/Object-oriented Programming.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Introduction</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/12 Base types.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">12 Base types</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/13 S3.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">13 S3</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active">
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a>
+  <ul class="collapse">
+  <li><a href="#outline" id="toc-outline" class="nav-link" data-scroll-target="#outline">Outline</a></li>
+  <li><a href="#prerequisites" id="toc-prerequisites" class="nav-link" data-scroll-target="#prerequisites">Prerequisites</a></li>
+  </ul></li>
   <li><a href="#basics" id="toc-basics" class="nav-link" data-scroll-target="#basics">Basics</a>
   <ul class="collapse">
-  <li><a href="#s3-对象" id="toc-s3-对象" class="nav-link" data-scroll-target="#s3-对象">S3 对象</a></li>
-  <li><a href="#泛型函数" id="toc-泛型函数" class="nav-link" data-scroll-target="#泛型函数">泛型函数</a></li>
+  <li><a href="#类属性" id="toc-类属性" class="nav-link" data-scroll-target="#类属性">类，属性</a></li>
+  <li><a href="#方法" id="toc-方法" class="nav-link" data-scroll-target="#方法">方法</a></li>
+  <li><a href="#方法派发" id="toc-方法派发" class="nav-link" data-scroll-target="#方法派发">方法派发</a></li>
   </ul></li>
   <li><a href="#classes" id="toc-classes" class="nav-link" data-scroll-target="#classes">Classes</a>
   <ul class="collapse">
@@ -194,8 +332,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#validators" id="toc-validators" class="nav-link" data-scroll-target="#validators">Validators</a></li>
   <li><a href="#helpers" id="toc-helpers" class="nav-link" data-scroll-target="#helpers">Helpers</a></li>
   </ul></li>
-  <li><a href="#generics-and-methods" id="toc-generics-and-methods" class="nav-link" data-scroll-target="#generics-and-methods">Generics and methods</a></li>
-  <li><a href="#函数总结" id="toc-函数总结" class="nav-link" data-scroll-target="#函数总结">函数总结</a></li>
+  <li><a href="#generics-and-methods" id="toc-generics-and-methods" class="nav-link" data-scroll-target="#generics-and-methods">Generics and methods</a>
+  <ul class="collapse">
+  <li><a href="#method-dispath" id="toc-method-dispath" class="nav-link" data-scroll-target="#method-dispath">Method dispath</a></li>
+  <li><a href="#finding-methods" id="toc-finding-methods" class="nav-link" data-scroll-target="#finding-methods">Finding methods</a></li>
+  <li><a href="#creating-methods" id="toc-creating-methods" class="nav-link" data-scroll-target="#creating-methods">Creating methods</a></li>
+  </ul></li>
+  <li><a href="#object-styles" id="toc-object-styles" class="nav-link" data-scroll-target="#object-styles">Object styles</a></li>
+  <li><a href="#inheritance" id="toc-inheritance" class="nav-link" data-scroll-target="#inheritance">Inheritance</a>
+  <ul class="collapse">
+  <li><a href="#nextmethod" id="toc-nextmethod" class="nav-link" data-scroll-target="#nextmethod"><code>NextMethod()</code></a></li>
+  <li><a href="#allowing-subclassing" id="toc-allowing-subclassing" class="nav-link" data-scroll-target="#allowing-subclassing">Allowing subclassing</a></li>
+  </ul></li>
+  <li><a href="#dispatch-details" id="toc-dispatch-details" class="nav-link" data-scroll-target="#dispatch-details">Dispatch details</a>
+  <ul class="collapse">
+  <li><a href="#s3-and-base-types" id="toc-s3-and-base-types" class="nav-link" data-scroll-target="#s3-and-base-types">S3 and base types</a></li>
+  <li><a href="#internal-generics" id="toc-internal-generics" class="nav-link" data-scroll-target="#internal-generics">Internal generics</a></li>
+  <li><a href="#group-generics" id="toc-group-generics" class="nav-link" data-scroll-target="#group-generics">Group generics</a></li>
+  <li><a href="#double-dispatch" id="toc-double-dispatch" class="nav-link" data-scroll-target="#double-dispatch">Double dispatch</a></li>
+  </ul></li>
   </ul>
 </nav>
     <div class="quarto-margin-footer"><div class="margin-footer-item">
@@ -217,14 +372,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">March 20, 2025</p>
+      <p class="date">July 29, 2025</p>
     </div>
   </div>
   
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">March 20, 2025</p>
+      <p class="date-modified">July 29, 2025</p>
     </div>
   </div>
     
@@ -237,16 +392,33 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="introduction" class="level2">
 <h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
-<p>R base 和<code>stats</code>包只使用了S3面向对象。S3面向对象不像其他语言中那么严格，R编程人员有很大的自由，这是危险的；为了能更好的使用S3对象，本章会介绍使用S3面向对象时约定的惯例。</p>
+<p>R 的第一个OOP是S3面向对象，它的唯一优点是极其简单——无法再扔掉它的任何一部分来实现OOP。S3面向对象是R <code>base</code>和<code>stats</code>包中唯一使用的OOP。</p>
+<p>S3面向对象不像其他语言中那么严格，赋予了R编程人员很大的自由，这是危险的；为了能更好的使用S3面向对象，本章会介绍使用S3面向对象时约定的惯例。</p>
+<p>本章的目的也仅是对S3面向对象如何工作进行介绍，不涉及如何有效地创建新的S3类。</p>
+<section id="outline" class="level3">
+<h3 class="anchored" data-anchor-id="outline">Outline</h3>
+<ul>
+<li>13.2节：</li>
+<li>13.3节：创建新的S3类时的细节，三个函数：<strong>constructor</strong>，<strong>helper</strong>，<strong>validator</strong></li>
+<li>13.4节：介绍类与方法如何工作（方法派发），<strong>method dispatch</strong></li>
+<li>13.5节：S3类的四种主要风格：vector，record，data frame，scalar</li>
+<li>13.6节：介绍S3的继承及如何添加类的关系</li>
+<li>13.7节：详细介绍类方法分派</li>
+</ul>
+</section>
+<section id="prerequisites" class="level3">
+<h3 class="anchored" data-anchor-id="prerequisites">Prerequisites</h3>
+<p>S3类与<code>class</code>属性密不可分，我们需要使用<code>sloop</code>包来查看S3类的内部结构。</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sloop)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
+</section>
 <section id="basics" class="level2">
 <h2 class="anchored" data-anchor-id="basics">Basics</h2>
-<section id="s3-对象" class="level3">
-<h3 class="anchored" data-anchor-id="s3-对象">S3 对象</h3>
-<p>一个S3对象是一个至少有1个<code>class</code>属性的base type。例如factor，它的base type是<code>integer</code>，除此之外还有<code>class</code>属性和<code>levels</code>属性。</p>
+<section id="类属性" class="level3">
+<h3 class="anchored" data-anchor-id="类属性">类，属性</h3>
+<p>S3对象是一个至少有1个<code>class</code>属性的base type。例如factor，它的base type是<code>integer</code>，除此之外还有<code>class</code>属性和<code>levels</code>属性。</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>f <span class="ot">&lt;-</span> <span class="fu">factor</span>(<span class="fu">c</span>(<span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"c"</span>))</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -267,30 +439,30 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "a" "b" "c"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="泛型函数" class="level3">
-<h3 class="anchored" data-anchor-id="泛型函数">泛型函数</h3>
-<p>同一个泛型函数对不同S3对象根据对象的<code>class</code>属性，具有不同的实现结果。</p>
+<section id="方法" class="level3">
+<h3 class="anchored" data-anchor-id="方法">方法</h3>
+<p>S3类方法的实现是基于“泛型函数”的。识别泛型函数的一种简单方法是使用<code>sloop::ftype()</code>，如果结果中有”generic”字样，就是泛型函数。</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(f)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] a b c</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Levels: a b c</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co"># stripping class reverts to integer behaviour</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">unclass</span>(f))</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 1 2 3</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; attr(,"levels")</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "a" "b" "c"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ftype</span>(print)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "S3"      "generic"</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ftype</span>(str)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "S3"      "generic"</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ftype</span>(unclass)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "primitive"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>识别泛型函数的一种简单方法是使用<code>sloop::ftype()</code>，如果结果中有”generic”字样，就是泛型函数。上面的<code>print()</code>也是泛型3函数。</p>
+<p>不同S3对象输入到同一个泛型函数时会产生不同的结果（<strong>多态</strong>）。底层逻辑是，根据对象<code>class</code>属性，选择对应的方法。许多R函数属于泛型函数，例如<code>print()</code>。</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ftype</span>(print)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "S3"      "generic"</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ftype</span>(str)</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "S3"      "generic"</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ftype</span>(unclass)</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "primitive"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(f)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] a b c</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Levels: a b c</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co"># stripping class reverts to integer behaviour</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">unclass</span>(f))</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 1 2 3</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; attr(,"levels")</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "a" "b" "c"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>诚如前面所讲，泛型函数作为S3系统实现面向对象的工具，它具有封装的特性，会隐藏对象中的细节。例如常用的<code>str()</code>泛型函数，虽然用来查看对象的结构，但你所看到的是对象想让你看到的，没有展示对象内部详细的细节。<code>POSIXlt</code>类用来表示时间，使用<code>str()</code>只能看到年月日，但其底层是一个<code>list</code>。</p>
+<p>我们知道面向对象系统有一个重要特征——“<strong>封装</strong>”。S3系统的泛型函数同样具有封装的特性，会隐藏对象中的细节。例如常用的泛型函数<code>str()</code>，虽然是用来查看对象的结构，但你所看到的是对象想让你看到的，没有展示对象内部详细的细节。<code>POSIXlt</code>类用来表示时间，使用<code>str()</code>只能看到年月日，但其底层是一个<code>list</code>。</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>time <span class="ot">&lt;-</span> <span class="fu">strptime</span>(<span class="fu">c</span>(<span class="st">"2017-01-01"</span>, <span class="st">"2020-05-04 03:21"</span>), <span class="st">"%Y-%m-%d"</span>)</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(time)</span>
@@ -312,8 +484,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  - attr(*, "tzone")= chr [1:3] "" "UTC" "UTC"</span></span>
 <span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  - attr(*, "balanced")= logi TRUE</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>泛型函数就像一个中间人：它定义接口 (即参数) ，然后为不同类找到正确的实现。特定类的实现称为方法（method），泛型通过执行方法分派（method dispatch）来找到该方法。</p>
-<p>可以使用<code>sloop::s3_dispatch()</code>函数查看方法分派的过程。如下面所示，找到了当前print的多个实现<code>print.factor</code>和<code>print.default</code>，最终选择了<code>print.factor</code>。</p>
+</section>
+<section id="方法派发" class="level3">
+<h3 class="anchored" data-anchor-id="方法派发">方法派发</h3>
+<p>泛型函数会为不同类找到正确的实现，类的特定实现称为方法（<strong>method</strong>），泛型函数通过执行方法分派（<strong>method dispatch</strong>）来找到对应的方法。</p>
+<p>可以使用<code>sloop::s3_dispatch()</code>函数查看方法派发的过程。如下面所示，找到了当前print的多个方法<code>print.factor</code>和<code>print.default</code>，最终选择了<code>print.factor</code>。</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">s3_dispatch</span>(<span class="fu">print</span>(f))</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; =&gt; print.factor</span></span>
@@ -334,14 +509,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="fu">s3_get_method</span>(weighted.mean.Date)</span>
 <span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; function (x, w, ...) </span></span>
 <span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; .Date(weighted.mean(unclass(x), w, ...))</span></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &lt;bytecode: 0x565520473fd8&gt;</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &lt;bytecode: 0x6484d9dc00f8&gt;</span></span>
 <span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &lt;environment: namespace:stats&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 </section>
 <section id="classes" class="level2">
 <h2 class="anchored" data-anchor-id="classes">Classes</h2>
-<p>S3 面向对象类的正式定义和实例化，只能使用<code>structure()</code>或<code>calss&lt;-()</code>函数通过设置<code>class</code>属性的方法。</p>
+<p>S3面向对象实例化一个对象只能使用<code>structure()</code>或<code>calss&lt;-()</code>函数——通过设置<code>class</code>属性的方法实现。</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create and assign class in one step</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">structure</span>(<span class="fu">list</span>(), <span class="at">class =</span> <span class="st">"my_class"</span>)</span>
@@ -360,7 +535,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] FALSE</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>classname 可以是任意字符串，但是推荐使用字姆和<code>_</code>，杜绝使用<code>.</code>。在package中使用class时，推荐加上包名。</p>
-<p>S3 面向对象没有类正确性检查，意味着可以随意更改一个对象的类：</p>
+<p>S3面向对象没有类正确性检查，意味着可以随意更改一个对象的类：</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a linear model</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>mod <span class="ot">&lt;-</span> <span class="fu">lm</span>(<span class="fu">log</span>(mpg) <span class="sc">~</span> <span class="fu">log</span>(disp), <span class="at">data =</span> mtcars)</span>
@@ -390,7 +565,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ul>
 <section id="constructors" class="level3">
 <h3 class="anchored" data-anchor-id="constructors">Constructors</h3>
-<p>S3 面向对象创建类的随意性，无法保证类的结构统一，构造函数可以很好地避免。构造函数应当遵循下面三条原则：</p>
+<p>S3 面向对象没有提供正式的类定义函数，无法保证类的结构统一，我们需要自行创建一个构造函数，保证类的构造正确。构造函数应当遵循下面三条原则：</p>
 <ul>
 <li>函数命名为<code>new_myclass()</code>样式。</li>
 <li>一个参数服务于构成类的base type；每个属性一个参数。</li>
@@ -415,6 +590,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a><span class="fu">new_difftime</span>(<span class="dv">52</span>, <span class="st">"weeks"</span>)</span>
 <span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Time difference of 52 weeks</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<p>构造函数面向的是开发者，这意味着，有些时候，我们可以牺牲一些安全性来换取高效性，例如避免耗时项的检查。</p>
 </section>
 <section id="validators" class="level3">
 <h3 class="anchored" data-anchor-id="validators">Validators</h3>
@@ -467,7 +643,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="helpers" class="level3">
 <h3 class="anchored" data-anchor-id="helpers">Helpers</h3>
-<p>提供一个方便使用者创建类的函数，遵循以下原则：</p>
+<p>为了方便使用者创建类对象，我们需要提供一个帮助函数。其遵循以下原则：</p>
 <ul>
 <li>函数名和类名相同，<code>myclass()</code>。</li>
 <li>如果存在constructor和validator，函数要使用它们。</li>
@@ -530,397 +706,455 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="generics-and-methods" class="level2">
 <h2 class="anchored" data-anchor-id="generics-and-methods">Generics and methods</h2>
-<p>如上所述，S3系统的泛函会执行方法分派，该过程由<code>UseMethod()</code>函数实现。该函数有两个参数：</p>
+<p>如上所述，S3系统的泛型函数会执行方法分派——找到类能使用的方法，该过程由<code>UseMethod()</code>函数实现。<code>UseMethod()</code>函数有两个参数：</p>
 <ul>
-<li>generic：字符串类型的泛函名称。</li>
+<li>generic：字符串类型的泛型函数名称。</li>
 <li>object：要分派的对象。</li>
 </ul>
+<p>通常只需要第一个参数，例如<code>mean()</code>:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">structure</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, <span class="at">class =</span> <span class="st">"test"</span>)</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">t</span>(x)</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;      [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9] [,10]</span></span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1,]    1    2    3    4    5    6    7    8    9    10</span></span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; attr(,"class")</span></span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "test"</span></span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>t</span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; function (x) </span></span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; UseMethod("t")</span></span>
-<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &lt;bytecode: 0x565520c999c8&gt;</span></span>
-<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &lt;environment: namespace:base&gt;</span></span>
-<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>t.test</span>
-<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; function (x, ...) </span></span>
-<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; UseMethod("t.test")</span></span>
-<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &lt;bytecode: 0x56551ca39718&gt;</span></span>
-<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &lt;environment: namespace:stats&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>mean</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; function (x, ...) </span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; UseMethod("mean")</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &lt;bytecode: 0x6484dae5ad88&gt;</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &lt;environment: namespace:base&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<p>创建自己的泛型函数，在创建时，泛型函数的参数不需要传递到<code>UseMethod()</code>中。</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>my_new_generic <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">UseMethod</span>(<span class="st">"my_new_generic"</span>)</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>泛型函数内不要添加额外的处理逻辑，这会导致不可预的意外，例如下面的泛型函数<code>g()</code>，你无法修改变量<code>y</code>的值。</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>generic2 <span class="ot">&lt;-</span> <span class="cf">function</span>(x) <span class="fu">UseMethod</span>(<span class="st">"generic2"</span>)</span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>generic2.a1 <span class="ot">&lt;-</span> <span class="cf">function</span>(x) <span class="st">"a1"</span></span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="co"># generic2.a2 &lt;- function(x) "a2"</span></span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>generic2.b <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">class</span>(x) <span class="ot">&lt;-</span> <span class="st">"a1"</span></span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">NextMethod</span>()</span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a><span class="fu">generic2</span>(<span class="fu">structure</span>(<span class="fu">list</span>(), <span class="at">class =</span> <span class="fu">c</span>(<span class="st">"b"</span>, <span class="st">"a2"</span>)))</span>
-<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Error in NextMethod(): no method to invoke</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>g <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  x <span class="ot">&lt;-</span> <span class="dv">10</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  y <span class="ot">&lt;-</span> <span class="dv">10</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">UseMethod</span>(<span class="st">"g"</span>)</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>g.default <span class="ot">&lt;-</span> <span class="cf">function</span>(x) <span class="fu">c</span>(<span class="at">x =</span> x, <span class="at">y =</span> y)</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a><span class="fu">g</span>(x)</span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; x y </span></span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="method-dispath" class="level3">
+<h3 class="anchored" data-anchor-id="method-dispath">Method dispath</h3>
+<p><code>UseMethod()</code>执行方法派发的原理：创建泛型函数拥有的方法向量（<code>generic.class</code>），寻找潜在可用的方法。使用<code>sloop::s3_dispath()</code>可以查看这一过程。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">Sys.Date</span>()</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="fu">s3_dispatch</span>(<span class="fu">print</span>(x))</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; =&gt; print.Date</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  * print.default</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ul>
+<li><code>=&gt;</code>表示该方法被调用</li>
+<li><code>*</code>表示该方法被定义但未被调用</li>
+</ul>
+<p>“default” class是特殊的伪类，它不是真实存在的类；包含它是为了使定义一个标准回退成为可能，这个回退在特定类的方法不可用时可以找到。例如下面的<code>test</code>类，在执行<code>t()</code>时，会自动为其分配<code>t.default()</code>方法，而不是R 4.0.0版本前的将<code>t.test()</code>当作方法进行派发。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">structure</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, <span class="at">class =</span> <span class="st">"test"</span>)</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="fu">s3_dispatch</span>(<span class="fu">t</span>(x))</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    t.test</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; =&gt; t.default</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Output in R version 3.6.2</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">structure</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, <span class="at">class =</span> <span class="st">"test"</span>)</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="fu">t</span>(x)</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  One Sample t-test</span></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;</span></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; data:  x</span></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; t = 5.7446, df = 9, p-value = 0.0002782</span></span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; alternative hypothesis: true mean is not equal to 0</span></span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 95 percent confidence interval:</span></span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  3.334149 7.665851</span></span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; sample estimates:</span></span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; mean of x</span></span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;       5.5</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>方法派发的本质相当简单，但随着本章的深入，你会发现它在包含继承、基类型、内部泛型和组泛型方面变得越来越复杂。下面的代码展示了几个更复杂的情况，我们将在后续13.7节和14章中详细介绍。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, <span class="at">nrow =</span> <span class="dv">2</span>)</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">s3_dispatch</span>(<span class="fu">mean</span>(x))</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    mean.matrix</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    mean.integer</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    mean.numeric</span></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; =&gt; mean.default</span></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a><span class="fu">s3_dispatch</span>(<span class="fu">sum</span>(<span class="fu">Sys.time</span>()))</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    sum.POSIXct</span></span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    sum.POSIXt</span></span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    sum.default</span></span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; =&gt; Summary.POSIXct</span></span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    Summary.POSIXt</span></span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    Summary.default</span></span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; -&gt; sum (internal)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="函数总结" class="level2">
-<h2 class="anchored" data-anchor-id="函数总结">函数总结</h2>
+<section id="finding-methods" class="level3">
+<h3 class="anchored" data-anchor-id="finding-methods">Finding methods</h3>
+<p><code>sloop::s3_methods_generic()</code>函数可以查看一个generic函数的所有方法。<code>sloop::s3_methods_class()</code>函数可以查看一个class的所有方法。</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">table</span>(<span class="fu">rpois</span>(<span class="dv">100</span>, <span class="dv">5</span>))</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>x</span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  1  2  3  4  5  6  7  8  9 10 11 12 </span></span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  6  6 14 20 22 14  9  2  2  3  1  1</span></span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a><span class="fu">typeof</span>(x) <span class="co"># 查看base type</span></span>
-<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "integer"</span></span>
-<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a><span class="fu">attributes</span>(x) <span class="co"># 查看属性</span></span>
-<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $dim</span></span>
-<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 12</span></span>
-<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $dimnames</span></span>
-<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $dimnames[[1]]</span></span>
-<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [1] "1"  "2"  "3"  "4"  "5"  "6"  "7"  "8"  "9"  "10" "11" "12"</span></span>
-<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; $class</span></span>
-<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "table"</span></span>
-<span id="cb22-21"><a href="#cb22-21" aria-hidden="true" tabindex="-1"></a><span class="fu">s3_class</span>(x) <span class="co"># 查看S3 class</span></span>
-<span id="cb22-22"><a href="#cb22-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "table"</span></span>
-<span id="cb22-23"><a href="#cb22-23" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>() <span class="co"># 查看class</span></span>
-<span id="cb22-24"><a href="#cb22-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Error in class(): 0 arguments passed to 'class' which requires 1</span></span>
-<span id="cb22-25"><a href="#cb22-25" aria-hidden="true" tabindex="-1"></a><span class="fu">inherits</span>(x, <span class="st">"classname"</span>) <span class="co"># 判断是否属于classname</span></span>
-<span id="cb22-26"><a href="#cb22-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] FALSE</span></span>
-<span id="cb22-27"><a href="#cb22-27" aria-hidden="true" tabindex="-1"></a>sloop<span class="sc">::</span><span class="fu">s3_methods_class</span>(<span class="st">"table"</span>) <span class="co"># 查看类可以用的泛函</span></span>
-<span id="cb22-28"><a href="#cb22-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tibble: 10 × 4</span></span>
-<span id="cb22-29"><a href="#cb22-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   generic       class visible source             </span></span>
-<span id="cb22-30"><a href="#cb22-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;         &lt;chr&gt; &lt;lgl&gt;   &lt;chr&gt;              </span></span>
-<span id="cb22-31"><a href="#cb22-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 [             table TRUE    base               </span></span>
-<span id="cb22-32"><a href="#cb22-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 aperm         table TRUE    base               </span></span>
-<span id="cb22-33"><a href="#cb22-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 as.data.frame table TRUE    base               </span></span>
-<span id="cb22-34"><a href="#cb22-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4 Axis          table FALSE   registered S3method</span></span>
-<span id="cb22-35"><a href="#cb22-35" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5 lines         table FALSE   registered S3method</span></span>
-<span id="cb22-36"><a href="#cb22-36" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6 plot          table FALSE   registered S3method</span></span>
-<span id="cb22-37"><a href="#cb22-37" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # ℹ 4 more rows</span></span>
-<span id="cb22-38"><a href="#cb22-38" aria-hidden="true" tabindex="-1"></a>sloop<span class="sc">::</span><span class="fu">s3_methods_generic</span>(<span class="st">"print"</span>) <span class="co"># 查看与泛函相关的类</span></span>
-<span id="cb22-39"><a href="#cb22-39" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tibble: 294 × 4</span></span>
-<span id="cb22-40"><a href="#cb22-40" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   generic class             visible source             </span></span>
-<span id="cb22-41"><a href="#cb22-41" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;   &lt;chr&gt;             &lt;lgl&gt;   &lt;chr&gt;              </span></span>
-<span id="cb22-42"><a href="#cb22-42" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 print   acf               FALSE   registered S3method</span></span>
-<span id="cb22-43"><a href="#cb22-43" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 print   activeConcordance FALSE   registered S3method</span></span>
-<span id="cb22-44"><a href="#cb22-44" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 print   AES               FALSE   registered S3method</span></span>
-<span id="cb22-45"><a href="#cb22-45" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4 print   all_vars          FALSE   registered S3method</span></span>
-<span id="cb22-46"><a href="#cb22-46" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5 print   anova             FALSE   registered S3method</span></span>
-<span id="cb22-47"><a href="#cb22-47" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6 print   any_vars          FALSE   registered S3method</span></span>
-<span id="cb22-48"><a href="#cb22-48" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # ℹ 288 more rows</span></span>
-<span id="cb22-49"><a href="#cb22-49" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-50"><a href="#cb22-50" aria-hidden="true" tabindex="-1"></a><span class="fu">UseMethod</span>()</span>
-<span id="cb22-51"><a href="#cb22-51" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Error in UseMethod(): there must be a 'generic' argument</span></span>
-<span id="cb22-52"><a href="#cb22-52" aria-hidden="true" tabindex="-1"></a><span class="fu">.class2</span>(x)</span>
-<span id="cb22-53"><a href="#cb22-53" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "table"</span></span>
-<span id="cb22-54"><a href="#cb22-54" aria-hidden="true" tabindex="-1"></a><span class="fu">methods</span>(<span class="st">"print"</span>)</span>
-<span id="cb22-55"><a href="#cb22-55" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   [1] print.acf*                                          </span></span>
-<span id="cb22-56"><a href="#cb22-56" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   [2] print.activeConcordance*                            </span></span>
-<span id="cb22-57"><a href="#cb22-57" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   [3] print.AES*                                          </span></span>
-<span id="cb22-58"><a href="#cb22-58" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   [4] print.all_vars*                                     </span></span>
-<span id="cb22-59"><a href="#cb22-59" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   [5] print.anova*                                        </span></span>
-<span id="cb22-60"><a href="#cb22-60" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   [6] print.any_vars*                                     </span></span>
-<span id="cb22-61"><a href="#cb22-61" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   [7] print.aov*                                          </span></span>
-<span id="cb22-62"><a href="#cb22-62" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   [8] print.aovlist*                                      </span></span>
-<span id="cb22-63"><a href="#cb22-63" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   [9] print.ar*                                           </span></span>
-<span id="cb22-64"><a href="#cb22-64" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [10] print.Arima*                                        </span></span>
-<span id="cb22-65"><a href="#cb22-65" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [11] print.arima0*                                       </span></span>
-<span id="cb22-66"><a href="#cb22-66" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [12] print.AsIs                                          </span></span>
-<span id="cb22-67"><a href="#cb22-67" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [13] print.aspell*                                       </span></span>
-<span id="cb22-68"><a href="#cb22-68" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [14] print.aspell_inspect_context*                       </span></span>
-<span id="cb22-69"><a href="#cb22-69" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [15] print.bibentry*                                     </span></span>
-<span id="cb22-70"><a href="#cb22-70" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [16] print.Bibtex*                                       </span></span>
-<span id="cb22-71"><a href="#cb22-71" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [17] print.browseVignettes*                              </span></span>
-<span id="cb22-72"><a href="#cb22-72" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [18] print.by                                            </span></span>
-<span id="cb22-73"><a href="#cb22-73" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [19] print.changedFiles*                                 </span></span>
-<span id="cb22-74"><a href="#cb22-74" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [20] print.check_bogus_return*                           </span></span>
-<span id="cb22-75"><a href="#cb22-75" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [21] print.check_code_usage_in_package*                  </span></span>
-<span id="cb22-76"><a href="#cb22-76" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [22] print.check_compiled_code*                          </span></span>
-<span id="cb22-77"><a href="#cb22-77" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [23] print.check_demo_index*                             </span></span>
-<span id="cb22-78"><a href="#cb22-78" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [24] print.check_depdef*                                 </span></span>
-<span id="cb22-79"><a href="#cb22-79" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [25] print.check_details*                                </span></span>
-<span id="cb22-80"><a href="#cb22-80" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [26] print.check_details_changes*                        </span></span>
-<span id="cb22-81"><a href="#cb22-81" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [27] print.check_doi_db*                                 </span></span>
-<span id="cb22-82"><a href="#cb22-82" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [28] print.check_dotInternal*                            </span></span>
-<span id="cb22-83"><a href="#cb22-83" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [29] print.check_make_vars*                              </span></span>
-<span id="cb22-84"><a href="#cb22-84" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [30] print.check_nonAPI_calls*                           </span></span>
-<span id="cb22-85"><a href="#cb22-85" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [31] print.check_package_code_assign_to_globalenv*       </span></span>
-<span id="cb22-86"><a href="#cb22-86" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [32] print.check_package_code_attach*                    </span></span>
-<span id="cb22-87"><a href="#cb22-87" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [33] print.check_package_code_data_into_globalenv*       </span></span>
-<span id="cb22-88"><a href="#cb22-88" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [34] print.check_package_code_startup_functions*         </span></span>
-<span id="cb22-89"><a href="#cb22-89" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [35] print.check_package_code_syntax*                    </span></span>
-<span id="cb22-90"><a href="#cb22-90" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [36] print.check_package_code_unload_functions*          </span></span>
-<span id="cb22-91"><a href="#cb22-91" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [37] print.check_package_compact_datasets*               </span></span>
-<span id="cb22-92"><a href="#cb22-92" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [38] print.check_package_CRAN_incoming*                  </span></span>
-<span id="cb22-93"><a href="#cb22-93" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [39] print.check_package_datalist*                       </span></span>
-<span id="cb22-94"><a href="#cb22-94" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [40] print.check_package_datasets*                       </span></span>
-<span id="cb22-95"><a href="#cb22-95" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [41] print.check_package_depends*                        </span></span>
-<span id="cb22-96"><a href="#cb22-96" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [42] print.check_package_description*                    </span></span>
-<span id="cb22-97"><a href="#cb22-97" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [43] print.check_package_description_encoding*           </span></span>
-<span id="cb22-98"><a href="#cb22-98" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [44] print.check_package_license*                        </span></span>
-<span id="cb22-99"><a href="#cb22-99" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [45] print.check_packages_in_dir*                        </span></span>
-<span id="cb22-100"><a href="#cb22-100" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [46] print.check_packages_used*                          </span></span>
-<span id="cb22-101"><a href="#cb22-101" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [47] print.check_po_files*                               </span></span>
-<span id="cb22-102"><a href="#cb22-102" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [48] print.check_pragmas*                                </span></span>
-<span id="cb22-103"><a href="#cb22-103" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [49] print.check_Rd_line_widths*                         </span></span>
-<span id="cb22-104"><a href="#cb22-104" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [50] print.check_Rd_metadata*                            </span></span>
-<span id="cb22-105"><a href="#cb22-105" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [51] print.check_Rd_xrefs*                               </span></span>
-<span id="cb22-106"><a href="#cb22-106" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [52] print.check_RegSym_calls*                           </span></span>
-<span id="cb22-107"><a href="#cb22-107" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [53] print.check_S3_methods_needing_delayed_registration*</span></span>
-<span id="cb22-108"><a href="#cb22-108" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [54] print.check_so_symbols*                             </span></span>
-<span id="cb22-109"><a href="#cb22-109" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [55] print.check_T_and_F*                                </span></span>
-<span id="cb22-110"><a href="#cb22-110" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [56] print.check_url_db*                                 </span></span>
-<span id="cb22-111"><a href="#cb22-111" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [57] print.check_vignette_index*                         </span></span>
-<span id="cb22-112"><a href="#cb22-112" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [58] print.checkDocFiles*                                </span></span>
-<span id="cb22-113"><a href="#cb22-113" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [59] print.checkDocStyle*                                </span></span>
-<span id="cb22-114"><a href="#cb22-114" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [60] print.checkFF*                                      </span></span>
-<span id="cb22-115"><a href="#cb22-115" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [61] print.checkRd*                                      </span></span>
-<span id="cb22-116"><a href="#cb22-116" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [62] print.checkRdContents*                              </span></span>
-<span id="cb22-117"><a href="#cb22-117" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [63] print.checkReplaceFuns*                             </span></span>
-<span id="cb22-118"><a href="#cb22-118" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [64] print.checkS3methods*                               </span></span>
-<span id="cb22-119"><a href="#cb22-119" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [65] print.checkTnF*                                     </span></span>
-<span id="cb22-120"><a href="#cb22-120" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [66] print.checkVignettes*                               </span></span>
-<span id="cb22-121"><a href="#cb22-121" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [67] print.citation*                                     </span></span>
-<span id="cb22-122"><a href="#cb22-122" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [68] print.cli_ansi_html_style*                          </span></span>
-<span id="cb22-123"><a href="#cb22-123" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [69] print.cli_ansi_string*                              </span></span>
-<span id="cb22-124"><a href="#cb22-124" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [70] print.cli_ansi_style*                               </span></span>
-<span id="cb22-125"><a href="#cb22-125" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [71] print.cli_boxx*                                     </span></span>
-<span id="cb22-126"><a href="#cb22-126" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [72] print.cli_diff_chr*                                 </span></span>
-<span id="cb22-127"><a href="#cb22-127" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [73] print.cli_doc*                                      </span></span>
-<span id="cb22-128"><a href="#cb22-128" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [74] print.cli_progress_demo*                            </span></span>
-<span id="cb22-129"><a href="#cb22-129" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [75] print.cli_rule*                                     </span></span>
-<span id="cb22-130"><a href="#cb22-130" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [76] print.cli_sitrep*                                   </span></span>
-<span id="cb22-131"><a href="#cb22-131" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [77] print.cli_spark*                                    </span></span>
-<span id="cb22-132"><a href="#cb22-132" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [78] print.cli_spinner*                                  </span></span>
-<span id="cb22-133"><a href="#cb22-133" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [79] print.cli_tree*                                     </span></span>
-<span id="cb22-134"><a href="#cb22-134" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [80] print.codoc*                                        </span></span>
-<span id="cb22-135"><a href="#cb22-135" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [81] print.codocClasses*                                 </span></span>
-<span id="cb22-136"><a href="#cb22-136" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [82] print.codocData*                                    </span></span>
-<span id="cb22-137"><a href="#cb22-137" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [83] print.colorConverter*                               </span></span>
-<span id="cb22-138"><a href="#cb22-138" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [84] print.compactPDF*                                   </span></span>
-<span id="cb22-139"><a href="#cb22-139" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [85] print.condition                                     </span></span>
-<span id="cb22-140"><a href="#cb22-140" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [86] print.connection                                    </span></span>
-<span id="cb22-141"><a href="#cb22-141" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [87] print.CRAN_package_reverse_dependencies_and_views*  </span></span>
-<span id="cb22-142"><a href="#cb22-142" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [88] print.data.frame                                    </span></span>
-<span id="cb22-143"><a href="#cb22-143" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [89] print.Date                                          </span></span>
-<span id="cb22-144"><a href="#cb22-144" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [90] print.default                                       </span></span>
-<span id="cb22-145"><a href="#cb22-145" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [91] print.dendrogram*                                   </span></span>
-<span id="cb22-146"><a href="#cb22-146" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [92] print.density*                                      </span></span>
-<span id="cb22-147"><a href="#cb22-147" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [93] print.difftime                                      </span></span>
-<span id="cb22-148"><a href="#cb22-148" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [94] print.dist*                                         </span></span>
-<span id="cb22-149"><a href="#cb22-149" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [95] print.Dlist                                         </span></span>
-<span id="cb22-150"><a href="#cb22-150" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [96] print.DLLInfo                                       </span></span>
-<span id="cb22-151"><a href="#cb22-151" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [97] print.DLLInfoList                                   </span></span>
-<span id="cb22-152"><a href="#cb22-152" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [98] print.DLLRegisteredRoutines                         </span></span>
-<span id="cb22-153"><a href="#cb22-153" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  [99] print.dplyr_join_by*                                </span></span>
-<span id="cb22-154"><a href="#cb22-154" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [100] print.dplyr_sel_vars*                               </span></span>
-<span id="cb22-155"><a href="#cb22-155" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [101] print.dummy_coef*                                   </span></span>
-<span id="cb22-156"><a href="#cb22-156" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [102] print.dummy_coef_list*                              </span></span>
-<span id="cb22-157"><a href="#cb22-157" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [103] print.ecdf*                                         </span></span>
-<span id="cb22-158"><a href="#cb22-158" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [104] print.eigen                                         </span></span>
-<span id="cb22-159"><a href="#cb22-159" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [105] print.element*                                      </span></span>
-<span id="cb22-160"><a href="#cb22-160" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [106] print.evaluate_evaluation*                          </span></span>
-<span id="cb22-161"><a href="#cb22-161" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [107] print.factanal*                                     </span></span>
-<span id="cb22-162"><a href="#cb22-162" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [108] print.factor                                        </span></span>
-<span id="cb22-163"><a href="#cb22-163" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [109] print.family*                                       </span></span>
-<span id="cb22-164"><a href="#cb22-164" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [110] print.fileSnapshot*                                 </span></span>
-<span id="cb22-165"><a href="#cb22-165" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [111] print.findLineNumResult*                            </span></span>
-<span id="cb22-166"><a href="#cb22-166" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [112] print.flatGridListing*                              </span></span>
-<span id="cb22-167"><a href="#cb22-167" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [113] print.formula*                                      </span></span>
-<span id="cb22-168"><a href="#cb22-168" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [114] print.fseq*                                         </span></span>
-<span id="cb22-169"><a href="#cb22-169" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [115] print.ftable*                                       </span></span>
-<span id="cb22-170"><a href="#cb22-170" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [116] print.fun_list*                                     </span></span>
-<span id="cb22-171"><a href="#cb22-171" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [117] print.function                                      </span></span>
-<span id="cb22-172"><a href="#cb22-172" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [118] print.getAnywhere*                                  </span></span>
-<span id="cb22-173"><a href="#cb22-173" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [119] print.ggplot*                                       </span></span>
-<span id="cb22-174"><a href="#cb22-174" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [120] print.ggplot2_bins*                                 </span></span>
-<span id="cb22-175"><a href="#cb22-175" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [121] print.ggproto*                                      </span></span>
-<span id="cb22-176"><a href="#cb22-176" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [122] print.ggproto_method*                               </span></span>
-<span id="cb22-177"><a href="#cb22-177" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [123] print.gList*                                        </span></span>
-<span id="cb22-178"><a href="#cb22-178" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [124] print.glm*                                          </span></span>
-<span id="cb22-179"><a href="#cb22-179" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [125] print.glue*                                         </span></span>
-<span id="cb22-180"><a href="#cb22-180" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [126] print.gpar*                                         </span></span>
-<span id="cb22-181"><a href="#cb22-181" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [127] print.GridCoords*                                   </span></span>
-<span id="cb22-182"><a href="#cb22-182" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [128] print.GridGrobCoords*                               </span></span>
-<span id="cb22-183"><a href="#cb22-183" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [129] print.GridGTreeCoords*                              </span></span>
-<span id="cb22-184"><a href="#cb22-184" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [130] print.grob*                                         </span></span>
-<span id="cb22-185"><a href="#cb22-185" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [131] print.gtable*                                       </span></span>
-<span id="cb22-186"><a href="#cb22-186" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [132] print.hashtab*                                      </span></span>
-<span id="cb22-187"><a href="#cb22-187" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [133] print.hcl_palettes*                                 </span></span>
-<span id="cb22-188"><a href="#cb22-188" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [134] print.hclust*                                       </span></span>
-<span id="cb22-189"><a href="#cb22-189" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [135] print.help_files_with_topic*                        </span></span>
-<span id="cb22-190"><a href="#cb22-190" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [136] print.hexmode                                       </span></span>
-<span id="cb22-191"><a href="#cb22-191" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [137] print.HoltWinters*                                  </span></span>
-<span id="cb22-192"><a href="#cb22-192" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [138] print.hsearch*                                      </span></span>
-<span id="cb22-193"><a href="#cb22-193" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [139] print.hsearch_db*                                   </span></span>
-<span id="cb22-194"><a href="#cb22-194" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [140] print.htest*                                        </span></span>
-<span id="cb22-195"><a href="#cb22-195" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [141] print.html*                                         </span></span>
-<span id="cb22-196"><a href="#cb22-196" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [142] print.html_dependency*                              </span></span>
-<span id="cb22-197"><a href="#cb22-197" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [143] print.htmltools.selector*                           </span></span>
-<span id="cb22-198"><a href="#cb22-198" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [144] print.htmltools.selector.list*                      </span></span>
-<span id="cb22-199"><a href="#cb22-199" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [145] print.infl*                                         </span></span>
-<span id="cb22-200"><a href="#cb22-200" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [146] print.integrate*                                    </span></span>
-<span id="cb22-201"><a href="#cb22-201" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [147] print.isoreg*                                       </span></span>
-<span id="cb22-202"><a href="#cb22-202" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [148] print.json*                                         </span></span>
-<span id="cb22-203"><a href="#cb22-203" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [149] print.key_missing*                                  </span></span>
-<span id="cb22-204"><a href="#cb22-204" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [150] print.kmeans*                                       </span></span>
-<span id="cb22-205"><a href="#cb22-205" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [151] print.knitr_kable*                                  </span></span>
-<span id="cb22-206"><a href="#cb22-206" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [152] print.last_dplyr_warnings*                          </span></span>
-<span id="cb22-207"><a href="#cb22-207" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [153] print.Latex*                                        </span></span>
-<span id="cb22-208"><a href="#cb22-208" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [154] print.LaTeX*                                        </span></span>
-<span id="cb22-209"><a href="#cb22-209" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [155] print.libraryIQR                                    </span></span>
-<span id="cb22-210"><a href="#cb22-210" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [156] print.lifecycle_warnings*                           </span></span>
-<span id="cb22-211"><a href="#cb22-211" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [157] print.listof                                        </span></span>
-<span id="cb22-212"><a href="#cb22-212" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [158] print.lm*                                           </span></span>
-<span id="cb22-213"><a href="#cb22-213" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [159] print.loadings*                                     </span></span>
-<span id="cb22-214"><a href="#cb22-214" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [160] print.loess*                                        </span></span>
-<span id="cb22-215"><a href="#cb22-215" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [161] print.logLik*                                       </span></span>
-<span id="cb22-216"><a href="#cb22-216" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [162] print.ls_str*                                       </span></span>
-<span id="cb22-217"><a href="#cb22-217" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [163] print.medpolish*                                    </span></span>
-<span id="cb22-218"><a href="#cb22-218" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [164] print.method_table*                                 </span></span>
-<span id="cb22-219"><a href="#cb22-219" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [165] print.MethodsFunction*                              </span></span>
-<span id="cb22-220"><a href="#cb22-220" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [166] print.mtable*                                       </span></span>
-<span id="cb22-221"><a href="#cb22-221" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [167] print.NativeRoutineList                             </span></span>
-<span id="cb22-222"><a href="#cb22-222" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [168] print.news_db*                                      </span></span>
-<span id="cb22-223"><a href="#cb22-223" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [169] print.nls*                                          </span></span>
-<span id="cb22-224"><a href="#cb22-224" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [170] print.noquote                                       </span></span>
-<span id="cb22-225"><a href="#cb22-225" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [171] print.numeric_version                               </span></span>
-<span id="cb22-226"><a href="#cb22-226" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [172] print.object_size*                                  </span></span>
-<span id="cb22-227"><a href="#cb22-227" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [173] print.octmode                                       </span></span>
-<span id="cb22-228"><a href="#cb22-228" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [174] print.packageDescription*                           </span></span>
-<span id="cb22-229"><a href="#cb22-229" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [175] print.packageInfo                                   </span></span>
-<span id="cb22-230"><a href="#cb22-230" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [176] print.packageIQR*                                   </span></span>
-<span id="cb22-231"><a href="#cb22-231" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [177] print.packageStatus*                                </span></span>
-<span id="cb22-232"><a href="#cb22-232" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [178] print.paged_df*                                     </span></span>
-<span id="cb22-233"><a href="#cb22-233" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [179] print.pairwise.htest*                               </span></span>
-<span id="cb22-234"><a href="#cb22-234" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [180] print.path*                                         </span></span>
-<span id="cb22-235"><a href="#cb22-235" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [181] print.person*                                       </span></span>
-<span id="cb22-236"><a href="#cb22-236" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [182] print.pillar*                                       </span></span>
-<span id="cb22-237"><a href="#cb22-237" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [183] print.pillar_1e*                                    </span></span>
-<span id="cb22-238"><a href="#cb22-238" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [184] print.pillar_colonnade*                             </span></span>
-<span id="cb22-239"><a href="#cb22-239" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [185] print.pillar_ornament*                              </span></span>
-<span id="cb22-240"><a href="#cb22-240" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [186] print.pillar_shaft*                                 </span></span>
-<span id="cb22-241"><a href="#cb22-241" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [187] print.pillar_squeezed_colonnade*                    </span></span>
-<span id="cb22-242"><a href="#cb22-242" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [188] print.pillar_tbl_format_setup*                      </span></span>
-<span id="cb22-243"><a href="#cb22-243" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [189] print.pillar_vctr*                                  </span></span>
-<span id="cb22-244"><a href="#cb22-244" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [190] print.pillar_vctr_attr*                             </span></span>
-<span id="cb22-245"><a href="#cb22-245" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [191] print.POSIXct                                       </span></span>
-<span id="cb22-246"><a href="#cb22-246" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [192] print.POSIXlt                                       </span></span>
-<span id="cb22-247"><a href="#cb22-247" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [193] print.power.htest*                                  </span></span>
-<span id="cb22-248"><a href="#cb22-248" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [194] print.ppr*                                          </span></span>
-<span id="cb22-249"><a href="#cb22-249" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [195] print.prcomp*                                       </span></span>
-<span id="cb22-250"><a href="#cb22-250" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [196] print.princomp*                                     </span></span>
-<span id="cb22-251"><a href="#cb22-251" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [197] print.proc_time                                     </span></span>
-<span id="cb22-252"><a href="#cb22-252" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [198] print.purrr_function_compose*                       </span></span>
-<span id="cb22-253"><a href="#cb22-253" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [199] print.purrr_function_partial*                       </span></span>
-<span id="cb22-254"><a href="#cb22-254" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [200] print.purrr_rate_backoff*                           </span></span>
-<span id="cb22-255"><a href="#cb22-255" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [201] print.purrr_rate_delay*                             </span></span>
-<span id="cb22-256"><a href="#cb22-256" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [202] print.quosure*                                      </span></span>
-<span id="cb22-257"><a href="#cb22-257" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [203] print.quosures*                                     </span></span>
-<span id="cb22-258"><a href="#cb22-258" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [204] print.R6*                                           </span></span>
-<span id="cb22-259"><a href="#cb22-259" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [205] print.R6ClassGenerator*                             </span></span>
-<span id="cb22-260"><a href="#cb22-260" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [206] print.raster*                                       </span></span>
-<span id="cb22-261"><a href="#cb22-261" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [207] print.Rconcordance*                                 </span></span>
-<span id="cb22-262"><a href="#cb22-262" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [208] print.Rd*                                           </span></span>
-<span id="cb22-263"><a href="#cb22-263" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [209] print.recordedplot*                                 </span></span>
-<span id="cb22-264"><a href="#cb22-264" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [210] print.rel*                                          </span></span>
-<span id="cb22-265"><a href="#cb22-265" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [211] print.restart                                       </span></span>
-<span id="cb22-266"><a href="#cb22-266" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [212] print.RGBcolorConverter*                            </span></span>
-<span id="cb22-267"><a href="#cb22-267" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [213] print.RGlyphFont*                                   </span></span>
-<span id="cb22-268"><a href="#cb22-268" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [214] print.rlang_box_done*                               </span></span>
-<span id="cb22-269"><a href="#cb22-269" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [215] print.rlang_box_splice*                             </span></span>
-<span id="cb22-270"><a href="#cb22-270" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [216] print.rlang_data_pronoun*                           </span></span>
-<span id="cb22-271"><a href="#cb22-271" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [217] print.rlang_dict*                                   </span></span>
-<span id="cb22-272"><a href="#cb22-272" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [218] print.rlang_dyn_array*                              </span></span>
-<span id="cb22-273"><a href="#cb22-273" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [219] print.rlang_envs*                                   </span></span>
-<span id="cb22-274"><a href="#cb22-274" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [220] print.rlang_error*                                  </span></span>
-<span id="cb22-275"><a href="#cb22-275" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [221] print.rlang_fake_data_pronoun*                      </span></span>
-<span id="cb22-276"><a href="#cb22-276" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [222] print.rlang_lambda_function*                        </span></span>
-<span id="cb22-277"><a href="#cb22-277" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [223] print.rlang_message*                                </span></span>
-<span id="cb22-278"><a href="#cb22-278" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [224] print.rlang_trace*                                  </span></span>
-<span id="cb22-279"><a href="#cb22-279" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [225] print.rlang_warning*                                </span></span>
-<span id="cb22-280"><a href="#cb22-280" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [226] print.rlang_zap*                                    </span></span>
-<span id="cb22-281"><a href="#cb22-281" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [227] print.rlang:::list_of_conditions*                   </span></span>
-<span id="cb22-282"><a href="#cb22-282" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [228] print.rle                                           </span></span>
-<span id="cb22-283"><a href="#cb22-283" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [229] print.rlib_bytes*                                   </span></span>
-<span id="cb22-284"><a href="#cb22-284" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [230] print.rlib_error_3_0*                               </span></span>
-<span id="cb22-285"><a href="#cb22-285" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [231] print.rlib_trace_3_0*                               </span></span>
-<span id="cb22-286"><a href="#cb22-286" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [232] print.roman*                                        </span></span>
-<span id="cb22-287"><a href="#cb22-287" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [233] print.scalar*                                       </span></span>
-<span id="cb22-288"><a href="#cb22-288" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [234] print.sessionInfo*                                  </span></span>
-<span id="cb22-289"><a href="#cb22-289" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [235] print.shiny.tag*                                    </span></span>
-<span id="cb22-290"><a href="#cb22-290" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [236] print.shiny.tag.env*                                </span></span>
-<span id="cb22-291"><a href="#cb22-291" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [237] print.shiny.tag.list*                               </span></span>
-<span id="cb22-292"><a href="#cb22-292" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [238] print.shiny.tag.query*                              </span></span>
-<span id="cb22-293"><a href="#cb22-293" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [239] print.simple.list                                   </span></span>
-<span id="cb22-294"><a href="#cb22-294" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [240] print.smooth.spline*                                </span></span>
-<span id="cb22-295"><a href="#cb22-295" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [241] print.socket*                                       </span></span>
-<span id="cb22-296"><a href="#cb22-296" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [242] print.src*                                          </span></span>
-<span id="cb22-297"><a href="#cb22-297" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [243] print.srcfile                                       </span></span>
-<span id="cb22-298"><a href="#cb22-298" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [244] print.srcref                                        </span></span>
-<span id="cb22-299"><a href="#cb22-299" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [245] print.stepfun*                                      </span></span>
-<span id="cb22-300"><a href="#cb22-300" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [246] print.stl*                                          </span></span>
-<span id="cb22-301"><a href="#cb22-301" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [247] print.StructTS*                                     </span></span>
-<span id="cb22-302"><a href="#cb22-302" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [248] print.subdir_tests*                                 </span></span>
-<span id="cb22-303"><a href="#cb22-303" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [249] print.summarize_CRAN_check_status*                  </span></span>
-<span id="cb22-304"><a href="#cb22-304" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [250] print.summary.aov*                                  </span></span>
-<span id="cb22-305"><a href="#cb22-305" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [251] print.summary.aovlist*                              </span></span>
-<span id="cb22-306"><a href="#cb22-306" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [252] print.summary.ecdf*                                 </span></span>
-<span id="cb22-307"><a href="#cb22-307" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [253] print.summary.glm*                                  </span></span>
-<span id="cb22-308"><a href="#cb22-308" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [254] print.summary.lm*                                   </span></span>
-<span id="cb22-309"><a href="#cb22-309" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [255] print.summary.loess*                                </span></span>
-<span id="cb22-310"><a href="#cb22-310" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [256] print.summary.manova*                               </span></span>
-<span id="cb22-311"><a href="#cb22-311" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [257] print.summary.nls*                                  </span></span>
-<span id="cb22-312"><a href="#cb22-312" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [258] print.summary.packageStatus*                        </span></span>
-<span id="cb22-313"><a href="#cb22-313" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [259] print.summary.ppr*                                  </span></span>
-<span id="cb22-314"><a href="#cb22-314" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [260] print.summary.prcomp*                               </span></span>
-<span id="cb22-315"><a href="#cb22-315" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [261] print.summary.princomp*                             </span></span>
-<span id="cb22-316"><a href="#cb22-316" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [262] print.summary.table                                 </span></span>
-<span id="cb22-317"><a href="#cb22-317" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [263] print.summary.warnings                              </span></span>
-<span id="cb22-318"><a href="#cb22-318" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [264] print.summaryDefault                                </span></span>
-<span id="cb22-319"><a href="#cb22-319" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [265] print.table                                         </span></span>
-<span id="cb22-320"><a href="#cb22-320" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [266] print.tables_aov*                                   </span></span>
-<span id="cb22-321"><a href="#cb22-321" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [267] print.tbl*                                          </span></span>
-<span id="cb22-322"><a href="#cb22-322" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [268] print.terms*                                        </span></span>
-<span id="cb22-323"><a href="#cb22-323" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [269] print.theme*                                        </span></span>
-<span id="cb22-324"><a href="#cb22-324" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [270] print.transform*                                    </span></span>
-<span id="cb22-325"><a href="#cb22-325" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [271] print.trunc_mat*                                    </span></span>
-<span id="cb22-326"><a href="#cb22-326" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [272] print.ts*                                           </span></span>
-<span id="cb22-327"><a href="#cb22-327" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [273] print.tskernel*                                     </span></span>
-<span id="cb22-328"><a href="#cb22-328" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [274] print.TukeyHSD*                                     </span></span>
-<span id="cb22-329"><a href="#cb22-329" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [275] print.tukeyline*                                    </span></span>
-<span id="cb22-330"><a href="#cb22-330" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [276] print.tukeysmooth*                                  </span></span>
-<span id="cb22-331"><a href="#cb22-331" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [277] print.undoc*                                        </span></span>
-<span id="cb22-332"><a href="#cb22-332" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [278] print.uneval*                                       </span></span>
-<span id="cb22-333"><a href="#cb22-333" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [279] print.unit*                                         </span></span>
-<span id="cb22-334"><a href="#cb22-334" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [280] print.vctrs_bytes*                                  </span></span>
-<span id="cb22-335"><a href="#cb22-335" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [281] print.vctrs_sclr*                                   </span></span>
-<span id="cb22-336"><a href="#cb22-336" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [282] print.vctrs_unspecified*                            </span></span>
-<span id="cb22-337"><a href="#cb22-337" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [283] print.vctrs_vctr*                                   </span></span>
-<span id="cb22-338"><a href="#cb22-338" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [284] print.viewport*                                     </span></span>
-<span id="cb22-339"><a href="#cb22-339" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [285] print.vignette*                                     </span></span>
-<span id="cb22-340"><a href="#cb22-340" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [286] print.warnings                                      </span></span>
-<span id="cb22-341"><a href="#cb22-341" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [287] print.xfun_md_viewable*                             </span></span>
-<span id="cb22-342"><a href="#cb22-342" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [288] print.xfun_raw_string*                              </span></span>
-<span id="cb22-343"><a href="#cb22-343" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [289] print.xfun_record_results*                          </span></span>
-<span id="cb22-344"><a href="#cb22-344" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [290] print.xfun_rename_seq*                              </span></span>
-<span id="cb22-345"><a href="#cb22-345" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [291] print.xfun_strict_list*                             </span></span>
-<span id="cb22-346"><a href="#cb22-346" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [292] print.xgettext*                                     </span></span>
-<span id="cb22-347"><a href="#cb22-347" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [293] print.xngettext*                                    </span></span>
-<span id="cb22-348"><a href="#cb22-348" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [294] print.xtabs*                                        </span></span>
-<span id="cb22-349"><a href="#cb22-349" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; see '?methods' for accessing help and source code</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">s3_methods_generic</span>(<span class="st">"mean"</span>)</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tibble: 7 × 4</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   generic class    visible source             </span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;   &lt;chr&gt;    &lt;lgl&gt;   &lt;chr&gt;              </span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 mean    Date     TRUE    base               </span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 mean    default  TRUE    base               </span></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 mean    difftime TRUE    base               </span></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4 mean    POSIXct  TRUE    base               </span></span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5 mean    POSIXlt  TRUE    base               </span></span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6 mean    quosure  FALSE   registered S3method</span></span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # ℹ 1 more row</span></span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a><span class="fu">s3_methods_class</span>(<span class="st">"ordered"</span>)</span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tibble: 4 × 4</span></span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   generic       class   visible source             </span></span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;         &lt;chr&gt;   &lt;lgl&gt;   &lt;chr&gt;              </span></span>
+<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 as.data.frame ordered TRUE    base               </span></span>
+<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 Ops           ordered TRUE    base               </span></span>
+<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 relevel       ordered FALSE   registered S3method</span></span>
+<span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4 Summary       ordered TRUE    base</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+</section>
+<section id="creating-methods" class="level3">
+<h3 class="anchored" data-anchor-id="creating-methods">Creating methods</h3>
+<p>创建自己类的方法格式为：</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>generic_name.class_name <span class="ot">&lt;-</span> <span class="cf">function</span>(generic_params) {</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># do something</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>在创建新方法时要注意：</p>
+<ul>
+<li><p>首先，只有当你拥有泛型函数或类时，才应该编写方法。虽然即使你不拥有某个类或泛型函数,R 也会允许你定义方法，但这是极其不礼貌的行为。相反，请与泛型函数或类的作者合作，在他们的代码中添加方法。</p></li>
+<li><p>一个方法必须具有与其泛型相同的参数。这是通过 R CMD 检查在包中强制执行的，但即使不创建包，这也是一个很好的实践。</p></li>
+</ul>
+</section>
+</section>
+<section id="object-styles" class="level2">
+<h2 class="anchored" data-anchor-id="object-styles">Object styles</h2>
+<p>这里用<code>length()</code>函数介绍一下不同类的方法风格。当<code>length()</code>函数作用于向量时，返回向量的长度。当作用在其他如dataframe类时，返回的是list的长度。</p>
+<ul>
+<li>Record style object：list中的元素等长。例如<code>POSIXlt</code>类：</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">as.POSIXlt</span>(<span class="fu">ISOdatetime</span>(<span class="dv">2020</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>))</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>x</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "2020-01-01 00:00:01 UTC" "2020-01-01 00:00:02 UTC"</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [3] "2020-01-01 00:00:03 UTC"</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(x)</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 3</span></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(<span class="fu">unclass</span>(x))</span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 11</span></span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>x[[<span class="dv">1</span>]] <span class="co"># the first date time</span></span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "2020-01-01 00:00:01 UTC"</span></span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a><span class="fu">unclass</span>(x)[[<span class="dv">1</span>]] <span class="co"># the first component, the number of seconds</span></span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 1 2 3</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ul>
+<li>Data frame</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">x =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">100</span>, <span class="at">y =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">100</span>)</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(x)</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 2</span></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(x)</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 100</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ul>
+<li>Scalar object: 使用一个list表示一个单一的对象。例如：<code>lm</code>对象</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>mod <span class="ot">&lt;-</span> <span class="fu">lm</span>(mpg <span class="sc">~</span> wt, <span class="at">data =</span> mtcars)</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(mod)</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 12</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>更多有关Object style2的内容可参考<a href="https://vctrs.r-lib.org">vctrs</a>包。</p>
+</section>
+<section id="inheritance" class="level2">
+<h2 class="anchored" data-anchor-id="inheritance">Inheritance</h2>
+<p>S3类的方法“<strong>继承</strong>”有由下面三种方式实现：</p>
+<ul>
+<li><code>class</code>属性可以是一个向量。</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(<span class="fu">ordered</span>(<span class="st">"x"</span>))</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "ordered" "factor"</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(<span class="fu">Sys.time</span>())</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "POSIXct" "POSIXt"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ul>
+<li>如果第一个类（class向量）没有方法定义，R 会自动向下寻找。</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">s3_dispatch</span>(<span class="fu">print</span>(<span class="fu">ordered</span>(<span class="st">"x"</span>)))</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    print.ordered</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; =&gt; print.factor</span></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  * print.default</span></span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a><span class="fu">s3_dispatch</span>(<span class="fu">print</span>(<span class="fu">Sys.time</span>()))</span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; =&gt; print.POSIXct</span></span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    print.POSIXt</span></span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  * print.default</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ul>
+<li>使用<code>NextMethod()</code>可以访委托方法给已存在的方法。</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 注意`-&gt;`</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="fu">s3_dispatch</span>(<span class="fu">ordered</span>(<span class="st">"x"</span>)[<span class="dv">1</span>])</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    [.ordered</span></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; =&gt; [.factor</span></span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    [.default</span></span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; -&gt; [ (internal)</span></span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a><span class="fu">s3_dispatch</span>(<span class="fu">Sys.time</span>()[<span class="dv">1</span>])</span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; =&gt; [.POSIXct</span></span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    [.POSIXt</span></span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    [.default</span></span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; -&gt; [ (internal)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>S3面向对象没有对子类和父类之间的关系施加限制，在创建一个子类时，推荐：</p>
+<ul>
+<li>子类的base type与父类保持一致</li>
+<li>子类的属性包含（继承）父类的属性</li>
+</ul>
+<section id="nextmethod" class="level3">
+<h3 class="anchored" data-anchor-id="nextmethod"><code>NextMethod()</code></h3>
+<p><code>NextMethod ()</code>是继承中最难理解的部分，所以我们从一个最常用的<code>[</code>的具体示例开始。我们首先创建一个简单的类：一个在打印时隐藏其输出的秘密类：</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>new_secret <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">x =</span> <span class="fu">double</span>()) {</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stopifnot</span>(<span class="fu">is.double</span>(x))</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">structure</span>(x, <span class="at">class =</span> <span class="st">"secret"</span>)</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>print.secret <span class="ot">&lt;-</span> <span class="cf">function</span>(x, ...) {</span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="fu">strrep</span>(<span class="st">"x"</span>, <span class="fu">nchar</span>(x)))</span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">invisible</span>(x)</span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">new_secret</span>(<span class="fu">c</span>(<span class="dv">15</span>, <span class="dv">1</span>, <span class="dv">456</span>))</span>
+<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a>x</span>
+<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "xx"  "x"   "xxx"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>上面代码运行成功，但secret类没有定义<code>[</code>方法。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">s3_dispatch</span>(x[<span class="dv">1</span>])</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    [.secret</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    [.default</span></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; =&gt; [ (internal)</span></span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>x[<span class="dv">1</span>]</span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 15</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>下面直接定义的<code>[.secret</code>方法会陷入无限循环：</p>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">[.secret</span><span class="st">`</span> <span class="ot">&lt;-</span> <span class="cf">function</span>(x, i) {</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">new_secret</span>(x[i])</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>我们需要额外的步骤，先去掉x的类属性，取完值后再重新定义类：</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">[.secret</span><span class="st">`</span> <span class="ot">&lt;-</span> <span class="cf">function</span>(x, i) {</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  x <span class="ot">&lt;-</span> <span class="fu">unclass</span>(x)</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">new_secret</span>(x[i])</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>x[<span class="dv">1</span>]</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "xx"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>上面的方法虽然有效，但会额外的创建<code>x</code>对象，造成资源浪费。更好的方法是使用<code>NextMethod()</code>方法。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">[.secret</span><span class="st">`</span> <span class="ot">&lt;-</span> <span class="cf">function</span>(x, i) {</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">new_secret</span>(<span class="fu">NextMethod</span>())</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>x[<span class="dv">1</span>]</span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "xx"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">s3_dispatch</span>(x[<span class="dv">1</span>])</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; =&gt; [.secret</span></span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    [.default</span></span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; -&gt; [ (internal)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><code>=&gt;</code>表示调用了<code>[.secret</code>, 但<code>NextMethod()</code>将方法委托于底层的内部<code>[</code>方法，如<code>-&gt;</code>所示。</p>
+<p><code>NextMethod()</code>在寻找委托方法的类时，会根据全局变量<code>.Class</code>来判断，内部的类型改变无效，例如：下面的结果返回的是<code>a2</code>。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>generic2 <span class="ot">&lt;-</span> <span class="cf">function</span>(x) <span class="fu">UseMethod</span>(<span class="st">"generic2"</span>)</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>generic2.a1 <span class="ot">&lt;-</span> <span class="cf">function</span>(x) <span class="st">"a1"</span></span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>generic2.a2 <span class="ot">&lt;-</span> <span class="cf">function</span>(x) <span class="st">"a2"</span></span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>generic2.b <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">class</span>(x) <span class="ot">&lt;-</span> <span class="st">"a1"</span></span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">NextMethod</span>()</span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a><span class="fu">generic2</span>(<span class="fu">structure</span>(<span class="fu">list</span>(), <span class="at">class =</span> <span class="fu">c</span>(<span class="st">"b"</span>, <span class="st">"a2"</span>)))</span>
+<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "a2"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="allowing-subclassing" class="level3">
+<h3 class="anchored" data-anchor-id="allowing-subclassing">Allowing subclassing</h3>
+<p>当你创建一个类时，你需要决定是否允许可以存在一个子类，因为允许子类会要求你再创建构造函数和方法时作出一些额外的工作。</p>
+<p>例如，允许子类后，父类的构造函数要添加额外的参数——<code>...</code>,<code>class</code>。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>new_secret <span class="ot">&lt;-</span> <span class="cf">function</span>(x, ..., <span class="at">class =</span> <span class="fu">character</span>()) {</span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stopifnot</span>(<span class="fu">is.double</span>(x))</span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">structure</span>(</span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>    x,</span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>    ...,</span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">class =</span> <span class="fu">c</span>(class, <span class="st">"secret"</span>)</span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>然后，子类的构造函数可以直接调用父类的构造函数，并添加额外的参数。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>new_supersecret <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">new_secret</span>(x, <span class="at">class =</span> <span class="st">"supersecret"</span>)</span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>print.supersecret <span class="ot">&lt;-</span> <span class="cf">function</span>(x, ...) {</span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="fu">rep</span>(<span class="st">"xxxxx"</span>, <span class="fu">length</span>(x)))</span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">invisible</span>(x)</span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a>x2 <span class="ot">&lt;-</span> <span class="fu">new_supersecret</span>(<span class="fu">c</span>(<span class="dv">15</span>, <span class="dv">1</span>, <span class="dv">456</span>))</span>
+<span id="cb43-11"><a href="#cb43-11" aria-hidden="true" tabindex="-1"></a>x2</span>
+<span id="cb43-12"><a href="#cb43-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "xxxxx" "xxxxx" "xxxxx"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>如果允许添加子类，方法同样需要额外的工作，否则方法始终返回父类。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">[.secret</span><span class="st">`</span> <span class="ot">&lt;-</span> <span class="cf">function</span>(x, ...) {</span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">new_secret</span>(<span class="fu">NextMethod</span>())</span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>x2[<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>]</span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "xx"  "x"   "xxx"</span></span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">[.secret</span><span class="st">`</span> <span class="ot">&lt;-</span> <span class="cf">function</span>(x, ...) {</span>
+<span id="cb44-9"><a href="#cb44-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">new_secret</span>(<span class="fu">NextMethod</span>(), <span class="at">class =</span> <span class="fu">class</span>(x))</span>
+<span id="cb44-10"><a href="#cb44-10" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb44-11"><a href="#cb44-11" aria-hidden="true" tabindex="-1"></a>x2[<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>]</span>
+<span id="cb44-12"><a href="#cb44-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "xxxxx" "xxxxx" "xxxxx"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>我们也可以使用<code>vctrs::vec_restore()</code>泛型函数，为secret类添加不同类时的返回结果。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="co"># `to` 参数用来传递类的其他属性。</span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>vec_restore.secret <span class="ot">&lt;-</span> <span class="cf">function</span>(x, to, ...) <span class="fu">new_secret</span>(x)</span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>vec_restore.supersecret <span class="ot">&lt;-</span> <span class="cf">function</span>(x, to, ...) <span class="fu">new_supersecret</span>(x)</span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">[.secret</span><span class="st">`</span> <span class="ot">&lt;-</span> <span class="cf">function</span>(x, ...) {</span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>  vctrs<span class="sc">::</span><span class="fu">vec_restore</span>(<span class="fu">NextMethod</span>(), x)</span>
+<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a>x2[<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>]</span>
+<span id="cb45-9"><a href="#cb45-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "xxxxx" "xxxxx" "xxxxx"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="dispatch-details" class="level2">
+<h2 class="anchored" data-anchor-id="dispatch-details">Dispatch details</h2>
+<section id="s3-and-base-types" class="level3">
+<h3 class="anchored" data-anchor-id="s3-and-base-types">S3 and base types</h3>
+<p>S3面向对象系统中的泛型函数在作用于 base type 时，不会根据<code>calss()</code>返回的类进行方法派发。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(<span class="fu">matrix</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>))</span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "matrix" "array"</span></span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a><span class="fu">s3_dispatch</span>(<span class="fu">print</span>(<span class="fu">matrix</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>)))</span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    print.matrix</span></span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    print.integer</span></span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    print.numeric</span></span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; =&gt; print.default</span></span>
+<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-9"><a href="#cb46-9" aria-hidden="true" tabindex="-1"></a>x1 <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span></span>
+<span id="cb46-10"><a href="#cb46-10" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(x1)</span>
+<span id="cb46-11"><a href="#cb46-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "integer"</span></span>
+<span id="cb46-12"><a href="#cb46-12" aria-hidden="true" tabindex="-1"></a><span class="fu">s3_dispatch</span>(<span class="fu">mean</span>(x1))</span>
+<span id="cb46-13"><a href="#cb46-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    mean.integer</span></span>
+<span id="cb46-14"><a href="#cb46-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    mean.numeric</span></span>
+<span id="cb46-15"><a href="#cb46-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; =&gt; mean.default</span></span>
+<span id="cb46-16"><a href="#cb46-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-17"><a href="#cb46-17" aria-hidden="true" tabindex="-1"></a>x2 <span class="ot">&lt;-</span> <span class="fu">structure</span>(x1, <span class="at">class =</span> <span class="st">"integer"</span>)</span>
+<span id="cb46-18"><a href="#cb46-18" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(x2)</span>
+<span id="cb46-19"><a href="#cb46-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "integer"</span></span>
+<span id="cb46-20"><a href="#cb46-20" aria-hidden="true" tabindex="-1"></a><span class="fu">s3_dispatch</span>(<span class="fu">mean</span>(x2))</span>
+<span id="cb46-21"><a href="#cb46-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    mean.integer</span></span>
+<span id="cb46-22"><a href="#cb46-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; =&gt; mean.default</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>base type 的方法派发根据是其<strong>implicit class</strong>。<strong>implicit class</strong> 有三种组成：</p>
+<ul>
+<li>当对象有维度时，“array”, “matrix”。</li>
+<li><code>typeof()</code>的结果。</li>
+<li>当对象是”integer”或”double”时，“numeric”。</li>
+</ul>
+<p><strong>implicit class</strong> 只能由<code>sloop::s3_class()</code>获取。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">s3_class</span>(<span class="fu">matrix</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>))</span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "matrix"  "integer" "numeric"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="internal-generics" class="level3">
+<h3 class="anchored" data-anchor-id="internal-generics">Internal generics</h3>
+<p>base R 中的一些函数，如<code>[</code>,<code>sum()</code>,<code>cbind()</code>等被称为<strong>internal generics</strong>。因为它们不使用<code>UseMethod()</code>，而是C语言中的<code>DispatchGroup()</code>或<code>DispatchOrEval()</code>。使用<code>s3_dispatch()</code>时，会显示为<code>(internal)</code>。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="fu">s3_dispatch</span>(<span class="fu">Sys.time</span>()[<span class="dv">1</span>])</span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; =&gt; [.POSIXct</span></span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    [.POSIXt</span></span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    [.default</span></span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; -&gt; [ (internal)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="group-generics" class="level3">
+<h3 class="anchored" data-anchor-id="group-generics">Group generics</h3>
+<p>Group generics 与 internal generics 类似，只存在于 base R 中，你自己无法构建。</p>
+<p>base R 中存在4大类 Group generics：</p>
+<ul>
+<li><strong>Math</strong>：<a href="https://rdrr.io/r/base/MathFun.html"><code>abs()</code></a>,&nbsp;<a href="https://rdrr.io/r/base/sign.html"><code>sign()</code></a>,&nbsp;<a href="https://rdrr.io/r/base/MathFun.html"><code>sqrt()</code></a>,&nbsp;<a href="https://rdrr.io/r/base/Round.html"><code>floor()</code></a>,&nbsp;<a href="https://rdrr.io/r/base/Trig.html"><code>cos()</code></a>,&nbsp;<a href="https://rdrr.io/r/base/Trig.html"><code>sin()</code></a>,&nbsp;<a href="https://rdrr.io/r/base/Log.html"><code>log()</code></a>, and more (see&nbsp;<a href="https://rdrr.io/r/base/groupGeneric.html"><code>?Math</code></a>&nbsp;for the complete list).</li>
+<li><strong>Ops</strong>：<code>+</code>,&nbsp;<code>-</code>,&nbsp;<code>*</code>,&nbsp;<code>/</code>,&nbsp;<code>^</code>,&nbsp;<code>%%</code>,&nbsp;<code>%/%</code>,&nbsp;<code>&amp;</code>,&nbsp;<code>|</code>,&nbsp;<code>!</code>,&nbsp;<code>==</code>,&nbsp;<code>!=</code>,&nbsp;<code>&lt;</code>,&nbsp;<code>&lt;=</code>,&nbsp;<code>&gt;=</code>, and&nbsp;<code>&gt;</code>.</li>
+<li><strong>Summary</strong>：<a href="https://rdrr.io/r/base/all.html"><code>all()</code></a>,&nbsp;<a href="https://rdrr.io/r/base/any.html"><code>any()</code></a>,&nbsp;<a href="https://rdrr.io/r/base/sum.html"><code>sum()</code></a>,&nbsp;<a href="https://rdrr.io/r/base/prod.html"><code>prod()</code></a>,&nbsp;<a href="https://rdrr.io/r/base/Extremes.html"><code>min()</code></a>,&nbsp;<a href="https://rdrr.io/r/base/Extremes.html"><code>max()</code></a>, and&nbsp;<a href="https://rdrr.io/r/base/range.html"><code>range()</code></a>.</li>
+<li><strong>Complex</strong>：<a href="https://rdrr.io/r/base/complex.html"><code>Arg()</code></a>,&nbsp;<a href="https://rdrr.io/r/base/complex.html"><code>Conj()</code></a>,&nbsp;<a href="https://rdrr.io/r/base/complex.html"><code>Im()</code></a>,&nbsp;<a href="https://rdrr.io/r/base/complex.html"><code>Mod()</code></a>,&nbsp;<a href="https://rdrr.io/r/base/complex.html"><code>Re()</code></a>.</li>
+</ul>
+<p>当你为你的类定义了某个Group generic，这个Group generic内的所有方法都会被覆盖。当某个方法不存在时，会从组内寻找。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="fu">s3_dispatch</span>(<span class="fu">sum</span>(<span class="fu">Sys.time</span>()))</span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    sum.POSIXct</span></span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    sum.POSIXt</span></span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    sum.default</span></span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; =&gt; Summary.POSIXct</span></span>
+<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    Summary.POSIXt</span></span>
+<span id="cb49-7"><a href="#cb49-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    Summary.default</span></span>
+<span id="cb49-8"><a href="#cb49-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; -&gt; sum (internal)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>很多 Group generics 中都使用了<code>NextMethod()</code>。例如期，我们用<code>abs()</code>来计算一个<code>difftime</code>对象。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">as.difftime</span>(<span class="dv">10</span>, <span class="at">units =</span> <span class="st">"mins"</span>)</span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a><span class="fu">s3_dispatch</span>(<span class="fu">abs</span>(y))</span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    abs.difftime</span></span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    abs.default</span></span>
+<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; =&gt; Math.difftime</span></span>
+<span id="cb50-6"><a href="#cb50-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    Math.default</span></span>
+<span id="cb50-7"><a href="#cb50-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; -&gt; abs (internal)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><code>Math.difftime()</code>大致如下：</p>
+<div class="sourceCode" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>Math.difftime <span class="ot">&lt;-</span> <span class="cf">function</span>(x, ...) {</span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">new_difftime</span>(<span class="fu">NextMethod</span>(), <span class="at">units =</span> <span class="fu">attr</span>(x, <span class="st">"units"</span>))</span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="double-dispatch" class="level3">
+<h3 class="anchored" data-anchor-id="double-dispatch">Double dispatch</h3>
+<p>Ops Group generics 使用了 double dispatch。这保证了<code>a + b</code>和<code>b + a</code>的计算结果一致。例如：</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>date <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(<span class="st">"2017-01-01"</span>)</span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>integer <span class="ot">&lt;-</span> <span class="dv">1</span>L</span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a>date <span class="sc">+</span> integer</span>
+<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "2017-01-02"</span></span>
+<span id="cb52-6"><a href="#cb52-6" aria-hidden="true" tabindex="-1"></a>integer <span class="sc">+</span> date</span>
+<span id="cb52-7"><a href="#cb52-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "2017-01-02"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>因为要同时为两种类进行方法派发，所以就会出现下面三种情况：</p>
+<ul>
+<li>如果方法相同，无所谓使用哪个方法。</li>
+<li>如果方法不同，R 最终回归到内部方法，并附带一个警告。</li>
+<li>如果有一个方法是“internal”，则R使用另外一种方法。</li>
+</ul>
 
 
+</section>
 </section>
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
@@ -1343,6 +1577,15 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <script src="https://utteranc.es/client.js" repo="hanguojun007/Blog" issue-term="pathname" theme="github-light" crossorigin="anonymous" async="">
 </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../Books/Advanced R(2e)/12 Base types.html" class="pagination-link" aria-label="12 Base types">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">12 Base types</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+  </div>
+</nav>
 </div> <!-- /content -->
 
 

@@ -22,4 +22,4 @@ website:
         - Object-oriented Programming
         - Books/Advanced R(2e)/Object-oriented Programming.qmd
         - Books/Advanced R(2e)/12 Base types.qmd
-        # - Books/Advanced R(2e)/13 S3.qmd
+        - Books/Advanced R(2e)/13 S3.qmd
