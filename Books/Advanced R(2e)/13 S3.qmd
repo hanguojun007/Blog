@@ -39,7 +39,7 @@ S3面向对象不像其他语言中那么严格，赋予了R编程人员很大�
 
 ### Outline
 
--   13.2节：
+-   13.2节：总览S3类——类，泛型函数，方法
 -   13.3节：创建新的S3类时的细节，三个函数：**constructor**，**helper**，**validator**
 -   13.4节：介绍类与方法如何工作（方法派发），**method dispatch**
 -   13.5节：S3类的四种主要风格：vector，record，data frame，scalar
