@@ -2042,5 +2042,54 @@
     "crumbs": [
       "13 S3"
     ]
+  },
+  {
+    "objectID": "Books/Js4R/11 Bidirectional Communication.html",
+    "href": "Books/Js4R/11 Bidirectional Communication.html",
+    "title": "11 Bidirectional Communication",
+    "section": "",
+    "text": "shiny 是R语言的web开发框架。它不仅可以像JavaScript那样运行在浏览器中，也可以与R后端进行交互。接下来一些章节的主要目的就是揭示通信的机制。本章首先介绍JavaScript如何嵌入到shiny程序中。"
+  },
+  {
+    "objectID": "Books/Js4R/11 Bidirectional Communication.html#websocket-an-shiny",
+    "href": "Books/Js4R/11 Bidirectional Communication.html#websocket-an-shiny",
+    "title": "11 Bidirectional Communication",
+    "section": "WebSocket an Shiny",
+    "text": "WebSocket an Shiny\nshiny程序由两部分组成：前端UI和后端Server。二者通过WebSocket——持续传递信息的链接——进行沟通。在Server端，由“httpuv”包和“WebSocket”包管理链接；在前端，由JS进行管理。\n\n基于此，我们可以创建一个简单的shiny程序：\nlibrary(shiny)\n\nui &lt;- fluidPage(\n  textInput(\"nameInput\", \"Name:\"),\n  textOutput(\"nameOutput\")\n)\n\nserver &lt;- function(input, output) {\n  output$nameOutput &lt;- renderText({\n    paste(\"Hello\", input$nameInput)\n  })\n}\n\nshinyApp(ui, server)\n上述shiny程序的UI与Server之间的逻辑关系图如下："
+  },
+  {
+    "objectID": "Books/Js4R/11 Bidirectional Communication.html#sessions",
+    "href": "Books/Js4R/11 Bidirectional Communication.html#sessions",
+    "title": "11 Bidirectional Communication",
+    "section": "Sessions",
+    "text": "Sessions\n注意：shiny会将不同前端与Server之间的通信封装成一个session，每个session（用户）之间相互独立，互不影响。\n另外关于WebSocket，它通常应用在群发消息。"
+  },
+  {
+    "objectID": "Books/Js4R/11 Bidirectional Communication.html#alertsan-example",
+    "href": "Books/Js4R/11 Bidirectional Communication.html#alertsan-example",
+    "title": "11 Bidirectional Communication",
+    "section": "Alerts，an example",
+    "text": "Alerts，an example\njBox是一种展示弹窗的插件，可以很方便地实现alert效果。\n我们将使用jBox库构建一个shiny程序——在单击actionButton时显示通知，并在关闭时 “告知” 服务器——以此解释WebSocket的双向通信。尽管本书介绍了如何包含JavaScript库依赖关系，但在本节 (且仅在本节) 中忽略。\n\nExplore\n下面我们创建了一个jBox的基础应用Html网页，当网页被打开时，会展示一个通知框。\n&lt;!DOCTYPE html&gt;\n&lt;html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"\" xml:lang=\"\"&gt;\n&lt;head&gt;\n&lt;script\n  src=\"https://code.jquery.com/jquery-3.5.1.min.js\"&gt;\n  &lt;/script&gt;\n&lt;script\n  src=\"https://cdn.jsdelivr.net/gh/StephanWagner/jBox@v1.2.0/\n    dist/jBox.all.min.js\"&gt;\n&lt;/script&gt;\n&lt;link\n  href=\"https://cdn.jsdelivr.net/gh/StephanWagner/jBox@v1.2.0/\n    dist/jBox.all.min.css\"\n  rel=\"stylesheet\"&gt;\n&lt;/head&gt;\n\n&lt;body&gt;\n  &lt;!-- Script to show a notification --&gt;\n  &lt;script&gt;\n    new jBox('Notice', {\n      content: 'Hurray! A notice!'\n    });\n  &lt;/script&gt;\n&lt;/body&gt;\n&lt;/html&gt;\n\n\n\n\n下面，我们使用shiny程序来复现上面的alert。由于jQuery已经包含在shiny中，因此，我们不需要再引入jQuery。\nlibrary(shiny)\n\nui &lt;- fluidPage(\n  tags$head(\n    tags$script(\n      src = paste0(\n        \"https://cdn.jsdelivr.net/gh/StephanWagner/\",\n        \"jBox@v1.2.0/dist/jBox.all.min.js\"\n      )\n    ),\n    tags$link(\n      rel = \"stylesheet\",\n      href = paste0(\n        \"https://cdn.jsdelivr.net/gh/StephanWagner/\",\n        \"jBox@v1.2.0/dist/jBox.all.min.css\"\n      )\n    )\n  ),\n  tags$script(\"\n    new jBox('Notice', {\n      content: 'Hurray! A notice!'\n    });\")\n)\n\nserver &lt;- function(input, output) {}\n\nshinyApp(ui, server)"
+  },
+  {
+    "objectID": "Books/Advanced R(2e)/14 R6.html",
+    "href": "Books/Advanced R(2e)/14 R6.html",
+    "title": "14 R6",
+    "section": "",
+    "text": "本章介绍R6 OOP系统，它有两大特点：\n\nR6使用了封装的OOP范式，意味着方法（method）属于对象（object）而不是泛型函数（generic），调用方法的范式为object$method()。\nR6对象是可改变的，意味着它们可以原地修改并具有参考语义。当你将一个R6对象赋值给另一个变量时，实际上是将指向该R6对象的引用来赋值给新变量。这样，任何对该对象所做的更改都会反映在所有引用它的变量中。\n\n虽然R6 OOP系统与其他语言中的OOP范式相同，使用起来更容易上手，但它缺点就是不符合R的使用习惯，我们将在第16章中讨论它们。\n\n\n\n14.2节：介绍使用R6::R6Class()创建R6类，使用构造器$new()创建新的R6对象。\n14.3节：讨论R6的访问机制：私有域和主动域。\n14.4节：探讨R6的参考语义的影响。学习如何使用终结器自动清理初始化器中执行的任何操作，以及如何在另一个R6对象中将一个R6对象作为字段使用。\n14.5节：对比R6系统和RC系统。\n\n\n\n\n\n# install.packages(\"R6\")\nlibrary(R6)"
+  },
+  {
+    "objectID": "Books/Advanced R(2e)/14 R6.html#introduction",
+    "href": "Books/Advanced R(2e)/14 R6.html#introduction",
+    "title": "14 R6",
+    "section": "",
+    "text": "本章介绍R6 OOP系统，它有两大特点：\n\nR6使用了封装的OOP范式，意味着方法（method）属于对象（object）而不是泛型函数（generic），调用方法的范式为object$method()。\nR6对象是可改变的，意味着它们可以原地修改并具有参考语义。当你将一个R6对象赋值给另一个变量时，实际上是将指向该R6对象的引用来赋值给新变量。这样，任何对该对象所做的更改都会反映在所有引用它的变量中。\n\n虽然R6 OOP系统与其他语言中的OOP范式相同，使用起来更容易上手，但它缺点就是不符合R的使用习惯，我们将在第16章中讨论它们。\n\n\n\n14.2节：介绍使用R6::R6Class()创建R6类，使用构造器$new()创建新的R6对象。\n14.3节：讨论R6的访问机制：私有域和主动域。\n14.4节：探讨R6的参考语义的影响。学习如何使用终结器自动清理初始化器中执行的任何操作，以及如何在另一个R6对象中将一个R6对象作为字段使用。\n14.5节：对比R6系统和RC系统。\n\n\n\n\n\n# install.packages(\"R6\")\nlibrary(R6)"
+  },
+  {
+    "objectID": "Books/Advanced R(2e)/14 R6.html#classes-and-methods",
+    "href": "Books/Advanced R(2e)/14 R6.html#classes-and-methods",
+    "title": "14 R6",
+    "section": "Classes and methods",
+    "text": "Classes and methods\nR6::R6Class()函数可以同时构建类（class）和方法（method），同时也是R6包中唯一需要使用的函数。\nR6Class()函数有两个极其重要的参数：\n\nclassname：类名，它不是必须的，但它改进了错误消息，并使得R6对象可以与S3类的泛型函数结合使用。R6 class名称通常使用UpperCamelCase命名法。\npublic：一个列表，包含类的属性（field）和方法，可以通过self$的方法获取。属性和方法通常使用snake_case命名法。\n\n\nAccumulator &lt;- R6Class(\n  classname = \"Accumulator\",\n  public = list(\n    sum = 0,\n    add = function(x = 1) {\n      self$sum &lt;- self$sum + x\n      invisible(self)\n    }\n  )\n)\n\n在使用R6Class()创建对象时，需要始终将创建的结果赋值给与类名相同的变量。\n\nAccumulator\n#&gt; &lt;Accumulator&gt; object generator\n#&gt;   Public:\n#&gt;     sum: 0\n#&gt;     add: function (x = 1) \n#&gt;     clone: function (deep = FALSE) \n#&gt;   Parent env: &lt;environment: R_GlobalEnv&gt;\n#&gt;   Locked objects: TRUE\n#&gt;   Locked class: FALSE\n#&gt;   Portable: TRUE\n\n可以使用object$new()的方法创建新对象。\n\nx &lt;- Accumulator$new()\n\n同样地，使用$获取对的属性和方法。\n\nx$add(4)\nx$sum\n#&gt; [1] 4\n\n后续我们以()区分$获取的时属性还是方法——$add()表示方法，$sum表示属性。\n\nMethod chaining\n当$add()方法返回的是self而不是$sum时，我们就可以使用方法链（method chaining），类似管道符。通常我们使用return()来返回，但鉴于self的隐私性，这里使用invisible()。\n\nx$add(10)$add(10)$sum\n#&gt; [1] 24\n\nx$\n  add(10)$\n  add(10)$\n  sum\n#&gt; [1] 44\n\n\n\nImportant methods"
   }
 ]
