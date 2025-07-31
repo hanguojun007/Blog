@@ -1,0 +1,115 @@
+---
+title: "14 R6"
+date: "2025-07-31"
+date-modified: "2025-07-31"
+
+format: "html"
+fig-width: 6
+fig-asp: 0.618
+out-width: 70%
+fig-align: center
+
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: "#>"
+    R.options:
+      dplyr.print_min: 6
+      dplyr.print_max: 6
+      pillar.max_footer_lines: 2
+      pillar.min_chars: 15
+      stringr.view_n: 6
+      cli.num_colors: 0
+      cli.hyperlink: FALSE
+      pillar.bold: TRUE
+      width: 77
+
+execute:
+  warning: true
+  error: true
+---
+
+## Introduction
+
+本章介绍R6 OOP系统，它有两大特点：
+
+-   R6使用了封装的OOP范式，意味着方法（method）属于对象（object）而不是泛型函数（generic），调用方法的范式为`object$method()`。
+
+-   R6对象是可改变的，意味着它们可以原地修改并具有参考语义。当你将一个R6对象赋值给另一个变量时，实际上是将指向该R6对象的引用来赋值给新变量。这样，任何对该对象所做的更改都会反映在所有引用它的变量中。
+
+虽然R6 OOP系统与其他语言中的OOP范式相同，使用起来更容易上手，但它缺点就是不符合R的使用习惯，我们将在第16章中讨论它们。
+
+### Outline
+
+-   14.2节：介绍使用`R6::R6Class()`创建R6类，使用构造器`$new()`创建新的R6对象。
+-   14.3节：讨论R6的访问机制：私有域和主动域。
+-   14.4节：探讨R6的参考语义的影响。学习如何使用终结器自动清理初始化器中执行的任何操作，以及如何在另一个R6对象中将一个R6对象作为字段使用。
+-   14.5节：对比R6系统和RC系统。
+
+### Prerequisites
+
+```{r}
+# install.packages("R6")
+library(R6)
+```
+
+## Classes and methods
+
+`R6::R6Class()`函数可以同时构建类（class）和方法（method），同时也是R6包中唯一需要使用的函数。
+
+`R6Class()`函数有两个极其重要的参数：
+
+-   `classname`：类名，它不是必须的，但它改进了错误消息，并使得R6对象可以与S3类的泛型函数结合使用。R6 class名称通常使用`UpperCamelCase`命名法。
+-   `public`：一个列表，包含类的属性（field）和方法，可以通过`self$`的方法获取。属性和方法通常使用`snake_case`命名法。
+
+```{r}
+Accumulator <- R6Class(
+  classname = "Accumulator",
+  public = list(
+    sum = 0,
+    add = function(x = 1) {
+      self$sum <- self$sum + x
+      invisible(self)
+    }
+  )
+)
+```
+
+在使用`R6Class()`创建对象时，需要始终将创建的结果赋值给与类名相同的变量。
+
+```{r}
+Accumulator
+```
+
+可以使用`object$new()`的方法创建新对象。
+
+```{r}
+x <- Accumulator$new()
+```
+
+同样地，使用`$`获取对的属性和方法。
+
+```{r}
+x$add(4)
+x$sum
+```
+
+后续我们以`()`区分`$`获取的时属性还是方法——`$add()`表示方法，`$sum`表示属性。
+
+### Method chaining
+
+当`$add()`方法返回的是`self`而不是`$sum`时，我们就可以使用方法链（**method chaining**），类似管道符。通常我们使用`return()`来返回，但鉴于`self`的隐私性，这里使用`invisible()`。
+
+```{r}
+x$add(10)$add(10)$sum
+
+x$
+  add(10)$
+  add(10)$
+  sum
+```
+
+### Important methods
+
+
+
