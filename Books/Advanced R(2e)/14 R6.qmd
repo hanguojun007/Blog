@@ -111,5 +111,209 @@ x$
 
 ### Important methods
 
+对大多数R6对象，有两个重要的方法需要定义——`$initialize()`和`$print()`。它们非必须，但会提升对象的使用性。
 
+`$initialize()`方法会覆盖默认的`$new()`方法。例如下面的“Person”类，我在`$initialize()`方法中判断了`$name`属性只能是单一的字符串，`$age`属性只能是单一的数字。如果你有更多对输入的检查，将它们放在`$validate()`方法中更合适。
 
+```{r}
+Person <- R6Class("Person", list(
+  name = NULL,
+  age = NA,
+  initialize = function(name, age = NA) {
+    stopifnot(is.character(name), length(name) == 1)
+    stopifnot(is.numeric(age), length(age) == 1)
+
+    self$name <- name
+    self$age <- age
+  }
+))
+
+hadley <- Person$new("Hadley", age = "thirty-eight")
+
+hadley <- Person$new("Hadley", age = 38)
+```
+
+`$print()`方法会覆盖默认的`print()`方法，允许你自定义对象的打印输出。和其他R6对象的方法一样，最终使用`invisible()`来返回。
+
+```{r}
+Person <- R6Class("Person", list(
+  name = NULL,
+  age = NA,
+  initialize = function(name, age = NA) {
+    self$name <- name
+    self$age <- age
+  },
+  print = function(...) {
+    cat("Person: \n")
+    cat("  Name: ", self$name, "\n", sep = "")
+    cat("  Age:  ", self$age, "\n", sep = "")
+    invisible(self)
+  }
+))
+
+hadley2 <- Person$new("Hadley")
+hadley2
+```
+
+### Adding methods after creation
+
+可以使用`$set()`修改R6对象的属性和方法。
+
+```{r}
+Accumulator <- R6Class("Accumulator")
+Accumulator$set("public", "sum", 0)
+Accumulator$set("public", "add", function(x = 1) {
+  self$sum <- self$sum + x
+  invisible(self)
+})
+```
+
+需要注意：对象添加新的属性和方法后，只有用它创建新的对象时才会添加，已经创建好的对象不会添加新的属性和方法。
+
+### Inheritance
+
+参数`inherit`允许创建继承关系。
+
+```{r}
+AccumulatorChatty <- R6Class(
+  "AccumulatorChatty",
+  inherit = Accumulator,
+  public = list(
+    add = function(x = 1) {
+      cat("Adding ", x, "\n", sep = "")
+      super$add(x = x)
+    }
+  )
+)
+
+x2 <- AccumulatorChatty$new()
+x2$add(10)$add(1)$sum
+```
+
+拥有继承关系的子类可以使用父类的方法，但时如何名称相同发生覆盖，则需要使用`suppe$`来方法父类方法，这与上一章中的`NextMethod()`函数类似。
+
+### Introspection
+
+每一个R6对象中都含有一个S3类。这意味着我们可以对R6对象使用一些S3类常用的函数，上述提到的`$print()`方法，本质上是`print.R6()`函数。
+
+`class()`可以确定是否属于R6类。
+
+```{r}
+class(hadley2)
+```
+
+`names()`可以查看R6类的所有属性和方法名。下面的`.__enclos_env__`是R6内部的实现细节（R6 = S3 + env）。
+
+```{r}
+names(hadley2)
+```
+
+### Exercises
+
+1.  Create a bank account R6 class that stores a balance and allows you to deposit and withdraw money. Create a subclass that throws an error if you attempt to go into overdraft. Create another subclass that allows you to go into overdraft, but charges you a fee.
+
+```{r}
+#| code-fold: true
+#| code-summary: "solution"
+Bank <- R6Class("Bank", list(
+  name = "",
+  balance = 0,
+  initialize = function(name, balance = 0) {
+    stopifnot(is.character(name), length(name) == 1)
+    stopifnot(is.numeric(balance), length(balance) == 1)
+
+    self$name <- name
+    self$balance <- balance
+  },
+  print = function(...) {
+    cat("Bank: \n")
+    cat("  Name: ", self$name, "\n", sep = "")
+    cat("  Balance:  ", self$balance, "\n", sep = "")
+    invisible(self)
+  },
+  deposit = function(x) {
+    self$balance <- self$balance + x
+    invisible(self)
+  },
+  withdraw = function(x) {
+    self$balance <- self$balance - x
+    invisible(self)
+  }
+))
+
+a <- Bank$new(name = "a", balance = 1000)
+a$deposit(500)$withdraw(2000)
+a
+
+Bank2 <- R6Class("Bank2", inherit = Bank, public = list(
+  withdraw = function(x) {
+    if (self$balance - x < 0) {
+      stop("Insufficient funds", call. = FALSE)
+    }
+  }
+))
+
+b <- Bank2$new(name = "b", balance = 1000)
+b$deposit(500)$withdraw(2000)
+b
+
+Bank3 <- R6Class("Bank3", inherit = Bank, public = list(
+  withdraw = function(x) {
+    if (self$balance - x < 0) {
+      message("charge of $5 applied")
+      self$balance <- self$balance - x - 5
+    }
+  }
+))
+
+c <- Bank3$new(name = "c", balance = 1000)
+c$deposit(500)$withdraw(2000)
+c
+```
+
+2.  Create an R6 class that represents a shuffled deck of cards. You should be able to draw cards from the deck with $draw(n), and return all cards to the deck and reshuffle with $reshuffle(). Use the following code to make a vector of cards.
+
+```{r}
+suit <- c("♠", "♥", "♦", "♣")
+value <- c("A", 2:10, "J", "Q", "K")
+cards <- paste0(rep(value, 4), suit)
+```
+
+```{r}
+#| code-fold: true
+#| code-summary: "solution"
+
+ShuffledDeck <- R6Class(
+  classname = "ShuffledDeck",
+  public = list(
+    deck = NULL,
+    initialize = function(deck = cards) {
+      self$deck <- sample(deck)
+    },
+    reshuffle = function() {
+      self$deck <- sample(cards)
+      invisible(self)
+    },
+    n = function() {
+      length(self$deck)
+    },
+    draw = function(n = 1) {
+      if (n > self$n()) {
+        stop("Only ", self$n(), " cards remaining.", call. = FALSE)
+      }
+
+      output <- self$deck[seq_len(n)]
+      self$deck <- self$deck[-seq_len(n)]
+      output
+    }
+  )
+)
+
+my_deck <- ShuffledDeck$new()
+my_deck$draw(52)
+my_deck$draw(10)
+my_deck$reshuffle()$draw(5)
+my_deck$reshuffle()$draw(5)
+```
+
+## Controlling access
