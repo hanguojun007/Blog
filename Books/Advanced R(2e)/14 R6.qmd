@@ -1,7 +1,7 @@
 ---
 title: "14 R6"
 date: "2025-07-31"
-date-modified: "2025-07-31"
+date-modified: "2025-08-01"
 
 format: "html"
 fig-width: 6
@@ -376,11 +376,8 @@ Rando <- R6::R6Class("Rando", active = list(
 ))
 x <- Rando$new()
 x$random(3)
-#> [1] 0.0808
 x$random
-#> [1] 0.834
 x$random <- 31
-#> [1] 0.601
 ```
 
 动态属性可以使静态属性看起来像公共属性。例如下例中，我们创建了只读的属性`age`和能确保字符串长度为1的属性`name`。
@@ -473,4 +470,122 @@ y1$add(10)
 c(y1 = y1$sum, y2 = y2$sum)
 ```
 
+引用语义的使用同样会带来其他结果：
 
+-   需要更多的上下文才能理解R6对象。
+-   考虑何时删除 R6对象是有意义的，你可以编写`$finalize()`来补充`$initialize()`，。
+-   如果某个属性是R6对象，则必须在`$initialize()`中创建它，而不是在`R6Class()`中。
+
+### Reasoning
+
+通常，参考语义会导致代码更难推理。考虑下面的例子：
+
+```r
+x <- list(a = 1)
+y <- list(b = 2)
+
+z <- f(x, y)
+```
+
+因为函数`f`内部无法修改外部的`x`,`y`，所以我们知道函数`f`只修改了`z`。
+
+但是想象`x`,`y`是一个R6对象：
+
+```r
+x <- List$new(a = 1)
+y <- List$new(b = 2)
+
+z <- f(x, y)
+```
+
+函数`f`内部可以调用`x`和`y`内部的属性或方法，并对它们进行修改。我们无法仅从`z <- f(x, y)`判断函数`f`是否修改了`x`,`y`，我们需要查看函数`f`内部的代码。
+
+### Finalizer
+
+因为R6对象具有引用语义，所以删除一次就会完全删除对象（不发生修改即拷贝）。这意味着我们可以在R6对象被删除时，使用`$finalize()`执行某些清理工作（类似`on.exit()`），来补充`$initialize()`。如下例中，我们实例化一个创建临时文件对象，然后删除该实例，就会删除临时文件。
+
+```{r}
+TemporaryFile <- R6Class(
+  "TemporaryFile",
+  public = list(
+    path = NULL,
+    initialize = function() {
+      self$path <- tempfile()
+    }
+  ),
+  private = list(
+    finalize = function() {
+      message("Cleaning up ", self$path)
+      unlink(self$path)
+    }
+  )
+)
+
+tf <- TemporaryFile$new()
+rm(tf)
+gc() # 使用gc()才会触发，书中好像是rm(tf)就会触发。
+```
+
+### R6 fields
+
+当使用R6类作为另外一个R6类的属性时，必须在`$initialize`方法中初始化属性。因为在外部定义的属性，表示该属性在定义R6类时已经创建，后续的所有实例都会继承这个属性。例如下面案例：我们想每次创建临时数据库时都创建一个临时文件，如果在外部定义属性`file`，实例`db_a`和`db_b`都会继承这个属性，这样`db_a`和`db_b`的属性`file`都指向同一个文件。
+
+```{r}
+TemporaryDatabase <- R6Class(
+  "TemporaryDatabase",
+  public = list(
+    con = NULL,
+    file = TemporaryFile$new(),
+    initialize = function() {
+      self$con <- DBI::dbConnect(RSQLite::SQLite(), path = file$path)
+    }
+  ),
+  private = list(
+    finalize = function() {
+      DBI::dbDisconnect(self$con)
+    }
+  )
+)
+
+db_a <- TemporaryDatabase$new()
+db_b <- TemporaryDatabase$new()
+
+db_a$file$path == db_b$file$path
+```
+
+相反，使用`$initialize()`方法，在创建实例时，始终会重新创建属性`file`。
+
+```{r}
+TemporaryDatabase <- R6Class(
+  "TemporaryDatabase",
+  public = list(
+    con = NULL,
+    file = NULL,
+    initialize = function() {
+      self$file <- TemporaryFile$new()
+      self$con <- DBI::dbConnect(RSQLite::SQLite(), path = file$path)
+    }
+  ),
+  private = list(
+    finalize = function() {
+      DBI::dbDisconnect(self$con)
+    }
+  )
+)
+
+db_a <- TemporaryDatabase$new()
+db_b <- TemporaryDatabase$new()
+
+db_a$file$path == db_b$file$path
+```
+
+## Why R6?
+
+R6 OOP系统相较于 RC OOP系统的一些优势：
+
+-   R6 更简单。R6 基于S3，RC 基于S4。
+-   R6 有全面的文档。[https://r6.r-lib.org/](https://r6.r-lib.org/)
+-   R6 提供了一种更简单的跨包子类化机制，这种机制无需思考就能正常工作。
+-   R6 对属性方法的管理更加明确。
+-   R6 更快。
+-   RC 与 base R 绑定，意味着你需要修改不同R版本的bug。
