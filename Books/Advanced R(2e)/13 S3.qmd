@@ -169,7 +169,7 @@ print(mod)
 
 -   低级构造函数(Constructor)，`new_myclass()`：高效地创建结构正确的类。
 -   验证函数(validator)，`validate_myclass()`：验证类的合法性。
--   帮助函数(helper)，`myclass()`：用户友好的创建类。
+-   辅助函数(helper)，`myclass()`：用户友好的创建类。
 
 ### Constructors
 
@@ -251,7 +251,7 @@ validate_factor(new_factor(0:1, "a"))
 
 ### Helpers
 
-为了方便使用者创建类对象，我们需要提供一个帮助函数。其遵循以下原则：
+为了方便使用者创建类对象，我们需要提供一个辅助函数。其遵循以下原则：
 
 -   函数名和类名相同，`myclass()`。
 -   如果存在constructor和validator，函数要使用它们。

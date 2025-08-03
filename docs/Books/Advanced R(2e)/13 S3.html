@@ -64,6 +64,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
+<link href="../../Books/Advanced R(2e)/14 R6.html" rel="next">
 <link href="../../Books/Advanced R(2e)/12 Base types.html" rel="prev">
 <script src="../../site_libs/quarto-html/quarto.js"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
@@ -305,6 +306,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">13 S3</span></a>
   </div>
 </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/14 R6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">14 R6</span></a>
+  </div>
+</li>
     </ul>
     </div>
 </nav>
@@ -509,7 +516,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="fu">s3_get_method</span>(weighted.mean.Date)</span>
 <span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; function (x, w, ...) </span></span>
 <span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; .Date(weighted.mean(unclass(x), w, ...))</span></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &lt;bytecode: 0x5ac8d12d7770&gt;</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &lt;bytecode: 0x55ed63496f08&gt;</span></span>
 <span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &lt;environment: namespace:stats&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
@@ -561,7 +568,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <ul>
 <li>低级构造函数(Constructor)，<code>new_myclass()</code>：高效地创建结构正确的类。</li>
 <li>验证函数(validator)，<code>validate_myclass()</code>：验证类的合法性。</li>
-<li>帮助函数(helper)，<code>myclass()</code>：用户友好的创建类。</li>
+<li>辅助函数(helper)，<code>myclass()</code>：用户友好的创建类。</li>
 </ul>
 <section id="constructors" class="level3">
 <h3 class="anchored" data-anchor-id="constructors">Constructors</h3>
@@ -643,7 +650,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="helpers" class="level3">
 <h3 class="anchored" data-anchor-id="helpers">Helpers</h3>
-<p>为了方便使用者创建类对象，我们需要提供一个帮助函数。其遵循以下原则：</p>
+<p>为了方便使用者创建类对象，我们需要提供一个辅助函数。其遵循以下原则：</p>
 <ul>
 <li>函数名和类名相同，<code>myclass()</code>。</li>
 <li>如果存在constructor和validator，函数要使用它们。</li>
@@ -716,7 +723,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>mean</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; function (x, ...) </span></span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; UseMethod("mean")</span></span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &lt;bytecode: 0x5ac8d0d1c028&gt;</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &lt;bytecode: 0x55ed62955d60&gt;</span></span>
 <span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; &lt;environment: namespace:base&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>创建自己的泛型函数，在创建时，泛型函数的参数不需要传递到<code>UseMethod()</code>中。</p>
@@ -1584,6 +1591,9 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       </a>          
   </div>
   <div class="nav-page nav-page-next">
+      <a href="../../Books/Advanced R(2e)/14 R6.html" class="pagination-link" aria-label="14 R6">
+        <span class="nav-page-text">14 R6</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
   </div>
 </nav>
 </div> <!-- /content -->

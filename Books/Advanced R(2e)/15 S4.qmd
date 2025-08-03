@@ -1,0 +1,367 @@
+---
+title: "15 S4"
+date: "2025-08-02"
+date-modified: "2025-08-02"
+
+format: "html"
+fig-width: 6
+fig-asp: 0.618
+out-width: 70%
+fig-align: center
+
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: "#>"
+    R.options:
+      dplyr.print_min: 6
+      dplyr.print_max: 6
+      pillar.max_footer_lines: 2
+      pillar.min_chars: 15
+      stringr.view_n: 6
+      cli.num_colors: 0
+      cli.hyperlink: FALSE
+      pillar.bold: TRUE
+      width: 77
+
+execute:
+  warning: true
+  error: true
+---
+
+## Introduction
+
+S4 是一种更规范的基于泛型函数的面向对象系统。其底层思想与S3类似，但是有更严格的函数去创建类、泛型函数、方法——`setClass()`，`setGeneric()`，`setMethod()`。此外，S4 OOP 提供更多的继承和方法派发。
+
+S4 与S3 相比，还多了一个新的内容——**slot**（槽），使用特殊操作符`@`提取。
+
+### Outline
+
+-   15.2节：简要概述 S4 的主要组成部分：类、泛型函数和方法
+-   15.3节：深入 S4 “类”的细节，包括原型、构造函数、辅助函数和验证函数。
+-   15.4节：介绍如何创建新的 S4 “泛型函数”，以及如何为这些泛型函数提供方法；介绍访问器函数——旨在允许用户安全地检查和修改对象槽。
+-   15.5节：深入 S4 中“方法多分派”的全部细节。
+-   15.6节：讨论 S4 和 S3 之间的相互作用，及如何一起使用它们。
+
+### Learning more
+
+与前几章类似，我们只关注S4 OOP如何工作，如何高效的使用它不在次范围内。在实践中，你需要额外注意：
+
+-   没有一本书可以回答你所有关于S4的问题。
+-   R的内置文档有时会与社区最佳实践发生冲突。
+
+在实践中，你需要仔细阅读文档，不断提问，多次实验。
+
+### Prerequisites
+
+所有S4 OOP相关的函数都由“methods”包提供。虽然该包总是会在终端交互时加载，但当使用`Rscritp`时则不会，所以当我们使用S4 OOP时，最好加载它。
+
+```{r}
+library(methods)
+```
+
+## Basics
+
+### `setClass()`
+
+`setClass()`可以定义一个类——类名和槽。在数据槽中可以规定数据类型和名字。
+
+```{r}
+setClass(
+  "Person",
+  slots = c(
+    name = "character",
+    age = "numeric"
+  )
+)
+```
+
+类定义完毕后，可以使用`new()`函数实例化一个对象。
+
+```{r}
+john <- new("Person", name = "John Smith", age = NA_real_)
+```
+
+使用`is()`函数检查对象的类名；使用`@`或`slot()`函数获取对象中的槽值。
+
+```{r}
+is(john)
+john@name
+slot(john, "age")
+```
+
+### `setGeneric()`
+
+`setGeneric()`可以定义一个泛型函数。我们可以创建一个提取年龄信息的泛型函数。
+
+```{r}
+setGeneric("age", function(x) standardGeneric("age"))
+setGeneric("age<-", function(x, value) standardGeneric("age<-"))
+```
+
+### `setMethod()`
+
+`setMethod()`可以定义一个方法。我们根据上面的泛型方法，定义属于`Person`类的`age`方法。
+
+```{r}
+setMethod("age", "Person", function(x) x@age)
+setMethod("age<-", "Person", function(x, value) {
+  x@age <- value
+  x
+})
+
+age(john) <- 18
+age(john)
+```
+
+假设`Person`类属于某个R包，你可以使用`class?Person`来获取该类的帮助文档。在方法调用前添加`?`，如`?age(john)`，可以获取方法的帮助文档。
+
+最后，你可以使用“sloop”包中的函数检查类和泛型函数。
+
+```{r}
+sloop::otype(john)
+sloop::ftype(age)
+```
+
+## Classes
+
+定义S4类时，通常要设定`setClass()`中的三个参数：
+
+-   class **name**：类名，通常类名使用`UpperCamelCase`。
+-   **slots**：一个有name属性的字符串向量，描述了槽的名字和数据类型。`ANY`可以表示任意类型数据。
+-   **prototype**：一个有name属性的列表，记录了每个槽中的默认值。
+
+```{r}
+setClass(
+  "Person",
+  slots = c(
+    name = "character",
+    age = "numeric"
+  ),
+  prototype = c(
+    name = NA_character_,
+    age = NA_real_
+  )
+)
+
+me <- new("Person", name = "James")
+str(me)
+```
+
+### Inheritance
+
+`setClass()`中的`contains`参数可以指定一个类，表示当前类继承自该类。例如，我们可以创建一个`Employee`类，继承自`Person`类，添加额外槽`boss`。
+
+```{r}
+setClass(
+  "Employee",
+  contains = "Person",
+  slots = c(
+    boss = "Person"
+  ),
+  prototype = list(
+    boss = new("Person")
+  )
+)
+
+str(new("Employee"))
+```
+
+`SetClass()`还有9个其他参数，但这些参数要么已被弃用，要么不推荐使用。
+
+### Introspection
+
+`is()`可以查看对象所属的类及其继承类。
+
+```{r}
+is(new("Person"))
+is(new("Employee"))
+```
+
+此外，还可以用作判断函数。
+
+```{r}
+is(john, "Person")
+```
+
+### Redefinition
+
+因为类与对象的定义都是环境中的一个变量，所以在实例化一个类的对象后，依然可以重新定义这个类，此时要注意已经实例化的对象可能无效。
+
+```{r}
+setClass("A", slots = c(x = "numeric"))
+a <- new("A", x = 10)
+
+setClass("A", slots = c(a_different_slot = "numeric"))
+a
+```
+
+### Helper
+
+`new()`函数是一种非常原始的实例化函数，很适合开发者；但对于使用者来说，`new()`函数不太友好，我们需要一个面向用户的辅助函数，更好的实例化对象。辅助函数应始终：
+
+-   使用与类相同的名称，例如`myclass()`。
+-   精心设计的用户界面，包含精心选择的默认值和有用的转换。
+-   为最终用户创建精心设计的错误消息。
+-   最后调用`ethods::new()`。
+
+我们可以创建为“Person”类创建一个简单的辅助函数：
+
+```{r}
+Person <- function(name, age = NA) {
+  age <- as.double(age)
+
+  new("Person", name = name, age = age)
+}
+
+Person("Hadley")
+```
+
+### Validator
+
+S4类的构造函数会根据slots中的类型进行验证。
+
+```{r}
+Person(mtcars)
+```
+
+但有时我们需要做出更多的判断，例如假设你想让“Person”类可以接受多个“人”的名字和年龄，那么名字和年龄的长度应该一致。
+
+```{r}
+Person("Hadley", age = c(30, 37))
+```
+
+此时我们需要使用`setValidity()`方法来定义额外的验证逻辑。`setValidity()`方法接收两个参数——类名和验证函数，最终返回一个字符串信息（未通过）或`TRUE`（通过）。
+
+```{r}
+setValidity("Person", function(object) {
+  if (length(object@name) != length(object@age)) {
+    "@name and @age must be same length"
+  } else {
+    TRUE
+  }
+})
+```
+
+现在，`Person()`构造函数会返回错误信息。
+
+```{r}
+Person("Hadley", age = c(30, 37))
+```
+
+但是要注意，此时验证函数依然只能通过函数`new()`来触发，在修改对象槽值时，验证函数不会被触发。只能使用`validObject()`函数来检查对象。
+
+```{r}
+alex <- Person("Alex", age = 30)
+alex@age <- 1:10
+
+validObject(alex)
+```
+
+## Generics and methods
+
+创建新的S4类的泛型函数的方式为：在`setGeneric()`函数中调用`standardGeneric()`函数。
+
+```r
+setGeneric("myGeneric", function(x) standardGeneric("myGeneric"))
+```
+
+通常规定，新的泛型函数名采用`lowerCamelCase`命名方式。
+
+同时，不要在泛型函数中使用`{}`，因为这会触发一种特殊情况，只要必要时才会这样做。
+
+```r
+# Don't do this!
+setGeneric("myGeneric", function(x) {
+  standardGeneric("myGeneric")
+})
+```
+
+### Signature
+
+与`setClass()`函数类似，`setGeneric()`函数同样拥有很多参数，但只需了解`signature`参数即可，该参数控制了方法派发。如果该参数的值来源只能是函数参数，若未指定，则会使用除`...`外所有的函数参数。如有你有类似`verbose = TRUE`或`quiet = FALSE`等无需参与方法派发的参数，最好为`signature`参数提供具体值。
+
+```r
+setGeneric("myGeneric",
+  function(x, ..., verbose = TRUE) standardGeneric("myGeneric"),
+  signature = "x"
+)
+```
+
+### Methods
+
+使用`setMethod()`函数可以创建S4类的方法，该函数有三个参数：泛型函数、singnature、函数定义，其余参数无需了解。与S3不同，S4的方法派发根据**signature**会有多种形式。我们将在下一节中详细介绍方法派发。
+
+```r
+setMethod("myGeneric", "Person", function(x) {
+  # method implementation
+})
+```
+
+要列出属于某个泛型函数或与类关联的所有方法，可以使用`methods("generic")`或`methods(class = "class")`；要查找特定方法的实现，可以使用`selectMethod("generic", "class")`。
+
+### Show method
+
+S4类有一些通用的泛型函数，如`show`，用于控制对象打印的信息。可以查看文档或使用`args(getGeneric("show"))`查看参数。
+
+```{r}
+args(getGeneric("show"))
+```
+
+可以看到“show”方法接受唯一的参数——对象本身。
+
+```{r}
+setMethod("show", "Person", function(object) {
+  cat(is(object)[[1]], "\n",
+    "  Name: ", object@name, "\n",
+    "  Age:  ", object@age, "\n",
+    sep = ""
+  )
+})
+john
+```
+
+### Accessors
+
+始终应该为**slot**中的值提供访问器函数，方便访问与修改。
+
+如果只有一个槽，访问器函数可以是：
+
+```r
+person_name <- function(x) {x@name}
+```
+
+也可以通过泛型函数定义，使得多个类可以同时使用：
+
+```{r}
+setGeneric("name", function(x) standardGeneric("name"))
+setMethod("name", "Person", function(x) x@name)
+
+name(john)
+```
+
+如果需要修改槽的值，还需要定义一个能修改值的访问器函数，函数在返回对象前执行`validObject()`检查。
+
+```{r}
+setGeneric("name<-", function(x, value) standardGeneric("name<-"))
+setMethod("name<-", "Person", function(x, value) {
+  x@name <- value
+  validObject(x)
+  x
+})
+
+name(john) <- "Jon Smythe"
+name(john)
+
+name(john) <- letters
+```
+
+::: {.callout-warning}
+直接使用`class@slot <- value`的方式也可以修改槽的值，但会忽略`validObject()`检查。
+```{r}
+john@name <- letters
+name(john)
+```
+:::
+
+## Method dispatch
