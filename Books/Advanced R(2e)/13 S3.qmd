@@ -111,7 +111,7 @@ str(unclass(time))
 s3_dispatch(print(f))
 ```
 
-从结果中可以看到，泛型函数的命名规则是`generic.class()`。通常你无需使用`generic.class()`形式的函数，只需使用`generic()`，它会根据输入对象的`class`属性自动识别。因为某些函数的定义早于S3系统，所以类型`<>.<>`的函数不都是泛函，可以使用`sloop::ftype()`进行识别。
+从结果中可以看到，方法的命名规则是`generic.class()`。通常你无需使用`generic.class()`形式的函数，只需使用`generic()`，它会根据输入对象的`class`属性自动识别。因为某些函数的定义早于S3系统，所以类型`<>.<>`的函数不都是泛函，可以使用`sloop::ftype()`进行识别。
 
 ```{r}
 ftype(t.test)
@@ -148,7 +148,7 @@ inherits(x, "my_class")
 inherits(x, "your_class")
 ```
 
-classname 可以是任意字符串，但是推荐使用字姆和`_`，杜绝使用`.`。在package中使用class时，推荐加上包名。
+classname 可以是任意字符串，但是推荐使用字母和`_`，杜绝使用`.`。在package中使用class时，推荐加上包名。
 
 S3面向对象没有类正确性检查，意味着可以随意更改一个对象的类：
 
