@@ -420,13 +420,96 @@ S4类中有两个“伪类”（**pseudo-classes**）用来定义方法。被称
 
 ![](images/multiple-any.png)
 
-使用多重继承时，很难防止歧义，需要谨慎使用，并根据图进行规划。？？？？？
+使用多重继承时，很难防止歧义，需要谨慎使用，尽可能减少方法数量，并根据图进行规划。例如下图中，只有两种符合数量尽可能少（左上，右上？），而且只有一种没有问题（右上？）。
 
 ![](images/multiple-all.png)
 
+### Multiple dispatch
+
+一旦你理解了多重继承，多重派发就会很直观，只是每个方法都需要两个类去调用。
+
+![](images/single-single.png)
+
+下面是一个方法歧义的示意图。
+
+![](images/single-single-ambig.png)
+
+实际上，多重派发要比多重继承更容易处理，因为它的终端类组合数量更少。
+
+### Multiple dispatch and multiple inheritance
+
+当然，我们也可以将多重派发与多重继承组合起来使用。
+
+![](images/single-multiple.png)
+
+一个更复杂的案例分发到两个类，这两个类都具有多重继承：
+
+![](images/multiple-multiple.png)
+
+随着方法图变得越来越复杂，在给定输入组合的情况下，预测哪个方法将被调用变得越来越困难，同时也越来越难以确保你没有引入歧义。如果你不得不绘制图表来确定实际将被调用的方法，这强烈表明你应该回过头来简化你的设计。
+
 ## S4 and S3
 
-在写S4类时，我们经常需要与已存在的S3类进行交互。
+S4类可以与已存在的S3类进行交互。
 
 ### Classes
 
+`setClass()`函数的参数`slots`,`contains`可以使用S4类或S3类，甚至**implicit**类。
+
+在使用S3类前，必须使用`setOldClass()`函数来重定义S3类。定义声明只需一次即可，例如下面是被base R重定义的S3类：
+
+```r
+setOldClass("data.frame")
+setOldClass(c("ordered", "factor"))
+setOldClass(c("glm", "lm"))
+```
+
+你也可以使用`setClass()`函数来重定义S3类，提供更具体地描述。
+
+```r
+setClass("factor",
+  contains = "integer",
+  slots = c(
+    levels = "character"
+  ),
+  prototype = structure(
+    integer(),
+    levels = character()
+  )
+)
+setOldClass("factor", S4Class = "factor")
+```
+
+注意：对S3类的重定义行为通常由S3类的拥有者提供。例如，如果你想在某个S3类的基础上定义S4类，你需要让S3类的拥有者提供重定义行为。
+
+如果S4类继承于某个S3类或base type，那么该S4类的实例化对象中会自动添加`.Data`槽，用来存放原始数据。
+
+```{r}
+RangedNumeric <- setClass(
+  "RangedNumeric",
+  contains = "numeric",
+  slots = c(min = "numeric", max = "numeric"),
+  prototype = structure(numeric(), min = NA_real_, max = NA_real_)
+)
+rn <- RangedNumeric(1:10, min = 1, max = 10)
+rn@min
+rn@.Data
+```
+
+你也可以为S4类定义S3类型的方法，反之亦然（使用`setOldClass()`）。阅读`?Methods_for_S3`了解更多信息。
+
+### Generics
+
+使用`setGeneric()`还可以将S3类的泛型函数转换为S4类的泛型函数。
+
+```{r}
+setGeneric("mean")
+```
+
+这种情况下，`mean()`函数会变为ANY类的默认方法。
+
+```{r}
+selectMethod("mean", "ANY")
+```
+
+注意：如何`setMethod()`的首个参数不是已经存在的泛型函数，它会自动调用`setGeneric()`。应该避免将常规函数转换为S4类的泛型函数。
