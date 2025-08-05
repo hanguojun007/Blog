@@ -1,0 +1,52 @@
+---
+title: "16 Trade-offs"
+date: "2025-08-05"
+date-modified: "2025-08-05"
+
+format: "html"
+fig-width: 6
+fig-asp: 0.618
+out-width: 70%
+fig-align: center
+
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: "#>"
+    R.options:
+      dplyr.print_min: 6
+      dplyr.print_max: 6
+      pillar.max_footer_lines: 2
+      pillar.min_chars: 15
+      stringr.view_n: 6
+      cli.num_colors: 0
+      cli.hyperlink: FALSE
+      pillar.bold: TRUE
+      width: 77
+
+execute:
+  warning: true
+  error: true
+---
+
+## Introduction
+
+前面我们对R中的三种OOP系统进行了系统介绍，了解了它们的基本使用方法，现在我们将三种系统进行对比，进一步了解它们各自的优劣势。这对我们在处理问题选择何种系统时会有所帮助。
+
+总的来说，作者推荐S3系统，因为它足够简单，并且广泛应用在base R和CRAN中；虽然它不是完善的，但是有一些处理方法可以避免。并不推荐总是使用R6系统。
+
+### Outline
+
+-   16.2节：S3与S4系统进行对比。简而言之，S4更加正式，往往需要更多的前期规划。这使得它更适合由团队而非个人开发的大型项目。
+-   16.3节：S3与R6系统进行对比。这一部分相当长，因为这两个系统在根本上是不同的，你需要考虑一些权衡。
+
+## S4 versus S3
+
+一旦你熟悉使用S3系统，S4系统也就水到渠成，因为底层思想是一致的，只是S4系统更加正式严格，这使得S4系统更适合大型项目。因为S4系统提供了许多工具，如构造函数，验证函数等，我们无需为此过多耗神，而是将更多精力花在“绘制蓝图”上。
+
+Bioconductor是一个使用S4系统取得良好效果的重要项目，其中很多包使用的数据结果，如`SummarizedExperiment`、`IRanges`、`DNAStringSet`，都是使用S4系统开发的。
+
+
+![](images/Matrix.png)
+
+## R6 versus S3
