@@ -6,9 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="dcterms.date" content="2025-03-17">
+<meta name="dcterms.date" content="2025-08-05">
 
-<title>index</title>
+<title>16 Trade-offs</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -21,6 +21,40 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -30,7 +64,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
-<link href="../../Books/Advanced R(2e)/1 Introduction.html" rel="next">
+<link href="../../Books/Advanced R(2e)/15 S4.html" rel="prev">
 <script src="../../site_libs/quarto-html/quarto.js"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -148,7 +182,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../Books/Advanced R(2e)/index.html">index</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../Books/Advanced R(2e)/16 Trade-offs.html">16 Trade-offs</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -162,7 +196,7 @@ ul.task-list li input[type="checkbox"] {
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../Books/Advanced R(2e)/index.html" class="sidebar-item-text sidebar-link active">
+  <a href="../../Books/Advanced R(2e)/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">index</span></a>
   </div>
 </li>
@@ -285,7 +319,7 @@ ul.task-list li input[type="checkbox"] {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../Books/Advanced R(2e)/16 Trade-offs.html" class="sidebar-item-text sidebar-link">
+  <a href="../../Books/Advanced R(2e)/16 Trade-offs.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">16 Trade-offs</span></a>
   </div>
 </li>
@@ -295,7 +329,23 @@ ul.task-list li input[type="checkbox"] {
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a>
+  <ul class="collapse">
+  <li><a href="#outline" id="toc-outline" class="nav-link" data-scroll-target="#outline">Outline</a></li>
+  </ul></li>
+  <li><a href="#s4-versus-s3" id="toc-s4-versus-s3" class="nav-link" data-scroll-target="#s4-versus-s3">S4 versus S3</a></li>
+  <li><a href="#r6-versus-s3" id="toc-r6-versus-s3" class="nav-link" data-scroll-target="#r6-versus-s3">R6 versus S3</a>
+  <ul class="collapse">
+  <li><a href="#namespacing" id="toc-namespacing" class="nav-link" data-scroll-target="#namespacing">Namespacing</a></li>
+  <li><a href="#threading-state" id="toc-threading-state" class="nav-link" data-scroll-target="#threading-state">Threading state</a></li>
+  </ul></li>
+  <li><a href="#method-chaining" id="toc-method-chaining" class="nav-link" data-scroll-target="#method-chaining">Method chaining</a></li>
+  </ul>
+</nav>
     <div class="quarto-margin-footer"><div class="margin-footer-item">
 <p><img src="../..\logo.jpg" class="conditional-footer img-fluid" width="200"></p>
 </div></div></div>
@@ -304,7 +354,7 @@ ul.task-list li input[type="checkbox"] {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">index</h1>
+<h1 class="title">16 Trade-offs</h1>
 </div>
 
 
@@ -315,14 +365,14 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">March 17, 2025</p>
+      <p class="date">August 5, 2025</p>
     </div>
   </div>
   
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">March 17, 2025</p>
+      <p class="date-modified">August 6, 2025</p>
     </div>
   </div>
     
@@ -333,26 +383,153 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<p>本篇为书籍<code>Advanced R</code>的学习笔记。</p>
-<p>原文见：<a href="https://adv-r.hadley.nz/index.html">Advanced R</a></p>
-<p>本书主要包含两方面：</p>
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>前面我们对R中的三种OOP系统进行了系统介绍，了解了它们的基本使用方法，现在我们将三种系统进行对比，进一步了解它们各自的优劣势。这对我们在处理问题选择何种系统时会有所帮助。</p>
+<p>总的来说，作者推荐S3系统，因为它足够简单，并且广泛应用在base R和CRAN中；虽然它不是完善的，但是有一些处理方法可以避免。并不推荐总是使用R6系统。</p>
+<section id="outline" class="level3">
+<h3 class="anchored" data-anchor-id="outline">Outline</h3>
 <ul>
-<li><p>R 语言底层逻辑</p></li>
-<li><p>高级编程技巧</p></li>
+<li>16.2节：S3与S4系统进行对比。简而言之，S4更加正式，往往需要更多的前期规划。这使得它更适合由团队而非个人开发的大型项目。</li>
+<li>16.3节：S3与R6系统进行对比。这一部分相当长，因为这两个系统在根本上是不同的，你需要考虑一些权衡。</li>
 </ul>
-<p>下面是全文概览：</p>
+</section>
+</section>
+<section id="s4-versus-s3" class="level2">
+<h2 class="anchored" data-anchor-id="s4-versus-s3">S4 versus S3</h2>
+<p>一旦你熟悉使用S3系统，S4系统也就水到渠成，因为底层思想是一致的，只是S4系统更加正式严格，这使得S4系统更适合大型项目。因为S4系统提供了许多工具，如构造函数，验证函数等，我们无需为此过多耗神，而是将更多精力花在“绘制蓝图”上。</p>
+<p>Bioconductor是一个使用S4系统取得良好效果的重要项目，其中很多包使用的数据结果，如<code>SummarizedExperiment</code>、<code>IRanges</code>、<code>DNAStringSet</code>，都是使用S4系统开发的。</p>
+<p>通过仔细地使用“methods”，在面对有关联地复杂系统时，我们可以最小程度地减少代码复用（继承）。例如“Matrix”包，它旨在高效地存储和计算多种不同类型的稀疏和密集矩阵。截至1.7.2版本，它定义了108个类、23个泛型函数和1780个方法。下面是它类图的一个小子集。</p>
+<p><img src="images/Matrix.png" class="img-fluid"></p>
+<p>矩阵计算这个领域非常适合使用S4, 因为稀疏矩阵的特定组合通常有计算捷径。S4 使得提供一个适用于所有输入的通用方法变得容易，然后在输入允许更高效实现的情况下提供更专业的方法。这需要仔细规划，以避免方法调度的模糊性，但这种规划会带来更高的性能。</p>
+<p>使用S4的最大挑战是日益增加的复杂性和缺乏单一文档来源的结合。S4是一个复杂的系统，在实践中有效使用可能具有挑战性。如果S4文档没有分散在R文档、书籍和网站中，这就不会是一个大问题。S4需要一本书的长度，但这本书 (目前) 还不存在。(S3 的文档并不更好，但缺乏这本书的痛苦较小，因为S3要简单得多。)</p>
+</section>
+<section id="r6-versus-s3" class="level2">
+<h2 class="anchored" data-anchor-id="r6-versus-s3">R6 versus S3</h2>
+<p>R6是一个与S3和S4截然不同的面向对象系统，因为它建立在封装对象之上，而不是泛型函数。此外，R6对象具有引用语义，这意味着它们可以在原位修改。这两个重大差异带来了许多不明显的后果，我们将在这里探讨。</p>
 <ul>
-<li>第1章：简介。</li>
-<li>第2-8章：R语言基础概念。</li>
-<li>第9-11章：函数编程。</li>
-<li>第12~16章：面向对象编程。</li>
-<li>第17~21章：元编程。</li>
-<li>第22-25章：高级编程技巧。</li>
+<li>泛型函数是一个常规函数，因此它存在于全局命名空间中。R6方法属于对象，因此它存在于局部命名空间中。这影响了我们思考命名的方式。</li>
+<li>R6的引用语义允许方法同时返回值和修改对象。这解决了一个被称为 “线程状态” 的棘手问题。</li>
+<li>R6使用<code>$</code>调用方法，<code>$</code>是一个“infix”运算符。如果你正确地设置了你的方法，你可以使用方法调用链作为管道的替代方案。</li>
 </ul>
-<p>本书适合在不同阶段，根本不同需求阅读不同章节。</p>
-<p>本书中的练习题解决方案：<a href="9https://advanced-r-solutions.rbind.io/">Advanced R Solutions</a></p>
+<p>这些是泛函性OOP和封装OOP之间的一般权衡，因此它们也可以作为R与Python中系统设计的讨论。</p>
+<section id="namespacing" class="level3">
+<h3 class="anchored" data-anchor-id="namespacing">Namespacing</h3>
+<p>S3和R6之间一个不明显的区别是方法所在的空间：</p>
+<ul>
+<li>泛型函数是全局的：所有包共享相同的命名空间。</li>
+<li>封装方法是本地的：方法绑定到单个对象。</li>
+</ul>
+<p>全局命名空间的优势在于，多个包可以使用相同的“动词”来处理不同类型的对象。泛型函数提供了统一的API, 这使得对新对象执行典型操作变得更容易，因为存在强大的命名约定。这在数据分析中效果很好，因为你经常想对不同类型的对象做相同的事情。特别是，这是R的建模系统如此有用的一个原因：无论模型在哪里实现，你总是可以使用相同的工具集 (summary ()、predict () 等) 来处理它。</p>
+<p>全局命名空间的缺点是它迫使你对命名进行更深入的思考。你需要避免在不同的包中使用多个名称相同的泛型，因为这需要用户频繁地输入<code>::</code>。这可能很困难，因为函数名称通常是英语动词，而动词通常具有多重含义。以 <code>plot()</code>为例：</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(data)       <span class="co"># plot some data</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(bank_heist) <span class="co"># plot a crime</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(land)       <span class="co"># create a new plot of land</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(movie)      <span class="co"># extract plot of a movie</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>通常，你应该避免使用与原始泛型函数名同义的方法，而是应该为这些方法定义一个新的泛型。</p>
+<p>R6 方法不会出现这个问题，因为它们的作用域是对象。以下代码没有问题，因为这并不意味着两个不同R6对象的plot方法具有相同的含义：</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>data<span class="sc">$</span><span class="fu">plot</span>()</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>bank_heist<span class="sc">$</span><span class="fu">plot</span>()</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>land<span class="sc">$</span><span class="fu">plot</span>()</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>movie<span class="sc">$</span><span class="fu">plot</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>这些考虑也适用于泛型函数的参数。S3泛型必须具有相同的核心参数，这意味着它们通常具有非特定的名称，如<code>x</code>或<code>.data</code>。S3泛型通常需要<code>...</code>向方法传递额外的参数，但这有一个缺点，即拼写错误的参数名称不会产生错误。相比之下，R6 方法可以有更广泛的变化，并使用更具体和更具启发性的参数名称。</p>
+<p>本地命名空间的一个次要优势是创建R6方法非常“廉价”。大多数封装的面向对象语言都鼓励你创建许多小方法，每个方法都有一个引人注目的名称。创建一个新的 S3 方法成本更高，因为你可能还需要创建一个泛型，并考虑上述命名问题。这意味着创建许多小方法的建议不适用于 S3。将代码分解成易于理解的小块仍然是一个好主意，但它们通常应该只是普通函数，而不是方法。</p>
+</section>
+<section id="threading-state" class="level3">
+<h3 class="anchored" data-anchor-id="threading-state">Threading state</h3>
+<p>使用S3编程的一个挑战是，当你想要同时返回值和修改对象时，会违反我们指导原则，即函数被调用时或返回值或执行副作用，但在少数情况下同时执行又是必要的。</p>
+<p>例如，假设你想创建一个“栈”对象，它有两个主要方法：</p>
+<ul>
+<li><code>push()</code>：在栈顶添加一个新对象。</li>
+<li><code>pop()</code>：返回栈定处的值，然后从栈中删除它。</li>
+</ul>
+<p>栈对象的构造函数和<code>push()</code>方法的实现很简单。栈包含一个项目列表；将一个对象推送到栈只是简单地添加到这个列表中。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>new_stack <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">items =</span> <span class="fu">list</span>()) {</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">structure</span>(<span class="fu">list</span>(<span class="at">items =</span> items), <span class="at">class =</span> <span class="st">"stack"</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>push <span class="ot">&lt;-</span> <span class="cf">function</span>(x, y) {</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  x<span class="sc">$</span>items <span class="ot">&lt;-</span> <span class="fu">c</span>(x<span class="sc">$</span>items, <span class="fu">list</span>(y))</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  x</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>实现<code>pop()</code>方法更具挑战性，因为它必须同时返回一个值 (栈顶部的对象) 和一个副作用 (从顶部移除该对象)。由于无法在S3中修改输入对象，我们需要返回两样东西：值和更新后的对象。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>pop <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  n <span class="ot">&lt;-</span> <span class="fu">length</span>(x<span class="sc">$</span>items)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  item <span class="ot">&lt;-</span> x<span class="sc">$</span>items[[n]]</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  x<span class="sc">$</span>items <span class="ot">&lt;-</span> x<span class="sc">$</span>items[<span class="sc">-</span>n]</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">item =</span> item, <span class="at">x =</span> x)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>这会导致使用方式相当尴尬：</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>s <span class="ot">&lt;-</span> <span class="fu">new_stack</span>()</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>s <span class="ot">&lt;-</span> <span class="fu">push</span>(s, <span class="dv">10</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>s <span class="ot">&lt;-</span> <span class="fu">push</span>(s, <span class="dv">20</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>out <span class="ot">&lt;-</span> <span class="fu">pop</span>(s)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>out<span class="sc">$</span>item</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 20</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>s <span class="ot">&lt;-</span> out<span class="sc">$</span>x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>这个问题被称为线程化状态（<strong>threading state</strong>）或累加器编程（<strong>accumulator programming</strong>），因为无论调用<code>pop()</code>多深，你都必须将修改后的栈对象一直线程化到它所在的位置。</p>
+<p>其他FP语言应对这一挑战的一种方式是提供多重赋值（<strong>multiple assign</strong>）或解构绑定运算符，允许你在一个步骤中赋值多个值。“zeallot”包为R提供了<code>%&lt;-%</code>的多重赋值功能。这使代码更加优雅，但并没有解决关键问题：</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(zeallot)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(value, s) <span class="sc">%&lt;-%</span> <span class="fu">pop</span>(s)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>value</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 10</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>堆栈的R6实现更简单，因为<code>$pop()</code>可以就地修改对象，并且只返回最上面的值：</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>Stack <span class="ot">&lt;-</span> R6<span class="sc">::</span><span class="fu">R6Class</span>(<span class="st">"Stack"</span>, <span class="fu">list</span>(</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">items =</span> <span class="fu">list</span>(),</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">push =</span> <span class="cf">function</span>(x) {</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    self<span class="sc">$</span>items <span class="ot">&lt;-</span> <span class="fu">c</span>(self<span class="sc">$</span>items, x)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">invisible</span>(self)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  },</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">pop =</span> <span class="cf">function</span>() {</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    item <span class="ot">&lt;-</span> self<span class="sc">$</span>items[[self<span class="sc">$</span><span class="fu">length</span>()]]</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    self<span class="sc">$</span>items <span class="ot">&lt;-</span> self<span class="sc">$</span>items[<span class="sc">-</span>self<span class="sc">$</span><span class="fu">length</span>()]</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    item</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  },</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">length =</span> <span class="cf">function</span>() {</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">length</span>(self<span class="sc">$</span>items)</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>这种方式的代码更加自然：</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>s <span class="ot">&lt;-</span> Stack<span class="sc">$</span><span class="fu">new</span>()</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>s<span class="sc">$</span><span class="fu">push</span>(<span class="dv">10</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>s<span class="sc">$</span><span class="fu">push</span>(<span class="dv">20</span>)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>s<span class="sc">$</span><span class="fu">pop</span>()</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 20</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>作者在“ggplot2”包种的<code>scales</code>中遇到了一个真实的线程状态案例。<code>scales</code>很复杂，因为它们需要跨每个分面和每个层组合数据。作者最初使用S3类，但这需要在许多函数之间传递<code>scales</code>数据。切换到R6后，代码变得简单了许多。然而，它也带来了一些问题，因为作者在修改图表时忘记调用<code>$clone()</code>。这使得独立的图表可以共享相同的比例数据，从而产生了一个难以追踪的微妙bug。</p>
+</section>
+</section>
+<section id="method-chaining" class="level2">
+<h2 class="anchored" data-anchor-id="method-chaining">Method chaining</h2>
+<p>管道符<code>%&gt;%</code>很有用，因为它提供了一个“infix”运算符，使得从左到右组合函数变得容易。有趣的是，管道对R6对象来说并不那么重要，因为它们已经使用了一个“infix”运算符：<code>$</code>。这允许用户在单个表达式中链接多个方法调用，这种技术被称为方法链（<strong>method chaining</strong>）。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>s <span class="ot">&lt;-</span> Stack<span class="sc">$</span><span class="fu">new</span>()</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>s<span class="sc">$</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">push</span>(<span class="dv">10</span>)<span class="sc">$</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">push</span>(<span class="dv">20</span>)<span class="sc">$</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pop</span>()</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 20</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>这种技术通常用于其他编程语言，如Python和JavaScript, 并且是通过一个约定实现的：任何主要因其副作用 (通常是修改对象) 而调用的R6方法都应该返回<code>invisible(self)</code>。</p>
+<p>方法链的主要优点是可以获得有用的自动补全；主要缺点是只有类的创建者才能添加新的方法 (而且没有办法使用多分派)。</p>
 
 
+</section>
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -776,11 +953,11 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
+      <a href="../../Books/Advanced R(2e)/15 S4.html" class="pagination-link" aria-label="15 S4">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">15 S4</span>
+      </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../../Books/Advanced R(2e)/1 Introduction.html" class="pagination-link" aria-label="1 Introduction">
-        <span class="nav-page-text">1 Introduction</span> <i class="bi bi-arrow-right-short"></i>
-      </a>
   </div>
 </nav>
 </div> <!-- /content -->
