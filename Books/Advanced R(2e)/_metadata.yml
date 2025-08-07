@@ -26,3 +26,5 @@ website:
         - Books/Advanced R(2e)/14 R6.qmd
         - Books/Advanced R(2e)/15 S4.qmd
         - Books/Advanced R(2e)/16 Trade-offs.qmd
+        - Metaprogramming
+        - Books/Advanced R(2e)/Metaprogramming Introduction.qmd

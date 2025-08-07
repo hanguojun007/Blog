@@ -2250,5 +2250,15 @@
     "crumbs": [
       "16 Trade-offs"
     ]
+  },
+  {
+    "objectID": "Books/Advanced R(2e)/Metaprogramming Introduction.html",
+    "href": "Books/Advanced R(2e)/Metaprogramming Introduction.html",
+    "title": "Introduction",
+    "section": "",
+    "text": "R 语言中最令人感兴趣的特性之一是元编程（metaprogramming）。这种思想认为：代码即数据，可以被其他代码审查和修改，这深深地影响了R。从低水平上看，它实现了我们只需library(purrr)而无需添加\"\"就可以加载R包；使plot(x, sin(x))能自动用x和sin(x)作为图的坐标轴名称。从高水平看，它允许我们使用y ~ x1 + x2来描述一个模型；将subset(df, x == y)转换为df[df$x == df$y, , drop = FALSE]；使用dplyr::filter(db, is.na(x))（当db是数据库链接时）生成SQL语句WHERE x IS NULL。\n与元编程关系密切的是非标准性评估（Non-standard Evaluation，NSE）。这个术语通常用来描述R函数的行为，但会导致两个方面的歧义。首先，NSE实际上是函数参数的一个属性，因此谈论NSE函数有点草率。其次，通过什么是非标准来定义某个东西会让人混淆，因此本书会使用更精确的词汇表。\n本书会着重于由“rlang”包提供的整洁评估（tidy evaluation）。这将使你能够专注于重要的想法，而不会被R历史中产生的怪癖要求所分散注意力。在用rlang介绍完每个重要的想法后，本书会回过头来讨论这些想法在base R 中是如何实现的。这种方法可能看起来有些落后，但它就像学习如何使用自动变速器而不是换挡杆开车一样：它让你在学习细节之前先关注大局。本书侧重于整洁评估的理论方面，因此你可以从头到尾完全理解它是如何运作的。\n我们会在下面五个章节中介绍元编程与整洁评估：\n\n17章：介绍整个元编程框架，简要了解了所有主要组成部分，以及它们如何组合在一起使用。\n18章：介绍如何将R代码用“tree”结构进行描述。你将学习如何可视化这些树，R的语法规则如何将线性字符序列转换为这些树，以及如何使用递归函数来处理代码树。\n19章：介绍来自rlang的工具，你可以用它们来捕获未经评估的函数参数。你还将学习准引用，它提供了一套取消引用输入的技术，使得从代码片段中轻松生成新树成为可能。\n20章：继续评估捕获的代码。在这里，你将学习一个重要的数据结构，即quosure, 它通过捕获要评估的代码和评估它的环境来确保正确的评估。本章将向你展示如何将所有片段组合在一起，以理解NSE在base R中的工作原理，以及如何编写类似subset()的函数。\n21章：介绍如何结合第一类环境（first-class environments）、词法作用域和元编程，将R代码翻译成其他语言，即HTML和LaTeX。\n\n\n\n\n Back to top",
+    "crumbs": [
+      "Introduction"
+    ]
   }
 ]

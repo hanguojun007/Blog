@@ -1,0 +1,46 @@
+---
+title: "17 Big picture"
+date: "2025-08-07"
+date-modified: "2025-08-07"
+
+format: "html"
+fig-width: 6
+fig-asp: 0.618
+out-width: 70%
+fig-align: center
+
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: "#>"
+    R.options:
+      dplyr.print_min: 6
+      dplyr.print_max: 6
+      pillar.max_footer_lines: 2
+      pillar.min_chars: 15
+      stringr.view_n: 6
+      cli.num_colors: 0
+      cli.hyperlink: FALSE
+      pillar.bold: TRUE
+      width: 77
+
+execute:
+  warning: true
+  error: true
+---
+
+## Introduction
+
+元编程（**metaprogramming**）可以说是本书中最难的章节，因为它需要你结果之前不相关的章节来处理你之前从未想过的问题，并且你会接触到大量的抽象概念。即使你是一个使用另一种语言的经验丰富的程序员，你现有的技能也不太可能提供太多帮助，因为现代流行语言很少有能够有R所提供的元编程水平。所以，如果你一开始感到沮丧或困惑，不要惊讶；这是这个过程中每个人都会经历的自然过程！
+
+但在过去几年中，元编程的理论和实践已经大幅成熟，为解决常见问题提供了坚实的基础和工具，学习元编程比以往任何时候都更容易。在本章中，你将了解所有主要元素的大致情况，以及它们是如何组合在一起的。
+
+### Outline
+
+-   17.2节：
+-   17.3节：
+-   17.4节：
+-   17.5节：
+-   17.6节：
+-   17.7节：
+-   17.8节：
