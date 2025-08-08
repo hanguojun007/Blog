@@ -37,10 +37,212 @@ execute:
 
 ### Outline
 
--   17.2节：
--   17.3节：
--   17.4节：
--   17.5节：
--   17.6节：
--   17.7节：
--   17.8节：
+-   17.2节：**code is tree**，使用抽象语法树（**abstract syntax tree**）将code转换为树。
+-   17.3节：**code is data**，创建或修改捕获的code字符串（使用树结构）。
+-   17.4节：如何以编程方式创建新表达式。
+-   17.5节：如何通过在环境中评估表达式来执行它们。
+-   17.6节：如何通过在新环境中提供自定义功能来自定义评估。
+-   17.7节：将这种自定义扩展到数据掩码，使环境和数据帧之间的界限变得模糊。
+-   17.8节：引入一种新的数据结构，称为 Quoseure, 它使这一切变得更加简单和正确。
+
+### Prerequisites
+
+我们使用“rlang”包来介绍上述内容，再后续章节中介绍base R中的等价物。同时使用“lobstr”包来查看code的树结构。
+
+```{r}
+library(rlang)
+library(lobstr)
+```
+
+请确保你对环境和dataframe的数据结构十分了解。
+
+## Code is tree
+
+抽象语法树（**abstract syntax tree**）几乎是每个编程语言的底层逻辑。R不同的地方在于，可以真实得查看和修改树结构。
+
+使用`lobstr::ast()`函数可以直观地感受到代码就是一个树形结构。其中“函数”形成树地分支点，其他常量或变量形成树的叶子。
+
+```{r}
+lobstr::ast(f(a, "b"))
+```
+
+嵌套函数会创建更深的分支树：
+
+```{r}
+lobstr::ast(f1(f2(a, b), f3(1, f4(2))))
+```
+
+因为R中所有的函数都可以写成标准形式（function(x) x），所以所有的代码都会生成树形结构：
+
+```{r}
+lobstr::ast(1 + 2 * 3)
+```
+
+## Code is data
+
+正因为R代码的底层是树形结构，所以R代码可以作为数据处理。`lobstr::ast()`只是直接展示了树形结构，我们需要使用`rlang::expr()`将这种树形结构数据类型提取出来。
+
+```{r}
+expr(mean(x, na.rm = TRUE))
+test <- expr(10 + 100 + 1000)
+test
+str(test)
+class(test)
+typeof(test)
+```
+
+通常称被捕获的代码为表达式（**expression**）。但表达式不仅只有“代码”（call），还有：变量（symbol），常量（constant），成对列表（pairlist）。
+
+当你在函数中使用`expr()`时会失效，它不会捕捉传入的参数，而是直接捕获它的输入：
+
+```{r}
+capture_it <- function(x) {
+  expr(x)
+}
+capture_it(a + b + c)
+```
+
+需要使用`enexpr()`函数来捕获传入的参数：
+
+```{r}
+capture_it <- function(x) {
+  enexpr(x)
+}
+capture_it(a + b + c)
+```
+
+一旦捕获了表达式，我们就可以修改它了。可以把树形结构数据当作列表处理，使用`[[`和`$`获取“元素”：
+
+```{r}
+ast(f(x = 1, y = 2))
+
+f <- expr(f(x = 1, y = 2))
+
+# Add a new argument
+f$z <- 3
+f
+
+# Or remove an argument:
+f[[2]] <- NULL
+f
+```
+
+需要注意：列表的第一个元素是函数本身`f`，修改第一个参数`x`使用`[[2]]`。
+
+## Code can generate code
+
+捕获代码后可以创建代码对应的树，相应地，我们可以将提取创建好地树转换为代码。
+
+`rlang::call2()`函数可以构建一个“调用函数代码”：第一个参数是函数名，后续是参数。
+
+```{r}
+call2("f", 1, 2, 3)
+call2("+", 1, call2("*", 2, 3))
+```
+
+除了`call2()`函数，我们也可以使用`rlang::expr()`和解引操作符（**unquote operator**）来生成代码，这种方式特别适合构建复杂的嵌套代码。
+
+```{r}
+xx <- expr(x + x)
+yy <- expr(y + y)
+
+expr(!!xx / !!yy)
+```
+
+注意：生成的是正确的语法`(x + x) / (y + y)`，不是`x + x / y + y`，也不是`x + (x / y) + y`。
+
+解引操作符在构建函数是会更有用：首先使用`enexpr()`捕获参数，然后使用`!!`和`expr()`创建新的代码。下面是一个生成计算变异系数代码的示例：
+
+```{r}
+cv <- function(var) {
+  var <- enexpr(var)
+  expr(sd(!!var) / mean(!!var))
+}
+
+cv(x)
+cv(x + y)
+```
+
+即使输入是奇怪的字符，函数也可以正常运行：
+
+```{r}
+cv(`)`)
+```
+
+## Evaluation runs code
+
+当捕获并修改代码后，我们可以提供一个运行环境，然后重新运行（**evaluate**）代码。
+
+`base::eval()`函数有两个参数：1. 代码；2. 运行环境。
+
+```{r}
+eval(expr(x + y), env(x = 1, y = 10))
+eval(expr(x + y), env(x = 2, y = 100))
+```
+
+如果环境参数缺失，会自动使用当前环境：
+
+```{r}
+x <- 1
+y <- 10
+eval(expr(x + y))
+```
+
+重新评估代码的一大优势是可以调整环境。这样做主要有两个原因：
+
+-   临时重写函数以实现特定于领域的语言。
+-   添加数据掩码，以便可以像引用环境中的变量一样引用数据帧中的变量。
+
+## Customising evaluation with functions
+
+在重新评估代码时使用的环境中，我们不仅可以添加变量，还可以添加函数。这样我们就可以在特定的环境中重新命名已有的函数，例如：我们可以构建一个字符串的`+`和`*`函数。
+
+```{r}
+string_math <- function(x) {
+  e <- env(
+    caller_env(),
+    `+` = function(x, y) paste0(x, y),
+    `*` = function(x, y) strrep(x, y)
+  )
+
+  eval(enexpr(x), e)
+}
+
+name <- "Hadley"
+string_math("Hello " + name)
+string_math(("x" * 2 + "-y") * 3)
+```
+
+dplyr将这个想法发挥到极致，在一个生成SQL并能在远程数据库中执行的环境中运行代码：
+
+```{r}
+library(dplyr)
+
+con <- DBI::dbConnect(RSQLite::SQLite(), filename = ":memory:")
+mtcars_db <- copy_to(con, mtcars)
+
+mtcars_db %>%
+  filter(cyl > 2) %>%
+  select(mpg:hp) %>%
+  head(10) %>%
+  show_query()
+
+DBI::dbDisconnect(con)
+```
+
+## Customising evaluation with data
+
+
+```{r}
+df <- data.frame(x = 1:5, y = sample(5))
+eval_tidy(expr(x + y), df)
+```
+
+
+```{r}
+with2 <- function(df, expr) {
+  eval_tidy(enexpr(expr), df)
+}
+
+with2(df, x + y)
+```
