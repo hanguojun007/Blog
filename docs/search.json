@@ -2260,5 +2260,95 @@
     "crumbs": [
       "Introduction"
     ]
+  },
+  {
+    "objectID": "Books/Advanced R(2e)/17 Big picture.html",
+    "href": "Books/Advanced R(2e)/17 Big picture.html",
+    "title": "17 Big picture",
+    "section": "",
+    "text": "元编程（metaprogramming）可以说是本书中最难的章节，因为它需要你结果之前不相关的章节来处理你之前从未想过的问题，并且你会接触到大量的抽象概念。即使你是一个使用另一种语言的经验丰富的程序员，你现有的技能也不太可能提供太多帮助，因为现代流行语言很少有能够有R所提供的元编程水平。所以，如果你一开始感到沮丧或困惑，不要惊讶；这是这个过程中每个人都会经历的自然过程！\n但在过去几年中，元编程的理论和实践已经大幅成熟，为解决常见问题提供了坚实的基础和工具，学习元编程比以往任何时候都更容易。在本章中，你将了解所有主要元素的大致情况，以及它们是如何组合在一起的。\n\n\n\n17.2节：code is tree，使用抽象语法树（abstract syntax tree）将code转换为树。\n17.3节：code is data，创建或修改捕获的code字符串（使用树结构）。\n17.4节：如何以编程方式创建新表达式。\n17.5节：如何通过在环境中评估表达式来执行它们。\n17.6节：如何通过在新环境中提供自定义功能来自定义评估。\n17.7节：将这种自定义扩展到数据掩码，使环境和数据框之间的界限变得模糊。\n17.8节：引入一种新的数据结构，称为 Quoseure, 它使这一切变得更加简单和正确。\n\n\n\n\n我们使用“rlang”包来介绍上述内容，再后续章节中介绍base R中的等价物。同时使用“lobstr”包来查看code的树结构。\n\nlibrary(rlang)\nlibrary(lobstr)\n\n请确保你对环境和dataframe的数据结构十分了解。",
+    "crumbs": [
+      "17 Big picture"
+    ]
+  },
+  {
+    "objectID": "Books/Advanced R(2e)/17 Big picture.html#introduction",
+    "href": "Books/Advanced R(2e)/17 Big picture.html#introduction",
+    "title": "17 Big picture",
+    "section": "",
+    "text": "元编程（metaprogramming）可以说是本书中最难的章节，因为它需要你结果之前不相关的章节来处理你之前从未想过的问题，并且你会接触到大量的抽象概念。即使你是一个使用另一种语言的经验丰富的程序员，你现有的技能也不太可能提供太多帮助，因为现代流行语言很少有能够有R所提供的元编程水平。所以，如果你一开始感到沮丧或困惑，不要惊讶；这是这个过程中每个人都会经历的自然过程！\n但在过去几年中，元编程的理论和实践已经大幅成熟，为解决常见问题提供了坚实的基础和工具，学习元编程比以往任何时候都更容易。在本章中，你将了解所有主要元素的大致情况，以及它们是如何组合在一起的。\n\n\n\n17.2节：code is tree，使用抽象语法树（abstract syntax tree）将code转换为树。\n17.3节：code is data，创建或修改捕获的code字符串（使用树结构）。\n17.4节：如何以编程方式创建新表达式。\n17.5节：如何通过在环境中评估表达式来执行它们。\n17.6节：如何通过在新环境中提供自定义功能来自定义评估。\n17.7节：将这种自定义扩展到数据掩码，使环境和数据框之间的界限变得模糊。\n17.8节：引入一种新的数据结构，称为 Quoseure, 它使这一切变得更加简单和正确。\n\n\n\n\n我们使用“rlang”包来介绍上述内容，再后续章节中介绍base R中的等价物。同时使用“lobstr”包来查看code的树结构。\n\nlibrary(rlang)\nlibrary(lobstr)\n\n请确保你对环境和dataframe的数据结构十分了解。",
+    "crumbs": [
+      "17 Big picture"
+    ]
+  },
+  {
+    "objectID": "Books/Advanced R(2e)/17 Big picture.html#code-is-tree",
+    "href": "Books/Advanced R(2e)/17 Big picture.html#code-is-tree",
+    "title": "17 Big picture",
+    "section": "Code is tree",
+    "text": "Code is tree\n抽象语法树（abstract syntax tree）几乎是每个编程语言的底层逻辑。R不同的地方在于，可以真实得查看和修改树结构。\n使用lobstr::ast()函数可以直观地感受到代码就是一个树形结构。其中“函数”形成树地分支点，其他常量或变量形成树的叶子。\n\nlobstr::ast(f(a, \"b\"))\n#&gt; █─f \n#&gt; ├─a \n#&gt; └─\"b\"\n\n嵌套函数会创建更深的分支树：\n\nlobstr::ast(f1(f2(a, b), f3(1, f4(2))))\n#&gt; █─f1 \n#&gt; ├─█─f2 \n#&gt; │ ├─a \n#&gt; │ └─b \n#&gt; └─█─f3 \n#&gt;   ├─1 \n#&gt;   └─█─f4 \n#&gt;     └─2\n\n因为R中所有的函数都可以写成标准形式（function(x) x），所以所有的代码都会生成树形结构：\n\nlobstr::ast(1 + 2 * 3)\n#&gt; █─`+` \n#&gt; ├─1 \n#&gt; └─█─`*` \n#&gt;   ├─2 \n#&gt;   └─3",
+    "crumbs": [
+      "17 Big picture"
+    ]
+  },
+  {
+    "objectID": "Books/Advanced R(2e)/17 Big picture.html#code-is-data",
+    "href": "Books/Advanced R(2e)/17 Big picture.html#code-is-data",
+    "title": "17 Big picture",
+    "section": "Code is data",
+    "text": "Code is data\n正因为R代码的底层是树形结构，所以R代码可以作为数据处理。lobstr::ast()只是直接展示了树形结构，我们需要使用rlang::expr()将这种树形结构数据类型提取出来。\n\nexpr(mean(x, na.rm = TRUE))\n#&gt; mean(x, na.rm = TRUE)\ntest &lt;- expr(10 + 100 + 1000)\ntest\n#&gt; 10 + 100 + 1000\nstr(test)\n#&gt;  language 10 + 100 + 1000\nclass(test)\n#&gt; [1] \"call\"\ntypeof(test)\n#&gt; [1] \"language\"\n\n通常称被捕获的代码为表达式（expression）。但表达式不仅只有“代码”（call），还有：变量（symbol），常量（constant），成对列表（pairlist）。\n当你在函数中使用expr()时会失效，它不会捕捉传入的参数，而是直接捕获它的输入：\n\ncapture_it &lt;- function(x) {\n  expr(x)\n}\ncapture_it(a + b + c)\n#&gt; x\n\n需要使用enexpr()函数来捕获传入的参数：\n\ncapture_it &lt;- function(x) {\n  enexpr(x)\n}\ncapture_it(a + b + c)\n#&gt; a + b + c\n\n一旦捕获了表达式，我们就可以修改它了。可以把树形结构数据当作列表处理，使用[[和$获取“元素”：\n\nast(f(x = 1, y = 2))\n#&gt; █─f \n#&gt; ├─x = 1 \n#&gt; └─y = 2\n\nf &lt;- expr(f(x = 1, y = 2))\n\n# Add a new argument\nf$z &lt;- 3\nf\n#&gt; f(x = 1, y = 2, z = 3)\n\n# Or remove an argument:\nf[[2]] &lt;- NULL\nf\n#&gt; f(y = 2, z = 3)\n\n需要注意：列表的第一个元素是函数本身f，修改第一个参数x使用[[2]]。",
+    "crumbs": [
+      "17 Big picture"
+    ]
+  },
+  {
+    "objectID": "Books/Advanced R(2e)/17 Big picture.html#code-can-generate-code",
+    "href": "Books/Advanced R(2e)/17 Big picture.html#code-can-generate-code",
+    "title": "17 Big picture",
+    "section": "Code can generate code",
+    "text": "Code can generate code\n捕获代码后可以创建代码对应的树，相应地，我们可以将提取创建好地树转换为代码。\nrlang::call2()函数可以构建一个“调用函数代码”：第一个参数是函数名，后续是参数。\n\ncall2(\"f\", 1, 2, 3)\n#&gt; f(1, 2, 3)\ncall2(\"+\", 1, call2(\"*\", 2, 3))\n#&gt; 1 + 2 * 3\n\n除了call2()函数，我们也可以使用rlang::expr()和解引操作符（unquote operator）来生成代码，这种方式特别适合构建复杂的嵌套代码。\n\nxx &lt;- expr(x + x)\nyy &lt;- expr(y + y)\n\nexpr(!!xx / !!yy)\n#&gt; (x + x)/(y + y)\n\n注意：生成的是正确的语法(x + x) / (y + y)，不是x + x / y + y，也不是x + (x / y) + y。\n解引操作符在构建函数是会更有用：首先使用enexpr()捕获参数，然后使用!!和expr()创建新的代码。下面是一个生成计算变异系数代码的示例：\n\ncv &lt;- function(var) {\n  var &lt;- enexpr(var)\n  expr(sd(!!var) / mean(!!var))\n}\n\ncv(x)\n#&gt; sd(x)/mean(x)\ncv(x + y)\n#&gt; sd(x + y)/mean(x + y)\n\n即使输入是奇怪的字符，函数也可以正常运行：\n\ncv(`)`)\n#&gt; sd(`)`)/mean(`)`)",
+    "crumbs": [
+      "17 Big picture"
+    ]
+  },
+  {
+    "objectID": "Books/Advanced R(2e)/17 Big picture.html#evaluation-runs-code",
+    "href": "Books/Advanced R(2e)/17 Big picture.html#evaluation-runs-code",
+    "title": "17 Big picture",
+    "section": "Evaluation runs code",
+    "text": "Evaluation runs code\n当捕获并修改代码后，我们可以提供一个运行环境，然后重新运行（evaluate）代码。\nbase::eval()函数有两个参数：1. 代码；2. 运行环境。\n\neval(expr(x + y), env(x = 1, y = 10))\n#&gt; [1] 11\neval(expr(x + y), env(x = 2, y = 100))\n#&gt; [1] 102\n\n如果环境参数缺失，会自动使用当前环境：\n\nx &lt;- 1\ny &lt;- 10\neval(expr(x + y))\n#&gt; [1] 11\n\n重新评估代码的一大优势是可以调整环境。这样做主要有两个原因：\n\n临时重写函数以实现特定于领域的语言。\n添加数据掩码，以便可以像引用环境中的变量一样引用数据框中的变量。",
+    "crumbs": [
+      "17 Big picture"
+    ]
+  },
+  {
+    "objectID": "Books/Advanced R(2e)/17 Big picture.html#customising-evaluation-with-functions",
+    "href": "Books/Advanced R(2e)/17 Big picture.html#customising-evaluation-with-functions",
+    "title": "17 Big picture",
+    "section": "Customising evaluation with functions",
+    "text": "Customising evaluation with functions\n在重新评估代码时使用的环境中，我们不仅可以添加变量，还可以添加函数。这样我们就可以在特定的环境中重新命名已有的函数，例如：我们可以构建一个字符串的+和*函数。\n\nstring_math &lt;- function(x) {\n  e &lt;- env(\n    caller_env(),\n    `+` = function(x, y) paste0(x, y),\n    `*` = function(x, y) strrep(x, y)\n  )\n\n  eval(enexpr(x), e)\n}\n\nname &lt;- \"Hadley\"\nstring_math(\"Hello \" + name)\n#&gt; [1] \"Hello Hadley\"\nstring_math((\"x\" * 2 + \"-y\") * 3)\n#&gt; [1] \"xx-yxx-yxx-y\"\n\ndplyr将这个想法发挥到极致，在一个生成SQL并能在远程数据库中执行的环境中运行代码：\n\nlibrary(dplyr)\n#&gt; \n#&gt; Attaching package: 'dplyr'\n#&gt; The following objects are masked from 'package:stats':\n#&gt; \n#&gt;     filter, lag\n#&gt; The following objects are masked from 'package:base':\n#&gt; \n#&gt;     intersect, setdiff, setequal, union\n\ncon &lt;- DBI::dbConnect(RSQLite::SQLite(), filename = \":memory:\")\n#&gt; Error in (function (cond) : error in evaluating the argument 'drv' in selecting a method for function 'dbConnect': there is no package called 'RSQLite'\nmtcars_db &lt;- copy_to(con, mtcars)\n#&gt; Error: object 'con' not found\n\nmtcars_db %&gt;%\n  filter(cyl &gt; 2) %&gt;%\n  select(mpg:hp) %&gt;%\n  head(10) %&gt;%\n  show_query()\n#&gt; Error: object 'mtcars_db' not found\n\nDBI::dbDisconnect(con)\n#&gt; Error in h(simpleError(msg, call)): error in evaluating the argument 'conn' in selecting a method for function 'dbDisconnect': object 'con' not found",
+    "crumbs": [
+      "17 Big picture"
+    ]
+  },
+  {
+    "objectID": "Books/Advanced R(2e)/17 Big picture.html#customising-evaluation-with-data",
+    "href": "Books/Advanced R(2e)/17 Big picture.html#customising-evaluation-with-data",
+    "title": "17 Big picture",
+    "section": "Customising evaluation with data",
+    "text": "Customising evaluation with data\n重定义函数是一种极其强大的工具，但是它要大量的投入。相反，数据掩码是一种即时快速的应用—-直接引用数据框中的变量而不是从环境中获取。数据掩码技术在很多函数中应用：subset()、transform()、aes()、summarise()等等。虽然eval()函数能够实现数据掩码技术，但存在潜在的风险（20.6节），本节使用rlang::eval_tidy()函数来完成。\neval_tidy()函数同样接受代码和运行环境两个参数，但此处的环境特指数据框。\n\ndf &lt;- data.frame(x = 1:5, y = sample(5))\neval_tidy(expr(x + y), df)\n#&gt; [1]  2  5  5  8 10\n\n虽然数据掩码技术使得直接调用x + y成为可能，方便了交互使用，但同时也会造成歧义。在20.4节中我们会介绍使用.data，.env来避免歧义。\n搭配enexpr()函数，我们开一个创建适配数据掩码的“with”函数——with2()：\n\n# Unfortunately, this function has a subtle bug and we need a new data structure to help deal with it.\nwith2 &lt;- function(df, expr) {\n  eval_tidy(enexpr(expr), df)\n}\n\nwith2(df, x + y)\n#&gt; [1]  2  5  5  8 10",
+    "crumbs": [
+      "17 Big picture"
+    ]
+  },
+  {
+    "objectID": "Books/Advanced R(2e)/17 Big picture.html#quosures",
+    "href": "Books/Advanced R(2e)/17 Big picture.html#quosures",
+    "title": "17 Big picture",
+    "section": "Quosures",
+    "text": "Quosures\n上面的with2()函数存在潜在风险，它会优先调用函数运行环境中的变量：\n\nwith2 &lt;- function(df, expr) {\n  a &lt;- 1000\n  eval_tidy(enexpr(expr), df)\n}\n\ndf &lt;- data.frame(x = 1:3)\na &lt;- 10\nwith2(df, x + a)\n#&gt; [1] 1001 1002 1003\n\n幸运地是，我们可以使用新的数据结构——quosure——来解决这个问题。eval_tidy()函数知道如何处理quosure，所以我们只需要使用enquo()函数来替换enexpr()函数：\n\nwith2 &lt;- function(df, expr) {\n  a &lt;- 1000\n  eval_tidy(enquo(expr), df)\n}\n\nwith2(df, x + a)\n#&gt; [1] 11 12 13\n\n无论何时使用数据掩码，都必须始终使用enquo()而不是enexpr()。",
+    "crumbs": [
+      "17 Big picture"
+    ]
   }
 ]
