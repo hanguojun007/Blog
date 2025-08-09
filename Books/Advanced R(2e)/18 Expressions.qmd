@@ -1,7 +1,7 @@
 ---
 title: "18 Expressions"
-date: "2025-08-08"
-date-modified: "2025-08-08"
+date: "2025-08-09"
+date-modified: "2025-08-10"
 
 format: "html"
 fig-width: 6
@@ -31,3 +31,388 @@ execute:
 
 ## Introduction
 
+想要理解“expression”的结构并运用它，我们需要学习一些新的概念，新的工具以及新的思考方式。
+
+首先就是在代码的执行和结果上有着显著差异，例如，当我们没有定义`x`时，计算`y <- x * 10`会报错：
+
+```{r}
+y <- x * 10
+```
+
+但是如果我们能够将“要执行的代码”和“执行的过程”分开，那么问题就迎刃而解了。例如使用`rlang::expr()`：
+
+```{r}
+z <- rlang::expr(y <- x * 10)
+z
+```
+
+`expr()`返回一个“表达式”，这个表达式对象包含了“代码”，但是没有“执行”。我们可以使用`base::eval()`来执行这个“表达式”：
+
+```{r}
+x <- 5
+eval(z)
+y
+```
+
+这样就将两个过程分离开来，本章的主要内容就是“表达式”这类对象的数据结构。掌握了这些内容，你就可以查看和修改“表达式”，也即修改了代码或者生成了代码。
+
+### Outline
+
+-   18.2节：介绍语法抽象树（**Abstract Syntax Tree**，AST）思想，它是所有R代码的底层数据结构。
+-   18.3节：深入了解AST，构成“表达式”的数据类型：constants，symbol，call，pairlist，missing argument。
+-   18.4节：介绍解析字符串为表达式，并探讨R中的语法。
+-   18.5节：介绍如何使用递归函数来处理“language”对象和“表达式”。
+-   18.6节：介绍三种特殊的数据类型：pairlist，missing argument，expression vector。
+
+### Prerequisites
+
+```{r}
+library(rlang)
+library(lobstr)
+```
+
+## Abstract Syntax Tree
+
+“表达式”基于**抽象语法树**（**Abstract Syntax Tree**，AST）这一数据结构类型。理解该数据结构对检查和修改“表达式”至关重要。
+
+### Drawing
+
+本书会采用两种方式来展示AST，以`f(x, "y", 1)`为例：
+
+-   通过手绘：
+
+    ![](images/simple.png)
+
+-   通过`lobstr::ast()`
+
+```{r}
+lobstr::ast(f(x, "y", 1))
+```
+
+两种方法都遵循相同的惯例：
+
+-   树叶类型：symbol（如`f`,`x`），constant（如`1`,`"y"`）。
+    -   symbol：采用紫色（圆角矩形）
+    -   constant：采用灰色（黑色，方角矩形）
+    -   字符串会带有引号。
+-   树枝类型：call，采用橙色方角矩形。
+    -   “call”对象的第一个元素是函数名，其余元素是参数。
+
+注意：本书中由`lobstr::ast()`函数生成的树没有颜色，你需要在终端内查看。
+
+上面的例子只有一层，实际中的“表达式”会有很多层。例如`f(g(1, 2), h(3, 4, i()))`：
+
+![](images/complicated.png)
+
+```{r}
+lobstr::ast(f(g(1, 2), h(3, 4, i())))
+```
+
+注意：如果函数的表达式中没有参数，例如`i()`，在最终的树中，它仅会被表示为symbol。
+
+树枝的顺序通常也表示了函数的执行顺序（由深到浅执行），但由于惰性评估的存在，也可能会出现跳过某个树枝的情况。
+
+### Non-code components
+
+AST在捕获代码时，会忽略空格与注释等不运行的部分。
+
+```{r}
+ast(
+  f(x, y) # important!
+)
+```
+
+只有一个地方会考虑空格：
+
+```{r}
+lobstr::ast(y <- x)
+lobstr::ast(y < -x)
+```
+
+### Infix calls
+
+R 中的任何函数都可以写成“prefix”型式。`y <- x * 10`实际上是由`<-`和`*`两个函数组成：
+
+``` r
+y <- x * 10
+`<-`(y, `*`(x, 10))
+```
+
+![](images/prefix.png)
+
+```{r}
+lobstr::ast(`<-`(y, `*`(x, 10)))
+```
+
+```{r}
+lobstr::ast(function(x = 1, y = 2) {})
+```
+
+## Expressions
+
+本节介绍构成“表达式”的主要三种数据类型——constant，symbol，call。
+
+### Constants
+
+常量是AST中最简单的数据类型。它是除`NULL`意外的任意长度为1的原子向量，例如`TRUE`,`1L`,`2.5`,`"hello"`。可以使用`rlang::is_syntactic_literal()`检查是否是“常量”。
+
+用于表示常量的“表达式”和常量本身是相同的，可以说常量是“自引用”：
+
+```{r}
+identical(expr(TRUE), TRUE)
+identical(expr(1), 1)
+identical(expr(2L), 2L)UE
+identical(expr("x"), "x")
+```
+
+### Symbols
+
+符合表示对象绑定的名称，例如：`x`,`mean`,`mtcars`等。在base R中，`is.name()`和`is.symbol()`都可以用来检查是否为“符号”。
+
+“rlang”包提供了两种创建符号的方法：`expr()`和`sym()`。`sym()`函数直接将一个字符串转换为符号。
+
+```{r}
+expr(x)
+sym("x")
+```
+
+可以使用`as.character()`和`rlang::as_string()`将符号转换为字符串。
+
+```{r}
+as.character(sym("x"))
+rlang::as_string(sym("x"))
+```
+
+注意：符号类型不能被向量化，它的长度总是1；如果想要创建多个符号，需要将他们组合为列表，并使用`rlang::syms()`。
+
+### Calls
+
+**call object**是被捕获的函数，它是一种特殊的列表（pairlist）——首个元素是函数名，后续元素是参数。call object 在AST中组成了树枝。使用`is.call()`检查是否是call object，`typeof()`和`str()`作用于call object时总是返回“language”。
+
+```{r}
+lobstr::ast(read.table("important.csv", row.names = FALSE))
+x <- expr(read.table("important.csv", row.names = FALSE))
+
+typeof(x)
+str(x)
+is.call(x)
+```
+
+“表达式”中的常量或符号类型的长度始终为1和call object有关，因为`c()`也是函数。
+
+#### Subsetting
+
+call object类似于列表，可以使用标准的提取函数。它的首个元素是函数名，通常是符号类型：
+
+```{r}
+x[[1]]
+is.symbol(x[[1]])
+```
+
+其余元素是参数：
+
+```{r}
+as.list(x[-1])
+```
+
+可以使用`[[`或`$`提取：
+
+```{r}
+x[[2]]
+x$row.names
+```
+
+添加新的元素：
+
+```{r}
+x$header <- TRUE
+x
+```
+
+由于R灵活的参数匹配规则，有时候提取特定的参数会变得很困难，此时可以使用`call_match()`将调用的函数参数补齐并标准化：
+
+```{r}
+rlang::call_match(x, read.table)
+```
+
+#### Function position
+
+call object 的首个元素是**function position**，它是“表达式”被评估时调用的函数名，通常是符号类型：
+
+```{r}
+lobstr::ast(foo())
+```
+
+尽管R允许函数名添加引号，但在被评估后依然会转换为符号类型：
+
+```{r}
+lobstr::ast("foo"())
+```
+
+call object 的首个元素无法修改其name属性，其余属性可以：
+
+```{r}
+x <- expr(foo(x = 1))
+names(x)
+names(x) <- c("x", "")
+x
+```
+
+如果函数不再当前环境中，表达式会添加对函数检索的步骤，例如：函数在某个包、属于某个R6类型、由某个函数工厂创建等。
+
+```{r}
+lobstr::ast(pkg::foo(1))
+lobstr::ast(obj$foo(1))
+lobstr::ast(foo(1)(2))
+```
+
+![](images/call-call.png)
+
+#### Constructing
+
+使用`rlang::call2()`可以构建一个call object：
+
+```{r}
+call2("mean", x = sym(x), na.rm = TRUE)
+call2(expr(base::mean), x = sym(x), na.rm = TRUE)
+```
+
+infix call 的创建方式一样：
+
+```{r}
+call2("<-", sym(x), 10)
+```
+
+我们会在下一章介绍更强大的工具来创建复杂的call object。
+
+### Summary
+
+下表总结了`str()`和`typeof()`处理不同“表达式”类型的结果：
+
+|   | [`str()`](https://rdrr.io/r/utils/str.html) | [`typeof()`](https://rdrr.io/r/base/typeof.html) |
+|------------------------|------------------------|------------------------|
+| Scalar constant | `logi`/`int`/`num`/`chr` | `logical`/`integer`/`double`/`character` |
+| Symbol | `symbol` | `symbol` |
+| Call object | `language` | `language` |
+| Pairlist | Dotted pair list | `pairlist` |
+| Expression vector | [`expression()`](https://rdrr.io/r/base/expression.html) | `expression` |
+
+下表总结了base R 和 “rlang” 提供的用于检测“表达式”类型的函数：
+
+|   | base | rlang |
+|----------------|------------------------|--------------------------------|
+| Scalar constant | — | [`is_syntactic_literal()`](https://rlang.r-lib.org/reference/is_expression.html) |
+| Symbol | [`is.symbol()`](https://rdrr.io/r/base/name.html) | [`is_symbol()`](https://rlang.r-lib.org/reference/is_symbol.html) |
+| Call object | [`is.call()`](https://rdrr.io/r/base/call.html) | [`is_call()`](https://rlang.r-lib.org/reference/is_call.html) |
+| Pairlist | [`is.pairlist()`](https://rdrr.io/r/base/list.html) | [`is_pairlist()`](https://rlang.r-lib.org/reference/is_pairlist.html) |
+| Expression vector | [`is.expression()`](https://rdrr.io/r/base/expression.html) | — |
+
+## Parsing and grammar
+
+计算机将字符串转为为“表达式”的过程称为解析（**parsing**），这个过程遵循一系列语法（**grammar**）。本节我们通过`lobstr::ast()`函数来探讨解析过程中的语法，以及如何相互转换“表达式”与字符串。
+
+### Operator precedence
+
+infix 函数的使用会产生两种歧义。第一种歧义类似于：`1 + 2 * 3`会产生什么，是9（(1 + 2) * 3）还是7（1 + (2 * 3)）？
+
+![](images/ambig-order.png)
+
+编程语言使用操作符优先级（**operator precedence**）来确定表达式的计算顺序。我们可以使用`lobstr::ast()`来查看实际的计算顺序：
+**）
+
+```{r}
+lobstr::ast(1 + 2 * 3)
+```
+
+预测数学操作符是比较容易的，因为它遵循我们学习过的数学规则。预测其他运算符的优先级则会困难一些，例如R中的`!`优先级通常比较低：
+
+```{r}
+lobstr::ast(!x %in% y)
+
+lobstr::ast(!1 + !1)
+!1 + !1
+```
+
+R 有着超过30种，被划分为18个类的infix运算符，详细细节见`?Syntax`。通常很少有人能记住完整的顺序，如果有任何混淆，请使用括号`(`！
+
+```{r}
+lobstr::ast((1 + 2) * 3)
+```
+
+### Associativity
+
+第二种歧义类似于多个相同的infix运算符的优先级。例如`1 + 2 + 3`与`1 + (2 + 3)`的关系，很显然是等价的，但在某些情况如`geom`之间使用的`+`，执行的先后并不等价。在R中，大多数运算符都遵循从左到右的执行顺序。
+
+```{r}
+lobstr::ast(1 + 2 + 3)
+```
+
+幂运算与赋值运算相反：
+
+```{r}
+lobstr::ast(2^2^3)
+lobstr::ast(x <- y <- z)
+```
+
+### Parsing and deparsing
+
+在终端输入代码并执行的过程伴随着终端对代码字符串的解析。同样地，我们也可以将要运行的代码写成字符串形式，然后在必要的地方解析并执行它。
+
+你可以使用`rlang::parse_env()`函数解析：
+
+```{r}
+x1 <- "y <- x + 10"
+x1
+is.call(x1)
+
+x2 <- rlang::parse_expr(x1)
+x2
+is.call(x2)
+```
+
+`parse_expr()`总是产生一个“表达式”，如果你的代码字符串中包含`;`或`\n`，需要使用`parse_exprs()`来解析，生成一个“表达式”列表：
+
+```{r}
+x3 <- "a <- 1; a + 1"
+rlang::parse_exprs(x3)
+```
+
+如果你经常处理代码字符串，你应该重新考虑处理方式。阅读第19章，并考虑是否可以使用准引号更安全地生成“表达式”。
+
+base R中的解析函数是`parse()`，我们会在18.6.3节中详细介绍。该函数需要使用`text`参数来接受代码字符串。
+
+```{r}
+parse(text = x1)
+```
+
+可以使用`rlang::expr_text()`函数还原（**deparsing**）一个“表达式”，这个函数在每次打印“表达式”时调用。
+
+```{r}
+z <- expr(y <- x + 10)
+expr_text(z)
+```
+
+要注意：解析与还原不是对称的，因为解析的过程会自动忽略“空格”、“注释”等不执行的符号：
+
+```{r}
+cat(expr_text(expr({
+  # This is a comment
+  x <-     `x` + 1
+})))
+```
+
+当使用base R 中的`deparse()`函数时，要注意它返回的是每行一个字符串的向量。
+
+```{r}
+as.list(deparse(expr({
+  # This is a comment
+  x <-     `x` + 1
+})))
+```
+
+## Walking AST with recursive functions
+
+```{r}
+lobstr::ast(a + 1)
+lobstr::ast(x^y %+% z)
+```

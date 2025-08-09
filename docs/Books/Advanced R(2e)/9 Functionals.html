@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.6.36">
+<meta name="generator" content="quarto-1.6.40">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -64,17 +64,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
-<link href="../../Books/Advanced R(2e)/Functional programming.html" rel="next">
-<link href="../../Books/Advanced R(2e)/8 Conditions.html" rel="prev">
+<link href="../../Books/Advanced R(2e)/10 Function factories.html" rel="next">
+<link href="../../Books/Advanced R(2e)/Functional programming.html" rel="prev">
 <script src="../../site_libs/quarto-html/quarto.js"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-01c78b5cd655e4cd89133cf59d535862.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-357f3a88c8c08e74b7450a91eb5d7532.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-e6e594f9697a8fc74d922f689f62e840.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": true,
@@ -259,12 +259,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </div>
 </li>
         <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../../Books/Advanced R(2e)/9 Functionals.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">9 Functionals</span></a>
-  </div>
-</li>
-        <li class="sidebar-item">
  <span class="menu-text">Functional programming</span>
   </li>
         <li class="sidebar-item">
@@ -274,12 +268,75 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </div>
 </li>
         <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/9 Functionals.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">9 Functionals</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/10 Function factories.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">10 Function factories</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/11 Function operators.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">11 Function operators</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
  <span class="menu-text">Object-oriented Programming</span>
   </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/Object-oriented Programming.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Introduction</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../../Books/Advanced R(2e)/12 Base types.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">12 Base types</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/13 S3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">13 S3</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/14 R6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">14 R6</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/15 S4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">15 S4</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/16 Trade-offs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">16 Trade-offs</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+ <span class="menu-text">Metaprogramming</span>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/Metaprogramming Introduction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Introduction</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/17 Big picture.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">17 Big picture</span></a>
   </div>
 </li>
     </ul>
@@ -335,7 +392,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </ul>
 </nav>
     <div class="quarto-margin-footer"><div class="margin-footer-item">
-<p><img src="../../logo.jpg" class="conditional-footer img-fluid" width="200"></p>
+<p><img src="../..\logo.jpg" class="conditional-footer img-fluid" width="200"></p>
 </div></div></div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -377,11 +434,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>randomise <span class="ot">&lt;-</span> <span class="cf">function</span>(f) <span class="fu">f</span>(<span class="fu">runif</span>(<span class="fl">1e3</span>))</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">randomise</span>(mean)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0.5122965</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0.5147903</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">randomise</span>(mean)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0.5053847</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0.4998569</span></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">randomise</span>(sum)</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 498.6696</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 493.8812</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>base R 中常见的<code>apply</code>家族函数就属于泛函，还有purrr包中的map系列函数，以及一些数学泛函——<code>integrate()</code>,<code>optim()</code>。</p>
 <p>base R 中的for循环优先级：泛函 &gt; for &gt; while &gt; repeat。如果你对for循环很熟悉，转换到泛函时，只需要从for循环中的提取函数，将其作为参数传入符合要求的泛函即可。当你找不到符合要求的泛函时，首先不要硬适配某种泛函，优先使用for循环，当类似的循环逻辑被重复使用时，考虑编写自己的泛函。</p>
@@ -593,15 +650,15 @@ Note
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>注意：使用<code>~ f(.x, ...)</code>形式直接传递参数和通过map函数进行传递，这两种方式有些许不同。前者会在每次调用函数<code>f</code>时都评估参数，后者只会在map函数中评估一次。当参数需要延迟评估时要特别注意，例如下面的参数是有<code>runif()</code>随机生成。</p>
+<p>注意：使用<code>~ f(.x, ...)</code>形式直接传递参数和通过map函数进行传递，这两种方式有些许不同。前者会在每次调用函数<code>f</code>时都评估参数，后者只会在map函数中评估一次。当参数需要惰性评估时要特别注意，例如下面的参数是有<code>runif()</code>随机生成。</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>plus <span class="ot">&lt;-</span> <span class="cf">function</span>(x, y) x <span class="sc">+</span> y</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>)</span>
 <span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="fu">map_dbl</span>(x, plus, <span class="fu">runif</span>(<span class="dv">1</span>))</span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0.06556413 0.06556413 0.06556413 0.06556413</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0.9335615 0.9335615 0.9335615 0.9335615</span></span>
 <span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="fu">map_dbl</span>(x, <span class="sc">~</span> <span class="fu">plus</span>(.x, <span class="fu">runif</span>(<span class="dv">1</span>)))</span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0.8742589 0.9740036 0.6046076 0.4938412</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0.1273780 0.8587769 0.5053184 0.6885845</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </div>
@@ -640,16 +697,16 @@ Note
 </ul>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">map_dbl</span>(trims, <span class="sc">~</span> <span class="fu">mean</span>(x, <span class="at">trim =</span> .x))</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 62.29917598  0.05500134  0.08526531  0.12600143</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1]  0.235246840  0.003923525  0.011154129 -0.010962846</span></span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="fu">map_dbl</span>(trims, <span class="cf">function</span>(trim) <span class="fu">mean</span>(x, <span class="at">trim =</span> trim))</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 62.29917598  0.05500134  0.08526531  0.12600143</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1]  0.235246840  0.003923525  0.011154129 -0.010962846</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <ul>
 <li>使用<code>mean()</code>函数的参数自动匹配。你需要直到<code>mean()</code>函数的参数名称，</li>
 </ul>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">map_dbl</span>(trims, mean, <span class="at">x =</span> x)</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 62.29917598  0.05500134  0.08526531  0.12600143</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1]  0.235246840  0.003923525  0.011154129 -0.010962846</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 </section>
@@ -795,14 +852,14 @@ Note
 <span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Caused by error in `weighted.mean.default()`:</span></span>
 <span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ! 'x' and 'w' must have the same length</span></span>
 <span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a><span class="fu">map2_dbl</span>(xs, ws, weighted.mean)</span>
-<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1]        NA 0.4274373 0.4235742 0.4496665 0.4655846 0.4480563 0.4670280</span></span>
-<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [8] 0.4991842</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1]        NA 0.4667609 0.4227345 0.5946132 0.6141333 0.4808475 0.5011029</span></span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [8] 0.5467264</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>传递额外参数<code>na.rm = TRUE</code>的方式与<code>map()</code>一样。</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">map2_dbl</span>(xs, ws, weighted.mean, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0.4596985 0.4274373 0.4235742 0.4496665 0.4655846 0.4480563 0.4670280</span></span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [8] 0.4991842</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0.5770996 0.4667609 0.4227345 0.5946132 0.6141333 0.4808475 0.5011029</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [8] 0.5467264</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><img src="images/map2-arg.png" class="img-fluid"></p>
 <p><code>map2()</code>函数的本质可以用下面的函数表示：</p>
@@ -880,9 +937,9 @@ Note
 <div class="cell">
 <div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">map</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>, <span class="sc">~</span> <span class="fu">sample</span>(<span class="dv">1000</span>, <span class="dv">10</span>))</span>
 <span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="fu">imap_chr</span>(x, <span class="sc">~</span> <span class="fu">paste0</span>(<span class="st">"The highest value of "</span>, .y, <span class="st">" is "</span>, <span class="fu">max</span>(.x)))</span>
-<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "The highest value of 1 is 992" "The highest value of 2 is 944"</span></span>
-<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [3] "The highest value of 3 is 907" "The highest value of 4 is 951"</span></span>
-<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [5] "The highest value of 5 is 880" "The highest value of 6 is 988"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] "The highest value of 1 is 960" "The highest value of 2 is 891"</span></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [3] "The highest value of 3 is 662" "The highest value of 4 is 948"</span></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [5] "The highest value of 5 is 899" "The highest value of 6 is 960"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="any-number-of-inputs-pmap-and-friends" class="level3">
@@ -903,13 +960,13 @@ Note
 <span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a><span class="fu">pmap</span>(params, runif)</span>
 <span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [[1]]</span></span>
-<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0.8321611</span></span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0.5500527</span></span>
 <span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [[2]]</span></span>
-<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 29.22384 41.99477</span></span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 66.13938 97.97263</span></span>
 <span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [[3]]</span></span>
-<span id="cb32-16"><a href="#cb32-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 203.9812 334.4941 312.3663</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb32-16"><a href="#cb32-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 416.8362 339.4410 616.1522</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><img src="images/pmap-3.png" class="img-fluid"></p>
 <p><code>map2(x, y, f)</code> 可以等价为<code>pmap(list(x, y), f)</code>。</p>
@@ -928,12 +985,12 @@ Note
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pmap_dbl</span>(<span class="fu">list</span>(xs, ws), weighted.mean)</span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1]        NA 0.4274373 0.4235742 0.4496665 0.4655846 0.4480563 0.4670280</span></span>
-<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [8] 0.4991842</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1]        NA 0.4667609 0.4227345 0.5946132 0.6141333 0.4808475 0.5011029</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [8] 0.5467264</span></span>
 <span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a><span class="fu">pmap_dbl</span>(<span class="fu">list</span>(xs, ws), weighted.mean, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0.4596985 0.4274373 0.4235742 0.4496665 0.4655846 0.4480563 0.4670280</span></span>
-<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [8] 0.4991842</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0.5770996 0.4667609 0.4227345 0.5946132 0.6141333 0.4808475 0.5011029</span></span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [8] 0.5467264</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><a href="@sec-vary_another_argument">9.2.5</a>小节中的情况也可以用<code>pmap()</code>解决。</p>
 <div class="cell">
@@ -941,7 +998,7 @@ Note
 <span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">rcauchy</span>(<span class="dv">1000</span>)</span>
 <span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a><span class="fu">pmap_dbl</span>(<span class="fu">list</span>(<span class="at">trim =</span> trims), mean, <span class="at">x =</span> x)</span>
-<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0.476989476 0.007400580 0.004859345 0.023438581</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1]  1.03688930 -0.08315130 -0.04954040 -0.02288907</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>base R 有两个等价的函数：<code>Map()</code>和<code>mapply()</code>，但是它们都有显著的缺陷。</p>
 <ul>
@@ -1621,13 +1678,13 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../../Books/Advanced R(2e)/8 Conditions.html" class="pagination-link" aria-label="8 Conditions">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">8 Conditions</span>
+      <a href="../../Books/Advanced R(2e)/Functional programming.html" class="pagination-link" aria-label="Introduction">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Introduction</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../../Books/Advanced R(2e)/Functional programming.html" class="pagination-link" aria-label="Introduction">
-        <span class="nav-page-text">Introduction</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../../Books/Advanced R(2e)/10 Function factories.html" class="pagination-link" aria-label="10 Function factories">
+        <span class="nav-page-text">10 Function factories</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

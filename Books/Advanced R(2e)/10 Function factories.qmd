@@ -138,7 +138,7 @@ fn_env(cube)$exp
 
 ### Forcing evaluation
 
-在实际使用过程中，`power1()`函数会因为延迟评估造成bug。
+在实际使用过程中，`power1()`函数会因为惰性评估造成bug。
 
 ```{r}
 x <- 2
@@ -152,7 +152,7 @@ x <- 3
 square(2)
 ```
 
-因为`power1()`中的`x`只有在`square()`被调用时才会被评估。这种由于延迟评估造成的bug，在由**function factories**生成**manufactured functions**时广泛存在。
+因为`power1()`中的`x`只有在`square()`被调用时才会被评估。这种由于惰性评估造成的bug，在由**function factories**生成**manufactured functions**时广泛存在。
 
 我们可以使用`force()`函数来强制在创建`square()`时，`power1()`的参数`x`就被评估。
 
