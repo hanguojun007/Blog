@@ -1,0 +1,114 @@
+---
+title: "19 Quasiquotation"
+date: "2025-08-11"
+date-modified: "2025-08-11"
+
+format: "html"
+fig-width: 6
+fig-asp: 0.618
+out-width: 70%
+fig-align: center
+
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: "#>"
+    R.options:
+      dplyr.print_min: 6
+      dplyr.print_max: 6
+      pillar.max_footer_lines: 2
+      pillar.min_chars: 15
+      stringr.view_n: 6
+      cli.num_colors: 0
+      cli.hyperlink: FALSE
+      pillar.bold: TRUE
+      width: 77
+
+execute:
+  warning: true
+  error: true
+---
+
+## Introduction
+
+准引用（**quasiquotation**）是一种“使用和提及”（use and mention）的语法规则。它包括两部分——引用和解引用，引用就是我们上章介绍过的捕获“表达式”，解引用就是重新评估“表达式”。准引用使得组合函数创建者的函数与函数使用者的函数更加容易。
+
+准引用是组成tidy-evaluation的三大基石之一（quosures和data-mask将在下章介绍），在tidy-evaluation中，所有支持引用的函数都支持解引用。
+
+### Outline
+
+-   19.2节：通过一个示例函数——`cement()`介绍为什么使用准引用。
+-   19.3节：介绍引用的工具。
+-   19.4节：介绍解引用的工具。
+-   19.5节：讨论base R中类似的“解引用”。
+-   19.6节：介绍使用`!!!`的另外两种情况。
+-   19.7节：介绍一些示例。
+-   19.8节：介绍准引用的历史。
+
+### Prerequisites
+
+需要熟悉第17，18章的内容。
+
+```{r}
+library(rlang)
+library(purrr)
+```
+
+### Related work
+
+引用函数与Lisp语言中的宏紧密相关。宏通常在编译时运行，这在R中不存在，并且它的输出也是AST结构。引用函数与更为深奥的Lisp **fexprs**关系更为密切，后者是默认引用所有参数的函数。当在其他编程语言中寻找相关工作时，了解这些术语是有用的。
+
+## Motivation
+
+我们将从一个具体的例子开始，这个例子有助于激发取消引用的需求，从而实现准引用。假设你要创建一个拼接字符串的函数：
+
+```{r}
+paste("Good", "morning", "Hadley")
+paste("Good", "afternoon", "Alice")
+```
+
+如果你厌倦了每次都输入引号“"”，那么你可以创建下面的函数（后续会详细介绍如何使用）：
+
+```{r}
+cement <- function(...) {
+  args <- ensyms(...)
+  paste(purrr::map(args, as_string), collapse = " ")
+}
+
+cement(Good, morning, Hadley)
+cement(Good, afternoon, Alice)
+```
+
+上面的函数使得我们无需在每个字符两边添加引号，但它有个问题是：当我们使用变量指代字符时，它无法识别变量。`paste()`函数则可以正常识别
+
+```{r}
+name <- "Hadley"
+time <- "morning"
+
+cement(Good, time, name)
+paste("Good", time, name)
+```
+
+我们需要使用特殊的解引符号`!!`处理上面这种情况：
+
+```{r}
+cement(Good, !!time, !!name)
+```
+
+::: {.callout-note}
+我个人认为“引用”与“解引”是由赋值符号`<-`的行为定义的。例如`time <- "morning"`，当我们直接使用`time`时就是引用，表示`time`是一个标签而不是真实的值；当我们使用`!!time`时就是解引，表示真实地使用`"morning"`。`cement()`函数中的`ensyms()`函数的作用是捕获“表达式”，后续直接将表达式转换为了字符串——`as_stirng()`。
+
+```{r}
+time <- "morning"
+cement <- function(...) {
+  args <- ensyms(...)
+  print(args)
+  typeof(args[[1]])
+}
+cement(time)
+cement(!!time)
+```
+:::
+
+### Vocabulary
+
