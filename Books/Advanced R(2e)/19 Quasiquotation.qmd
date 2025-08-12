@@ -1,7 +1,7 @@
 ---
 title: "19 Quasiquotation"
 date: "2025-08-11"
-date-modified: "2025-08-11"
+date-modified: "2025-08-12"
 
 format: "html"
 fig-width: 6
@@ -31,15 +31,15 @@ execute:
 
 ## Introduction
 
-准引用（**quasiquotation**）是一种“使用和提及”（use and mention）的语法规则。它包括两部分——引用和解引用，引用就是我们上章介绍过的捕获“表达式”，解引用就是重新评估“表达式”。准引用使得组合函数创建者的函数与函数使用者的函数更加容易。
+准引用（**quasiquotation**）包括两部分——引用和解引用，引用就是我们上章介绍过的捕获“表达式”，解引用相当于“评估”“表达式”。但是要注意，**解引用函数只在引用函数内有效**，它的目的是“评估”要捕获的“表达式”中的部分元素。准引用使得组合“函数创建者的函数”与“函数使用者的函数”更加容易。
 
 准引用是组成tidy-evaluation的三大基石之一（quosures和data-mask将在下章介绍），在tidy-evaluation中，所有支持引用的函数都支持解引用。
 
 ### Outline
 
 -   19.2节：通过一个示例函数——`cement()`介绍为什么使用准引用。
--   19.3节：介绍引用的工具。
--   19.4节：介绍解引用的工具。
+-   19.3节：介绍引用函数。
+-   19.4节：介绍解引用函数。
 -   19.5节：讨论base R中类似的“解引用”。
 -   19.6节：介绍使用`!!!`的另外两种情况。
 -   19.7节：介绍一些示例。
@@ -60,7 +60,7 @@ library(purrr)
 
 ## Motivation
 
-我们将从一个具体的例子开始，这个例子有助于激发取消引用的需求，从而实现准引用。假设你要创建一个拼接字符串的函数：
+我们将从一个具体的例子开始，激发准引用的使用需求。假设你要创建一个类似`paste()`的函数：
 
 ```{r}
 paste("Good", "morning", "Hadley")
@@ -89,26 +89,203 @@ cement(Good, time, name)
 paste("Good", time, name)
 ```
 
-我们需要使用特殊的解引符号`!!`处理上面这种情况：
+我们可以使用特殊的解引符号`!!`处理上面这种情况：
 
 ```{r}
 cement(Good, !!time, !!name)
 ```
 
-::: {.callout-note}
-我个人认为“引用”与“解引”是由赋值符号`<-`的行为定义的。例如`time <- "morning"`，当我们直接使用`time`时就是引用，表示`time`是一个标签而不是真实的值；当我们使用`!!time`时就是解引，表示真实地使用`"morning"`。`cement()`函数中的`ensyms()`函数的作用是捕获“表达式”，后续直接将表达式转换为了字符串——`as_stirng()`。
+::: callout-note
+上面的示例可能具有误导性。前面我们讲到过，常量的“表达式”就是常量，所以`"Hadley"`等价于`expr("Hadley")`，`!!`始终作用的是一个“表达式”，并且它会被传入到`ensyms()`中，也即**解引函数始终在引用函数内生效**。
 
-```{r}
-time <- "morning"
-cement <- function(...) {
-  args <- ensyms(...)
-  print(args)
-  typeof(args[[1]])
-}
-cement(time)
-cement(!!time)
-```
+引用函数`ensyms()`的返回值是一个表达式，我们可以对他进行“评估”或`as_string()`，但这些都已经不属于准引用的范畴了。
 :::
 
 ### Vocabulary
 
+“引用”与“评估”参数之间的不同是重要的：
+
+-   一个被评估的参数遵循R的常规评估规则。
+-   一个被引用的参数被保存为表达式，遵循自定义的处理规则。
+
+上面的`paste()`的参数被评估，`cement()`的参数被引用。
+
+如果你不确定一个参数是被评估还是被引用，你可以在函数外面的环境中允许这个参数，如果报错，那么这个参数被引用。例如：
+
+```{r}
+# works
+library(MASS)
+
+# fails
+MASS
+```
+
+## Quoting
+
+准引用的第一个部分是引用——捕获表达式但不进行评估。引用相关的函数通常是成对出现，因为要考虑直接引用和间接引用（函数中的惰性评估）。本节首先介绍“rlang”中的引用函数，然后介绍base R中的。
+
+### Capturing expressions
+
+捕获表达式的函数有四个：
+
+|   | 单个引用 | 多个引用 |
+|------------------------|------------------------|------------------------|
+| 交互场景 | [`expr()`](https://rlang.r-lib.org/reference/expr.html) | [`exprs()`](https://rlang.r-lib.org/reference/defusing-advanced.html) |
+| 函数场景 | [`enexpr()`](https://rlang.r-lib.org/reference/defusing-advanced.html) | [`enexprs()`](https://rlang.r-lib.org/reference/defusing-advanced.html) |
+
+在交互场景下，`expr()`和`exprs()`都直接捕获它们的参数，前者捕获单个参数，后者捕获多个参数。
+
+```{r}
+expr(x + y)
+expr(1 / 2 / 3)
+
+exprs(x = x^2, y = y^3, z = z^4)
+# shorthand for
+# list(x = expr(x ^ 2), y = expr(y ^ 3), z = expr(z ^ 4))
+```
+
+在函数场景下，因为惰性评估的原因，需要使用额外的函数`enexpr()`和`enexprs()`。
+
+```{r}
+# expr 直接捕获参数
+f1 <- function(x) expr(x)
+f1(a + b + c)
+
+# exprs 捕获函数的参数评估后的结果
+f2 <- function(x) enexpr(x)
+f2(a + b + c)
+```
+
+捕获特殊参数`...`的结果只能使用`enexprs()`。
+
+```{r}
+f <- function(...) enexprs(...)
+f(x = 1, y = 10 * z)
+```
+
+### Capturing symbols
+
+`ensym()`和`ensyms()`函数是`enexpr()`和`enexprs()`的变体，专门用于捕获符号或将字符串转换为符号，输入不符合时会报错。
+
+```{r}
+f <- function(...) ensyms(...)
+f(x)
+f("x")
+```
+
+### With base R
+
+上述讲到的函数在base R中都有对应的等价函数，它们之间的主要不同是base R中的函数不支持解引用。
+
+| base R | rlang |
+|:----------------------------------:|:----------------------------------:|
+| [`quote()`](https://rdrr.io/r/base/substitute.html) | [`expr()`](https://rlang.r-lib.org/reference/expr.html) |
+| [`alist()`](https://rdrr.io/r/base/list.html) | [`exprs()`](https://rlang.r-lib.org/reference/defusing-advanced.html) |
+| [`substitute()`](https://rdrr.io/r/base/substitute.html) | [`enexpr()`](https://rlang.r-lib.org/reference/defusing-advanced.html) |
+| `as.list(substitute(...()))` | [`enexprs()`](https://rlang.r-lib.org/reference/defusing-advanced.html) |
+
+```{r}
+quote(x + y)
+
+alist(x = 1, y = x + 2)
+
+f3 <- function(x) substitute(x)
+f3(x + y)
+
+f <- function(...) as.list(substitute(...()))
+f(x = 1, y = 10 * z)
+```
+
+除此之外，base R中还有两个重要的引用函数：
+
+-   `bquote()`：提供了有限的准引用形式，将在19.5节中讨论。
+-   `~`：能够捕获环境的引用函数，将在20.3.4中讨论。
+
+### Substitution
+
+`substitute()`函数除了执行“引用”的功能外，还执行“替换”的功能。
+
+```{r}
+f4 <- function(x) substitute(x * 2)
+f4(a + b + c)
+```
+
+如果你在交互场景中使用它的“替换”功能时，推荐添加第二个参数来指定哪些是要替换的。
+
+```{r}
+substitute(x * y * z, list(x = 10, y = quote(a + b)))
+```
+
+### Summary
+
+在使用引用功能时，你始终要注意两点：
+
+-   要引用的对象是固定（交互场景）还是不固定的（函数场景）。
+
+-   要引用单个还是多个。
+
+|   | Developer | User |
+|----|----|----|
+| One | [`expr()`](https://rlang.r-lib.org/reference/expr.html) | [`enexpr()`](https://rlang.r-lib.org/reference/defusing-advanced.html) |
+| Many | [`exprs()`](https://rlang.r-lib.org/reference/defusing-advanced.html) | [`enexprs()`](https://rlang.r-lib.org/reference/defusing-advanced.html) |
+
+|   | Developer | User |
+|----|----|----|
+| One | [`quote()`](https://rdrr.io/r/base/substitute.html) | [`substitute()`](https://rdrr.io/r/base/substitute.html) |
+| Many | [`alist()`](https://rdrr.io/r/base/list.html) | `as.list(substitute(...()))` |
+
+## Unquoting
+
+解引用允你许选择性地评估“表达式”中的部分内容，其余仍然被引用。这样，你可以使用一个AST模板去生成其他AST。base R需要使用另外的技术来实现，我们将在19.5中介绍。
+
+与解引用类似的是`eval()`函数（20章），但他们是不同的，解引用在引用函数内使用——`expr(!!x)`，评估实在函数外使用——`eval(expr(x))`，它们最终的结果也可能不同。
+
+### Unquoting one argument
+
+`!!`会“评估”一个“表达式”，并返回的值插入到整体的“表达式”中：
+
+```{r}
+x <- expr(-1)
+expr(f(!!x, y))
+```
+
+下面是`!!`运行的底层逻辑示例图：
+
+![](images/bang-bang.png)
+
+`!!`当然也可以作用于符号或常量：
+
+```{r}
+a <- sym("y")
+b <- 1
+expr(f(!!a, !!b))
+```
+
+![](images/bang-bang-symbol.png)
+
+`!!`作用于返回“表达式”的函数：
+
+```{r}
+mean_rm <- function(var) {
+  var <- ensym(var)
+  expr(mean(!!var, na.rm = TRUE))
+}
+expr(!!mean_rm(x) + !!mean_rm(y))
+```
+
+`!!`会保留操作符的优先级：
+
+```{r}
+x1 <- expr(x + 1)
+x2 <- expr(x + 2)
+
+expr(!!x1 / !!x2)
+```
+
+![](images/bang-bang-infix.png)
+
+如果我们只是简单地将表达式的文本粘贴在一起，我们最终会得到`x + 1 / x + 2`，这是完全不同的AST:
+
+![](images/infix-bad.png)
+
+### Unquoting a function
