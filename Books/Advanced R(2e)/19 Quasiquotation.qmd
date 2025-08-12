@@ -289,3 +289,112 @@ expr(!!x1 / !!x2)
 ![](images/infix-bad.png)
 
 ### Unquoting a function
+
+通常`!!`用来解引用参数，但是`!!`也可以用来解引用函数。需要注意的是`expr(!!f(x))`解引用的是`f(x)`，需要使用额外的括号表示解引函数——`expr((!!f)(x))`。
+
+```{r}
+f <- expr(foo)
+expr((!!f)(x, y))
+```
+
+函数`f`来自于包的写法也可以：
+
+```{r}
+f <- expr(pkg::foo)
+expr((!!f)(x, y))
+```
+
+![](images/fun.png)
+
+上面的代码也可以使用`rlang::call2()`改写：
+
+```{r}
+f <- expr(pkg::foo)
+call2(f, expr(x), expr(y))
+```
+
+### Unquoting a missing argument
+
+在极少数情况下，我们需要解引用缺失值参数（missing argument），但直接解引用会失效：
+
+```{r}
+arg <- missing_arg()
+expr(foo(!!arg, !!arg))
+```
+
+我们需要使用`rlang::maybe_missing()`来处理缺失值参数：
+
+```{r}
+expr(foo(!!maybe_missing(arg), !!maybe_missing(arg)))
+```
+
+### Unquoting in special forms
+
+某些函数的infix形式的解引用会失败，例如`$`：它必须始终跟随变量名称，而不是其他表达式，强制使用会报错：
+
+```{r}
+x <- expr(x)
+expr(df$!!x)
+```
+
+需要将函数转变为prefix形式：
+
+```{r}
+x <- expr(x)
+expr(`$`(df, !!x))
+```
+
+### Unquoting many arguments
+
+`!!`是一对一地解引用，`!!!`是一对多的解引用。可以是“表达式”列表或带name属性的向量和列表。
+
+```{r}
+xs <- exprs(1, a, -b)
+expr(f(!!!xs, y))
+
+# Or with names
+ys <- set_names(xs, c("a", "b", "c"))
+expr(f(!!!ys, d = 4))
+```
+
+![](images/bang-bang-bang.png)
+
+`!!!`也可以应用在`call2()`中：
+
+```{r}
+call2("f", !!!xs, expr(y))
+```
+
+### The polite fiction of `!!`
+
+`!!`和`!!!`与R中的类似`+`,`-`,`!`等运算符不同，在R的视角里，`!!`就是运行了两次的`!`：
+
+```{r}
+!!TRUE
+!!!TRUE
+```
+
+`!!`和`!!!`必须在准引用函数中才能变得类似`+`,`-`,`!`等运算符。在准引用函数外使用，会被视为`!`作用于“表达式”，导致报错：
+
+```{r}
+x <- quote(variable)
+!!x
+```
+
+但是因为`!`可以作用于数字，所以有时会产生错误的结果：
+
+```{r}
+df <- data.frame(x = 1:5)
+y <- 100
+with(df, x + !!y)
+```
+
+### Non-standard ASTs
+
+
+```{r}
+epxr(!!data.frame(x = 10))
+
+lobstr::ast(!!data.frame(x = 10))
+```
+
