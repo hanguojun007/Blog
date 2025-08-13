@@ -225,12 +225,12 @@ substitute(x * y * z, list(x = 10, y = quote(a + b)))
 -   要引用单个还是多个。
 
 |   | Developer | User |
-|----|----|----|
+|------------------------|------------------------|------------------------|
 | One | [`expr()`](https://rlang.r-lib.org/reference/expr.html) | [`enexpr()`](https://rlang.r-lib.org/reference/defusing-advanced.html) |
 | Many | [`exprs()`](https://rlang.r-lib.org/reference/defusing-advanced.html) | [`enexprs()`](https://rlang.r-lib.org/reference/defusing-advanced.html) |
 
 |   | Developer | User |
-|----|----|----|
+|------------------------|------------------------|------------------------|
 | One | [`quote()`](https://rdrr.io/r/base/substitute.html) | [`substitute()`](https://rdrr.io/r/base/substitute.html) |
 | Many | [`alist()`](https://rdrr.io/r/base/list.html) | `as.list(substitute(...()))` |
 
@@ -391,10 +391,192 @@ with(df, x + !!y)
 
 ### Non-standard ASTs
 
+在解引用时，可能会轻易地创建出非标准的AST，例如解引用的对象不是“表达式”时。这些非标准AST是有效的，偶尔也很有用，但它们的正确使用超出了本书的范围。然而，了解它们很重要，因为它们可能会被解析，从而以误导性的方式被打印出来。
+
+例如，如果你内联更复杂的对象，它们的属性就不会打印出来。这可能会导致输出混乱：
 
 ```{r}
-epxr(!!data.frame(x = 10))
-
-lobstr::ast(!!data.frame(x = 10))
+x1 <- expr(class(!!data.frame(x = 10)))
+x1
+eval(x1)
 ```
 
+有两个工具可以消除这种混乱：`rlang::expr_print()`和`lobstr::ast()`:
+
+```{r}
+expr_print(x1)
+lobstr::ast(!!x1)
+```
+
+另外一种插入整数语句造成地混乱：
+
+```{r}
+x2 <- expr(f(!!c(1L, 2L, 3L, 4L, 5L)))
+x2
+expr_print(x2)
+lobstr::ast(!!x2)
+```
+
+也可以创建由于运算符优先级而无法从代码中生成的常规AST。在这种情况下，R将打印AST中不存在的括号：
+
+```{r}
+x3 <- expr(1 + !!expr(2 + 3))
+x3
+
+lobstr::ast(!!x3)
+```
+
+## Non-quoting
+
+base R中的`bquote()`函数支持准引用，使用`.()`来解引用。
+
+```{r}
+xyz <- bquote(x + y + z)
+bquote(-.(xyz) / 2)
+```
+
+但`bquote()`函数在base R中并没有被广泛使用，也没有对R的书写方式产生任何轻微的影响。主要有三个原因：
+
+-   它无法将创作者的函数和使用者的函数组合在一起，只适合自己使用。
+-   它不支持解引用多个表达式。
+-   它不支持提供的环境及在环境中处理代码。
+
+base R中具有引用参数功能的函数使用的其他技术路径（不是`bquote()`），在需要“解引用”时，它们选择性地关闭引用功能，不是真正的“解引用”，这里称之为**非引用**。
+
+引用与非引用在base R中有四种基本形式：
+
+-   成对出现的引用和非引用函数。例如，`$`有两个参数，第二个参数引用的。把`mtcars$cyl`写成prefix型式`` `$`(mtcars, cyl) ``，就会很容易发现它的引用特性。更直接的对比是非引用函数`[[`：
+
+```{r}
+x <- list(var = 1, y = 2)
+var <- "y"
+
+x$var
+x[[var]]
+```
+
+base R中还有三个与`$`紧密相关的函数：`subset()`、`transform()`和`with()`。它们被视为仅适用于交互场景使用的`$`包装，因此都具有相同的非引用替代函数：`[<-`/`assign()`、`::`/`getExportedValue()`。
+
+-   成对出现的引用和非引用参数。例如，`rm()`函数允许在`...`中使用引用参数或在`list`中提供非引用参数。同样的还有`data()`,`save()`等。
+
+```{r}
+x <- 1
+rm(x)
+
+y <- 2
+vars <- c("y", "vars")
+rm(list = vars)
+```
+
+-   通过某个参数控制另外一个参数是否是引用的。例如，`library()`函数的`character.only`参数控制`package`参数是否是引用的。同样的还有`demo()`,`detach()`,`example()`,`require()`。
+
+```{r}
+library(MASS)
+
+pkg <- "MASS"
+library(pkg, character.only = TRUE)
+```
+
+-   进行尝试，如果评估失败尝试引用。例如，`help()`函数的第一个参数要求是非引用的字符串，如果评估失败会尝试引用参数。同样的还有`ls()`,`page()`,`match.fun()`。
+
+```{r}
+# Shows help for var
+help(var)
+
+var <- "mean"
+# Shows help for mean
+help(var)
+
+var <- 10
+# Shows help for var
+help(var)
+```
+
+base R中另一类重要的引用函数是建模和绘图函数，它们遵循所谓的[**标准非标准评估规则**](http://developer.r-project.org/nonstandard-eval.pdf)。例如，`lm()`函数的`formula`参数，绘图函数`plot()`中的映射类参数`col`,`cex`,`pch`等等。
+
+```{r}
+palette(RColorBrewer::brewer.pal(3, "Set1"))
+plot(
+  Sepal.Length ~ Petal.Length,
+  data = iris,
+  col = Species,
+  pch = 20,
+  cex = 2
+)
+```
+
+## `...`(dot-dot-dot)
+
+本节介绍两种常见的使用`!!!`和`:=`的场景。
+
+-   使用`!!!`解引用参数，释放到`...`中。考虑下面的数据框列表，如果要按行合并它们，你可以直接使用`rbind(dfs$a, dfs$b)`，但如果list中包含多个数据框呢，或者数量未知呢？
+
+```{r}
+dfs <- list(
+  a = data.frame(x = 1, y = 2),
+  b = data.frame(x = 3, y = 4)
+)
+```
+
+可以使用`!!!`直接解引用参数，释放到`...`中。
+
+```{r}
+dplyr::bind_rows(!!!dfs)
+```
+
+在这种情况下使用时，`!!!`的行为在Ruby、Go、PHP和Julia中被称为“splatting”。它与Python中的`*args(star-args)`和`*kwarg(star-star-kwargs)`密切相关，这些行为有时被称为参数解包。
+
+-   如何自定义符号的名字。例如，你想创建一个单列的数据框，并且它的列名由变量`var`决定，你可以使用`setNames(data.frame(val), var)`，但这样并不“优雅”。
+
+```{r}
+var <- "x"
+val <- c(4, 3, 9)
+```
+
+可以使用`:=`可以在`=`的左边解引用参数：
+
+```{r}
+tibble::tibble(!!var := val)
+```
+
+因为R不支持使用“表达式”作为参数名称，所以使用了新的操作符`:=`：
+
+```{r}
+tibble::tibble(!!var = val)
+```
+
+作者称支持这些无需引用参数工具的函数，都有**tidy dots**。创建具有**tidy dots**的函数只需要使用`list2()`。
+
+### Examples
+
+
+
+
+### `exec()`
+
+
+
+### `dots_list()`
+
+
+
+### With base R
+
+
+
+## Case studies
+
+
+### `lobstr::ast()`
+
+
+### Map-reduce to generate code
+
+
+### Slicing an array
+
+
+### Creating functions
+
+
+## History
