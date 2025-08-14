@@ -549,19 +549,140 @@ tibble::tibble(!!var = val)
 
 ### Examples
 
+下面是一个设置属性函数的例子，它允许我们灵活的设置属性。
 
+```{r}
+set_attr <- function(.x, ...) {
+  attr <- rlang::list2(...)
+  attributes(.x) <- attr
+  .x
+}
 
+attrs <- list(x = 1, y = 2)
+attr_name <- "z"
+
+1:10 %>%
+  set_attr(w = 0, !!!attrs, !!attr_name := 3) %>%
+  str()
+```
 
 ### `exec()`
 
+如果你想再没有**tidy-dots**的函数中使用`!!!`和`:=`，你可以使用`exec()`。它的使用方法与`call2()`类似，但`call2()`返回“表达式”，而`exec()`直接评估了“表达式”。
 
+使用`!!!`解析参数列表：
+
+```{r}
+# Directly
+exec("mean", x = 1:10, na.rm = TRUE, trim = 0.1)
+
+# Indirectly
+args <- list(x = 1:10, na.rm = TRUE, trim = 0.1)
+exec("mean", !!!args)
+
+# Mixed
+params <- list(na.rm = TRUE, trim = 0.1)
+exec("mean", x = 1:10, !!!params)
+```
+
+使用`:=`解析不固定参数：
+
+```{r}
+arg_name <- "na.rm"
+arg_val <- TRUE
+exec("mean", 1:10, !!arg_name := arg_val)
+```
+
+`exec()`也可以和泛函配合使用：
+
+```{r}
+x <- c(runif(10), NA)
+funs <- c("mean", "median", "sd")
+
+purrr::map_dbl(funs, exec, x, na.rm = TRUE)
+```
 
 ### `dots_list()`
 
+`list2()`提供了一个方便的功能：它会自动忽略最后一个空参数。这意味你可以在诸如`tibble::tibble()`这样的函数中不必理会最后一个元素后的逗号。
 
+```{r}
+# Can easily move x to first entry:
+tibble::tibble(
+  y = 1:5,
+  z = 3:-1,
+  x = 5:1,
+) %>%
+  dplyr::mutate(
+    a = 1:5,
+    b = 5:1,
+    c = 1:5,
+  )
+
+# Need to remove comma from z and add comma to x
+data.frame(
+  y = 1:5,
+  z = 3:-1,
+  x = 5:1
+)
+```
+
+`list2()`函数是对`rlang::dots_list()`函数的封装，设置了一些常用设置为默认值。你可以直接使用`dots_list()`函数进行个性化的设置。
+
+-   `.ignore_empty`参数控制忽略哪些参数。默认情况下，设置`ignore_empty = "trailing"`会忽略最后一个空参数，这会导致上述行为，但你可以选择忽略所有缺失的参数（`"all"`），或者不忽略任何缺失的参数（`"none"`）。
+
+-   `.homonyms`参数控制同名参数的处理。
+
+```{r}
+str(dots_list(x = 1, x = 2))
+str(dots_list(x = 1, x = 2, .homonyms = "first"))
+str(dots_list(x = 1, x = 2, .homonyms = "last"))
+str(dots_list(x = 1, x = 2, .homonyms = "error"))
+```
+
+-   如果存在未被忽略的空参数，`.preserve_empty`控制如何处理它们。默认情况下会抛出一个错误；设置`.preserve_empty = TRUE`则会返回缺失符号。如果使用`dots_list()`生成函数调用，这将很有用。
 
 ### With base R
 
+base R 提供了一个瑞士军刀般的函数——`do.call()`。该函数接受两个参数，首个参数`what`接受一个函数名，第二个参数`args`接受一个参数列表。例如，`do.call("f", list(x, y ,z))`等价于`f(x, y, z)`。
+
+-   `do.call()`解决`rbind()`多个数据框：
+
+```{r}
+do.call("rbind", dfs)
+```
+
+-   `do.call()`解决变量名的问题：
+
+```{r}
+args <- list(val)
+names(args) <- var
+
+do.call("data.frame", args)
+```
+
+一些base R中的函数（`interaction()`, `expand.grid()`, `options()`, `par()`）使用了一种技巧去规避使用`do.call()`：如果`...`中的第一个参数是列表，则直接使用这个列表，跳过`...`中的剩余参数。
+
+```r
+f <- function(...) {
+  dots <- list(...)
+  if (length(dots) == 1 && is.list(dots[[1]])) {
+    dots <- dots[[1]]
+  }
+
+  # Do something
+  ...
+}
+```
+
+`RCurl::getURL()`函数采取了另外一种技巧：同时处理`...`和`.dots`。
+
+```r
+f <- function(..., .dots) {
+  dots <- c(list(...), .dots)
+  # Do something
+}
+```
 
 
 ## Case studies
