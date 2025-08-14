@@ -30,3 +30,4 @@ website:
         - Books/Advanced R(2e)/Metaprogramming Introduction.qmd
         - Books/Advanced R(2e)/17 Big picture.qmd
         - Books/Advanced R(2e)/18 Expressions.qmd
+        - Books/Advanced R(2e)/19 Quasiquotation.qmd
