@@ -1,0 +1,117 @@
+---
+title: "20 Evaluation"
+date: "2025-08-15"
+date-modified: "2025-08-15"
+
+format: "html"
+fig-width: 6
+fig-asp: 0.618
+out-width: 70%
+fig-align: center
+
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: "#>"
+    R.options:
+      dplyr.print_min: 6
+      dplyr.print_max: 6
+      pillar.max_footer_lines: 2
+      pillar.min_chars: 15
+      stringr.view_n: 6
+      cli.num_colors: 0
+      cli.hyperlink: FALSE
+      pillar.bold: TRUE
+      width: 77
+
+execute:
+  warning: true
+  error: true
+---
+
+
+## Introduction
+
+
+
+### Prerequisites
+
+要求熟悉前两章内容和第7章有关环境的内容。
+
+```{r}
+library(rlang)
+library(purrr)
+```
+
+## Evaluation basics
+
+`eval()`函数有两个参数：`epxr`，`env`。
+
+`expr`参数是待评估的“表达式”或符号。由于`eval()`函数不会对输入引用，所以需要与`expr()`一同使用：
+
+```{r}
+x <- 10
+eval(expr(x))
+
+y <- 2
+eval(expr(x + y))
+```
+
+`env`参数用来指定评估“表达式”的“环境”，如果没有指定，则默认为当前环境。
+
+```{r}
+eval(expr(x + y), env(x = 1000))
+```
+
+当指定了环境，却没有引用输入时，会导致错误的结果：
+
+```{r}
+eval(print(x + 1), env(x = 1000))
+
+eval(expr(print(x + 1)), env(x = 1000))
+```
+
+在了解了基础知识后，让我们探索一些应用。我们将使用“rlang”重新实现某些函数的底层原理，主要是base R中的函数。
+
+### Application:`local()`
+
+有时我们会创建一些临时变量来执行一系列计算，这些临时变量不会长期使用，可能也会相当占用内存，需要在使用结束后删除。一种方法是使用`rm()`清楚临时变量；另一种是将计算过程打包为函数，仅调用一次。更优雅的方式是使用`local()`函数，它可以创建一个临时环境，并执行其中的代码。
+
+```{r}
+# Clean up variables created earlier
+rm(x, y)
+
+foo <- local({
+  x <- 10
+  y <- 200
+  x + y
+})
+
+foo
+x
+y
+```
+
+`local()`函数的本质很简单，我们可以采用下面的策略实现它。首先捕获输入的“表达式”，然后使用`local()`函数的执行环境作为`eval()`的调用环境参与评估。
+
+```{r}
+local2 <- function(expr) {
+  env <- env(caller_env())
+  eval(enexpr(expr), env)
+}
+
+foo <- local2({
+  x <- 10
+  y <- 200
+  x + y
+})
+
+foo
+x
+y
+```
+
+但`base::local()`的底层实现很复杂，它使用了`eval()`和`substitute()`。
+
+### Application:`source()`
+
