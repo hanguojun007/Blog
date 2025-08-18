@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.6.36">
+<meta name="generator" content="quarto-1.6.40">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -70,10 +70,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-01c78b5cd655e4cd89133cf59d535862.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-357f3a88c8c08e74b7450a91eb5d7532.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-e6e594f9697a8fc74d922f689f62e840.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": true,
@@ -406,7 +406,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </ul>
 </nav>
     <div class="quarto-margin-footer"><div class="margin-footer-item">
-<p><img src="../../logo.jpg" class="conditional-footer img-fluid" width="200"></p>
+<p><img src="../..\logo.jpg" class="conditional-footer img-fluid" width="200"></p>
 </div></div></div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -996,10 +996,11 @@ Note
 <span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>var <span class="ot">&lt;-</span> <span class="st">"mean"</span></span>
 <span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Shows help for mean</span></span>
 <span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a><span class="fu">help</span>(var)</span>
-<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>var <span class="ot">&lt;-</span> <span class="dv">10</span></span>
-<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Shows help for var</span></span>
-<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a><span class="fu">help</span>(var)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; starting httpd help server ... done</span></span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a>var <span class="ot">&lt;-</span> <span class="dv">10</span></span>
+<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Shows help for var</span></span>
+<span id="cb38-13"><a href="#cb38-13" aria-hidden="true" tabindex="-1"></a><span class="fu">help</span>(var)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>base R中另一类重要的引用函数是建模和绘图函数，它们遵循所谓的<a href="http://developer.r-project.org/nonstandard-eval.pdf"><strong>标准非标准评估规则</strong></a>。例如，<code>lm()</code>函数的<code>formula</code>参数，绘图函数<code>plot()</code>中的映射类参数<code>col</code>,<code>cex</code>,<code>pch</code>等等。</p>
 <div class="cell">
@@ -1120,7 +1121,7 @@ Note
 <span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>funs <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"mean"</span>, <span class="st">"median"</span>, <span class="st">"sd"</span>)</span>
 <span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>purrr<span class="sc">::</span><span class="fu">map_dbl</span>(funs, exec, x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0.4661792 0.4955151 0.2998324</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 0.6283860 0.7322721 0.3160886</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="dots_list" class="level3">
@@ -1322,7 +1323,7 @@ Note
 </section>
 <section id="creating-functions" class="level3">
 <h3 class="anchored" data-anchor-id="creating-functions">Creating functions</h3>
-<p>另外一个有用的应用是使用<code>rlang::new_function()</code>“手动”创建函数，创建函数的三要素——参数，主题，环境。</p>
+<p>另外一个有用的应用是使用<code>rlang::new_function()</code>“手动”创建函数，创建函数的三要素——参数，主体，环境。</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="fu">new_function</span>(</span>
 <span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">exprs</span>(<span class="at">x =</span> , <span class="at">y =</span> ),</span>

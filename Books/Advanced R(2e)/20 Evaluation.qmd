@@ -115,3 +115,116 @@ y
 
 ### Application:`source()`
 
+我们可以通过组合`eval()`和`parse_expr()`来实现`source()`的功能。首先从磁盘中读取文件，然后使用`parse_expr()`将字符串转换成“表达式”列表，最后使用`eval()`评估“表达式”。实现如下：
+
+```{r}
+source2 <- function(path, env = caller_env()) {
+  file <- paste(readLines(path, warn = FALSE), collapse = "\n")
+  exprs <- parse_exprs(file)
+
+  res <- NULL
+  for (i in seq_along(exprs)) {
+    res <- eval(exprs[[i]], env)
+  }
+
+  invisible(res)
+}
+```
+
+真实的`base::source()`函数更加复杂，会打印输入输出信息，同时有许多额外参数控制行为。
+
+#### Expression vectors
+
+上一章讲到，`base::parse()`函数解析字符串时，如果捕获到多个“表达式”，会返回一个包含多个表达式的向量。`base::eval()`函数可以直接评估这个向量，而不用上面的`for`循环。
+
+```{r}
+source3 <- function(file, env = parent.frame()) {
+  lines <- parse(file)
+  res <- eval(lines, envir = env)
+  invisible(res)
+}
+```
+
+### Gotcha:`function()`
+
+如果你使用`eval()`和`expr()`来生成函数，有一个小小的漏洞需要注意：
+
+```{r}
+x <- 10
+y <- 20
+f <- eval(expr(function(x, y) !!x + !!y))
+f
+```
+
+这个函数看起来不像能工作，但它确实能工作：
+
+```{r}
+f()
+```
+
+这是因为，如果函数有“srcref”属性，就会打印它，但“srcref”是一个base R的特性，它无法识别准引号。
+
+要解决这个问题，可以使用`new_function()`或删除“srcref”属性：
+
+```{r}
+attr(f, "srcref") <- NULL
+f
+```
+
+## Quosures
+
+几乎`eval()`的所有使用都包括“表达式”和“环境”两个参数，但是base R中没有能同时提供这两个参数的数据结构，“rlang”包创建了这种数据结构——“**quosures**”。**quosures**是“quoting”和“closure”的复合体，意味着它同时包含了“表达式”和环境。
+
+在本节中，你将学习如何创建和操作quosure, 以及一些关于如何实现它。
+
+### Creating
+
+有三中方式创建quosure:
+
+-   使用`enquo()`和`enquos()`，它们会同时捕获表达式和环境。许多quosure都是由此创建的。
+
+```{r}
+foo <- function(x) enquo(x)
+foo(a + b)
+```
+
+-   使用`quo()`和`quos()`，与`enquo()`和`enquos()`的关系可以参考`expr()``enexpr()`。使用的场景很少。
+
+```{r}
+quo(x + y + z)
+```
+
+-   使用`new_quosure()`，输入“表达式”和环境来创建quosure。使用场景也极少。
+
+```{r}
+new_quosure(expr(x + y), env(x = 1, y = 10))
+```
+
+### Evaluting
+
+只能使用`eval_tidy()`来评估quosure。
+
+```{r}
+q1 <- new_quosure(expr(x + y), env(x = 1, y = 10))
+eval_tidy(q1)
+```
+
+### Dots
+
+`enquos()`可以正确识别`...`中传入的参数及其绑定的环境。例如，下面的`qs`对象，正确评估了`global`和`f`的环境。
+
+```{r}
+f <- function(...) {
+  x <- 1
+  g(..., f = x)
+}
+g <- function(...) {
+  enquos(...)
+}
+
+x <- 0
+qs <- f(global = x)
+qs
+map_dbl(qs, eval_tidy)
+```
+
