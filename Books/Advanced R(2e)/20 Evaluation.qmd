@@ -228,3 +228,231 @@ qs
 map_dbl(qs, eval_tidy)
 ```
 
+### Under the hood
+
+Quosures 数据结构受R中的“formulas”启发，因为“formula”同样也是同时捕获“表达式”与“环境”。早期也确实使用“formula”来进行评估，但因为无法简单的将`~`变为准引用函数，所以放弃使用“formula”。
+
+```{r}
+f <- ~ runif(3)
+str(f)
+```
+
+Quosures 同样也是“formula”的子类：
+
+```{r}
+q4 <- new_quosure(expr(x + y + z))
+class(q4)
+```
+
+这意味着一些函数可以直接作用于Quosures：
+
+```{r}
+is_call(q4)
+
+q4[[1]]
+q4[[2]]
+```
+
+有一个用于存放环境的属性：
+
+```{r}
+attr(q4, ".Environment")
+```
+
+但是不建议使用上面的函数，而是使用`get_expr()`和`get_env()`来获取表达式和环境：
+
+```{r}
+get_expr(q4)
+get_env(q4)
+```
+
+### Nested quosures
+
+准引用支持在“表达式”中引入quosures，这是一种高级技术，使得创建嵌套quosures变得可能。例如下面的“表达式”中嵌套了两个短语。
+
+```{r}
+q2 <- new_quosure(expr(x), env(x = 1))
+q3 <- new_quosure(expr(x), env(x = 10))
+
+x <- expr(!!q2 + !!q3)
+```
+
+它可以被正确地评估，但是如果打印它，你会发现它的“formula”形式：
+
+```{r}
+eval_tidy(x)
+x
+```
+
+可以使用`rlang::expr_print()`来更好的展示，在终端中根据不同环境源显示不同颜色：
+
+```{r}
+expr_print(x)
+```
+
+## Data masks
+
+本节介绍数据掩码（**data mask**）相关内容，这是一种同时在“环境”与“数据框构成的环境”中评估“表达式”的技术。它的核心思想与base R中的`with()`,`subset()`和`transform()`类似，被广泛应用在“tidyverse”系列包中。
+
+::: {.callout-note}
+注意：`enquo()`保证了能在不同环境中正确评估“表达式”中的变量，`expr()`不能，这是一个重要的区别。但是本节所有示例中的`enquo()`与`expr()`都可以替换，不影响结果。
+:::
+
+### Basics
+
+数据掩码允许你混合环境来源和数据框来源的变量。你可以将数据框当作环境变量传递给`eval_tidy()`的第二个参数。
+
+```{r}
+q1 <- new_quosure(expr(x * y), env(x = 100))
+df <- data.frame(y = 1:10)
+
+eval_tidy(q1, df)
+```
+
+上面的代码可能有些难以理解，我们可以作一些拆分：
+
+```{r}
+x <- 100
+df <- data.frame(y = 1:10)
+eval_tidy(expr(x * y), df)
+```
+
+稍加修改，改写为类似`base::with()`的函数：
+
+```{r}
+with2 <- function(data, expr) {
+  expr <- enquo(expr)
+  eval_tidy(expr, data)
+}
+
+with2(df, x * y)
+```
+
+`base::eval()`可以实现类似的效果，传递数据框到第二个参数，环境到第三个参数。
+
+```{r}
+with3 <- function(data, expr) {
+  expr <- substitute(expr)
+  eval(expr, data, caller_env())
+}
+```
+
+### Pronouns
+
+数据掩码会引起歧义。例如，在以下代码中，除非你知道`df`中包含哪些变量，否则你无法知道`x`是来自数据掩码还是环境。
+
+```{r}
+with2(df, x)
+```
+
+为了解决歧义问题，数据掩码提供了两个声明：`.data`和`.env`。
+
+-   `.data$x` 表示数据掩码中的变量`x`。
+-   `.env$x` 表示环境中的变量`x`。
+
+```{r}
+x <- 1
+df <- data.frame(x = 2)
+
+with2(df, .data$x)
+with2(df, .env$x)
+```
+
+对于两个声明，你可以使用`[[`，但是要注意它们是特殊的对象，和真实的数据框、环境不同。例如，如果找不到变量，它会抛出错误：
+
+```{r}
+df$y
+with2(df, .data$y)
+```
+
+### Application: `subset()`
+
+下面是`subset()`的使用场景之一：直接通过某个“表达式”进行过滤数据框的行。
+
+```{r}
+sample_df <- data.frame(a = 1:5, b = 5:1, c = c(5, 3, 1, 4, 1))
+
+# Shorthand for sample_df[sample_df$a >= 4, ]
+subset(sample_df, a >= 4)
+
+# Shorthand for sample_df[sample_df$b == sample_df$c, ]
+subset(sample_df, b == c)
+```
+
+`subset()`的核心逻辑是：
+
+-   两个参数：数据框`data`和“表达式”`rows`。
+-   在数据框`data`中，评估`rows`，并返回结果逻辑向量。
+-   根据逻辑向量，返回数据框的行。
+
+```{r}
+subset2 <- function(data, rows) {
+  rows <- enquo(rows)
+  rows_val <- eval_tidy(rows, data)
+  stopifnot(is.logical(rows_val))
+
+  data[rows_val, , drop = FALSE]
+}
+
+subset2(sample_df, a >= 4)
+```
+
+### Application: `transform()`
+
+`transform()`函数类似`dplyr::mutate()`，可以在数据框中添加新的一列。
+
+```{r}
+df <- data.frame(x = c(2, 3, 1), y = runif(3))
+transform(df, x = -x, y2 = 2 * y)
+```
+
+下面是`transform()`的简单等价实现：
+
+```{r}
+transform2 <- function(.data, ...) {
+  dots <- enquos(...)
+
+  for (i in seq_along(dots)) {
+    name <- names(dots)[[i]]
+    dot <- dots[[i]]
+
+    .data[[name]] <- eval_tidy(dot, .data)
+  }
+
+  .data
+}
+
+transform2(df, x2 = x * 2, y = -y)
+```
+
+### Application: `select()`
+
+数据掩码不总是作用于数据框，也可以是list。这是`subset()`的另一个使用场景——根据“表达式”选择某些列——的底层逻辑。
+
+```{r}
+df <- data.frame(a = 1, b = 2, c = 3, d = 4, e = 5)
+subset(df, select = b:d)
+```
+
+它的关键思想是创建一个有name属性的list，list的每个元素是对应列的位置索引。
+
+```{r}
+vars <- as.list(set_names(seq_along(df), names(df)))
+str(vars)
+```
+
+然后在list中进行评估，返回位置索引：
+
+```{r}
+select2 <- function(.data, ...) {
+  dots <- enquos(...)
+
+  vars <- as.list(set_names(seq_along(.data), names(.data)))
+  cols <- unlist(map(dots, eval_tidy, vars))
+
+  .data[, cols, drop = FALSE]
+}
+select2(df, b:d)
+```
+
+## Using tidy evaluation
