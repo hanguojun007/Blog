@@ -456,3 +456,129 @@ select2(df, b:d)
 ```
 
 ## Using tidy evaluation
+
+本节将会给出一些使用tidy evaluation的函数例子。
+
+### Quoting and unquoting
+
+嵌套函数传递“表达式”时，函数内部一定要先使用`enquo()`引用“表达式”，然后再使用`!!`解引用。
+
+假设有这样一个随机排序数据框的函数：
+
+```{r}
+resample <- function(df, n) {
+  idx <- sample(nrow(df), n, replace = TRUE)
+  df[idx, , drop = FALSE]
+}
+```
+
+现在要结合上面的`subset2()`函数，同时实现筛选和随机排序：
+
+```{r}
+subsample <- function(df, cond, n = nrow(df)) {
+  df <- subset2(df, cond)
+  resample(df, n)
+}
+
+df <- data.frame(x = c(1, 1, 1, 2, 2), y = 1:5)
+rm(x)
+subsample(df, x == 1)
+```
+
+由于`subsample()`函数没有对`cond`进行引用，所以导致`subset2()`无法正确评估`x`。这种嵌套传递“表达式”需要“引用-解引用”式的中间步骤。
+
+```{r}
+subsample <- function(df, cond, n = nrow(df)) {
+  cond <- enquo(cond)
+  df <- subset2(df, !!cond)
+  resample(df, n)
+}
+
+subsample(df, x == 1)
+```
+
+### Handling ambiguity
+
+当既有指向数据框的参数也有指向环境的参数时，会导致引用歧义，产生不符合预期的结果。
+
+假设现在有一个根据提供的参数值来过滤数据框的函数。
+
+```{r}
+threshold_x <- function(df, val) {
+  subset2(df, x >= val)
+}
+```
+
+-   当`x`在环境中存在，但不在数据框中时：
+
+```{r}
+x <- 10
+no_x <- data.frame(y = 1:3)
+threshold_x(no_x, 2)
+```
+
+-   当数据框中有`val`列时：
+
+```{r}
+has_val <- data.frame(x = 1:3, val = 9:11)
+threshold_x(has_val, 2)
+```
+
+特殊情况会产生不符合预期的结果，所以我们需要声明参数来源。
+
+```{r}
+threshold_x <- function(df, val) {
+  subset2(df, .data$x >= .env$val)
+}
+
+x <- 10
+threshold_x(no_x, 2)
+threshold_x(has_val, 2)
+```
+
+通常使用`.env`声明的参数也可以使用`!!`来替代：
+
+```{r}
+threshold_x <- function(df, val) {
+  subset2(df, .data$x >= !!val)
+}
+```
+
+二者的区别在于何时评估参数`val`：如果使用`!!`，`val`会被`enquo()`评估，如果使用`.env`，`val`会被`eval_tidy()`评估。这种差别的影响微乎其微。
+
+### Quoting and ambiguity
+
+::: {.callout-warning}
+本小节的内容，没有搞懂作者的意图。
+:::
+
+将上面的`threshold_x()`函数的筛选列由固定的`x`改为参数`var`提供，可以使用`.data[[var]]`来访问列：
+
+```{r}
+threshold_var <- function(df, var, val) {
+  var <- as_string(ensym(var))
+  subset2(df, .data[[var]] >= !!val)
+}
+
+df <- data.frame(x = 1:10)
+threshold_var(df, x, 8)
+```
+
+也可以使用`enquo()`和`!!`来处理列：
+
+```{r}
+threshold_expr <- function(df, expr, val) {
+  expr <- enquo(expr)
+  subset2(df, !!expr >= !!val)
+}
+
+threshold_expr(df, x, 8)
+```
+
+## Base evaluation
+
+本节介绍base R中替代**tidy evaluation**的两种常用函数：
+
+-   `substitute()`和在调用环境中评估（`base::subset()`使用的函数）。
+
+-   `match.call()`
