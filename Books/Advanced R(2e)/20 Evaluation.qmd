@@ -1,7 +1,7 @@
 ---
 title: "20 Evaluation"
 date: "2025-08-15"
-date-modified: "2025-08-15"
+date-modified: "2025-08-20"
 
 format: "html"
 fig-width: 6
@@ -30,6 +30,28 @@ execute:
 ---
 
 ## Introduction
+
+“引用”有两个反面——“解引用”和“评估”。通常，“解引用”面向使用者，赋予了使用者选择性评估“表达式”的能力；而“评估”面向开发者，赋予了开发者在自定义环境中评估“表达式”的能力。
+
+本章从最纯粹的评估模式开始讨论，介绍`eval()`如何在环境中评估一个表达式，及如何使用它实现许多重要的base R 函数。然后延申评估，介绍两种重要思想：
+
+-   Quoseure: 一种用于捕获表达式及其关联环境的数据结构。
+
+-   数据掩码：使在“数据框环境”中评估表达式更加容易。
+
+总之，准引用、quosure、数据掩码共同构成了我们所说的整洁评估（tidy-eval）。整洁评估为非标准评估提供了一种原则性的方法，使得可以交互使用这些函数并将其与其他函数进行嵌套。整洁评估是所有这些理论中最重要的实际含义，因此将花一些时间来探讨它们的含义。本章最后讨论了base R的最相关方法，以及如何围绕它们的缺点进行编程。
+
+### Outline
+
+-   20.2节：介绍`base::eval()`函数，及如何使用它实现`local()`和`source()`。
+
+-   20.3节：介绍quosure数据结构，及如何生成与评估它。
+
+-   20.4节：介绍数据掩码和避免歧义的声明。
+
+-   20.5节：介绍使用整洁评估的实例。
+
+-   20.6节：介绍base R中的非标准性评估及其缺陷。
 
 ### Prerequisites
 
@@ -68,7 +90,7 @@ eval(print(x + 1), env(x = 1000))
 eval(expr(print(x + 1)), env(x = 1000))
 ```
 
-在了解了基础知识后，让我们探索一些应用。我们将使用“rlang”重新实现某些函数的底层原理，主要是base R中的函数。
+在了解了基础知识后，让我们探索一些应用，根据底层原理重新实现base R中的某些函数。
 
 ### Application:`local()`
 
@@ -153,13 +175,13 @@ f <- eval(expr(function(x, y) !!x + !!y))
 f
 ```
 
-这个函数看起来不像能工作，但它确实能工作：
+这个函数看起来不像能正常运行，其实可以：
 
 ```{r}
 f()
 ```
 
-这是因为，如果函数有“srcref”属性，就会打印它，但“srcref”是一个base R的特性，它无法识别准引号。
+这是因为，如果函数有“srcref”属性，就会打印它，但“srcref”是一个base R的特性，它无法识别准引用。
 
 要解决这个问题，可以使用`new_function()`或删除“srcref”属性：
 
@@ -643,7 +665,6 @@ This is a convenience function intended for use interactively. For programming i
       call <- substitute(subset_base(df1, expr))
       expr_print(call)
       eval(call, caller_env())
-
     }
 
     my_df <- data.frame(x = 1:3, y = 3:1)
@@ -675,3 +696,121 @@ This is a convenience function intended for use interactively. For programming i
 这意味着，`subset(df, x == y)` 不等于`df[x == y, ]`，而是等价于`df[x == y & !is.na(x == y), , drop = FALSE]`。而且，类似`subset()`的函数，如`dplyr::filter()`甚至可以将R语言的过滤规则转化为SQL语言，使得它在编程方面应用广泛。
 
 ### **`match.call()`**
+
+base R中另外一种NSE模式是使用`match.call()`。与`substitute()`类似，都会捕获”表达式“，但`match.call()`会捕获完整的调用”表达式“，并修改然后评估它。”rlang“中没有与其等价的函数。
+
+```{r}
+g <- function(x, y, z) {
+  match.call()
+}
+g(1, 2, z = 3)
+```
+
+`match.call()`的一个重要有应用是`write.csv()`，`write.csv()`捕获调用`write.table()`的表达式，然后修改参数，最后评估：
+
+```{r}
+write.csv <- function(...) {
+  call <- match.call(write.table, expand.dots = TRUE)
+
+  call[[1]] <- quote(write.table)
+  call$sep <- ","
+  call$dec <- "."
+
+  eval(call, parent.frame())
+}
+```
+
+但是也可以不使用NSE直接实现这种功能：
+
+```{r}
+write.csv <- function(...) {
+  write.table(..., sep = ",", dec = ".")
+}
+```
+
+#### **Wrapping modelling functions**
+
+`match.call()`的另一个重要应用是`lm()`。但这一技术同时也导致打印捕获的”formula“不完整。让我们思考下面这一简单地对`lm()`的包装：
+
+```{r}
+lm2 <- function(formula, data) {
+  lm(formula, data)
+}
+```
+
+这个包装函数可以成功运行，但无法准确捕获到”formula“：
+
+```{r}
+lm2(mpg ~ disp, mtcars)
+```
+
+为了修复这一错误，我们需要使用准引用技术。
+
+```{r}
+lm3 <- function(formula, data, env = caller_env()) {
+  formula <- enexpr(formula)
+  data <- enexpr(data)
+
+  lm_call <- expr(lm(!!formula, data = !!data))
+  expr_print(lm_call)
+  eval(lm_call, env)
+}
+lm3(mpg ~ disp, mtcars)
+```
+
+当你想要封装一个base R中的NSE函数时，你需要注意下面三点：
+
+-   使用`enexpr()`捕获未评估的参数，使用`caller_env()`获取调用函数的env。
+
+-   使用`expr()`与`!!`组合新的调用“表达式”。
+
+-   要在`caller_env()`中评估新的“表达式”。
+
+#### Evaluation environment
+
+如果在`lm3()`中，对`data`进行了某种处理，如`resample()`，那么会导致`data`的环境由外部的调用环境变为内部的运行环境，最终导致报错。
+
+```{r}
+resample_lm0 <- function(formula, data, env = caller_env()) {
+  formula <- enexpr(formula)
+  resample_data <- resample(data, n = nrow(data))
+
+  lm_call <- expr(lm(!!formula, data = resample_data))
+  expr_print(lm_call)
+  eval(lm_call, env)
+}
+
+df <- data.frame(x = 1:10, y = 5 + 3 * (1:10) + round(rnorm(10), 2))
+resample_lm0(y ~ x, data = df)
+```
+
+有两种方法可以避免报错：
+
+-   直接将`data`解引用进行传递，但这会导致打印出的`data`很奇怪：
+
+    ```{r}
+    resample_lm1 <- function(formula, data, env = caller_env()) {
+      formula <- enexpr(formula)
+      resample_data <- resample(data, n = nrow(data))
+
+      lm_call <- expr(lm(!!formula, data = !!resample_data))
+      expr_print(lm_call)
+      eval(lm_call, env)
+    }
+    resample_lm1(y ~ x, data = df)$call
+    ```
+
+-   将修改后的`data`重新添加到`caller_env()`中：
+
+    ```{r}
+    resample_lm2 <- function(formula, data, env = caller_env()) {
+      formula <- enexpr(formula)
+      resample_data <- resample(data, n = nrow(data))
+
+      lm_env <- env(env, resample_data = resample_data)
+      lm_call <- expr(lm(!!formula, data = resample_data))
+      expr_print(lm_call)
+      eval(lm_call, lm_env)
+    }
+    resample_lm2(y ~ x, data = df)
+    ```
