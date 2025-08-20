@@ -1,0 +1,64 @@
+---
+title: "21 Translating R code"
+date: "2025-08-20"
+date-modified: "2025-08-20"
+
+format: "html"
+fig-width: 6
+fig-asp: 0.618
+out-width: 70%
+fig-align: center
+
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: "#>"
+    R.options:
+      dplyr.print_min: 6
+      dplyr.print_max: 6
+      pillar.max_footer_lines: 2
+      pillar.min_chars: 15
+      stringr.view_n: 6
+      cli.num_colors: 0
+      cli.hyperlink: FALSE
+      pillar.bold: TRUE
+      width: 77
+
+execute:
+  warning: true
+  error: true
+---
+
+## Introduction
+
+first-class环境，词法作用域，元编程组成了一套实现将R代码转换为其他语言的工具箱。例如，`dbplyr`为`dplyr`处理数据库提供了支持，允许用R语言表达数据操作并自动将其翻译成SQL，可以使用`translate_sql()`一览其关键思想：
+
+```{r}
+library(dbplyr)
+con <- simulate_postgres()
+
+translate_sql(x^2, con = con)
+translate_sql(x < 5 & !is.na(x), con = con)
+translate_sql(!first %in% c("John", "Roger", "Robert"), con = con)
+translate_sql(select == 7, con = con)
+```
+
+由于SQL语言有许多特性，将R语言翻译成SQL语言的机制非常复杂，因此本章我们介绍两种简单但有用的领域特定语言(DSL): 一种用于生成HTML, 另一种用于在LaTeX中生成数学方程。
+
+### Outline
+
+-   21.2节：介绍创建HTML。
+
+-   21.2节：介绍创建LaTeX。
+
+### Prerequisites
+
+学习本章，你需要了解：环境、表达式、整洁评估、泛函编程、元编程、S3面向对象等。
+
+```{r}
+library(rlang)
+library(purrr)
+```
+
+## HTML
+
