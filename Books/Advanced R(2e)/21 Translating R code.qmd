@@ -62,3 +62,48 @@ library(purrr)
 
 ## HTML
 
+HTML文件是网站的底层核心，是一种特殊的标记语言（SGML，Standard Generalised Markup Language），它和XML相似但不等同。
+
+```html
+<body>
+  <h1 id='first'>A heading</h1>
+  <p>Some text &amp; <b>some bold text.</b></p>
+  <img src='myimg.png' width='100' height='100' />
+</body>
+```
+
+HTML文件中的关键组件是标签（tag），形如`<tag></tag>`或`<tag/>`。标签可以嵌套在其他标签中，并与文本交织在一起。HTML标签有超过100个，但在本章中，我们只关注其中的少数几个：
+
+-   `<body>`：文档的主体，包含文档所有内容的顶级标签。
+-   `<h1>`：文档的标题级别。
+-   `<p>`：段落。
+-   `<b>`：粗体。
+-   `<img>`：图片。
+
+标签具有带名字的属性，形如`<tag name1='value1' name2='value2'/></tag>`。其中有两个重要的属性——`id`和`class`，它们会与CSS联合使用来控制页面的外观。
+
+`<img>`标签不包裹任何内容，它只能被写作`<img />`而不能写成`<img></img>`，类似`<img>`的标签被称为空标签（Void tags）。因为它们不能包裹内容，所以它们的属性非常重要，`<img>`有三个常被使用的属性：`scr`控制图片路径，`width`和`height`控制图片大小。
+
+因为`<`和`>`是HTML中的特殊字符，想要在文本中书写它们，必须用转义符`&lt;`和`&gt;`来代替。同样，`&`也必须用转义符`&amp;`来代替。
+
+### Goal
+
+我们的目标是使用R生成上面的模板html文档。类似：
+
+```r
+with_html(
+  body(
+    h1("A heading", id = "first"),
+    p("Some text &", b("some bold text.")),
+    img(src = "myimg.png", width = 100, height = 100)
+  )
+)
+```
+
+它有三个特点：
+
+-   函数名与标签名相同。
+-   未命名参数成为标签的内容，而命名参数成为其属性。
+-   & 和其他特殊字符会自动转义。
+
+### Escaping
