@@ -64,7 +64,7 @@ library(purrr)
 
 HTML文件是网站的底层核心，是一种特殊的标记语言（SGML，Standard Generalised Markup Language），它和XML相似但不等同。
 
-```html
+``` html
 <body>
   <h1 id='first'>A heading</h1>
   <p>Some text &amp; <b>some bold text.</b></p>
@@ -90,7 +90,7 @@ HTML文件中的关键组件是标签（tag），形如`<tag></tag>`或`<tag/>`�
 
 我们的目标是使用R生成上面的模板html文档。类似：
 
-```r
+``` r
 with_html(
   body(
     h1("A heading", id = "first"),
@@ -107,3 +107,346 @@ with_html(
 -   & 和其他特殊字符会自动转义。
 
 ### Escaping
+
+转义功能对于代码“翻译”至关重要，它有两个难点：
+
+-   对输入的字符进行自动转义，`&`,`<`,`>`。
+
+-   正确识别是否需要转义，防止`&amp;`变为`&amp;amp;`。
+
+解决这两个难点的最简单方法是使用S3面向对象，区分要进行转义的普通字符，和已经转义的字符（类）。
+
+```{r}
+html <- function(x) structure(x, class = "advr_html")
+
+print.advr_html <- function(x, ...) {
+  out <- paste0("<HTML> ", x)
+  cat(paste(strwrap(out), collapse = "\n"), "\n", sep = "")
+}
+```
+
+创建转义泛函和它针对两种类的方法：
+
+-   `escape.character()`：对普通字符进行转义。
+-   `escape.advr_html()`：对已经转义的字符不做任何处理。
+
+```{r}
+escape <- function(x) UseMethod("escape")
+
+escape.character <- function(x) {
+  x <- gsub("&", "&amp;", x)
+  x <- gsub("<", "&lt;", x)
+  x <- gsub(">", "&gt;", x)
+
+  html(x)
+}
+
+escape.advr_html <- function(x) x
+```
+
+检查它是否运行成功：
+
+```{r}
+escape("This is some text.")
+escape("x > 1 & y < 2")
+
+# Double escaping is not a problem
+escape(escape("This is some text. 1 > 2"))
+
+# And text we know is HTML doesn't get escaped.
+escape(html("<hr />"))
+```
+
+### Basic tag functions
+
+接下来，我们将手动编写一个单标签函数，然后弄清楚如何对其进行泛化，这样我们就可以用代码为每个标签生成一个函数。
+
+我们以`<p>`标签为例。HTML的标签可以同时具有属性和子标签（`<b>`,`<i>`）。考虑到属性有name，子标签没有，我们可以将它们类比为函数参数，在函数内部处理两种类型的参数。`p()`函数的使用方法可能会类似于：
+
+``` r
+p("Some text. ", b(i("some bold italic text")), class = "mypara")
+```
+
+考虑到标签拥有的属性数目不同，子标签的数量也会不同。我们需要使用`...`来获取参数，然后根据是否有name属性进行分类。
+
+```{r}
+dots_partition <- function(...) {
+  dots <- list2(...)
+
+  if (is.null(names(dots))) {
+    is_named <- rep(FALSE, length(dots))
+  } else {
+    is_named <- names(dots) != ""
+  }
+
+  list(
+    named = dots[is_named],
+    unnamed = dots[!is_named]
+  )
+}
+
+str(dots_partition(a = 1, 2, b = 3, 4))
+```
+
+现在我们可以创建`p()`函数了。示例中引入了一些新的函数，这里不再详细讨论。
+
+```{r}
+html_attributes <- function(list) {
+  if (length(list) == 0) {
+    return("")
+  }
+
+  attr <- map2_chr(names(list), list, html_attribute)
+  paste0(" ", unlist(attr), collapse = "")
+}
+html_attribute <- function(name, value = NULL) {
+  if (length(value) == 0) {
+    return(name)
+  } # for attributes with no value
+  if (length(value) != 1) stop("`value` must be NULL or length 1")
+
+  if (is.logical(value)) {
+    # Convert T and F to true and false
+    value <- tolower(value)
+  } else {
+    value <- escape_attr(value)
+  }
+  paste0(name, "='", value, "'")
+}
+escape_attr <- function(x) {
+  x <- escape.character(x)
+  x <- gsub("\'", "&#39;", x)
+  x <- gsub("\"", "&quot;", x)
+  x <- gsub("\r", "&#13;", x)
+  x <- gsub("\n", "&#10;", x)
+  x
+}
+
+p <- function(...) {
+  dots <- dots_partition(...)
+  attribs <- html_attributes(dots$named)
+  children <- map_chr(dots$unnamed, escape)
+
+  html(paste0(
+    "<p",
+    attribs,
+    ">",
+    paste(children, collapse = ""),
+    "</p>"
+  ))
+}
+
+p("Some text")
+p("Some text", id = "myid")
+p("Some text", class = "important", `data-value` = 10)
+```
+
+### Tag functions
+
+```{r}
+tag <- function(tag) {
+  new_function(
+    exprs(... = ),
+    expr({
+      dots <- dots_partition(...)
+      attribs <- html_attributes(dots$named)
+      children <- map_chr(dots$unnamed, escape)
+
+      html(paste0(
+        !!paste0("<", tag),
+        attribs,
+        ">",
+        paste(children, collapse = ""),
+        !!paste0("</", tag, ">")
+      ))
+    }),
+    caller_env()
+  )
+}
+tag("b")
+```
+
+
+```{r}
+p <- tag("p")
+b <- tag("b")
+i <- tag("i")
+p("Some text. ", b(i("some bold italic text")), class = "mypara")
+```
+
+```{r}
+void_tag <- function(tag) {
+  new_function(
+    exprs(... = ),
+    expr({
+      dots <- dots_partition(...)
+      if (length(dots$unnamed) > 0) {
+        abort(!!paste0("<", tag, "> must not have unnamed arguments"))
+      }
+      attribs <- html_attributes(dots$named)
+
+      html(paste0(!!paste0("<", tag), attribs, " />"))
+    }),
+    caller_env()
+  )
+}
+
+img <- void_tag("img")
+img
+img(src = "myimage.png", width = 100, height = 100)
+```
+
+### Processing all tags
+
+```{r}
+tags <- c(
+  "a",
+  "abbr",
+  "address",
+  "article",
+  "aside",
+  "audio",
+  "b",
+  "bdi",
+  "bdo",
+  "blockquote",
+  "body",
+  "button",
+  "canvas",
+  "caption",
+  "cite",
+  "code",
+  "colgroup",
+  "data",
+  "datalist",
+  "dd",
+  "del",
+  "details",
+  "dfn",
+  "div",
+  "dl",
+  "dt",
+  "em",
+  "eventsource",
+  "fieldset",
+  "figcaption",
+  "figure",
+  "footer",
+  "form",
+  "h1",
+  "h2",
+  "h3",
+  "h4",
+  "h5",
+  "h6",
+  "head",
+  "header",
+  "hgroup",
+  "html",
+  "i",
+  "iframe",
+  "ins",
+  "kbd",
+  "label",
+  "legend",
+  "li",
+  "mark",
+  "map",
+  "menu",
+  "meter",
+  "nav",
+  "noscript",
+  "object",
+  "ol",
+  "optgroup",
+  "option",
+  "output",
+  "p",
+  "pre",
+  "progress",
+  "q",
+  "ruby",
+  "rp",
+  "rt",
+  "s",
+  "samp",
+  "script",
+  "section",
+  "select",
+  "small",
+  "span",
+  "strong",
+  "style",
+  "sub",
+  "summary",
+  "sup",
+  "table",
+  "tbody",
+  "td",
+  "textarea",
+  "tfoot",
+  "th",
+  "thead",
+  "time",
+  "title",
+  "tr",
+  "u",
+  "ul",
+  "var",
+  "video"
+)
+
+void_tags <- c(
+  "area",
+  "base",
+  "br",
+  "col",
+  "command",
+  "embed",
+  "hr",
+  "img",
+  "input",
+  "keygen",
+  "link",
+  "meta",
+  "param",
+  "source",
+  "track",
+  "wbr"
+)
+```
+
+
+```{r}
+html_tags <- c(
+  tags %>% set_names() %>% map(tag),
+  void_tags %>% set_names() %>% map(void_tag)
+)
+```
+
+
+```{r}
+html_tags$p(
+  "Some text. ",
+  html_tags$b(html_tags$i("some bold italic text")),
+  class = "mypara"
+)
+```
+
+
+```{r}
+with_html <- function(code) {
+  code <- enquo(code)
+  eval_tidy(code, html_tags)
+}
+```
+
+```{r}
+with_html(
+  body(
+    h1("A heading", id = "first"),
+    p("Some text &", b("some bold text.")),
+    img(src = "myimg.png", width = 100, height = 100)
+  )
+)
+```
