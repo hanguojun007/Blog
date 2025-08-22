@@ -243,6 +243,8 @@ p("Some text", class = "important", `data-value` = 10)
 
 ### Tag functions
 
+创建其他的标签函数，我们只需要替换`p`即可。所以`tag()`接受一个标签参数，返回一个`rlang::new_function()`创建的函数。`new_function()`内使用`exprs(... = )`来捕获参数。
+
 ```{r}
 tag <- function(tag) {
   new_function(
@@ -266,6 +268,7 @@ tag <- function(tag) {
 tag("b")
 ```
 
+现在可以复现上面的函数样式了：
 
 ```{r}
 p <- tag("p")
@@ -273,6 +276,8 @@ b <- tag("b")
 i <- tag("i")
 p("Some text. ", b(i("some bold italic text")), class = "mypara")
 ```
+
+在创建所有HTML标签函数前，需要为空标签类型创建泛函`void_tag()`。它与`tag()`函数类似，但在出现子标签时报错。
 
 ```{r}
 void_tag <- function(tag) {
@@ -298,134 +303,37 @@ img(src = "myimage.png", width = 100, height = 100)
 
 ### Processing all tags
 
+现在我们可以批量创建所有的标签函数：
+
 ```{r}
 tags <- c(
-  "a",
-  "abbr",
-  "address",
-  "article",
-  "aside",
-  "audio",
-  "b",
-  "bdi",
-  "bdo",
-  "blockquote",
-  "body",
-  "button",
-  "canvas",
-  "caption",
-  "cite",
-  "code",
-  "colgroup",
-  "data",
-  "datalist",
-  "dd",
-  "del",
-  "details",
-  "dfn",
-  "div",
-  "dl",
-  "dt",
-  "em",
-  "eventsource",
-  "fieldset",
-  "figcaption",
-  "figure",
-  "footer",
-  "form",
-  "h1",
-  "h2",
-  "h3",
-  "h4",
-  "h5",
-  "h6",
-  "head",
-  "header",
-  "hgroup",
-  "html",
-  "i",
-  "iframe",
-  "ins",
-  "kbd",
-  "label",
-  "legend",
-  "li",
-  "mark",
-  "map",
-  "menu",
-  "meter",
-  "nav",
-  "noscript",
-  "object",
-  "ol",
-  "optgroup",
-  "option",
-  "output",
-  "p",
-  "pre",
-  "progress",
-  "q",
-  "ruby",
-  "rp",
-  "rt",
-  "s",
-  "samp",
-  "script",
-  "section",
-  "select",
-  "small",
-  "span",
-  "strong",
-  "style",
-  "sub",
-  "summary",
-  "sup",
-  "table",
-  "tbody",
-  "td",
-  "textarea",
-  "tfoot",
-  "th",
-  "thead",
-  "time",
-  "title",
-  "tr",
-  "u",
-  "ul",
-  "var",
-  "video"
+  "a", "abbr", "address", "article", "aside", "audio", "b", "bdi", "bdo",
+  "blockquote", "body", "button", "canvas", "caption", "cite", "code",
+  "colgroup", "data", "datalist", "dd", "del", "details", "dfn", "div", "dl",
+  "dt", "em", "eventsource", "fieldset", "figcaption", "figure", "footer",
+  "form", "h1", "h2", "h3", "h4", "h5", "h6", "head", "header", "hgroup",
+  "html", "i", "iframe", "ins", "kbd", "label", "legend", "li", "mark", "map",
+  "menu", "meter", "nav", "noscript", "object", "ol", "optgroup", "option",
+  "output", "p", "pre", "progress", "q", "ruby", "rp", "rt", "s", "samp",
+  "script", "section", "select", "small", "span", "strong", "style", "sub",
+  "summary", "sup", "table", "tbody", "td", "textarea", "tfoot", "th", "thead",
+  "time", "title", "tr", "u", "ul", "var", "video"
 )
 
 void_tags <- c(
-  "area",
-  "base",
-  "br",
-  "col",
-  "command",
-  "embed",
-  "hr",
-  "img",
-  "input",
-  "keygen",
-  "link",
-  "meta",
-  "param",
-  "source",
-  "track",
-  "wbr"
+  "area", "base", "br", "col", "command", "embed", "hr", "img", "input",
+  "keygen", "link", "meta", "param", "source", "track", "wbr"
 )
 ```
 
+仔细观察会发现，有些标签与base R中的函数名重复（`body`,`col`,`q`,`sub`,`summary`,`table`），我们可以将所有的函数以列表的形式保存起来，方便后续调用。
 
 ```{r}
 html_tags <- c(
   tags %>% set_names() %>% map(tag),
   void_tags %>% set_names() %>% map(void_tag)
 )
-```
 
-
-```{r}
 html_tags$p(
   "Some text. ",
   html_tags$b(html_tags$i("some bold italic text")),
@@ -433,15 +341,14 @@ html_tags$p(
 )
 ```
 
+上面的标签函数调用略有冗长，每次都要前缀`html_tags$`。我们可以使用一个辅助函数来实现直接使用标签函数。
 
 ```{r}
 with_html <- function(code) {
   code <- enquo(code)
   eval_tidy(code, html_tags)
 }
-```
 
-```{r}
 with_html(
   body(
     h1("A heading", id = "first"),
@@ -450,3 +357,5 @@ with_html(
   )
 )
 ```
+
+## LaTeX
