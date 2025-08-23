@@ -1,0 +1,40 @@
+---
+title: "Introduction"
+date: "2025-08-23"
+date-modified: "2025-08-23"
+
+format: "html"
+fig-width: 6
+fig-asp: 0.618
+out-width: 70%
+fig-align: center
+
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: "#>"
+    R.options:
+      dplyr.print_min: 6
+      dplyr.print_max: 6
+      pillar.max_footer_lines: 2
+      pillar.min_chars: 15
+      stringr.view_n: 6
+      cli.num_colors: 0
+      cli.hyperlink: FALSE
+      pillar.bold: TRUE
+      width: 77
+
+execute:
+  warning: true
+  error: true
+---
+
+最后四章涵盖了两种一般的编程技术：发现和修复 bug, 以及发现和修复性能问题。测量和提高性能的工具尤其重要，因为 R 并不是一种快速的语言。这并非偶然：R 是有意设计的，目的是让交互式数据分析对人类来说更容易，而不是让计算机尽可能快。虽然 R 比其他编程语言慢，但在大多数情况下，它已经足够快了。这些章节将帮助你处理 R 不再足够快的情况，无论是通过提高 R 代码的性能，还是切换到专门为性能设计的语言 C++。
+
+1.  第 22 章讨论了调试，因为找到错误的根本原因可能会非常令人沮丧。幸运的是，R 拥有一些出色的调试工具，当这些工具与一个可靠的策略相结合时，你应该能够快速且相对轻松地找到大多数问题的根本原因。
+
+2.  第 23 章重点关注性能测量。
+
+3.  第 24 章将展示如何提高性能。
+
+4.  第 25 章介绍如何结合C++。

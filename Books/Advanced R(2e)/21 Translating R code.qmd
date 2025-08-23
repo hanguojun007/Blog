@@ -1,7 +1,7 @@
 ---
 title: "21 Translating R code"
 date: "2025-08-20"
-date-modified: "2025-08-20"
+date-modified: "2025-08-23"
 
 format: "html"
 fig-width: 6

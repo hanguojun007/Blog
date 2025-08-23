@@ -1,0 +1,112 @@
+---
+title: "22 Debugging"
+date: "2025-08-23"
+date-modified: "2025-08-23"
+
+format: "html"
+fig-width: 6
+fig-asp: 0.618
+out-width: 70%
+fig-align: center
+
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: "#>"
+    R.options:
+      dplyr.print_min: 6
+      dplyr.print_max: 6
+      pillar.max_footer_lines: 2
+      pillar.min_chars: 15
+      stringr.view_n: 6
+      cli.num_colors: 0
+      cli.hyperlink: FALSE
+      pillar.bold: TRUE
+      width: 77
+
+execute:
+  warning: true
+  error: true
+---
+
+## Introduction
+
+当R代码运行时抛出错误，你会怎样处理？你会使用什么工具来检测和解决？本章就上面两点，先介绍通用的错误处理方法，然后介绍一些特殊的工具。
+
+注意：在编写新函数时，你不应该使用这些工具。如果你发现自己经常在新代码中使用这些工具，请重新考虑你的方法。与其试图一次性编写一个大函数，不如交互式地分段编写。如果从小处着手，你可以快速确定为什么某些事情不能正常工作，而不需要复杂的调试工具。
+
+### Outline
+
+-   22.2节：介绍找到和解决bug的通用策略。
+-   22.3节：介绍`traceback()`，锁定错误的调用栈。
+-   22.4节：介绍中断函数执行，并交互探索具体发生的事件。
+-   22.5节：讨论非交互状态下的调试。
+-   22.6节：讨论一些偶尔也需要调试的非错误问题。
+
+## Overall approach
+
+::: {.callout-tip}
+Finding your bug is a process of confirming the many things that you believe are true — until you find one which is not true.
+
+—Norm Matloff
+:::
+
+找到问题的根本原因总是具有挑战性。大多数bug都很微妙且难以发现，因为如果它们很明显，你一开始就会避开它们。一个好的策略会有所帮助。以下是我发现有用的四步流程概述：
+
+1.  **Google!**
+
+    无论何时看到错误消息，都可以先在浏览器上搜索它（现在用AI啦）。如果你幸运的话，你会发现这是一个已知解决方案中常见的错误。在搜索时，通过删除任何与你的问题特定的变量名称或值来提高匹配成功的概率。
+
+    可以使用“errorist”和“searcher”包自动执行这个过程，参阅它们的网站以了解更多详细信息。
+
+2.  **Make it repeatable**
+
+    为了找到错误的根本原因，你需要在考虑和拒绝假设时多次执行代码。为了使迭代尽可能快速，值得进行一些前期投资，使问题既容易又快速地重现。
+
+    首先创建一个可重复的示例 (参见 1.7 节)。接下来，通过删除代码和简化数据来使示例最小化。在这个过程中，你可能会发现一些不会触发错误的输入。请记住这些输入：它们将有助于诊断根本原因。
+
+    如果你正在使用自动化测试，这也是创建自动化测试用例的好时机。如果你现有的测试覆盖率较低，可以趁机添加一些附近的测试，以确保保留现有的良好行为。这样可以降低创建新 bug 的可能性。
+
+3.  **Figure out where it is**
+
+    如果你幸运的话，下一节中的一个工具将帮助你快速识别导致 bug 的代码行。然而，通常情况下，你需要对问题进行更多的思考。采用科学的方法是一个很好的主意。生成假设，设计实验来测试它们，并记录你的结果。这可能看起来是很多工作，但系统的方法最终会节省你的时间。我经常浪费大量时间依靠直觉来解决 bug (“哦，这一定是一个差一错误，所以我就在这里减去 1”), 而实际上我采用系统的方法会更好。
+
+    如果这个方法失败了，你可能需要向其他人寻求帮助。如果你遵循了上一步，你就会有一个容易与他人分享的小例子。这会让其他人更容易看到问题，也更有可能帮助你找到解决方案。
+
+4.  **Fix it and test it**
+
+    一旦你发现了 bug, 你需要弄清楚如何修复它，并检查修复是否真的有效。同样，有自动化测试非常有用。这不仅有助于确保你确实修复了 bug, 还有助于确保你在过程中没有引入任何新的 bug。在没有自动化测试的情况下，请确保仔细记录正确的输出，并检查之前失败的输入。
+
+## Locating errors
+
+一旦你使错误可重复，下一步就是找出它的来源。在这个过程中，最重要的工具是`traceback()`, 它向你显示导致错误的调用序列 (也称为调用栈，见 7.5 节)。
+
+下面是一个简单的例子。你可以看到 `f()` 调用 `g()` 调用 `h()` 调用 `i()`, 后者检查其参数是否为数值：
+
+```{r}
+f <- function(a) g(a)
+g <- function(b) h(b)
+h <- function(c) i(c)
+i <- function(d) {
+  if (!is.numeric(d)) {
+    stop("`d` must be numeric", call. = FALSE)
+  }
+  d + 10
+}
+```
+
+当你在Rstudio中运行`f("a")`时，你会看到：
+
+![](images/rstudio-error.png)
+
+错误信息的右侧出现两个选项：“Show Traceback”和“Rerun with Debug”，如果你点击“Show Traceback”，你可以看到：
+
+![](images/rstudio-traceback.png)
+
+如果你没有使用Rstudio，你可以使用`traceback()`来查看这些信息。
+
+```{r}
+traceback()
+```
+
+
