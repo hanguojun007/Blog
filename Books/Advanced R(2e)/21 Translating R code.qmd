@@ -359,3 +359,280 @@ with_html(
 ```
 
 ## LaTeX
+
+使用R语言生成LaTeX语句会麻烦一些，因为要同时处理函数名和参数的转换。这意味着，我们需要使用抽象语法树（AST）来修改代码。
+
+### LaTeX mathematics
+
+在开始之前，先简单介绍一下LaTeX中公式的表达方式。完整的标准非常复杂，但幸运的是，相关文档非常详细，而且最常见的命令结构相当简单：
+
+-   大多数简单的数学方程写法与在R中输入它们的方式相同：`x * y`，`z ^ 5`。下标使用`_`（例如，`x_1`）。
+
+-   特殊符号使用`\`转义：`\pi` = \pi，`pm` = \pm。LaTeX中有大量这种符号，可以在网上搜索，或者使用http://detexify.kirelabs.org/classify.html。
+
+-   复杂函数，形如`\name{arg1}{arg2}`。例如，分数`\frac{a}{b}`，开方`\sqrt{a}`。
+
+-   使用`{}`将元素分组：`x ^ a + b`与`x ^ {a + b}`。
+
+-   区分函数与变量。使用`\textrm{f}(a * b)`来标识`f`是函数，`a * b`是变量，不然无法确定`f`是函数还是变量。
+
+### Goal
+
+我们的目标是使用这些规则自动将R表达式转换为适当的LaTeX表示形式。我们将分四个阶段处理这个问题：
+
+-   转换已知的符号：`pi` -> `\pi`
+
+-   保留其他符号不变：`x` -> `x`，`y` -> `y`
+
+-   转换已知的函数为特殊符号：`sqrt(frac(a,b))` -> `\sqrt{\frac{a}{b}}`
+
+-   使用`\textrm{}`标识其他函数：`f(a)` -> `\textrm{f}(a)`
+
+### `to_math()`
+
+首先，我们封装一个函数，将R表达式转换为LaTeX数学表达式。这将类似于`to_html()`，通过捕获未计算的表达式并在特殊环境中对其进行计算来实现。主要有两个区别：
+
+-   评估环境不再是恒定的，因为它必须根据输入而变化。这对于处理未知符号和函数是必要的。
+
+-   我们从不在参数环境中计算，因为我们将每个函数都转换为LaTeX表达式。用户需要使用`!!`才能正常计算。
+
+```{r}
+to_math <- function(x) {
+  expr <- enexpr(x)
+  out <- eval_bare(expr, latex_env(expr))
+
+  latex(out)
+}
+
+latex <- function(x) structure(x, class = "advr_latex")
+print.advr_latex <- function(x) {
+  cat("<LATEX> ", x, "\n", sep = "")
+}
+```
+
+我们会逐步构建`latex_env()`。
+
+### Known symbols
+
+第一步，创建一个能生成在LaTeX中用来表示希腊字符的特殊字符的环境。如，`pi`转换为`\pi`。
+
+```{r}
+greek <- c(
+  "alpha", "theta", "tau", "beta", "vartheta", "pi", "upsilon", "gamma",
+  "varpi", "phi", "delta", "kappa", "rho", "varphi", "epsilon", "lambda",
+  "varrho", "chi", "varepsilon", "mu", "sigma", "psi", "zeta", "nu",
+  "varsigma", "omega", "eta", "xi", "Gamma", "Lambda", "Sigma", "Psi",
+  "Delta", "Xi", "Upsilon", "Omega", "Theta", "Pi", "Phi"
+)
+greek_list <- set_names(paste0("\\", greek), greek)
+greek_env <- as_environment(greek_list)
+
+latex_env <- function(expr) {
+  greek_env
+}
+
+to_math(pi)
+to_math(beta)
+```
+
+### Unknown symbols
+
+第二步，保留不是希腊字符的符号为原样。但有个问题是：我们无法预先知道输入的符号是什么，没法创建类似`greek_env`的环境。幸运的是，我们可以使用抽象语法树提取“表达式”中的字符。
+
+```{r}
+all_names_rec <- function(x) {
+  switch_expr(
+    x,
+    constant = character(),
+    symbol = as.character(x),
+    call = flat_map_chr(as.list(x[-1]), all_names)
+  )
+}
+
+all_names <- function(x) {
+  unique(all_names_rec(x))
+}
+
+all_names(expr(x + y + f(a, b, c, 10)))
+```
+
+现在，我们可以从输入的“表达式”中提取所有符号并创建环境。
+
+```{r}
+latex_env <- function(expr) {
+  names <- all_names(expr)
+  symbol_env <- as_environment(set_names(names))
+
+  symbol_env
+}
+
+to_math(x)
+to_math(longvariablename)
+to_math(pi)
+```
+
+接下来，我们需要将两个环境结合，将`symbol_env`设置为`greek_env`的父环境。
+
+```{r}
+latex_env <- function(expr) {
+  # Unknown symbols
+  names <- all_names(expr)
+  symbol_env <- as_environment(set_names(names))
+
+  # Known symbols
+  env_clone(greek_env, parent = symbol_env)
+}
+
+to_math(x)
+to_math(longvariablename)
+to_math(pi)
+```
+
+### Known functions
+
+第三步，添加函数。
+
+首先，我们将介绍一些辅助函数，它们可以轻松地添加新的一元和二元运算符。这些函数非常简单：它们只是组合字符串。
+
+```{r}
+unary_op <- function(left, right) {
+  new_function(
+    exprs(e1 = ),
+    expr(
+      paste0(!!left, e1, !!right)
+    ),
+    caller_env()
+  )
+}
+
+binary_op <- function(sep) {
+  new_function(
+    exprs(e1 = , e2 = ),
+    expr(
+      paste0(e1, !!sep, e2)
+    ),
+    caller_env()
+  )
+}
+
+unary_op("\\sqrt{", "}")
+binary_op("+")
+```
+
+使用这些辅助函数，我们可以映射一些将R转换为LaTeX的示例。请注意，有了R的词法作用域规则的帮助，我们可以轻松地为标准函数如`+`、`-`和`*`, 甚至`(`和`{`提供新的含义。
+
+```{r}
+# Binary operators
+f_env <- child_env(
+  .parent = empty_env(),
+  `+` = binary_op(" + "),
+  `-` = binary_op(" - "),
+  `*` = binary_op(" * "),
+  `/` = binary_op(" / "),
+  `^` = binary_op("^"),
+  `[` = binary_op("_"),
+
+  # Grouping
+  `{` = unary_op("\\left{ ", " \\right}"),
+  `(` = unary_op("\\left( ", " \\right)"),
+  paste = paste,
+
+  # Other math functions
+  sqrt = unary_op("\\sqrt{", "}"),
+  sin = unary_op("\\sin(", ")"),
+  log = unary_op("\\log(", ")"),
+  abs = unary_op("\\left| ", "\\right| "),
+  frac = function(a, b) {
+    paste0("\\frac{", a, "}{", b, "}")
+  },
+
+  # Labelling
+  hat = unary_op("\\hat{", "}"),
+  tilde = unary_op("\\tilde{", "}")
+)
+```
+
+我们再次修改`latex_env()`以包含这个环境。这应该是R查找名称的最后一个环境，这样像`sin(sin)`这样的表达式才能工作。
+
+```{r}
+latex_env <- function(expr) {
+  # Known functions
+  f_env
+
+  # Default symbols
+  names <- all_names(expr)
+  symbol_env <- as_environment(set_names(names), parent = f_env)
+
+  # Known symbols
+  greek_env <- env_clone(greek_env, parent = symbol_env)
+
+  greek_env
+}
+
+to_math(sin(x + pi))
+to_math(log(x[i]^2))
+to_math(sin(sin))
+```
+
+### Unknown functions
+
+第四步，添加未知函数到环境中。同样，我们再次使用抽象语法树来提取：
+
+```{r}
+all_calls_rec <- function(x) {
+  switch_expr(x, constant = , symbol = character(), call = {
+    fname <- as.character(x[[1]])
+    children <- flat_map_chr(as.list(x[-1]), all_calls)
+    c(fname, children)
+  })
+}
+all_calls <- function(x) {
+  unique(all_calls_rec(x))
+}
+
+all_calls(expr(f(g + b, c, d(a))))
+```
+
+创建一个闭包函数生成未知函数：
+
+```{r}
+unknown_op <- function(op) {
+  new_function(
+    exprs(... = ),
+    expr({
+      contents <- paste(..., collapse = ", ")
+      paste0(!!paste0("\\mathrm{", op, "}("), contents, ")")
+    })
+  )
+}
+unknown_op("foo")
+```
+
+更新`latex_env()`：
+
+```{r}
+latex_env <- function(expr) {
+  calls <- all_calls(expr)
+  call_list <- map(set_names(calls), unknown_op)
+  call_env <- as_environment(call_list)
+
+  # Known functions
+  f_env <- env_clone(f_env, call_env)
+
+  # Default symbols
+  names <- all_names(expr)
+  symbol_env <- as_environment(set_names(names), parent = f_env)
+
+  # Known symbols
+  greek_env <- env_clone(greek_env, parent = symbol_env)
+  greek_env
+}
+```
+
+测试：
+
+```{r}
+to_math(sin(pi) + f(a))
+```
+
+你可以进一步拓展这个想法，翻译数学表达式的类型，但你应该不再需要任何额外的元编程工具了。

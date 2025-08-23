@@ -32,3 +32,4 @@ website:
         - Books/Advanced R(2e)/18 Expressions.qmd
         - Books/Advanced R(2e)/19 Quasiquotation.qmd
         - Books/Advanced R(2e)/20 Evaluation.qmd
+        - Books/Advanced R(2e)/21 Translating R code.qmd
