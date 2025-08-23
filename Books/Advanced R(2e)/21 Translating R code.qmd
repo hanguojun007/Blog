@@ -461,6 +461,10 @@ switch_expr <- function(x, ...) {
   )
 }
 
+flat_map_chr <- function(.x, .f, ...) {
+  purrr::flatten_chr(purrr::map(.x, .f, ...))
+}
+
 all_names_rec <- function(x) {
   switch_expr(
     x,
