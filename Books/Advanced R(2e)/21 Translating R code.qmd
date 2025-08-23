@@ -440,6 +440,27 @@ to_math(beta)
 第二步，保留不是希腊字符的符号为原样。但有个问题是：我们无法预先知道输入的符号是什么，没法创建类似`greek_env`的环境。幸运的是，我们可以使用抽象语法树提取“表达式”中的字符。
 
 ```{r}
+expr_type <- function(x) {
+  if (rlang::is_syntactic_literal(x)) {
+    "constant"
+  } else if (is.symbol(x)) {
+    "symbol"
+  } else if (is.call(x)) {
+    "call"
+  } else if (is.pairlist(x)) {
+    "pairlist"
+  } else {
+    typeof(x)
+  }
+}
+
+switch_expr <- function(x, ...) {
+  switch(expr_type(x),
+    ...,
+    stop("Don't know how to handle type ", typeof(x), call. = FALSE)
+  )
+}
+
 all_names_rec <- function(x) {
   switch_expr(
     x,
