@@ -45,7 +45,7 @@ execute:
 
 ## Overall approach
 
-::: {.callout-tip}
+::: callout-tip
 Finding your bug is a process of confirming the many things that you believe are true — until you find one which is not true.
 
 —Norm Matloff
@@ -111,7 +111,7 @@ f("a")
 traceback()
 ```
 
-::: {.callout-note}
+::: callout-note
 注意：如果你使用`source()`加载的函数，调用`traceback()`后会显示错误的具体未知，`filename.r#linenumber`。
 :::
 
@@ -161,3 +161,87 @@ g <- function(b) {
   h(b)
 }
 ```
+
+`browser()`会在终端生成`Browse[1]>`样式的提示，表示你正在`browser()`启动的环境中交互。如果你在Rstudio中点击“Rerun with Debug”，会在环境栏中显示当前环境中的对象，在traceback栏中显示调用栈。
+
+### `browser()` commands
+
+除了可以运行常规R代码外，`browser()`提供了一些特殊的命令，可以直接在终端运行它们的缩写或在Rstudio中工具栏：
+
+![](images/debug-toolbar.png)
+
+-   Next, `n`：运行函数下一步. 如果你有一个变量名是 `n`，你需要运行`print(n)`来展示值。
+
+-   Step into, ![](https://adv-r.hadley.nz/screenshots/step-into.png){width="25" height="18"} or `s`：功能类似next，但是如果下一步运行的是函数，会跳入到该函数中进行交互。
+
+-   Finish, ![](https://adv-r.hadley.nz/screenshots/finish-loop.png){width="25" height="18"} or `f`：结束当前循环或函数。
+
+-   Continue, `c`：如果你已经修复了错误状态，并想要检查函数是否正常运行，运行它，会离开交互式调试，继续正常执行函数。
+
+-   Stop, `Q`：停止调试，终止函数，然后返回全局工作空间。一旦你确定了问题所在，并且准备好修复它并重新加载代码，就可以使用这个方法。
+
+还有两个稍微不那么有用且在工具栏中不可用的命令：
+
+-   Enter：重复之前的命令。该功能极易激活，使用`options(browserNLdisabled = TRUE)`可以将其关闭。
+
+-   `where`：打印活动调用的堆栈跟踪 (相当于Rstudio交互式 的traceback) 。
+
+### Alternatives
+
+有三种替代`browser()`的方法：在Rstudio中设置断点、`options(error = recover)`、`debug()`。
+
+#### Breakpoints
+
+在Rstudio中，你可以点击左侧代码行或者使用`Shift + F9`来设置断点。设置断点相当于你在这行代码中插入了`browser()`。这样，你可以直观地看到插入的断点，也可以无需在源码中插入`browser()`来调试。但它有两个小缺点：
+
+-   有极少的情况下，断点会失效。阅读[breakpoint troubleshooting](http://www.rstudio.com/ide/docs/debugging/breakpoint-troubleshooting)了解更多信息。
+
+-   目前Rstudio不支持在条件情况中设置断点。
+
+#### `recover()`
+
+设置`options(error = recover)`后，报错时会自动进入交互式调试。设置`options(error = NULL)`即可恢复默认行为。
+
+```{r}
+options(error = recover)
+f("x")
+```
+
+#### `debug()`
+
+另一种方法是调用一个能插入`browser()`的函数：
+
+-   `debug()`插入`browser()`到函数`f`的开头，`undebug()`移除，`debugonce()`仅在下一次调用函数时触发，再次调用消失。
+
+-   `utils::setBreakpoint()`与`debug()`类似，除函数名外，还可以接受行数、文件名找到恰当的函数。
+
+这两个函数都是`trace()`的特殊情况，它在现有函数中的任意位置插入任意代码。当调试没有源代码的代码时，`trace()`偶尔会很有用。要从函数中移除“trace”，可以使用`untrace()`。每个函数只能执行一个“trace”, 但这一个“trace”可以调用多个函数。
+
+#### Call stack
+
+不幸地是，[`traceback()`](https://rdrr.io/r/base/traceback.html), [`browser()`](https://rdrr.io/r/base/browser.html) & `where`, and [`recover()`](https://rdrr.io/r/utils/recover.html) 产生的调用栈并不一致。下表是对上面`f("a")`调用栈的总结。
+
+| [`traceback()`](https://rdrr.io/r/base/traceback.html) | `where` | [`recover()`](https://rdrr.io/r/utils/recover.html) | rlang functions |
+|:---|:---|:---|:---|
+| `5: stop("...")` |  |  |  |
+| `4: i(c)` | `where 1: i(c)` | `1: f()` | `1. └─global::f(10)` |
+| `3: h(b)` | `where 2: h(b)` | `2: g(a)` | `2. └─global::g(a)` |
+| `2: g(a)` | `where 3: g(a)` | `3: h(b)` | `3. └─global::h(b)` |
+| `1: f("a")` | `where 4: f("a")` | `4: i("a")` | `4. └─global::i("a")` |
+
+在RStudio展示的调用顺序与[`traceback()`](https://rdrr.io/r/base/traceback.html)一致；“rlang”函数产生的调用顺序与[`recover()`](https://rdrr.io/r/utils/recover.html)一致。
+
+### Compiled code
+
+编译代码 (如 C 或 C++)也可以使用交互式调试器 (gdb 或 lldb) 。遗憾的是，这超出了本书的范围，但有一些资源你可能会发现很有用。
+
+-   <http://r-pkgs.had.co.nz/src.html#src-debugging>
+
+-   <https://github.com/wch/r-debug/blob/master/debugging-r.md>
+
+-   <http://kevinushey.github.io/blog/2015/04/05/debugging-with-valgrind/>
+
+-   <https://www.jimhester.com/2018/08/22/debugging-rstudio/>
+
+## Non-interactive debugging
+
