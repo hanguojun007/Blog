@@ -93,6 +93,8 @@ i <- function(d) {
   }
   d + 10
 }
+
+f("a")
 ```
 
 当你在Rstudio中运行`f("a")`时，你会看到：
@@ -109,4 +111,53 @@ i <- function(d) {
 traceback()
 ```
 
+::: {.callout-note}
+注意：如果你使用`source()`加载的函数，调用`traceback()`后会显示错误的具体未知，`filename.r#linenumber`。
+:::
 
+### Lazy evaluation
+
+`traceback()`的一个缺点是始终线性展示调用栈，如果调用过程包含大量的惰性评估，就会显得混乱。例如，在`f()`内惰性评估`j()`产生的调用栈：
+
+```{r}
+j <- function() k()
+k <- function() stop("Oops!", call. = FALSE)
+f(j())
+```
+
+```{r}
+traceback()
+```
+
+可以使用`rlang::abort()`来替代`stop()`，使用`rlang::last_trace()`来替换`traceback()`。
+
+```{r}
+k <- function() rlang::abort("Oops!")
+f(j())
+rlang::last_trace()
+```
+
+## Interactive debugger
+
+对于找到并修复错误，有时错误的位置信息已经足够；但通常需要更多信息，最简单的方法是使用交互式调试器，它允许暂停函数的执行，并交互式地探索其状态。
+
+如果你正在使用RStudio, 进入交互式调试器最简单的方式是通过RStudio的“Rerun with Debug” 工具，它会重新运行创建错误的命令，暂停发生错误的执行。否则，你需要在暂停的地方插入一个`browser()`调用，然后重新运行该函数。例如，可以在`g()`中插入一个`browser()`调用：
+
+```{r}
+g <- function(b) {
+  browser()
+  h(b)
+}
+f(10)
+```
+
+`browser()`是一个常规函数，你可以使用`if`语句包裹它：
+
+```{r}
+g <- function(b) {
+  if (b < 0) {
+    browser()
+  }
+  h(b)
+}
+```
