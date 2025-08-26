@@ -33,3 +33,5 @@ website:
         - Books/Advanced R(2e)/19 Quasiquotation.qmd
         - Books/Advanced R(2e)/20 Evaluation.qmd
         - Books/Advanced R(2e)/21 Translating R code.qmd
+        - Books/Advanced R(2e)/Techniques Introduction.qmd
+        - Books/Advanced R(2e)/22 Debugging.qmd

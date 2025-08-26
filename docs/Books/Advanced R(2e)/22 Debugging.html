@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.40">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<meta name="dcterms.date" content="2025-08-23">
+<title>22 Debugging</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../Books/Advanced R(2e)/Techniques Introduction.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-e6e594f9697a8fc74d922f689f62e840.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light"><script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": true,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "Search",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script><link rel="stylesheet" href="../../styles.css">
+</head>
+<body class="nav-sidebar floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top"><nav class="navbar navbar-expand-lg " data-bs-theme="dark"><div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">RSSPtho</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+<li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-books" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Books</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-books">
+<li>
+    <a class="dropdown-item" href="../../Books/ggplot2/index.html">
+ <span class="dropdown-text">ggplot2</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Books/R4DS2/index.html">
+ <span class="dropdown-text">R for Data Science(2e)</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Books/Tidy Modeling with R/index.html">
+ <span class="dropdown-text">Tidy Modeling with R</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Books/Advanced R(2e)/index.html">
+ <span class="dropdown-text">Advanced R(2e)</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Books/quarto/Project Basics.html">
+ <span class="dropdown-text">Quarto</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Books/Js4R/00 Preface.html">
+ <span class="dropdown-text">Js4R</span></a>
+  </li>  
+    </ul>
+</li>
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About me</span></a>
+  </li>  
+</ul>
+<div class="quarto-navbar-tools">
+    <a href="https://github.com/hanguojun007" title="" class="quarto-navigation-tool px-1" aria-label=""><i class="bi bi-github"></i></a>
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav><nav class="quarto-secondary-nav"><div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../Books/Advanced R(2e)/22 Debugging.html">22 Debugging</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav></header><!-- content --><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto"><div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">index</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/1 Introduction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1 Introduction</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+ <span class="menu-text">Foundations</span>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/Foundations Introduction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Introduction</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/2 Names and values.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2 Names and values</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/3 Vectors.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">3 Vectors</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/4 Subsetting.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">4 Subsetting</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/5 Control flow.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">5 Control flow</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/6 Functions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">6 Functions</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/7 Environments.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">7 Environments</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/8 Conditions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">8 Conditions</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+ <span class="menu-text">Functional programming</span>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/Functional programming.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Introduction</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/9 Functionals.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">9 Functionals</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/10 Function factories.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">10 Function factories</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/11 Function operators.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">11 Function operators</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+ <span class="menu-text">Object-oriented Programming</span>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/Object-oriented Programming.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Introduction</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/12 Base types.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">12 Base types</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/13 S3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">13 S3</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/14 R6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">14 R6</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/15 S4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">15 S4</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/16 Trade-offs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">16 Trade-offs</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+ <span class="menu-text">Metaprogramming</span>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/Metaprogramming Introduction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Introduction</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/17 Big picture.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">17 Big picture</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/18 Expressions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">18 Expressions</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/19 Quasiquotation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">19 Quasiquotation</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/20 Evaluation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">20 Evaluation</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/21 Translating R code.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">21 Translating R code</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/Techniques Introduction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Introduction</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/22 Debugging.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">22 Debugging</span></a>
+  </div>
+</li>
+    </ul>
+</div>
+</nav><div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active"><h2 id="toc-title">On this page</h2>
+   
+  <ul>
+<li>
+<a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a>
+  <ul class="collapse">
+<li><a href="#outline" id="toc-outline" class="nav-link" data-scroll-target="#outline">Outline</a></li>
+  </ul>
+</li>
+  <li><a href="#overall-approach" id="toc-overall-approach" class="nav-link" data-scroll-target="#overall-approach">Overall approach</a></li>
+  <li>
+<a href="#locating-errors" id="toc-locating-errors" class="nav-link" data-scroll-target="#locating-errors">Locating errors</a>
+  <ul class="collapse">
+<li><a href="#lazy-evaluation" id="toc-lazy-evaluation" class="nav-link" data-scroll-target="#lazy-evaluation">Lazy evaluation</a></li>
+  </ul>
+</li>
+  <li>
+<a href="#interactive-debugger" id="toc-interactive-debugger" class="nav-link" data-scroll-target="#interactive-debugger">Interactive debugger</a>
+  <ul class="collapse">
+<li><a href="#browser-commands" id="toc-browser-commands" class="nav-link" data-scroll-target="#browser-commands"><code>browser()</code> commands</a></li>
+  <li><a href="#alternatives" id="toc-alternatives" class="nav-link" data-scroll-target="#alternatives">Alternatives</a></li>
+  <li><a href="#compiled-code" id="toc-compiled-code" class="nav-link" data-scroll-target="#compiled-code">Compiled code</a></li>
+  </ul>
+</li>
+  <li>
+<a href="#non-interactive-debugging" id="toc-non-interactive-debugging" class="nav-link" data-scroll-target="#non-interactive-debugging">Non-interactive debugging</a>
+  <ul class="collapse">
+<li><a href="#dump.frames" id="toc-dump.frames" class="nav-link" data-scroll-target="#dump.frames"><code>dump.frames()</code></a></li>
+  <li><a href="#print-debugging" id="toc-print-debugging" class="nav-link" data-scroll-target="#print-debugging">Print debugging</a></li>
+  <li><a href="#rmarkdown" id="toc-rmarkdown" class="nav-link" data-scroll-target="#rmarkdown">RMarkdown</a></li>
+  </ul>
+</li>
+  <li><a href="#non-error-failures" id="toc-non-error-failures" class="nav-link" data-scroll-target="#non-error-failures">Non-error failures</a></li>
+  </ul></nav>
+    <div class="quarto-margin-footer"><div class="margin-footer-item">
+<p><img src="../..\logo.jpg" class="conditional-footer img-fluid" width="200"></p>
+</div></div></div>
+<!-- main -->
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
+<h1 class="title">22 Debugging</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">August 23, 2025</p>
+    </div>
+  </div>
+  
+    <div>
+    <div class="quarto-title-meta-heading">Modified</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date-modified">August 23, 2025</p>
+    </div>
+  </div>
+    
+  </div>
+  
+
+
+</header><section id="introduction" class="level2"><h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>当R代码运行时抛出错误，你会怎样处理？你会使用什么工具来检测和解决？本章就上面两点，先介绍通用的错误处理方法，然后介绍一些特殊的工具。</p>
+<p>注意：在编写新函数时，你不应该使用这些工具。如果你发现自己经常在新代码中使用这些工具，请重新考虑你的方法。与其试图一次性编写一个大函数，不如交互式地分段编写。如果从小处着手，你可以快速确定为什么某些事情不能正常工作，而不需要复杂的调试工具。</p>
+<section id="outline" class="level3"><h3 class="anchored" data-anchor-id="outline">Outline</h3>
+<ul>
+<li>22.2节：介绍找到和解决bug的通用策略。</li>
+<li>22.3节：介绍<code><a href="https://rdrr.io/r/base/traceback.html">traceback()</a></code>，锁定错误的调用栈。</li>
+<li>22.4节：介绍中断函数执行，并交互探索具体发生的事件。</li>
+<li>22.5节：讨论非交互状态下的调试。</li>
+<li>22.6节：讨论一些偶尔也需要调试的非错误问题。</li>
+</ul></section></section><section id="overall-approach" class="level2"><h2 class="anchored" data-anchor-id="overall-approach">Overall approach</h2>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Finding your bug is a process of confirming the many things that you believe are true — until you find one which is not true.</p>
+<p>—Norm Matloff</p>
+</div>
+</div>
+<p>找到问题的根本原因总是具有挑战性。大多数bug都很微妙且难以发现，因为如果它们很明显，你一开始就会避开它们。一个好的策略会有所帮助。以下是我发现有用的四步流程概述：</p>
+<ol type="1">
+<li>
+<p><strong>Google!</strong></p>
+<p>无论何时看到错误消息，都可以先在浏览器上搜索它（现在用AI啦）。如果你幸运的话，你会发现这是一个已知解决方案中常见的错误。在搜索时，通过删除任何与你的问题特定的变量名称或值来提高匹配成功的概率。</p>
+<p>可以使用“errorist”和“searcher”包自动执行这个过程，参阅它们的网站以了解更多详细信息。</p>
+</li>
+<li>
+<p><strong>Make it repeatable</strong></p>
+<p>为了找到错误的根本原因，你需要在考虑和拒绝假设时多次执行代码。为了使迭代尽可能快速，值得进行一些前期投资，使问题既容易又快速地重现。</p>
+<p>首先创建一个可重复的示例 (参见 1.7 节)。接下来，通过删除代码和简化数据来使示例最小化。在这个过程中，你可能会发现一些不会触发错误的输入。请记住这些输入：它们将有助于诊断根本原因。</p>
+<p>如果你正在使用自动化测试，这也是创建自动化测试用例的好时机。如果你现有的测试覆盖率较低，可以趁机添加一些附近的测试，以确保保留现有的良好行为。这样可以降低创建新 bug 的可能性。</p>
+</li>
+<li>
+<p><strong>Figure out where it is</strong></p>
+<p>如果你幸运的话，下一节中的一个工具将帮助你快速识别导致 bug 的代码行。然而，通常情况下，你需要对问题进行更多的思考。采用科学的方法是一个很好的主意。生成假设，设计实验来测试它们，并记录你的结果。这可能看起来是很多工作，但系统的方法最终会节省你的时间。我经常浪费大量时间依靠直觉来解决 bug (“哦，这一定是一个差一错误，所以我就在这里减去 1”), 而实际上我采用系统的方法会更好。</p>
+<p>如果这个方法失败了，你可能需要向其他人寻求帮助。如果你遵循了上一步，你就会有一个容易与他人分享的小例子。这会让其他人更容易看到问题，也更有可能帮助你找到解决方案。</p>
+</li>
+<li>
+<p><strong>Fix it and test it</strong></p>
+<p>一旦你发现了 bug, 你需要弄清楚如何修复它，并检查修复是否真的有效。同样，有自动化测试非常有用。这不仅有助于确保你确实修复了 bug, 还有助于确保你在过程中没有引入任何新的 bug。在没有自动化测试的情况下，请确保仔细记录正确的输出，并检查之前失败的输入。</p>
+</li>
+</ol></section><section id="locating-errors" class="level2"><h2 class="anchored" data-anchor-id="locating-errors">Locating errors</h2>
+<p>一旦你使错误可重复，下一步就是找出它的来源。在这个过程中，最重要的工具是<code><a href="https://rdrr.io/r/base/traceback.html">traceback()</a></code>, 它向你显示导致错误的调用序列 (也称为调用栈，见 7.5 节)。</p>
+<p>下面是一个简单的例子。你可以看到 <code>f()</code> 调用 <code>g()</code> 调用 <code>h()</code> 调用 <code>i()</code>, 后者检查其参数是否为数值：</p>
+<div class="cell">
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">a</span><span class="op">)</span> <span class="fu">g</span><span class="op">(</span><span class="va">a</span><span class="op">)</span></span>
+<span><span class="va">g</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">b</span><span class="op">)</span> <span class="fu">h</span><span class="op">(</span><span class="va">b</span><span class="op">)</span></span>
+<span><span class="va">h</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">c</span><span class="op">)</span> <span class="fu">i</span><span class="op">(</span><span class="va">c</span><span class="op">)</span></span>
+<span><span class="va">i</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">d</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/numeric.html">is.numeric</a></span><span class="op">(</span><span class="va">d</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="kw"><a href="https://rdrr.io/r/base/stop.html">stop</a></span><span class="op">(</span><span class="st">"`d` must be numeric"</span>, call. <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span>  <span class="va">d</span> <span class="op">+</span> <span class="fl">10</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="fu">f</span><span class="op">(</span><span class="st">"a"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Error: `d` must be numeric</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>当你在Rstudio中运行<code>f("a")</code>时，你会看到：</p>
+<p><img src="images/rstudio-error.png" class="img-fluid"></p>
+<p>错误信息的右侧出现两个选项：“Show Traceback”和“Rerun with Debug”，如果你点击“Show Traceback”，你可以看到：</p>
+<p><img src="images/rstudio-traceback.png" class="img-fluid"></p>
+<p>如果你没有使用Rstudio，你可以使用<code><a href="https://rdrr.io/r/base/traceback.html">traceback()</a></code>来查看这些信息。</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/traceback.html">traceback</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; 5: stop("`d` must be numeric", call. = FALSE) at #3</span></span>
+<span><span class="co">#&gt; 4: i(c) at #1</span></span>
+<span><span class="co">#&gt; 3: h(b) at #1</span></span>
+<span><span class="co">#&gt; 2: g(a) at #1</span></span>
+<span><span class="co">#&gt; 1: f("a")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>注意：如果你使用<code><a href="https://rdrr.io/r/base/source.html">source()</a></code>加载的函数，调用<code><a href="https://rdrr.io/r/base/traceback.html">traceback()</a></code>后会显示错误的具体未知，<code>filename.r#linenumber</code>。</p>
+</div>
+</div>
+<section id="lazy-evaluation" class="level3"><h3 class="anchored" data-anchor-id="lazy-evaluation">Lazy evaluation</h3>
+<p><code><a href="https://rdrr.io/r/base/traceback.html">traceback()</a></code>的一个缺点是始终线性展示调用栈，如果调用过程包含大量的惰性评估，就会显得混乱。例如，在<code>f()</code>内惰性评估<code>j()</code>产生的调用栈：</p>
+<div class="cell">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">j</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="fu">k</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">k</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="kw"><a href="https://rdrr.io/r/base/stop.html">stop</a></span><span class="op">(</span><span class="st">"Oops!"</span>, call. <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="fu">f</span><span class="op">(</span><span class="fu">j</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Error: Oops!</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/traceback.html">traceback</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; 7: stop("Oops!", call. = FALSE) at #1</span></span>
+<span><span class="co">#&gt; 6: k() at #1</span></span>
+<span><span class="co">#&gt; 5: j() at #1</span></span>
+<span><span class="co">#&gt; 4: i(c) at #1</span></span>
+<span><span class="co">#&gt; 3: h(b) at #1</span></span>
+<span><span class="co">#&gt; 2: g(a)</span></span>
+<span><span class="co">#&gt; 1: f(j())</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>可以使用<code><a href="https://rlang.r-lib.org/reference/abort.html">rlang::abort()</a></code>来替代<code><a href="https://rdrr.io/r/base/stop.html">stop()</a></code>，使用<code><a href="https://rlang.r-lib.org/reference/last_error.html">rlang::last_trace()</a></code>来替换<code><a href="https://rdrr.io/r/base/traceback.html">traceback()</a></code>。</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">k</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="fu">rlang</span><span class="fu">::</span><span class="fu"><a href="https://rlang.r-lib.org/reference/abort.html">abort</a></span><span class="op">(</span><span class="st">"Oops!"</span><span class="op">)</span></span>
+<span><span class="fu">f</span><span class="op">(</span><span class="fu">j</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; rlang::last_trace()</span></span>
+<span><span class="co">#&gt; &lt;error/rlang_error&gt;</span></span>
+<span><span class="co">#&gt; Error in `k()`:</span></span>
+<span><span class="co">#&gt; ! Oops!</span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Backtrace:</span></span>
+<span><span class="co">#&gt;     ▆</span></span>
+<span><span class="co">#&gt;  1. ├─global f(j())</span></span>
+<span><span class="co">#&gt;  2. │ └─global g(a)</span></span>
+<span><span class="co">#&gt;  3. │   └─global h(b)</span></span>
+<span><span class="co">#&gt;  4. │     └─global i(c)</span></span>
+<span><span class="co">#&gt;  5. └─global j()</span></span>
+<span><span class="co">#&gt;  6.   └─global k()</span></span>
+<span><span class="co">#&gt; Run rlang::last_trace(drop = FALSE) to see 1 hidden frame.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section></section><section id="interactive-debugger" class="level2"><h2 class="anchored" data-anchor-id="interactive-debugger">Interactive debugger</h2>
+<p>对于找到并修复错误，有时错误的位置信息已经足够；但通常需要更多信息，最简单的方法是使用交互式调试器，它允许暂停函数的执行，并交互式地探索其状态。</p>
+<p>如果你正在使用RStudio, 进入交互式调试器最简单的方式是通过RStudio的“Rerun with Debug” 工具，它会重新运行创建错误的命令，暂停发生错误的执行。否则，你需要在暂停的地方插入一个<code><a href="https://rdrr.io/r/base/browser.html">browser()</a></code>调用，然后重新运行该函数。例如，可以在<code>g()</code>中插入一个<code><a href="https://rdrr.io/r/base/browser.html">browser()</a></code>调用：</p>
+<div class="cell">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">g</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">b</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/browser.html">browser</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>  <span class="fu">h</span><span class="op">(</span><span class="va">b</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span><span class="fu">f</span><span class="op">(</span><span class="fl">10</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Called from: g(a)</span></span>
+<span><span class="co">#&gt; debug: h(b)</span></span>
+<span><span class="co">#&gt; [1] 20</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><code><a href="https://rdrr.io/r/base/browser.html">browser()</a></code>是一个常规函数，你可以使用<code>if</code>语句包裹它：</p>
+<div class="cell">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">g</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">b</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="va">b</span> <span class="op">&lt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/browser.html">browser</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span>  <span class="fu">h</span><span class="op">(</span><span class="va">b</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><code><a href="https://rdrr.io/r/base/browser.html">browser()</a></code>会在终端生成<code>Browse[1]&gt;</code>样式的提示，表示你正在<code><a href="https://rdrr.io/r/base/browser.html">browser()</a></code>启动的环境中交互。如果你在Rstudio中点击“Rerun with Debug”，会在环境栏中显示当前环境中的对象，在traceback栏中显示调用栈。</p>
+<section id="browser-commands" class="level3"><h3 class="anchored" data-anchor-id="browser-commands">
+<code>browser()</code> commands</h3>
+<p>除了可以运行常规R代码外，<code><a href="https://rdrr.io/r/base/browser.html">browser()</a></code>提供了一些特殊的命令，可以直接在终端运行它们的缩写或在Rstudio中工具栏：</p>
+<p><img src="images/debug-toolbar.png" class="img-fluid"></p>
+<ul>
+<li><p>Next, <code>n</code>：运行函数下一步. 如果你有一个变量名是 <code>n</code>，你需要运行<code>print(n)</code>来展示值。</p></li>
+<li><p>Step into, <img src="https://adv-r.hadley.nz/screenshots/step-into.png" width="25" height="18"> or <code>s</code>：功能类似next，但是如果下一步运行的是函数，会跳入到该函数中进行交互。</p></li>
+<li><p>Finish, <img src="https://adv-r.hadley.nz/screenshots/finish-loop.png" width="25" height="18"> or <code>f</code>：结束当前循环或函数。</p></li>
+<li><p>Continue, <code>c</code>：如果你已经修复了错误状态，并想要检查函数是否正常运行，运行它，会离开交互式调试，继续正常执行函数。</p></li>
+<li><p>Stop, <code>Q</code>：停止调试，终止函数，然后返回全局工作空间。一旦你确定了问题所在，并且准备好修复它并重新加载代码，就可以使用这个方法。</p></li>
+</ul>
+<p>还有两个稍微不那么有用且在工具栏中不可用的命令：</p>
+<ul>
+<li><p>Enter：重复之前的命令。该功能极易激活，使用<code>options(browserNLdisabled = TRUE)</code>可以将其关闭。</p></li>
+<li><p><code>where</code>：打印活动调用的堆栈跟踪 (相当于Rstudio交互式 的traceback) 。</p></li>
+</ul></section><section id="alternatives" class="level3"><h3 class="anchored" data-anchor-id="alternatives">Alternatives</h3>
+<p>有三种替代<code><a href="https://rdrr.io/r/base/browser.html">browser()</a></code>的方法：在Rstudio中设置断点、<code>options(error = recover)</code>、<code><a href="https://rdrr.io/r/base/debug.html">debug()</a></code>。</p>
+<section id="breakpoints" class="level4"><h4 class="anchored" data-anchor-id="breakpoints">Breakpoints</h4>
+<p>在Rstudio中，你可以点击左侧代码行或者使用<code>Shift + F9</code>来设置断点。设置断点相当于你在这行代码中插入了<code><a href="https://rdrr.io/r/base/browser.html">browser()</a></code>。这样，你可以直观地看到插入的断点，也可以无需在源码中插入<code><a href="https://rdrr.io/r/base/browser.html">browser()</a></code>来调试。但它有两个小缺点：</p>
+<ul>
+<li><p>有极少的情况下，断点会失效。阅读<a href="http://www.rstudio.com/ide/docs/debugging/breakpoint-troubleshooting">breakpoint troubleshooting</a>了解更多信息。</p></li>
+<li><p>目前Rstudio不支持在条件情况中设置断点。</p></li>
+</ul></section><section id="recover" class="level4"><h4 class="anchored" data-anchor-id="recover"><code>recover()</code></h4>
+<p>设置<code>options(error = recover)</code>后，报错时会自动进入交互式调试。设置<code>options(error = NULL)</code>即可恢复默认行为。</p>
+<div class="cell">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html">options</a></span><span class="op">(</span>error <span class="op">=</span> <span class="va">recover</span><span class="op">)</span></span>
+<span><span class="fu">f</span><span class="op">(</span><span class="st">"x"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Error: `d` must be numeric</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section><section id="debug" class="level4"><h4 class="anchored" data-anchor-id="debug"><code>debug()</code></h4>
+<p>另一种方法是调用一个能插入<code><a href="https://rdrr.io/r/base/browser.html">browser()</a></code>的函数：</p>
+<ul>
+<li><p><code><a href="https://rdrr.io/r/base/debug.html">debug()</a></code>插入<code><a href="https://rdrr.io/r/base/browser.html">browser()</a></code>到函数<code>f</code>的开头，<code><a href="https://rdrr.io/r/base/debug.html">undebug()</a></code>移除，<code><a href="https://rdrr.io/r/base/debug.html">debugonce()</a></code>仅在下一次调用函数时触发，再次调用消失。</p></li>
+<li><p><code><a href="https://rdrr.io/r/utils/findLineNum.html">utils::setBreakpoint()</a></code>与<code><a href="https://rdrr.io/r/base/debug.html">debug()</a></code>类似，除函数名外，还可以接受行数、文件名找到恰当的函数。</p></li>
+</ul>
+<p>这两个函数都是<code><a href="https://rdrr.io/r/base/trace.html">trace()</a></code>的特殊情况，它在现有函数中的任意位置插入任意代码。当调试没有源代码的代码时，<code><a href="https://rdrr.io/r/base/trace.html">trace()</a></code>偶尔会很有用。要从函数中移除“trace”，可以使用<code><a href="https://rdrr.io/r/base/trace.html">untrace()</a></code>。每个函数只能执行一个“trace”, 但这一个“trace”可以调用多个函数。</p>
+</section><section id="call-stack" class="level4"><h4 class="anchored" data-anchor-id="call-stack">Call stack</h4>
+<p>不幸地是，<a href="https://rdrr.io/r/base/traceback.html"><code>traceback()</code></a>, <a href="https://rdrr.io/r/base/browser.html"><code>browser()</code></a> &amp; <code>where</code>, and <a href="https://rdrr.io/r/utils/recover.html"><code>recover()</code></a> 产生的调用栈并不一致。下表是对上面<code>f("a")</code>调用栈的总结。</p>
+<table class="caption-top table">
+<thead><tr class="header">
+<th style="text-align: left;"><a href="https://rdrr.io/r/base/traceback.html"><code>traceback()</code></a></th>
+<th style="text-align: left;"><code>where</code></th>
+<th style="text-align: left;"><a href="https://rdrr.io/r/utils/recover.html"><code>recover()</code></a></th>
+<th style="text-align: left;">rlang functions</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>5: stop("...")</code></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>4: i(c)</code></td>
+<td style="text-align: left;"><code>where 1: i(c)</code></td>
+<td style="text-align: left;"><code>1: f()</code></td>
+<td style="text-align: left;"><code>1. └─global::f(10)</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>3: h(b)</code></td>
+<td style="text-align: left;"><code>where 2: h(b)</code></td>
+<td style="text-align: left;"><code>2: g(a)</code></td>
+<td style="text-align: left;"><code>2. └─global::g(a)</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>2: g(a)</code></td>
+<td style="text-align: left;"><code>where 3: g(a)</code></td>
+<td style="text-align: left;"><code>3: h(b)</code></td>
+<td style="text-align: left;"><code>3. └─global::h(b)</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>1: f("a")</code></td>
+<td style="text-align: left;"><code>where 4: f("a")</code></td>
+<td style="text-align: left;"><code>4: i("a")</code></td>
+<td style="text-align: left;"><code>4. └─global::i("a")</code></td>
+</tr>
+</tbody>
+</table>
+<p>在RStudio展示的调用顺序与<a href="https://rdrr.io/r/base/traceback.html"><code>traceback()</code></a>一致；“rlang”函数产生的调用顺序与<a href="https://rdrr.io/r/utils/recover.html"><code>recover()</code></a>一致。</p>
+</section></section><section id="compiled-code" class="level3"><h3 class="anchored" data-anchor-id="compiled-code">Compiled code</h3>
+<p>编译代码 (如 C 或 C++)也可以使用交互式调试器 (gdb 或 lldb) 。遗憾的是，这超出了本书的范围，但有一些资源你可能会发现很有用。</p>
+<ul>
+<li><p><a href="http://r-pkgs.had.co.nz/src.html#src-debugging" class="uri">http://r-pkgs.had.co.nz/src.html#src-debugging</a></p></li>
+<li><p><a href="https://github.com/wch/r-debug/blob/master/debugging-r.md" class="uri">https://github.com/wch/r-debug/blob/master/debugging-r.md</a></p></li>
+<li><p><a href="http://kevinushey.github.io/blog/2015/04/05/debugging-with-valgrind/" class="uri">http://kevinushey.github.io/blog/2015/04/05/debugging-with-valgrind/</a></p></li>
+<li><p><a href="https://www.jimhester.com/2018/08/22/debugging-rstudio/" class="uri">https://www.jimhester.com/2018/08/22/debugging-rstudio/</a></p></li>
+</ul></section></section><section id="non-interactive-debugging" class="level2"><h2 class="anchored" data-anchor-id="non-interactive-debugging">Non-interactive debugging</h2>
+<p>当无法交互式地运行代码时，debug会很困难。典型地如，在远程服务器运行某个流程，或者在交互运行式不会出错。当无法进行交互式探索时，花费时间将问题设置得尽可能小，以便快速迭代会十分重要。例如，</p>
+<p>你需要格外关注下面几个常见的问题：</p>
+<ul>
+<li><p>全局环境是否前后不同，是否加载了不同的包，是否有值不同的变量？</p></li>
+<li><p>是否工作目录不同？</p></li>
+<li><p>是否<code>PATH</code>环境变量不同，导致调用外部命令时失败？</p></li>
+<li><p>是否<code>R_LIBS</code>环境变量不同，导致加载包时失败或版本不一致。</p></li>
+</ul>
+<section id="dump.frames" class="level3"><h3 class="anchored" data-anchor-id="dump.frames"><code>dump.frames()</code></h3>
+<p><code><a href="https://rdrr.io/r/utils/debugger.html">dump.frames()</a></code>等价于<code><a href="https://rdrr.io/r/utils/recover.html">recover()</a></code>。它会在工作目录下储存一个<code>last.dump.rda</code>的文件，你可以使用<code>laod("last.dump.rda")</code>在交互终端中加载文件，接着使用<code><a href="https://rdrr.io/r/utils/debugger.html">debugger()</a></code>进入交互环境中进行debug。</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># In batch R process ----</span></span>
+<span><span class="va">dump_and_quit</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="co"># Save debugging info to file last.dump.rda</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/debugger.html">dump.frames</a></span><span class="op">(</span>to.file <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span>  <span class="co"># Quit R with error status</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/quit.html">q</a></span><span class="op">(</span>status <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/options.html">options</a></span><span class="op">(</span>error <span class="op">=</span> <span class="va">dump_and_quit</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># In a later interactive session ----</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/load.html">load</a></span><span class="op">(</span><span class="st">"last.dump.rda"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/debugger.html">debugger</a></span><span class="op">(</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section><section id="print-debugging" class="level3"><h3 class="anchored" data-anchor-id="print-debugging">Print debugging</h3>
+<p>如果<code><a href="https://rdrr.io/r/utils/debugger.html">dump.frames()</a></code>不起作用，另一个策略是使用<strong>print debugging</strong>——在代码中插入一些<code>print</code>来标记代码位置，进而锁定出错的范围。这种方法低效且原始，但往往会有效果。</p>
+<div class="cell">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">f</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">a</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span><span class="op">(</span><span class="st">"f()\n"</span><span class="op">)</span></span>
+<span>  <span class="fu">g</span><span class="op">(</span><span class="va">a</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span><span class="va">g</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">b</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span><span class="op">(</span><span class="st">"g()\n"</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span><span class="op">(</span><span class="st">"b ="</span>, <span class="va">b</span>, <span class="st">"\n"</span><span class="op">)</span></span>
+<span>  <span class="fu">h</span><span class="op">(</span><span class="va">b</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span><span class="va">h</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">c</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span><span class="op">(</span><span class="st">"i()\n"</span><span class="op">)</span></span>
+<span>  <span class="fu">i</span><span class="op">(</span><span class="va">c</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="fu">f</span><span class="op">(</span><span class="fl">10</span><span class="op">)</span></span>
+<span><span class="co">#&gt; f()</span></span>
+<span><span class="co">#&gt; g()</span></span>
+<span><span class="co">#&gt; b = 10 </span></span>
+<span><span class="co">#&gt; i()</span></span>
+<span><span class="co">#&gt; [1] 20</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>print debugging</strong>对于编译的代码也特别有用，因为编译器经常会修改代码，以至于即使在交互式调试器中，也无法找出根本问题。</p>
+</section><section id="rmarkdown" class="level3"><h3 class="anchored" data-anchor-id="rmarkdown">RMarkdown</h3>
+<p>在RMarkdown文件中进行debug需要一些特殊的工具。首先你需要使用命令行<code>rmarkdown::render("path/to/file.Rmd")</code>来编译文件，这会在当前终端中运行RMarkdown中的代码，使得debug容易些。如果这样做没有产生错误，那么你要检查你得环境，因为肯定不一致。</p>
+<p>如果问题依然存在，你需要使用上面的交互式debug技巧。但无论何种方法，你都需要添加额外的步骤：在错误设置中添加<code><a href="https://rdrr.io/r/base/sink.html">sink()</a></code>。重新设置<code><a href="https://rdrr.io/r/base/sink.html">sink()</a></code>会移除knitr的默认”sink”设置，能够确保日志在终端中输出。例如，在RMarkdown中使用<code><a href="https://rdrr.io/r/utils/recover.html">recover()</a></code>：</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html">options</a></span><span class="op">(</span>error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/sink.html">sink</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/recover.html">recover</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>这种设置会生成“no sink to remove”的警告信息，你可以完全忽略它。</p>
+<p>如果你只是想生成调用栈，最简单的方式是使用<code><a href="https://rlang.r-lib.org/reference/trace_back.html">rlang::trace_back()</a></code>，并对<code>rlang_trace_top_env</code>设置。它会确保只会返回RMarkdown中代码的调用栈，而不是RMarkdown和knitr的所有调用栈。</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html">options</a></span><span class="op">(</span>rlang_trace_top_env <span class="op">=</span> <span class="fu">rlang</span><span class="fu">::</span><span class="fu"><a href="https://rlang.r-lib.org/reference/stack.html">current_env</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/options.html">options</a></span><span class="op">(</span>error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/sink.html">sink</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="fu">rlang</span><span class="fu">::</span><span class="fu"><a href="https://rlang.r-lib.org/reference/trace_back.html">trace_back</a></span><span class="op">(</span>bottom <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sys.parent.html">sys.frame</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span>, simplify <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section></section><section id="non-error-failures" class="level2"><h2 class="anchored" data-anchor-id="non-error-failures">Non-error failures</h2>
+<p>除了抛出错误之外，还有其他方式导致函数失败：</p>
+<ul>
+<li><p>函数可能会产生意外的警告。追踪警告最简单的方法是<code>options(warn = 2)</code>将其转换为错误，并使用调用栈，例如<code>doWithOneRestart()</code>、<code>withOneRestart()</code>和常规调试工具。当这样做时，你会看到一些额外的<code>restarts()</code>和<code><a href="https://rdrr.io/r/base/conditions.html">.signalSimpleWarning()</a></code>调用。忽略这些：它们是用于将警告转换为错误的内部函数。</p></li>
+<li><p>一个函数可能永远不会返回。这特别难以自动调试，但有时终止函数并查看<code><a href="https://rdrr.io/r/base/traceback.html">traceback()</a></code>会提供一些信息。也可以使用打印调试。</p></li>
+<li><p>最糟糕的情况是，你的代码可能会完全崩溃，使你无法交互式地调试代码。这表明编译的(C 或 C++)代码中存在bug。</p></li>
+</ul>
+<p>如果是你的编译代码出错，你可以阅读22.4节中的链接，自行debug。如果错误来自base R或某个R包，你需要联系相关管理员进行维护。</p>
+
+
+</section><a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script><script src="https://utteranc.es/client.js" repo="hanguojun007/Blog" issue-term="pathname" theme="github-light" crossorigin="anonymous" async="">
+</script><nav class="page-navigation"><div class="nav-page nav-page-previous">
+      <a href="../../Books/Advanced R(2e)/Techniques Introduction.html" class="pagination-link" aria-label="Introduction">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Introduction</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+</body></html>

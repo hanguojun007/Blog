@@ -3,7 +3,9 @@ title: "22 Debugging"
 date: "2025-08-23"
 date-modified: "2025-08-23"
 
-format: "html"
+format:
+  html:
+    code-link: true
 fig-width: 6
 fig-asp: 0.618
 out-width: 70%
@@ -107,8 +109,13 @@ f("a")
 
 如果你没有使用Rstudio，你可以使用`traceback()`来查看这些信息。
 
-```{r}
+```r
 traceback()
+#> 5: stop("`d` must be numeric", call. = FALSE) at #3
+#> 4: i(c) at #1
+#> 3: h(b) at #1
+#> 2: g(a) at #1
+#> 1: f("a")
 ```
 
 ::: callout-note
@@ -125,16 +132,36 @@ k <- function() stop("Oops!", call. = FALSE)
 f(j())
 ```
 
-```{r}
+```r
 traceback()
+#> 7: stop("Oops!", call. = FALSE) at #1
+#> 6: k() at #1
+#> 5: j() at #1
+#> 4: i(c) at #1
+#> 3: h(b) at #1
+#> 2: g(a)
+#> 1: f(j())
 ```
 
 可以使用`rlang::abort()`来替代`stop()`，使用`rlang::last_trace()`来替换`traceback()`。
 
-```{r}
+```r
 k <- function() rlang::abort("Oops!")
 f(j())
-rlang::last_trace()
+#> rlang::last_trace()
+#> <error/rlang_error>
+#> Error in `k()`:
+#> ! Oops!
+#> ---
+#> Backtrace:
+#>     ▆
+#>  1. ├─global f(j())
+#>  2. │ └─global g(a)
+#>  3. │   └─global h(b)
+#>  4. │     └─global i(c)
+#>  5. └─global j()
+#>  6.   └─global k()
+#> Run rlang::last_trace(drop = FALSE) to see 1 hidden frame.
 ```
 
 ## Interactive debugger
@@ -245,3 +272,94 @@ f("x")
 
 ## Non-interactive debugging
 
+当无法交互式地运行代码时，debug会很困难。典型地如，在远程服务器运行某个流程，或者在交互运行式不会出错。当无法进行交互式探索时，花费时间将问题设置得尽可能小，以便快速迭代会十分重要。例如，
+
+你需要格外关注下面几个常见的问题：
+
+-   全局环境是否前后不同，是否加载了不同的包，是否有值不同的变量？
+
+-   是否工作目录不同？
+
+-   是否`PATH`环境变量不同，导致调用外部命令时失败？
+
+-   是否`R_LIBS`环境变量不同，导致加载包时失败或版本不一致。
+
+### `dump.frames()`
+
+`dump.frames()`等价于`recover()`。它会在工作目录下储存一个`last.dump.rda`的文件，你可以使用`laod("last.dump.rda")`在交互终端中加载文件，接着使用`debugger()`进入交互环境中进行debug。
+
+```r
+# In batch R process ----
+dump_and_quit <- function() {
+  # Save debugging info to file last.dump.rda
+  dump.frames(to.file = TRUE)
+  # Quit R with error status
+  q(status = 1)
+}
+options(error = dump_and_quit)
+
+# In a later interactive session ----
+load("last.dump.rda")
+debugger()
+```
+
+### Print debugging
+
+如果`dump.frames()`不起作用，另一个策略是使用**print debugging**——在代码中插入一些`print`来标记代码位置，进而锁定出错的范围。这种方法低效且原始，但往往会有效果。
+
+```{r}
+f <- function(a) {
+  cat("f()\n")
+  g(a)
+}
+g <- function(b) {
+  cat("g()\n")
+  cat("b =", b, "\n")
+  h(b)
+}
+h <- function(c) {
+  cat("i()\n")
+  i(c)
+}
+
+f(10)
+```
+
+**print debugging**对于编译的代码也特别有用，因为编译器经常会修改代码，以至于即使在交互式调试器中，也无法找出根本问题。
+
+### RMarkdown
+
+在RMarkdown文件中进行debug需要一些特殊的工具。首先你需要使用命令行`rmarkdown::render("path/to/file.Rmd")`来编译文件，这会在当前终端中运行RMarkdown中的代码，使得debug容易些。如果这样做没有产生错误，那么你要检查你得环境，因为肯定不一致。
+
+如果问题依然存在，你需要使用上面的交互式debug技巧。但无论何种方法，你都需要添加额外的步骤：在错误设置中添加`sink()`。重新设置`sink()`会移除knitr的默认"sink"设置，能够确保日志在终端中输出。例如，在RMarkdown中使用`recover()`：
+
+```r
+options(error = function() {
+  sink()
+  recover()
+})
+```
+
+这种设置会生成“no sink to remove”的警告信息，你可以完全忽略它。
+
+如果你只是想生成调用栈，最简单的方式是使用`rlang::trace_back()`，并对`rlang_trace_top_env`设置。它会确保只会返回RMarkdown中代码的调用栈，而不是RMarkdown和knitr的所有调用栈。
+
+```r
+options(rlang_trace_top_env = rlang::current_env())
+options(error = function() {
+  sink()
+  print(rlang::trace_back(bottom = sys.frame(-1)), simplify = "none")
+})
+```
+
+## Non-error failures
+
+除了抛出错误之外，还有其他方式导致函数失败：
+
+-   函数可能会产生意外的警告。追踪警告最简单的方法是`options(warn = 2)`将其转换为错误，并使用调用栈，例如`doWithOneRestart()`、`withOneRestart()`和常规调试工具。当这样做时，你会看到一些额外的`restarts()`和`.signalSimpleWarning()`调用。忽略这些：它们是用于将警告转换为错误的内部函数。
+
+-   一个函数可能永远不会返回。这特别难以自动调试，但有时终止函数并查看`traceback()`会提供一些信息。也可以使用打印调试。
+
+-   最糟糕的情况是，你的代码可能会完全崩溃，使你无法交互式地调试代码。这表明编译的(C 或 C++)代码中存在bug。
+
+如果是你的编译代码出错，你可以阅读22.4节中的链接，自行debug。如果错误来自base R或某个R包，你需要联系相关管理员进行维护。
