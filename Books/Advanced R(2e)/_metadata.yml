@@ -35,3 +35,4 @@ website:
         - Books/Advanced R(2e)/21 Translating R code.qmd
         - Books/Advanced R(2e)/Techniques Introduction.qmd
         - Books/Advanced R(2e)/22 Debugging.qmd
+        - Books/Advanced R(2e)/23 Measuring performance.qmd

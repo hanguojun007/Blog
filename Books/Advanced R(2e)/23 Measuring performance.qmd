@@ -1,7 +1,7 @@
 ---
 title: "23 Measuring performance"
 date: "2025-08-26"
-date-modified: "2025-08-26"
+date-modified: "2025-08-28"
 
 format:
   html:
@@ -34,7 +34,7 @@ execute:
 
 ## Introduction
 
-::: {.callout-tip}
+::: callout-tip
 Programmers waste enormous amounts of time thinking about, or worrying about, the speed of noncritical parts of their programs, and these attempts at efficiency actually have a strong negative impact when debugging and maintenance are considered.
 
 — Donald Knuth
@@ -82,7 +82,7 @@ h <- function() {
 
 如果我们剖析`f()`的运行过程，每隔 0.1s 停止运行，我们会看到：
 
-```r
+``` r
 "pause" "f"
 "pause" "g" "f"
 "pause" "h" "g" "f"
@@ -113,11 +113,12 @@ writeLines(readLines(tmp))
 
 -   使用`profvis::profvis()`。推荐保存代码到单独的文件中，然后`source()`它，最后在剖析。这样可以保证性能分析数据与源代码联系的更准确。
 
-    ```r
+    ``` r
     source("profiling-example.R")
     profvis(f())
     ```
-在剖析结束后，“profvis”会生成可交互的网页来探索结果。界面如下：
+
+    在剖析结束后，“profvis”会生成可交互的网页来探索结果。界面如下：
 
 ![](images/flamegraph.png)
 
@@ -135,7 +136,7 @@ writeLines(readLines(tmp))
 
 火焰图中有一个与源代码不匹配的特殊条目——`<GC>`，表示垃圾收集器`gc()`正在运行。如果`<GC>`消耗大量时间，通常表示代码创建了大量临时对象。例如：
 
-```r
+``` r
 x <- integer()
 for (i in 1:1e4) {
   x <- c(x, i)
@@ -158,7 +159,7 @@ for (i in 1:1e4) {
 
 -   惰性评估意味着参数通常在另一个函数中进行评估，这使得调用栈更加复杂（见7.5.2节）。不幸的是，R的性能分析器没有存储足够的信息来解开惰性评估，因此在以下代码中，性能分析会使`i()`看起来像是由 `j()`调用的，因为参数在被`j()`需要之前不会被评估。
 
-    ```r
+    ``` r
     i <- function() {
       pause(0.1)
       10
@@ -183,6 +184,30 @@ x <- runif(100)
 ))
 ```
 
-
+`bench::mark()`默认会将所有方法都至少运行一次（`min_iterations = 1`），并且最多花费0.5s（`min_time = 0.5`）。它会检查每次运行返回的值是否相同，如果你想测试返回不同值的速度，可以设置`check = FALSE`。
 
 ### `bench::mark()` results
+
+`bench::mark()`会将结果返回为一个tibble，每行是一个表达式，每列是一个测量结果。
+
+-   `min`， `mean`，`median`，`max`，`itr/sec`估计出运行时间的分布。通常，关注运行时间的最小值和中值，因为运行时间往往右偏。例如上面的`lb`结果显示：`sqrt()`方法要更优：
+
+    ```{r}
+    plot(lb)
+    ```
+
+-   `men_alloc`表示第一次运行时的内存占用。`n_gc()`表示垃圾回收的次数。
+
+-   `n_itr`和`total_time`表示整个测试过程的运行次数和运行总时间。
+
+-   `result`，`memory`，`time`，`gc`列表列（list-column），储存了原始的运行结果。
+
+因为结果是tibble格式，你可以使用`[`提取列：
+
+```{r}
+lb[c("expression", "min", "median", "itr/sec", "n_gc")]
+```
+
+### Interpreting results
+
+一定要注意基准测试结果中的单位。因为单位才是实际中我们关注的内容，例如上例中的结果，运行100次后总共的耗时也是毫秒级别，即使二者有显著差异，但实际体验中并不会造成影响。
