@@ -2696,7 +2696,7 @@
     "href": "Books/Advanced R(2e)/23 Measuring performance.html",
     "title": "23 Measuring performance",
     "section": "",
-    "text": "Tip\n\n\n\nProgrammers waste enormous amounts of time thinking about, or worrying about, the speed of noncritical parts of their programs, and these attempts at efficiency actually have a strong negative impact when debugging and maintenance are considered.\n— Donald Knuth\n\n\n在你想让代码运行得更快之前，首先需要弄清楚是什么让它变慢。这听起来很简单，但实际上并非如此。即使是有经验的程序员，也很难找出代码中的瓶颈。所以，不要依赖直觉，你应该使用剖析器（profiling）对代码进行性能分析：使用真实的输入来测量每一行代码的运行时间。\n一旦你找出了瓶颈，就需要谨慎地尝试各种替代方案，以找到更快且功能相同的代码。在第24章中，你将学到很多加快代码运行速度的方法，但首先你需要学习如何进行微基准测试（microbenchmark），这样才能精确地衡量性能上的差异。\n\n\n23.2节：介绍如何使用剖析器来分析导致代码运行慢的原因。\n23.3节：如何使用微基准测试来探索可替代方案并找到运行最快的方案。\n\n使用“profvis”进行性能分析和微基准测试。\n\nlibrary(profvis)\nlibrary(bench)",
+    "text": "Tip\n\n\n\nProgrammers waste enormous amounts of time thinking about, or worrying about, the speed of noncritical parts of their programs, and these attempts at efficiency actually have a strong negative impact when debugging and maintenance are considered.\n— Donald Knuth\n\n\n在你想让代码运行得更快之前，首先需要弄清楚是什么让它变慢。这听起来很简单，但实际上并非如此。即使是有经验的程序员，也很难找出代码中的瓶颈。所以，不要依赖直觉，你应该使用剖析器（profiling）对代码进行性能分析：使用真实的输入来测量每一行代码的运行时间。\n一旦你找出了瓶颈，就需要谨慎地尝试各种替代方案，以找到更快且功能相同的代码。在第24章中，你将学到很多加快代码运行速度的方法，但首先你需要学习如何进行微基准测试（microbenchmark），这样才能精确地衡量性能上的差异。\n\n\n23.2节：介绍如何使用剖析器来分析导致代码运行慢的原因。\n23.3节：如何使用微基准测试来探索可替代方案并找到运行最快的方案。\n\n使用“profvis”进行性能分析和微基准测试。\n\nlibrary(profvis)\nlibrary(bench)\n#&gt; Error in library(bench): there is no package called 'bench'",
     "crumbs": [
       "23 Measuring performance"
     ]
@@ -2706,7 +2706,7 @@
     "href": "Books/Advanced R(2e)/23 Measuring performance.html#introduction",
     "title": "23 Measuring performance",
     "section": "",
-    "text": "Tip\n\n\n\nProgrammers waste enormous amounts of time thinking about, or worrying about, the speed of noncritical parts of their programs, and these attempts at efficiency actually have a strong negative impact when debugging and maintenance are considered.\n— Donald Knuth\n\n\n在你想让代码运行得更快之前，首先需要弄清楚是什么让它变慢。这听起来很简单，但实际上并非如此。即使是有经验的程序员，也很难找出代码中的瓶颈。所以，不要依赖直觉，你应该使用剖析器（profiling）对代码进行性能分析：使用真实的输入来测量每一行代码的运行时间。\n一旦你找出了瓶颈，就需要谨慎地尝试各种替代方案，以找到更快且功能相同的代码。在第24章中，你将学到很多加快代码运行速度的方法，但首先你需要学习如何进行微基准测试（microbenchmark），这样才能精确地衡量性能上的差异。\n\n\n23.2节：介绍如何使用剖析器来分析导致代码运行慢的原因。\n23.3节：如何使用微基准测试来探索可替代方案并找到运行最快的方案。\n\n使用“profvis”进行性能分析和微基准测试。\n\nlibrary(profvis)\nlibrary(bench)",
+    "text": "Tip\n\n\n\nProgrammers waste enormous amounts of time thinking about, or worrying about, the speed of noncritical parts of their programs, and these attempts at efficiency actually have a strong negative impact when debugging and maintenance are considered.\n— Donald Knuth\n\n\n在你想让代码运行得更快之前，首先需要弄清楚是什么让它变慢。这听起来很简单，但实际上并非如此。即使是有经验的程序员，也很难找出代码中的瓶颈。所以，不要依赖直觉，你应该使用剖析器（profiling）对代码进行性能分析：使用真实的输入来测量每一行代码的运行时间。\n一旦你找出了瓶颈，就需要谨慎地尝试各种替代方案，以找到更快且功能相同的代码。在第24章中，你将学到很多加快代码运行速度的方法，但首先你需要学习如何进行微基准测试（microbenchmark），这样才能精确地衡量性能上的差异。\n\n\n23.2节：介绍如何使用剖析器来分析导致代码运行慢的原因。\n23.3节：如何使用微基准测试来探索可替代方案并找到运行最快的方案。\n\n使用“profvis”进行性能分析和微基准测试。\n\nlibrary(profvis)\nlibrary(bench)\n#&gt; Error in library(bench): there is no package called 'bench'",
     "crumbs": [
       "23 Measuring performance"
     ]
@@ -2726,9 +2726,30 @@
     "href": "Books/Advanced R(2e)/23 Measuring performance.html#microbenchmarking",
     "title": "23 Measuring performance",
     "section": "Microbenchmarking",
-    "text": "Microbenchmarking\n某段代码的运行耗时可能只有几毫秒，几微秒，甚至几纳秒，微基准测试（microbenchmark）可以用来测量这些代码的性能，进而进行对比。但一定要警惕将微基准测试的结果推广到实际代码中：微基准测试中观察到的差异在实际代码中通常会被更高阶的效应所主导；就像在烘焙时，对亚原子物理学的深入理解并没有太大帮助一样。\n“bench”包提供了很好的用来进行微基准测试的工具。“bench”包采用了更精准的计时器，能够尽可能地对比那些耗时极少的操作。例如，对比两种不同开方函数的性能：\n\nx &lt;- runif(100)\n(lb &lt;- bench::mark(\n  sqrt(x),\n  x^0.5\n))\n#&gt; # A tibble: 2 × 6\n#&gt;   expression      min   median `itr/sec` mem_alloc `gc/sec`\n#&gt;   &lt;bch:expr&gt; &lt;bch:tm&gt; &lt;bch:tm&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;\n#&gt; 1 sqrt(x)       400ns    500ns  1299900.      848B        0\n#&gt; 2 x^0.5         2.3µs    2.5µs   359711.      848B        0\n\nbench::mark()默认会将所有方法都至少运行一次（min_iterations = 1），并且最多花费0.5s（min_time = 0.5）。它会检查每次运行返回的值是否相同，如果你想测试返回不同值的速度，可以设置check = FALSE。\n\nbench::mark() results\nbench::mark()会将结果返回为一个tibble，每行是一个表达式，每列是一个测量结果。\n\n\nmin， mean，median，max，itr/sec估计出运行时间的分布。通常，关注运行时间的最小值和中值，因为运行时间往往右偏。例如上面的lb结果显示：sqrt()方法要更优：\n\nplot(lb)\n\n\n\n\n\n\n\n\nmen_alloc表示第一次运行时的内存占用。n_gc()表示垃圾回收的次数。\nn_itr和total_time表示整个测试过程的运行次数和运行总时间。\nresult，memory，time，gc列表列（list-column），储存了原始的运行结果。\n\n因为结果是tibble格式，你可以使用[提取列：\n\nlb[c(\"expression\", \"min\", \"median\", \"itr/sec\", \"n_gc\")]\n#&gt; # A tibble: 2 × 4\n#&gt;   expression      min   median `itr/sec`\n#&gt;   &lt;bch:expr&gt; &lt;bch:tm&gt; &lt;bch:tm&gt;     &lt;dbl&gt;\n#&gt; 1 sqrt(x)       400ns    500ns  1299900.\n#&gt; 2 x^0.5         2.3µs    2.5µs   359711.\n\nInterpreting results\n一定要注意基准测试结果中的单位。因为单位才是实际中我们关注的内容，例如上例中的结果，运行100次后总共的耗时也是毫秒级别，即使二者有显著差异，但实际体验中并不会造成影响。",
+    "text": "Microbenchmarking\n某段代码的运行耗时可能只有几毫秒，几微秒，甚至几纳秒，微基准测试（microbenchmark）可以用来测量这些代码的性能，进而进行对比。但一定要警惕将微基准测试的结果推广到实际代码中：微基准测试中观察到的差异在实际代码中通常会被更高阶的效应所主导；就像在烘焙时，对亚原子物理学的深入理解并没有太大帮助一样。\n“bench”包提供了很好的用来进行微基准测试的工具。“bench”包采用了更精准的计时器，能够尽可能地对比那些耗时极少的操作。例如，对比两种不同开方函数的性能：\n\nx &lt;- runif(100)\n(lb &lt;- bench::mark(\n  sqrt(x),\n  x^0.5\n))\n#&gt; Error in loadNamespace(x): there is no package called 'bench'\n\nbench::mark()默认会将所有方法都至少运行一次（min_iterations = 1），并且最多花费0.5s（min_time = 0.5）。它会检查每次运行返回的值是否相同，如果你想测试返回不同值的速度，可以设置check = FALSE。\n\nbench::mark() results\nbench::mark()会将结果返回为一个tibble，每行是一个表达式，每列是一个测量结果。\n\n\nmin， mean，median，max，itr/sec估计出运行时间的分布。通常，关注运行时间的最小值和中值，因为运行时间往往右偏。例如上面的lb结果显示：sqrt()方法要更优：\n\nplot(lb)\n#&gt; Error: object 'lb' not found\n\n\nmen_alloc表示第一次运行时的内存占用。n_gc()表示垃圾回收的次数。\nn_itr和total_time表示整个测试过程的运行次数和运行总时间。\nresult，memory，time，gc列表列（list-column），储存了原始的运行结果。\n\n因为结果是tibble格式，你可以使用[提取列：\n\nlb[c(\"expression\", \"min\", \"median\", \"itr/sec\", \"n_gc\")]\n#&gt; Error: object 'lb' not found\n\nInterpreting results\n一定要注意基准测试结果中的单位。因为单位才是实际中我们关注的内容，例如上例中的结果，运行100次后总共的耗时也是毫秒级别，即使二者有显著差异，但实际体验中并不会造成影响。",
     "crumbs": [
       "23 Measuring performance"
     ]
+  },
+  {
+    "objectID": "Books/Advanced R(2e)/24 Improving performance.html",
+    "href": "Books/Advanced R(2e)/24 Improving performance.html",
+    "title": "24 Improving performance",
+    "section": "",
+    "text": "Tip\n\n\n\nWe should forget about small efficiencies, say about 97% of the time: premature optimization is the root of all evil. Yet we should not pass up our opportunities in that critical 3%. A good programmer will not be lulled into complacency by such reasoning, he will be wise to look carefully at the critical code; but only after that code has been identified.\n— Donald Knuth\n\n\n本节介绍四种通用的优化工具和一个通用的性能优化策略，帮助你确保优化后的代码仍然结果正确。但要注意：优化需建立在对实际瓶颈的识别之上，避免在非关键部分浪费精力，同时抓住真正影响性能的核心环节。如果你想更多地了解R语言的性能特点，推荐Evaluating the Design of the R Language这本书，该书通过将一个经过修改的R解释器与大量实际应用中的代码相结合，得出了相关结论。\n\n\n24.2节：介绍如何组织代码，使优化尽可能简单、无bug。\n24.3节：提醒你去寻找已有的解决方案。\n24.4节：强调“懒惰”的重要性：使函数运行快的最简单方法就是让函数做最简单的事。\n24.5节：介绍向量化，并展示如何最大限度地利用内置函数。\n24.6节：讨论复制数据的性能风险。\n24.7节：将所有片段整合成一个案例研究，展示如何将重复t检验的速度提高约1000倍。\n24.8节：提供了更多帮助你编写快速代码资源的指针。\n\n\nlibrary(bench)\n#&gt; Error in library(bench): there is no package called 'bench'"
+  },
+  {
+    "objectID": "Books/Advanced R(2e)/24 Improving performance.html#introduction",
+    "href": "Books/Advanced R(2e)/24 Improving performance.html#introduction",
+    "title": "24 Improving performance",
+    "section": "",
+    "text": "Tip\n\n\n\nWe should forget about small efficiencies, say about 97% of the time: premature optimization is the root of all evil. Yet we should not pass up our opportunities in that critical 3%. A good programmer will not be lulled into complacency by such reasoning, he will be wise to look carefully at the critical code; but only after that code has been identified.\n— Donald Knuth\n\n\n本节介绍四种通用的优化工具和一个通用的性能优化策略，帮助你确保优化后的代码仍然结果正确。但要注意：优化需建立在对实际瓶颈的识别之上，避免在非关键部分浪费精力，同时抓住真正影响性能的核心环节。如果你想更多地了解R语言的性能特点，推荐Evaluating the Design of the R Language这本书，该书通过将一个经过修改的R解释器与大量实际应用中的代码相结合，得出了相关结论。\n\n\n24.2节：介绍如何组织代码，使优化尽可能简单、无bug。\n24.3节：提醒你去寻找已有的解决方案。\n24.4节：强调“懒惰”的重要性：使函数运行快的最简单方法就是让函数做最简单的事。\n24.5节：介绍向量化，并展示如何最大限度地利用内置函数。\n24.6节：讨论复制数据的性能风险。\n24.7节：将所有片段整合成一个案例研究，展示如何将重复t检验的速度提高约1000倍。\n24.8节：提供了更多帮助你编写快速代码资源的指针。\n\n\nlibrary(bench)\n#&gt; Error in library(bench): there is no package called 'bench'"
+  },
+  {
+    "objectID": "Books/Advanced R(2e)/24 Improving performance.html#code-organisation",
+    "href": "Books/Advanced R(2e)/24 Improving performance.html#code-organisation",
+    "title": "24 Improving performance",
+    "section": "Code organisation",
+    "text": "Code organisation\n在尝试优化代码时，通常会掉入两个陷阱中：\n\n代码运行快速但不正确。\n你认为运行快速，但实际效果并不好（没有进行基准测试）。\n\n下面的策略会帮助你避免这些陷阱。\n在进行多种方法的基准测试前，可以将这个方法打包成一个函数。因为函数内的环境是独立的，不会存在干扰，也方便检查返回的结果是否正确。例如，对比两种不同计算均值的方法：\n\nmean1 &lt;- function(x) mean(x)\nmean2 &lt;- function(x) sum(x) / length(x)\n\n建议你记录所有尝试的内容，甚至包括失败。如果将来发生类似的问题，查看你尝试过的所有内容会很有用。推荐使用RMarkdown或quarto, 这使得将代码与详细的注释和说明混合在一起变得容易。\n接下来，生成一个具有代表性的测试示例。这个示例应该足够大，以捕捉问题的本质，但又要足够小，运行最多只需要几秒钟。你不希望花费太长时间，因为你需要多次运行测试示例来比较方法。另一方面，你也不希望示例太小，因为那样结果可能无法扩展到真正的问题。这里使用100,000个数字来进行测试：\n\nx &lt;- runif(1e5)"
   }
 ]
