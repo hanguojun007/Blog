@@ -450,8 +450,7 @@ Tip
 <p>使用“profvis”进行性能分析和微基准测试。</p>
 <div class="cell">
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://profvis.r-lib.org">profvis</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://bench.r-lib.org/">bench</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; Error in library(bench): there is no package called 'bench'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://bench.r-lib.org/">bench</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section></section><section id="profiling" class="level2"><h2 class="anchored" data-anchor-id="profiling">Profiling</h2>
 <p>剖析器是所有编程语言中用来分析代码性能的主要工具。剖析器的种类繁多，R使用一种很简单称为采样（统计）剖析器的工具。它的工作原理是每个几毫秒停止程序执行，记录当前的调用栈，进而统计每个栈消耗的时间。例如下面的<code>f()</code>函数：</p>
@@ -485,10 +484,10 @@ Tip
 <span><span class="fu"><a href="https://rdrr.io/r/utils/Rprof.html">Rprof</a></span><span class="op">(</span><span class="cn">NULL</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/writeLines.html">writeLines</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/readLines.html">readLines</a></span><span class="op">(</span><span class="va">tmp</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; sample.interval=100000</span></span>
-<span><span class="co">#&gt; "pause" "f" "eval" "eval" "withVisible" "withCallingHandlers" "eval" "eval" "with_handlers" "doWithOneRestart" "withOneRestart" "withRestartList" "doWithOneRestart" "withOneRestart" "withRestartList" "withRestarts" "evaluate::evaluate" "evaluate" "in_dir" "in_input_dir" "eng_r" "block_exec" "call_block" "process_group" "withCallingHandlers" "xfun:::handle_error" "process_file" "knitr::knit" "rmarkdown::render" "execute" ".main" </span></span>
 <span><span class="co">#&gt; "pause" "g" "f" "eval" "eval" "withVisible" "withCallingHandlers" "eval" "eval" "with_handlers" "doWithOneRestart" "withOneRestart" "withRestartList" "doWithOneRestart" "withOneRestart" "withRestartList" "withRestarts" "evaluate::evaluate" "evaluate" "in_dir" "in_input_dir" "eng_r" "block_exec" "call_block" "process_group" "withCallingHandlers" "xfun:::handle_error" "process_file" "knitr::knit" "rmarkdown::render" "execute" ".main" </span></span>
 <span><span class="co">#&gt; "pause" "h" "g" "f" "eval" "eval" "withVisible" "withCallingHandlers" "eval" "eval" "with_handlers" "doWithOneRestart" "withOneRestart" "withRestartList" "doWithOneRestart" "withOneRestart" "withRestartList" "withRestarts" "evaluate::evaluate" "evaluate" "in_dir" "in_input_dir" "eng_r" "block_exec" "call_block" "process_group" "withCallingHandlers" "xfun:::handle_error" "process_file" "knitr::knit" "rmarkdown::render" "execute" ".main" </span></span>
-<span><span class="co">#&gt; "pause" "h" "f" "eval" "eval" "withVisible" "withCallingHandlers" "eval" "eval" "with_handlers" "doWithOneRestart" "withOneRestart" "withRestartList" "doWithOneRestart" "withOneRestart" "withRestartList" "withRestarts" "evaluate::evaluate" "evaluate" "in_dir" "in_input_dir" "eng_r" "block_exec" "call_block" "process_group" "withCallingHandlers" "xfun:::handle_error" "process_file" "knitr::knit" "rmarkdown::render" "execute" ".main"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="co">#&gt; "pause" "h" "f" "eval" "eval" "withVisible" "withCallingHandlers" "eval" "eval" "with_handlers" "doWithOneRestart" "withOneRestart" "withRestartList" "doWithOneRestart" "withOneRestart" "withRestartList" "withRestarts" "evaluate::evaluate" "evaluate" "in_dir" "in_input_dir" "eng_r" "block_exec" "call_block" "process_group" "withCallingHandlers" "xfun:::handle_error" "process_file" "knitr::knit" "rmarkdown::render" "execute" ".main" </span></span>
+<span><span class="co">#&gt; ".External" "dev.cur" "capture_plot" "watcher$capture_plot_and_output" "withCallingHandlers" "eval" "eval" "with_handlers" "doWithOneRestart" "withOneRestart" "withRestartList" "doWithOneRestart" "withOneRestart" "withRestartList" "withRestarts" "evaluate::evaluate" "evaluate" "in_dir" "in_input_dir" "eng_r" "block_exec" "call_block" "process_group" "withCallingHandlers" "xfun:::handle_error" "process_file" "knitr::knit" "rmarkdown::render" "execute" ".main"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>这是因为所有剖析器都必须在准确性和性能之间做出基本的权衡。使用采样剖析器时，这种权衡对性能的影响微乎其微，但本质上是随机的，因为计时器的准确性和每次操作所花费的时间都存在一定的变异性。这意味着每次进行性能分析时，你得到的答案都会略有不同。幸运的是，变异性影响对多的是那些运行时间很短的函数，而这些函数也是最不受关注的。</p>
 <section id="visualising-profiles" class="level3"><h3 class="anchored" data-anchor-id="visualising-profiles">Visualising profiles</h3>
@@ -539,22 +538,31 @@ Tip
 <p>“bench”包提供了很好的用来进行微基准测试的工具。“bench”包采用了更精准的计时器，能够尽可能地对比那些耗时极少的操作。例如，对比两种不同开方函数的性能：</p>
 <div class="cell">
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span></span>
-<span><span class="op">(</span><span class="va">lb</span> <span class="op">&lt;-</span> <span class="fu">bench</span><span class="fu">::</span><span class="fu">mark</span><span class="op">(</span></span>
+<span><span class="op">(</span><span class="va">lb</span> <span class="op">&lt;-</span> <span class="fu">bench</span><span class="fu">::</span><span class="fu"><a href="https://bench.r-lib.org/reference/mark.html">mark</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">sqrt</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>,</span>
 <span>  <span class="va">x</span><span class="op">^</span><span class="fl">0.5</span></span>
 <span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Error in loadNamespace(x): there is no package called 'bench'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="co">#&gt; # A tibble: 2 × 6</span></span>
+<span><span class="co">#&gt;   expression      min   median `itr/sec` mem_alloc `gc/sec`</span></span>
+<span><span class="co">#&gt;   &lt;bch:expr&gt; &lt;bch:tm&gt; &lt;bch:tm&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 sqrt(x)       292ns 315.02ns  1422117.      848B        0</span></span>
+<span><span class="co">#&gt; 2 x^0.5         1.5µs   1.54µs   464769.      848B        0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p><code>bench::mark()</code>默认会将所有方法都至少运行一次（<code>min_iterations = 1</code>），并且最多花费0.5s（<code>min_time = 0.5</code>）。它会检查每次运行返回的值是否相同，如果你想测试返回不同值的速度，可以设置<code>check = FALSE</code>。</p>
+<p><code><a href="https://bench.r-lib.org/reference/mark.html">bench::mark()</a></code>默认会将所有方法都至少运行一次（<code>min_iterations = 1</code>），并且最多花费0.5s（<code>min_time = 0.5</code>）。它会检查每次运行返回的值是否相同，如果你想测试返回不同值的速度，可以设置<code>check = FALSE</code>。</p>
 <section id="benchmark-results" class="level3"><h3 class="anchored" data-anchor-id="benchmark-results">
 <code>bench::mark()</code> results</h3>
-<p><code>bench::mark()</code>会将结果返回为一个tibble，每行是一个表达式，每列是一个测量结果。</p>
+<p><code><a href="https://bench.r-lib.org/reference/mark.html">bench::mark()</a></code>会将结果返回为一个tibble，每行是一个表达式，每列是一个测量结果。</p>
 <ul>
 <li>
 <p><code>min</code>， <code>mean</code>，<code>median</code>，<code>max</code>，<code>itr/sec</code>估计出运行时间的分布。通常，关注运行时间的最小值和中值，因为运行时间往往右偏。例如上面的<code>lb</code>结果显示：<code><a href="https://rdrr.io/r/base/MathFun.html">sqrt()</a></code>方法要更优：</p>
 <div class="cell">
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">lb</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Error: object 'lb' not found</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">lb</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure"><p><img src="23-Measuring-performance_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="576"></p>
+</figure>
+</div>
+</div>
 </div>
 </li>
 <li><p><code>men_alloc</code>表示第一次运行时的内存占用。<code>n_gc()</code>表示垃圾回收的次数。</p></li>
@@ -564,7 +572,11 @@ Tip
 <p>因为结果是tibble格式，你可以使用<code>[</code>提取列：</p>
 <div class="cell">
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">lb</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"expression"</span>, <span class="st">"min"</span>, <span class="st">"median"</span>, <span class="st">"itr/sec"</span>, <span class="st">"n_gc"</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="co">#&gt; Error: object 'lb' not found</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="co">#&gt; # A tibble: 2 × 4</span></span>
+<span><span class="co">#&gt;   expression      min   median `itr/sec`</span></span>
+<span><span class="co">#&gt;   &lt;bch:expr&gt; &lt;bch:tm&gt; &lt;bch:tm&gt;     &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 sqrt(x)       292ns 315.02ns  1422117.</span></span>
+<span><span class="co">#&gt; 2 x^0.5         1.5µs   1.54µs   464769.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="interpreting-results" class="level3"><h3 class="anchored" data-anchor-id="interpreting-results">Interpreting results</h3>
 <p>一定要注意基准测试结果中的单位。因为单位才是实际中我们关注的内容，例如上例中的结果，运行100次后总共的耗时也是毫秒级别，即使二者有显著差异，但实际体验中并不会造成影响。</p>
