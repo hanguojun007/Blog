@@ -1,0 +1,84 @@
+---
+title: "24 Improving performance"
+date: "2025-08-28"
+date-modified: "2025-08-28"
+
+format:
+  html:
+    code-link: true
+
+fig-width: 6
+fig-asp: 0.618
+out-width: 70%
+fig-align: center
+
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: "#>"
+    R.options:
+      dplyr.print_min: 6
+      dplyr.print_max: 6
+      pillar.max_footer_lines: 2
+      pillar.min_chars: 15
+      stringr.view_n: 6
+      cli.num_colors: 0
+      cli.hyperlink: FALSE
+      pillar.bold: TRUE
+      width: 77
+
+execute:
+  warning: true
+  error: true
+---
+
+## Introduction
+
+::: {.callout-tip}
+We should forget about small efficiencies, say about 97% of the time: premature optimization is the root of all evil. Yet we should not pass up our opportunities in that critical 3%. A good programmer will not be lulled into complacency by such reasoning, he will be wise to look carefully at the critical code; but only after that code has been identified.
+
+— Donald Knuth
+:::
+
+本节介绍四种通用的优化工具和一个通用的性能优化策略，帮助你确保优化后的代码仍然结果正确。但要注意：优化需建立在对实际瓶颈的识别之上，避免在非关键部分浪费精力，同时抓住真正影响性能的核心环节。如果你想更多地了解R语言的性能特点，推荐**Evaluating the Design of the R Language**这本书，该书通过将一个经过修改的R解释器与大量实际应用中的代码相结合，得出了相关结论。
+
+### Outline
+
+-   24.2节：介绍如何组织代码，使优化尽可能简单、无bug。
+-   24.3节：提醒你去寻找已有的解决方案。
+-   24.4节：强调“懒惰”的重要性：使函数运行快的最简单方法就是让函数做最简单的事。
+-   24.5节：介绍向量化，并展示如何最大限度地利用内置函数。
+-   24.6节：讨论复制数据的性能风险。
+-   24.7节：将所有片段整合成一个案例研究，展示如何将重复t检验的速度提高约1000倍。
+-   24.8节：提供了更多帮助你编写快速代码资源的指针。
+
+### Prerequisites
+
+```{r}
+library(bench)
+```
+
+## Code organisation
+
+在尝试优化代码时，通常会掉入两个陷阱中：
+
+-   代码运行快速但不正确。
+-   你认为运行快速，但实际效果并不好（没有进行基准测试）。
+
+下面的策略会帮助你避免这些陷阱。
+
+在进行多种方法的基准测试前，可以将这个方法打包成一个函数。因为函数内的环境是独立的，不会存在干扰，也方便检查返回的结果是否正确。例如，对比两种不同计算均值的方法：
+
+```{r}
+mean1 <- function(x) mean(x)
+mean2 <- function(x) sum(x) / length(x)
+```
+
+建议你记录所有尝试的内容，甚至包括失败。如果将来发生类似的问题，查看你尝试过的所有内容会很有用。推荐使用RMarkdown或quarto, 这使得将代码与详细的注释和说明混合在一起变得容易。
+
+接下来，生成一个具有代表性的测试示例。这个示例应该足够大，以捕捉问题的本质，但又要足够小，运行最多只需要几秒钟。你不希望花费太长时间，因为你需要多次运行测试示例来比较方法。另一方面，你也不希望示例太小，因为那样结果可能无法扩展到真正的问题。这里使用100,000个数字来进行测试：
+
+```{r}
+x <- runif(1e5)
+```
+
