@@ -1,7 +1,7 @@
 ---
 title: "24 Improving performance"
 date: "2025-08-28"
-date-modified: "2025-08-28"
+date-modified: "2025-08-30"
 
 format:
   html:
@@ -175,4 +175,202 @@ bench::mark(
 ```
 
 ### `as.data.frame()`
+
+能够确定输入的数据类型是另外一种加开代码运行的方式。例如，`as.data.frame()`的转换过程分两步，先将每个元素强制转换为数据框，然后再使用`rbind()`将结果拼接起来。如果你已经知道列表有name属性且元素等长，那么你可以直接将其转换为数据框（R中的所有数据结构都是向量，只是属性class不同）：
+
+```{r}
+quickdf <- function(l) {
+  class(l) <- "data.frame"
+  attr(l, "row.names") <- .set_row_names(length(l[[1]]))
+  l
+}
+
+l <- lapply(1:26, function(i) runif(1e3))
+names(l) <- letters
+
+bench::mark(
+  as.data.frame = as.data.frame(l),
+  quick_df      = quickdf(l)
+)[c("expression", "min", "median", "itr/sec", "n_gc")]
+```
+
+当然，这种快速的方法牺牲的是对结果正确性的保证。如果你的输入错误，那么你将会得到错误的结果：
+
+```{r}
+quickdf(list(x = 1, y = 1:2))
+```
+
+为了得到这个最小化方法，作者仔细阅读并重写了`as.data.frame.list()`和`data.frame()`的源代码，并做了许多小的修改，每次都检查是否破坏了现有的行为；经过几个小时的工作，能够分离出上面显示的最小化代码。这是一种非常有用的技术：大多数base R函数是为了灵活性和功能性而编写的，而不是为了性能。因此，根据特定需求重写通常可以带来显著的改进。要做到这一点，需要阅读源代码，它可能很复杂和令人困惑，但不要放弃！
+
+## Vectorise
+
+如果你使用过R一段时间，你可能听说过这样的话——“向量化你的代码”。但是究竟什么是“向量化”呢？“向量化”不仅仅只是避免使用for循环，而是一种整体化解决问题的思路，即你要处理的是一个向量，而不是向量中的每个标量。一个“向量化”的函数通常有两个关键特点：
+
+-   简化了问题逻辑：从“逐个处理”到“整体处理”。
+
+-   提升了运行速度：底层使用C语言而非R。
+
+在实践中，除了使用`map()`或`lapply()`来实现“向量化”，也可以使用已经“向量化”的函数。base R提供了许多已经“向量化”的函数：
+
+-   `rowSums()`,`colSums()`,`rowMeans()`,`colMeans()`：可以使用它们构建新的“向量化”函数：
+
+    ```r
+    rowAny <- function(x) rowSums(x) > 0
+    rowAll <- function(x) rowSums(x) == ncol(x)
+    ```
+
+-   向量化提取自己可以极大地提升运行速度（见4.5节）：可以一步进行提取赋值多个值，例如，当`x`是向量、矩阵、数据框时，`x[is.na(x)] <- 0`会替换所有缺失值为0。
+
+-   可以是使用`cut`和`findInterval()`函数来将连续变量离散化。
+
+-   其他“向量化”函数，如`cumsum()`和`diff()`。
+
+线性代数的运行通常是向量化的，它们的循环使用了外部库，如`BLAS`。如果你的问题可以使用线性代数来解决，那么运行速度通常会很快。
+
+“向量化”的缺点是：很难预测性能，无法简单地进行线性估算。如下例，查询100个字符的运行时间并不是处理单个字符的100倍运行时间，而仅是10倍。这背后的逻辑是：“向量化”会动态的切换策略——操作量高于某个阈值时，会采用耗时的“初始化”+不耗时的“处理”策略。
+
+```{r}
+lookup <- setNames(as.list(sample(100, 26)), letters)
+
+x1 <- "j"
+x10 <- sample(letters, 10)
+x100 <- sample(letters, 100, replace = TRUE)
+
+bench::mark(
+  lookup[x1],
+  lookup[x10],
+  lookup[x100],
+  check = FALSE
+)[c("expression", "min", "median", "itr/sec", "n_gc")]
+```
+
+向量化并不能解决所有问题，而且与其费力地将现有算法强行改成使用向量化的方法，不如使用C++ 编写自己的向量化函数。我们将在第25章学习如何做到这一点。
+
+## Avoiding copies
+
+R 代码运行缓慢的一个究极原因是在for循环中不断创建额外的对象。当你使用`c()`，`append()`，`cbind()`，`rbind()`，`paste()`组合创建新的对象时，R必须首先创建一个新的对象，然后将旧对象的内容复制到新的对象中。当你在for循环中使用这些函数时，就会不断地创建额外对象。
+
+下面是一个示例：`collapse()`函数使用for循环将多个字符串连接成一个字符串；对比直接使用`paste()`函数中的参数`collapse`。
+
+```{r}
+random_string <- function() {
+  paste(sample(letters, 50, replace = TRUE), collapse = "")
+}
+strings10 <- replicate(10, random_string())
+strings100 <- replicate(100, random_string())
+
+collapse <- function(xs) {
+  out <- ""
+  for (x in xs) {
+    out <- paste0(out, x)
+  }
+  out
+}
+
+bench::mark(
+  loop10 = collapse(strings10),
+  loop100 = collapse(strings100),
+  vec10 = paste(strings10, collapse = ""),
+  vec100 = paste(strings100, collapse = ""),
+  check = FALSE
+)[c("expression", "min", "median", "itr/sec", "n_gc")]
+```
+
+因为“修改后复制”的机制，`x[i] <- y`也会触发复制，详见第2章。
+
+## Case study: t-test
+
+下面，我们使用上述介绍的方法来加快“t-test"中t统计量的批量计算。
+
+假设我们有1000次实验（行），每次实验有50个样本（列），前25个样本为一组，后25个样本为另一组，生成测试数据：
+
+```{r}
+m <- 1000
+n <- 50
+X <- matrix(rnorm(m * n, mean = 10, sd = 3), nrow = m)
+grp <- rep(1:2, each = n / 2)
+```
+
+有两种方法来批量计算t-test的t统计量：
+
+```{r}
+system.time(
+  for (i in 1:m) {
+    t.test(X[i, ] ~ grp)$statistic
+  }
+)
+system.time(
+  for (i in 1:m) {
+    t.test(X[i, grp == 1], X[i, grp == 2])$statistic
+  }
+)
+```
+
+当然，我们也可以使用`map_dbl()`来批量计算：
+
+```{r}
+compT <- function(i) {
+  t.test(X[i, grp == 1], X[i, grp == 2])$statistic
+}
+system.time(t1 <- purrr::map_dbl(1:m, compT))
+```
+
+首先我们可以使用减少函数额外工作的策略优化，查看`stats::t.test.default()`的源码，你会发现它不仅计算了t统计量，还计算了p值和打印输出。我们可以只计算t统计量：
+
+```{r}
+my_t <- function(x, grp) {
+  t_stat <- function(x) {
+    m <- mean(x)
+    n <- length(x)
+    var <- sum((x - m)^2) / (n - 1)
+
+    list(m = m, n = n, var = var)
+  }
+
+  g1 <- t_stat(x[grp == 1])
+  g2 <- t_stat(x[grp == 2])
+
+  se_total <- sqrt(g1$var / g1$n + g2$var / g2$n)
+  (g1$m - g2$m) / se_total
+}
+
+system.time(t2 <- purrr::map_dbl(1:m, ~ my_t(X[., ], grp)))
+stopifnot(all.equal(t1, t2))
+```
+
+针对上面计的for循环计算策略，我们可以使用向量化函数来优化。
+
+```{r}
+rowtstat <- function(X, grp) {
+  t_stat <- function(X) {
+    m <- rowMeans(X)
+    n <- ncol(X)
+    var <- rowSums((X - m)^2) / (n - 1)
+
+    list(m = m, n = n, var = var)
+  }
+
+  g1 <- t_stat(X[, grp == 1])
+  g2 <- t_stat(X[, grp == 2])
+
+  se_total <- sqrt(g1$var / g1$n + g2$var / g2$n)
+  (g1$m - g2$m) / se_total
+}
+system.time(t3 <- rowtstat(X, grp))
+stopifnot(all.equal(t1, t3))
+```
+
+## Other techniques
+
+写出运行速度快的代码是成为优秀程序员的一部分。除了本章介绍的策略外，你可以通过下面的方式来提升自己的通用编程技巧：
+
+-   浏览[R blogs](http://www.r-bloggers.com/)，了解其他人如何解决性能问题。
+
+-   阅读其他R编程数据，如"The Art of R Programming"，"[R Inferno](http://www.burns-stat.com/documents/books/the-r-inferno/)"。
+
+-   参加一门算法和数据结构课程，学习一些众所周知的方法来解决某些类型的问题。
+
+-   学习如何并行地运行代码，如"Parallel R"和"Parallel Computing for Data Science"。
+
+-   阅读通用的有关优化的数据，如"Mature optimisation"，"Pragmatic Programmer"。
 

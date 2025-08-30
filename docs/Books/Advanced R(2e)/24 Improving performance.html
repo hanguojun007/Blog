@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.6.36">
+<meta name="generator" content="quarto-1.6.40">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <meta name="dcterms.date" content="2025-08-28">
 <title>24 Improving performance</title>
@@ -60,15 +60,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
+<link href="../../Books/Advanced R(2e)/23 Measuring performance.html" rel="prev">
 <script src="../../site_libs/quarto-html/quarto.js"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-01c78b5cd655e4cd89133cf59d535862.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-357f3a88c8c08e74b7450a91eb5d7532.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light"><script id="quarto-search-options" type="application/json">{
+<link href="../../site_libs/bootstrap/bootstrap-e6e594f9697a8fc74d922f689f62e840.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light"><script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": true,
   "collapse-after": 3,
@@ -95,7 +96,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 }</script><link rel="stylesheet" href="../../styles.css">
 </head>
-<body class="nav-fixed">
+<body class="nav-sidebar floating nav-fixed">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top"><nav class="navbar navbar-expand-lg " data-bs-theme="dark"><div class="navbar-container container-fluid">
@@ -164,8 +165,213 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
           </div> <!-- /navcollapse -->
       </div> <!-- /container-fluid -->
-    </nav></header><!-- content --><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+    </nav><nav class="quarto-secondary-nav"><div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../Books/Advanced R(2e)/24 Improving performance.html">24 Improving performance</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav></header><!-- content --><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto"><div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">index</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/1 Introduction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1 Introduction</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+ <span class="menu-text">Foundations</span>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/Foundations Introduction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Introduction</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/2 Names and values.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2 Names and values</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/3 Vectors.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">3 Vectors</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/4 Subsetting.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">4 Subsetting</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/5 Control flow.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">5 Control flow</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/6 Functions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">6 Functions</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/7 Environments.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">7 Environments</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/8 Conditions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">8 Conditions</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+ <span class="menu-text">Functional programming</span>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/Functional programming.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Introduction</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/9 Functionals.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">9 Functionals</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/10 Function factories.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">10 Function factories</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/11 Function operators.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">11 Function operators</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+ <span class="menu-text">Object-oriented Programming</span>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/Object-oriented Programming.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Introduction</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/12 Base types.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">12 Base types</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/13 S3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">13 S3</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/14 R6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">14 R6</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/15 S4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">15 S4</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/16 Trade-offs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">16 Trade-offs</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+ <span class="menu-text">Metaprogramming</span>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/Metaprogramming Introduction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Introduction</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/17 Big picture.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">17 Big picture</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/18 Expressions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">18 Expressions</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/19 Quasiquotation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">19 Quasiquotation</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/20 Evaluation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">20 Evaluation</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/21 Translating R code.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">21 Translating R code</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/Techniques Introduction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Introduction</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/22 Debugging.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">22 Debugging</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/23 Measuring performance.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">23 Measuring performance</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/24 Improving performance.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">24 Improving performance</span></a>
+  </div>
+</li>
+    </ul>
+</div>
+</nav><div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active"><h2 id="toc-title">On this page</h2>
@@ -179,9 +385,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </ul>
 </li>
   <li><a href="#code-organisation" id="toc-code-organisation" class="nav-link" data-scroll-target="#code-organisation">Code organisation</a></li>
+  <li><a href="#checking-for-existing-solutions" id="toc-checking-for-existing-solutions" class="nav-link" data-scroll-target="#checking-for-existing-solutions">Checking for existing solutions</a></li>
+  <li>
+<a href="#doing-as-little-as-possible" id="toc-doing-as-little-as-possible" class="nav-link" data-scroll-target="#doing-as-little-as-possible">Doing as little as possible</a>
+  <ul class="collapse">
+<li><a href="#mean" id="toc-mean" class="nav-link" data-scroll-target="#mean"><code>mean()</code></a></li>
+  <li><a href="#as.data.frame" id="toc-as.data.frame" class="nav-link" data-scroll-target="#as.data.frame"><code>as.data.frame()</code></a></li>
+  </ul>
+</li>
+  <li><a href="#vectorise" id="toc-vectorise" class="nav-link" data-scroll-target="#vectorise">Vectorise</a></li>
+  <li><a href="#avoiding-copies" id="toc-avoiding-copies" class="nav-link" data-scroll-target="#avoiding-copies">Avoiding copies</a></li>
+  <li><a href="#case-study-t-test" id="toc-case-study-t-test" class="nav-link" data-scroll-target="#case-study-t-test">Case study: t-test</a></li>
+  <li><a href="#other-techniques" id="toc-other-techniques" class="nav-link" data-scroll-target="#other-techniques">Other techniques</a></li>
   </ul></nav>
     <div class="quarto-margin-footer"><div class="margin-footer-item">
-<p><img src="../../logo.jpg" class="conditional-footer img-fluid" width="200"></p>
+<p><img src="../..\logo.jpg" class="conditional-footer img-fluid" width="200"></p>
 </div></div></div>
 <!-- main -->
 <main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
@@ -203,7 +421,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">August 28, 2025</p>
+      <p class="date-modified">August 30, 2025</p>
     </div>
   </div>
     
@@ -238,8 +456,7 @@ Tip
 <li>24.8节：提供了更多帮助你编写快速代码资源的指针。</li>
 </ul></section><section id="prerequisites" class="level3"><h3 class="anchored" data-anchor-id="prerequisites">Prerequisites</h3>
 <div class="cell">
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://bench.r-lib.org/">bench</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; Error in library(bench): there is no package called 'bench'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://bench.r-lib.org/">bench</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section></section><section id="code-organisation" class="level2"><h2 class="anchored" data-anchor-id="code-organisation">Code organisation</h2>
 <p>在尝试优化代码时，通常会掉入两个陷阱中：</p>
@@ -258,6 +475,291 @@ Tip
 <div class="cell">
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="fl">1e5</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<p>现在使用<code><a href="https://bench.r-lib.org/reference/mark.html">bench::mark()</a></code>来精确比较变量。<code><a href="https://bench.r-lib.org/reference/mark.html">bench::mark()</a></code>会自动检查所有调用是否返回相同类型的值。这并不能保证函数对所有输入的行为都相同，因此在理想情况下，还需要进行单元测试，以确保不会意外地改变函数的行为。</p>
+<div class="cell">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">bench</span><span class="fu">::</span><span class="fu"><a href="https://bench.r-lib.org/reference/mark.html">mark</a></span><span class="op">(</span></span>
+<span>  <span class="fu">mean1</span><span class="op">(</span><span class="va">x</span><span class="op">)</span>,</span>
+<span>  <span class="fu">mean2</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"expression"</span>, <span class="st">"min"</span>, <span class="st">"median"</span>, <span class="st">"itr/sec"</span>, <span class="st">"n_gc"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="co">#&gt; # A tibble: 2 × 4</span></span>
+<span><span class="co">#&gt;   expression      min   median `itr/sec`</span></span>
+<span><span class="co">#&gt;   &lt;bch:expr&gt; &lt;bch:tm&gt; &lt;bch:tm&gt;     &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 mean1(x)    135.6µs  136.8µs     6790.</span></span>
+<span><span class="co">#&gt; 2 mean2(x)     66.4µs   72.8µs    12790.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>从结果上看，<code><a href="https://rdrr.io/r/base/mean.html">mean()</a></code>意外地要比<code>sum(x) / length(x)</code>慢一些。这是因为<code><a href="https://rdrr.io/r/base/mean.html">mean()</a></code>在计算时，会进行一些额外的步骤，来提升结果地精度。如果你对这种计算策略感兴趣，可以查看：</p>
+<ul>
+<li>http://stackoverflow.com/questions/22515525#22518603</li>
+<li>http://stackoverflow.com/questions/22515175#22515856</li>
+<li>http://stackoverflow.com/questions/3476015#22511936</li>
+</ul></section><section id="checking-for-existing-solutions" class="level2"><h2 class="anchored" data-anchor-id="checking-for-existing-solutions">Checking for existing solutions</h2>
+<p>当你尝试过自己很多种想法后，仍然很难解决问题时，你可以检查是否已经有成熟地解决方案了。下面是两个好的检索开始：</p>
+<ul>
+<li><p><a href="http://cran.rstudio.com/web/views/">CRAN task views</a>，根据任务收集CRAN上的包。</p></li>
+<li><p>在<a href="http://cran.r-project.org/web/packages/Rcpp">Rcpp</a>的CRAN主页上，可以找到一些使用Rcpp的包，这些包都使用C++语言编写，可能会更快些。</p></li>
+</ul>
+<p>除此之外，你需要将你的问题描述清楚，并使用搜索引擎（现在用AI啦😊）搜索。同时，你要广泛地阅读相关书籍，积攒的专业知识有助于你更快速的检索并理解答案。将自己解决问题的过程和最终答案记录下来，长时间的积累后，可以使用某些工具进行构建自己的知识库以便日后查阅。</p>
+</section><section id="doing-as-little-as-possible" class="level2"><h2 class="anchored" data-anchor-id="doing-as-little-as-possible">Doing as little as possible</h2>
+<p>尽可能将函数的功能限定在某个范围内，接受特定的输入，输出特定的结果。例如：</p>
+<ul>
+<li><p><code><a href="https://rdrr.io/r/base/colSums.html">rowSums()</a></code>，<code><a href="https://rdrr.io/r/base/colSums.html">colSums()</a></code>，<code><a href="https://rdrr.io/r/base/colSums.html">rowMeans()</a></code>，<code><a href="https://rdrr.io/r/base/colSums.html">colMeans()</a></code>要比应用<code><a href="https://rdrr.io/r/base/apply.html">apply()</a></code>来计算快很多。</p></li>
+<li><p><code><a href="https://rdrr.io/r/base/lapply.html">vapply()</a></code>比<code><a href="https://rdrr.io/r/base/lapply.html">sapply()</a></code>更快，因为它规定了输出的类型。</p></li>
+<li><p><code>any(x == 10)</code>要比<code>10 %in% x</code>更快。</p></li>
+</ul>
+<p>某些函数的输入要求特定类型，当输入不符合时，函数可能会执行额外的类型转换工作。例如，应用<code><a href="https://rdrr.io/r/base/apply.html">apply()</a></code>到<code>data.frame</code>时，会自动将<code>data.frame</code>转换为<code>matrix</code>。</p>
+<p>如果提供更多问题的信息，某些函数会减少一些工作量。例如：</p>
+<ul>
+<li><p><code><a href="https://rdrr.io/r/utils/read.table.html">read.csv()</a></code>中使用<code>colClasses</code>指定已知列类型。</p></li>
+<li><p><code><a href="https://rdrr.io/r/base/factor.html">factor()</a></code>使用<code>levels</code>参数指定已知因子级别。</p></li>
+<li><p><code><a href="https://rdrr.io/r/base/cut.html">cut()</a></code>设置<code>labels = FALSE</code>可以避免产生标签。</p></li>
+<li><p><code>unlist(x, use.names = FALSE)</code>要比<code>unlist(x)</code>更快。</p></li>
+<li><p><code><a href="https://rdrr.io/r/base/interaction.html">interaction()</a></code>设置<code>drop = TRUE</code>可以丢掉不必要的因子水平。</p></li>
+</ul>
+<p>下面以<code><a href="https://rdrr.io/r/base/mean.html">mean()</a></code>和<code><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame()</a></code>为例，展示如何使用这种策略来提高性能。</p>
+<section id="mean" class="level3"><h3 class="anchored" data-anchor-id="mean"><code>mean()</code></h3>
+<p>由于R的大多数函数使用了S3或S4面向对象，因此，我们可以通过避免方法派发来提高性能。这在一个大型循环任务中会很有效。</p>
+<ul>
+<li><p>S3，可以直接调用<code>generic.class()</code>函数。</p></li>
+<li><p>S4，需要使用<code>selectMethod()</code>函数获取方法，然后赋值给环境变量进行调用。</p></li>
+</ul>
+<p>例如，<code><a href="https://rdrr.io/r/base/mean.html">mean.default()</a></code>计算小型数值向量时要比<code><a href="https://rdrr.io/r/base/mean.html">mean()</a></code>快上些：</p>
+<div class="cell">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="fl">1e2</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">bench</span><span class="fu">::</span><span class="fu"><a href="https://bench.r-lib.org/reference/mark.html">mark</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean.default</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"expression"</span>, <span class="st">"min"</span>, <span class="st">"median"</span>, <span class="st">"itr/sec"</span>, <span class="st">"n_gc"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="co">#&gt; # A tibble: 2 × 4</span></span>
+<span><span class="co">#&gt;   expression           min   median `itr/sec`</span></span>
+<span><span class="co">#&gt;   &lt;bch:expr&gt;      &lt;bch:tm&gt; &lt;bch:tm&gt;     &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 mean(x)              4µs    4.5µs   173972.</span></span>
+<span><span class="co">#&gt; 2 mean.default(x)    1.4µs    1.6µs   422194.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>这种优化方式存在一定风险，当<code>x</code>不是数值向量时，<code><a href="https://rdrr.io/r/base/mean.html">mean.default()</a></code>会报错。你甚至可以直接调用<code><a href="https://rdrr.io/r/base/Internal.html">.Internal()</a></code>函数来极大的提升性能，同时有也将引入更大的风险——无法对NA值进行处理。</p>
+<div class="cell">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="fl">1e2</span><span class="op">)</span></span>
+<span><span class="fu">bench</span><span class="fu">::</span><span class="fu"><a href="https://bench.r-lib.org/reference/mark.html">mark</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean.default</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/Internal.html">.Internal</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"expression"</span>, <span class="st">"min"</span>, <span class="st">"median"</span>, <span class="st">"itr/sec"</span>, <span class="st">"n_gc"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="co">#&gt; # A tibble: 3 × 4</span></span>
+<span><span class="co">#&gt;   expression              min   median `itr/sec`</span></span>
+<span><span class="co">#&gt;   &lt;bch:expr&gt;         &lt;bch:tm&gt; &lt;bch:tm&gt;     &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 mean(x)                 4µs    4.4µs   208106.</span></span>
+<span><span class="co">#&gt; 2 mean.default(x)       1.5µs    1.7µs   557977.</span></span>
+<span><span class="co">#&gt; 3 .Internal(mean(x))    100ns    200ns  4363192.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>注意：这些差异之所以出现，是因为<code>x</code>很小。如果你增加大小，这些差异基本上就会消失，因为大部分时间都用在计算平均值上，而不是进行方法派发。这很好地提醒了我们，输入的大小很重要，你应该根据真实的数据来进行优化。</p>
+<div class="cell">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="fl">1e5</span><span class="op">)</span></span>
+<span><span class="fu">bench</span><span class="fu">::</span><span class="fu"><a href="https://bench.r-lib.org/reference/mark.html">mark</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean.default</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/Internal.html">.Internal</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"expression"</span>, <span class="st">"min"</span>, <span class="st">"median"</span>, <span class="st">"itr/sec"</span>, <span class="st">"n_gc"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="co">#&gt; # A tibble: 3 × 4</span></span>
+<span><span class="co">#&gt;   expression              min   median `itr/sec`</span></span>
+<span><span class="co">#&gt;   &lt;bch:expr&gt;         &lt;bch:tm&gt; &lt;bch:tm&gt;     &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 mean(x)               136µs    136µs     6913.</span></span>
+<span><span class="co">#&gt; 2 mean.default(x)       132µs    146µs     6485.</span></span>
+<span><span class="co">#&gt; 3 .Internal(mean(x))    131µs    131µs     6798.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section><section id="as.data.frame" class="level3"><h3 class="anchored" data-anchor-id="as.data.frame"><code>as.data.frame()</code></h3>
+<p>能够确定输入的数据类型是另外一种加开代码运行的方式。例如，<code><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame()</a></code>的转换过程分两步，先将每个元素强制转换为数据框，然后再使用<code><a href="https://rdrr.io/r/base/cbind.html">rbind()</a></code>将结果拼接起来。如果你已经知道列表有name属性且元素等长，那么你可以直接将其转换为数据框（R中的所有数据结构都是向量，只是属性class不同）：</p>
+<div class="cell">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">quickdf</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">l</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/class.html">class</a></span><span class="op">(</span><span class="va">l</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="st">"data.frame"</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/attr.html">attr</a></span><span class="op">(</span><span class="va">l</span>, <span class="st">"row.names"</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/base-internal.html">.set_row_names</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">l</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="va">l</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="va">l</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">lapply</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">26</span>, <span class="kw">function</span><span class="op">(</span><span class="va">i</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="fl">1e3</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">l</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">letters</span></span>
+<span></span>
+<span><span class="fu">bench</span><span class="fu">::</span><span class="fu"><a href="https://bench.r-lib.org/reference/mark.html">mark</a></span><span class="op">(</span></span>
+<span>  as.data.frame <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span><span class="op">(</span><span class="va">l</span><span class="op">)</span>,</span>
+<span>  quick_df      <span class="op">=</span> <span class="fu">quickdf</span><span class="op">(</span><span class="va">l</span><span class="op">)</span></span>
+<span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"expression"</span>, <span class="st">"min"</span>, <span class="st">"median"</span>, <span class="st">"itr/sec"</span>, <span class="st">"n_gc"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="co">#&gt; # A tibble: 2 × 4</span></span>
+<span><span class="co">#&gt;   expression         min   median `itr/sec`</span></span>
+<span><span class="co">#&gt;   &lt;bch:expr&gt;    &lt;bch:tm&gt; &lt;bch:tm&gt;     &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 as.data.frame   1.03ms   1.09ms      852.</span></span>
+<span><span class="co">#&gt; 2 quick_df           6µs    6.7µs   129923.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>当然，这种快速的方法牺牲的是对结果正确性的保证。如果你的输入错误，那么你将会得到错误的结果：</p>
+<div class="cell">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">quickdf</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fl">1</span>, y <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning in format.data.frame(if (omit) x[seq_len(n0), , drop = FALSE] else</span></span>
+<span><span class="co">#&gt; x, : corrupt data frame: columns will be truncated or padded with NAs</span></span>
+<span><span class="co">#&gt;   x y</span></span>
+<span><span class="co">#&gt; 1 1 1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>为了得到这个最小化方法，作者仔细阅读并重写了<code><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame.list()</a></code>和<code><a href="https://rdrr.io/r/base/data.frame.html">data.frame()</a></code>的源代码，并做了许多小的修改，每次都检查是否破坏了现有的行为；经过几个小时的工作，能够分离出上面显示的最小化代码。这是一种非常有用的技术：大多数base R函数是为了灵活性和功能性而编写的，而不是为了性能。因此，根据特定需求重写通常可以带来显著的改进。要做到这一点，需要阅读源代码，它可能很复杂和令人困惑，但不要放弃！</p>
+</section></section><section id="vectorise" class="level2"><h2 class="anchored" data-anchor-id="vectorise">Vectorise</h2>
+<p>如果你使用过R一段时间，你可能听说过这样的话——“向量化你的代码”。但是究竟什么是“向量化”呢？“向量化”不仅仅只是避免使用for循环，而是一种整体化解决问题的思路，即你要处理的是一个向量，而不是向量中的每个标量。一个“向量化”的函数通常有两个关键特点：</p>
+<ul>
+<li><p>简化了问题逻辑：从“逐个处理”到“整体处理”。</p></li>
+<li><p>提升了运行速度：底层使用C语言而非R。</p></li>
+</ul>
+<p>在实践中，除了使用<code>map()</code>或<code><a href="https://rdrr.io/r/base/lapply.html">lapply()</a></code>来实现“向量化”，也可以使用已经“向量化”的函数。base R提供了许多已经“向量化”的函数：</p>
+<ul>
+<li>
+<p><code><a href="https://rdrr.io/r/base/colSums.html">rowSums()</a></code>,<code><a href="https://rdrr.io/r/base/colSums.html">colSums()</a></code>,<code><a href="https://rdrr.io/r/base/colSums.html">rowMeans()</a></code>,<code><a href="https://rdrr.io/r/base/colSums.html">colMeans()</a></code>：可以使用它们构建新的“向量化”函数：</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">rowAny</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html">rowSums</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span></span>
+<span><span class="va">rowAll</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html">rowSums</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">==</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">ncol</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</li>
+<li><p>向量化提取自己可以极大地提升运行速度（见4.5节）：可以一步进行提取赋值多个值，例如，当<code>x</code>是向量、矩阵、数据框时，<code>x[is.na(x)] &lt;- 0</code>会替换所有缺失值为0。</p></li>
+<li><p>可以是使用<code>cut</code>和<code><a href="https://rdrr.io/r/base/findInterval.html">findInterval()</a></code>函数来将连续变量离散化。</p></li>
+<li><p>其他“向量化”函数，如<code><a href="https://rdrr.io/r/base/cumsum.html">cumsum()</a></code>和<code><a href="https://rdrr.io/r/base/diff.html">diff()</a></code>。</p></li>
+</ul>
+<p>线性代数的运行通常是向量化的，它们的循环使用了外部库，如<code>BLAS</code>。如果你的问题可以使用线性代数来解决，那么运行速度通常会很快。</p>
+<p>“向量化”的缺点是：很难预测性能，无法简单地进行线性估算。如下例，查询100个字符的运行时间并不是处理单个字符的100倍运行时间，而仅是10倍。这背后的逻辑是：“向量化”会动态的切换策略——操作量高于某个阈值时，会采用耗时的“初始化”+不耗时的“处理”策略。</p>
+<div class="cell">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">lookup</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/setNames.html">setNames</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">as.list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">26</span><span class="op">)</span><span class="op">)</span>, <span class="va">letters</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">x1</span> <span class="op">&lt;-</span> <span class="st">"j"</span></span>
+<span><span class="va">x10</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span><span class="op">(</span><span class="va">letters</span>, <span class="fl">10</span><span class="op">)</span></span>
+<span><span class="va">x100</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span><span class="op">(</span><span class="va">letters</span>, <span class="fl">100</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">bench</span><span class="fu">::</span><span class="fu"><a href="https://bench.r-lib.org/reference/mark.html">mark</a></span><span class="op">(</span></span>
+<span>  <span class="va">lookup</span><span class="op">[</span><span class="va">x1</span><span class="op">]</span>,</span>
+<span>  <span class="va">lookup</span><span class="op">[</span><span class="va">x10</span><span class="op">]</span>,</span>
+<span>  <span class="va">lookup</span><span class="op">[</span><span class="va">x100</span><span class="op">]</span>,</span>
+<span>  check <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"expression"</span>, <span class="st">"min"</span>, <span class="st">"median"</span>, <span class="st">"itr/sec"</span>, <span class="st">"n_gc"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="co">#&gt; # A tibble: 3 × 4</span></span>
+<span><span class="co">#&gt;   expression        min   median `itr/sec`</span></span>
+<span><span class="co">#&gt;   &lt;bch:expr&gt;   &lt;bch:tm&gt; &lt;bch:tm&gt;     &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 lookup[x1]      300ns    400ns  2101238.</span></span>
+<span><span class="co">#&gt; 2 lookup[x10]     700ns    900ns   928453.</span></span>
+<span><span class="co">#&gt; 3 lookup[x100]    2.5µs    4.1µs   218293.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>向量化并不能解决所有问题，而且与其费力地将现有算法强行改成使用向量化的方法，不如使用C++ 编写自己的向量化函数。我们将在第25章学习如何做到这一点。</p>
+</section><section id="avoiding-copies" class="level2"><h2 class="anchored" data-anchor-id="avoiding-copies">Avoiding copies</h2>
+<p>R 代码运行缓慢的一个究极原因是在for循环中不断创建额外的对象。当你使用<code><a href="https://rdrr.io/r/base/c.html">c()</a></code>，<code><a href="https://rdrr.io/r/base/append.html">append()</a></code>，<code><a href="https://rdrr.io/r/base/cbind.html">cbind()</a></code>，<code><a href="https://rdrr.io/r/base/cbind.html">rbind()</a></code>，<code><a href="https://rdrr.io/r/base/paste.html">paste()</a></code>组合创建新的对象时，R必须首先创建一个新的对象，然后将旧对象的内容复制到新的对象中。当你在for循环中使用这些函数时，就会不断地创建额外对象。</p>
+<p>下面是一个示例：<code>collapse()</code>函数使用for循环将多个字符串连接成一个字符串；对比直接使用<code><a href="https://rdrr.io/r/base/paste.html">paste()</a></code>函数中的参数<code>collapse</code>。</p>
+<div class="cell">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">random_string</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span><span class="op">(</span><span class="va">letters</span>, <span class="fl">50</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, collapse <span class="op">=</span> <span class="st">""</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span><span class="va">strings10</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">replicate</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fu">random_string</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">strings100</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html">replicate</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fu">random_string</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">collapse</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">xs</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">out</span> <span class="op">&lt;-</span> <span class="st">""</span></span>
+<span>  <span class="kw">for</span> <span class="op">(</span><span class="va">x</span> <span class="kw">in</span> <span class="va">xs</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="va">out</span>, <span class="va">x</span><span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span>  <span class="va">out</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="fu">bench</span><span class="fu">::</span><span class="fu"><a href="https://bench.r-lib.org/reference/mark.html">mark</a></span><span class="op">(</span></span>
+<span>  loop10 <span class="op">=</span> <span class="fu">collapse</span><span class="op">(</span><span class="va">strings10</span><span class="op">)</span>,</span>
+<span>  loop100 <span class="op">=</span> <span class="fu">collapse</span><span class="op">(</span><span class="va">strings100</span><span class="op">)</span>,</span>
+<span>  vec10 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="va">strings10</span>, collapse <span class="op">=</span> <span class="st">""</span><span class="op">)</span>,</span>
+<span>  vec100 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="va">strings100</span>, collapse <span class="op">=</span> <span class="st">""</span><span class="op">)</span>,</span>
+<span>  check <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"expression"</span>, <span class="st">"min"</span>, <span class="st">"median"</span>, <span class="st">"itr/sec"</span>, <span class="st">"n_gc"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="co">#&gt; # A tibble: 4 × 4</span></span>
+<span><span class="co">#&gt;   expression      min   median `itr/sec`</span></span>
+<span><span class="co">#&gt;   &lt;bch:expr&gt; &lt;bch:tm&gt; &lt;bch:tm&gt;     &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 loop10       22.1µs   23.1µs    40670.</span></span>
+<span><span class="co">#&gt; 2 loop100     572.5µs  584.7µs     1584.</span></span>
+<span><span class="co">#&gt; 3 vec10           4µs    4.3µs   203744.</span></span>
+<span><span class="co">#&gt; 4 vec100       23.5µs   24.5µs    35494.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>因为“修改后复制”的机制，<code>x[i] &lt;- y</code>也会触发复制，详见第2章。</p>
+</section><section id="case-study-t-test" class="level2"><h2 class="anchored" data-anchor-id="case-study-t-test">Case study: t-test</h2>
+<p>下面，我们使用上述介绍的方法来加快“t-test”中t统计量的批量计算。</p>
+<p>假设我们有1000次实验（行），每次实验有50个样本（列），前25个样本为一组，后25个样本为另一组，生成测试数据：</p>
+<div class="cell">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fl">1000</span></span>
+<span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">50</span></span>
+<span><span class="va">X</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="va">m</span> <span class="op">*</span> <span class="va">n</span>, mean <span class="op">=</span> <span class="fl">10</span>, sd <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="va">m</span><span class="op">)</span></span>
+<span><span class="va">grp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, each <span class="op">=</span> <span class="va">n</span> <span class="op">/</span> <span class="fl">2</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>有两种方法来批量计算t-test的t统计量：</p>
+<div class="cell">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html">system.time</a></span><span class="op">(</span></span>
+<span>  <span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="va">m</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/stats/t.test.html">t.test</a></span><span class="op">(</span><span class="va">X</span><span class="op">[</span><span class="va">i</span>, <span class="op">]</span> <span class="op">~</span> <span class="va">grp</span><span class="op">)</span><span class="op">$</span><span class="va">statistic</span></span>
+<span>  <span class="op">}</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt;    user  system elapsed </span></span>
+<span><span class="co">#&gt;    0.49    0.00    0.49</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html">system.time</a></span><span class="op">(</span></span>
+<span>  <span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="va">m</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/stats/t.test.html">t.test</a></span><span class="op">(</span><span class="va">X</span><span class="op">[</span><span class="va">i</span>, <span class="va">grp</span> <span class="op">==</span> <span class="fl">1</span><span class="op">]</span>, <span class="va">X</span><span class="op">[</span><span class="va">i</span>, <span class="va">grp</span> <span class="op">==</span> <span class="fl">2</span><span class="op">]</span><span class="op">)</span><span class="op">$</span><span class="va">statistic</span></span>
+<span>  <span class="op">}</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt;    user  system elapsed </span></span>
+<span><span class="co">#&gt;    0.12    0.00    0.12</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>当然，我们也可以使用<code>map_dbl()</code>来批量计算：</p>
+<div class="cell">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">compT</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">i</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/t.test.html">t.test</a></span><span class="op">(</span><span class="va">X</span><span class="op">[</span><span class="va">i</span>, <span class="va">grp</span> <span class="op">==</span> <span class="fl">1</span><span class="op">]</span>, <span class="va">X</span><span class="op">[</span><span class="va">i</span>, <span class="va">grp</span> <span class="op">==</span> <span class="fl">2</span><span class="op">]</span><span class="op">)</span><span class="op">$</span><span class="va">statistic</span></span>
+<span><span class="op">}</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html">system.time</a></span><span class="op">(</span><span class="va">t1</span> <span class="op">&lt;-</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html">map_dbl</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">m</span>, <span class="va">compT</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;    user  system elapsed </span></span>
+<span><span class="co">#&gt;    0.14    0.02    0.16</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>首先我们可以使用减少函数额外工作的策略优化，查看<code><a href="https://rdrr.io/r/stats/t.test.html">stats::t.test.default()</a></code>的源码，你会发现它不仅计算了t统计量，还计算了p值和打印输出。我们可以只计算t统计量：</p>
+<div class="cell">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">my_t</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">grp</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">t_stat</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span>    <span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span>    <span class="va">var</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="op">(</span><span class="va">x</span> <span class="op">-</span> <span class="va">m</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span> <span class="op">/</span> <span class="op">(</span><span class="va">n</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span></span>
+<span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>m <span class="op">=</span> <span class="va">m</span>, n <span class="op">=</span> <span class="va">n</span>, var <span class="op">=</span> <span class="va">var</span><span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span></span>
+<span>  <span class="va">g1</span> <span class="op">&lt;-</span> <span class="fu">t_stat</span><span class="op">(</span><span class="va">x</span><span class="op">[</span><span class="va">grp</span> <span class="op">==</span> <span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
+<span>  <span class="va">g2</span> <span class="op">&lt;-</span> <span class="fu">t_stat</span><span class="op">(</span><span class="va">x</span><span class="op">[</span><span class="va">grp</span> <span class="op">==</span> <span class="fl">2</span><span class="op">]</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="va">se_total</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">sqrt</a></span><span class="op">(</span><span class="va">g1</span><span class="op">$</span><span class="va">var</span> <span class="op">/</span> <span class="va">g1</span><span class="op">$</span><span class="va">n</span> <span class="op">+</span> <span class="va">g2</span><span class="op">$</span><span class="va">var</span> <span class="op">/</span> <span class="va">g2</span><span class="op">$</span><span class="va">n</span><span class="op">)</span></span>
+<span>  <span class="op">(</span><span class="va">g1</span><span class="op">$</span><span class="va">m</span> <span class="op">-</span> <span class="va">g2</span><span class="op">$</span><span class="va">m</span><span class="op">)</span> <span class="op">/</span> <span class="va">se_total</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html">system.time</a></span><span class="op">(</span><span class="va">t2</span> <span class="op">&lt;-</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html">map_dbl</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">m</span>, <span class="op">~</span> <span class="fu">my_t</span><span class="op">(</span><span class="va">X</span><span class="op">[</span><span class="va">.</span>, <span class="op">]</span>, <span class="va">grp</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;    user  system elapsed </span></span>
+<span><span class="co">#&gt;    0.02    0.00    0.01</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span><span class="op">(</span><span class="va">t1</span>, <span class="va">t2</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>针对上面计的for循环计算策略，我们可以使用向量化函数来优化。</p>
+<div class="cell">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">rowtstat</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">X</span>, <span class="va">grp</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">t_stat</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">X</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html">rowMeans</a></span><span class="op">(</span><span class="va">X</span><span class="op">)</span></span>
+<span>    <span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">ncol</a></span><span class="op">(</span><span class="va">X</span><span class="op">)</span></span>
+<span>    <span class="va">var</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html">rowSums</a></span><span class="op">(</span><span class="op">(</span><span class="va">X</span> <span class="op">-</span> <span class="va">m</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span> <span class="op">/</span> <span class="op">(</span><span class="va">n</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span></span>
+<span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>m <span class="op">=</span> <span class="va">m</span>, n <span class="op">=</span> <span class="va">n</span>, var <span class="op">=</span> <span class="va">var</span><span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span></span>
+<span>  <span class="va">g1</span> <span class="op">&lt;-</span> <span class="fu">t_stat</span><span class="op">(</span><span class="va">X</span><span class="op">[</span>, <span class="va">grp</span> <span class="op">==</span> <span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
+<span>  <span class="va">g2</span> <span class="op">&lt;-</span> <span class="fu">t_stat</span><span class="op">(</span><span class="va">X</span><span class="op">[</span>, <span class="va">grp</span> <span class="op">==</span> <span class="fl">2</span><span class="op">]</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="va">se_total</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">sqrt</a></span><span class="op">(</span><span class="va">g1</span><span class="op">$</span><span class="va">var</span> <span class="op">/</span> <span class="va">g1</span><span class="op">$</span><span class="va">n</span> <span class="op">+</span> <span class="va">g2</span><span class="op">$</span><span class="va">var</span> <span class="op">/</span> <span class="va">g2</span><span class="op">$</span><span class="va">n</span><span class="op">)</span></span>
+<span>  <span class="op">(</span><span class="va">g1</span><span class="op">$</span><span class="va">m</span> <span class="op">-</span> <span class="va">g2</span><span class="op">$</span><span class="va">m</span><span class="op">)</span> <span class="op">/</span> <span class="va">se_total</span></span>
+<span><span class="op">}</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html">system.time</a></span><span class="op">(</span><span class="va">t3</span> <span class="op">&lt;-</span> <span class="fu">rowtstat</span><span class="op">(</span><span class="va">X</span>, <span class="va">grp</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;    user  system elapsed </span></span>
+<span><span class="co">#&gt;    0.02    0.00    0.01</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span><span class="op">(</span><span class="va">t1</span>, <span class="va">t3</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section><section id="other-techniques" class="level2"><h2 class="anchored" data-anchor-id="other-techniques">Other techniques</h2>
+<p>写出运行速度快的代码是成为优秀程序员的一部分。除了本章介绍的策略外，你可以通过下面的方式来提升自己的通用编程技巧：</p>
+<ul>
+<li><p>浏览<a href="http://www.r-bloggers.com/">R blogs</a>，了解其他人如何解决性能问题。</p></li>
+<li><p>阅读其他R编程数据，如”The Art of R Programming”，“<a href="http://www.burns-stat.com/documents/books/the-r-inferno/">R Inferno</a>”。</p></li>
+<li><p>参加一门算法和数据结构课程，学习一些众所周知的方法来解决某些类型的问题。</p></li>
+<li><p>学习如何并行地运行代码，如”Parallel R”和”Parallel Computing for Data Science”。</p></li>
+<li><p>阅读通用的有关优化的数据，如”Mature optimisation”，“Pragmatic Programmer”。</p></li>
+</ul>
 
 
 </section><a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
@@ -677,7 +1179,14 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script><script src="https://utteranc.es/client.js" repo="hanguojun007/Blog" issue-term="pathname" theme="github-light" crossorigin="anonymous" async="">
-</script>
+</script><nav class="page-navigation"><div class="nav-page nav-page-previous">
+      <a href="../../Books/Advanced R(2e)/23 Measuring performance.html" class="pagination-link" aria-label="23 Measuring performance">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">23 Measuring performance</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+  </div>
+</nav>
 </div> <!-- /content -->
 
 
