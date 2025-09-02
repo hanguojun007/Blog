@@ -89,7 +89,7 @@ add
 add(1, 2, 3)
 ```
 
-运行这段代码时，“Rcpp”会编译C++代码，并将R函数`add`与C++函数`add`关联起来。关联过程的大量底层细节被“Rcpp”自行处理了。下面我们由浅入深地介绍如何将简单地R函数转换为C++函数。
+运行这段代码时，“Rcpp”会编译C++代码，并将R函数`add`与C++函数`add`关联起来。关联过程的大量底层细节被“Rcpp”自行处理了。下面我们以不同的例子，由浅入深地介绍C++的语法。
 
 ### No inputs, scalar output
 
@@ -101,7 +101,7 @@ one <- function() 1L
 
 等价的C++函数：
 
-```c
+```cpp
 int one() {
   return 1;
 }
@@ -161,10 +161,157 @@ C++版的函数中：
 
 -   函数的输入与输出一样，也需要声明类型。
 -   `if`语句的语法一样，退出可以使用`break`，但是跳过需要使用`continue`而非`next` 。
--   `return`语句必须放在函数的末尾。
 
 ### Vector input, scalar output
 
-第三个例子是`sign()`函数的向量版本，接受一个向量输入，返回一个向量输出，向量中的每个元素都对应输入向量的元素。
+R与C++有一个显著的不同是在for循环的资源消耗上，C++更低。例如，在for循环中执行`sum`函数：
 
+R版本：
 
+```{r}
+sumR <- function(x) {
+  total <- 0
+  for (i in seq_along(x)) {
+    total <- total + x[i]
+  }
+  total
+}
+```
+
+C++版本：
+
+```{r}
+cppFunction(
+  "
+  double sumC(NumericVector x) {
+    int n = x.size();
+    double total = 0;
+    for(int i = 0; i < n; ++i) {
+      total += x[i];
+    }
+    return total;
+  }
+  "
+)
+```
+
+C++版与R版本在结构上很相似，但：
+
+-   获取向量长度，C++通过`.size()`方法完成。C++通过`.`来调用方法。
+
+-   `for`的声明语法不一样：`for(init; check; increment)`。额外设置变量`i`，判断`i`与`n`的比较。
+
+-   C++中位置索引的起始是0。
+
+-   使用`=`赋值，而不是`<-`。
+
+-   C++提供原位修改运算符：`total += x[i]`。除此还有`-=`、`*=`、`/=`。
+
+```{r}
+x <- runif(1e3)
+bench::mark(
+  sum(x),
+  sumC(x),
+  sumR(x)
+)[1:6]
+```
+
+### Vector input, vector output
+
+下面我们创建一个计算单个值与向量的欧几里得距离：
+
+R版本：
+
+```{r}
+pdistR <- function(x, ys) {
+  sqrt((x - ys)^2)
+}
+```
+
+在R中，我们没有在函数中定义`x`是标量，而是在文档中明确说明这一点。在C++版本中，则必须明确说明类型：
+
+```{r}
+cppFunction(
+  "
+  NumericVector pdistC(double x, NumericVector ys) {
+    int n = ys.size();
+    NumericVector out(n);
+
+    for(int i = 0; i < n; ++i) {
+      out[i] = sqrt(pow(ys[i] - x, 2.0));
+    }
+
+    return out;
+  }
+  "
+)
+```
+
+这个C++函数引入了一些新概念：
+
+-   创建一个长度为`n`的数字向量需要构造器：`NumericVector out(n)`。拷贝一个需要：`NumericVector zs = clone(ys)`。
+
+-   使用`pow()`而非`^`计算幂。
+
+```{r}
+y <- runif(1e6)
+bench::mark(
+  pdistR(0.5, y),
+  pdistC(0.5, y)
+)[1:6]
+```
+
+上面的结果显示，C++并没有比R快多少，节约的时间与开发C++函数的时间相比不值一提。而且C++运行快速的真正原因是它只是用了零时标量`ys[i] -x`，而R使用了临时向量`x - ys`，额外分配的内存会占用大量时间。
+
+### Using sourceCpp
+
+在实际开发中，我们往往需要使用`sourceCpp()`来单独加载C++脚本。在使用支持C++的IDE编写脚本可以提供语法高亮，自动补齐，语法检查等功能。
+
+独立的C++脚本需要加载`.cpp`插件：
+
+```cpp
+#include <Rcpp.h>
+using namespace Rcpp;
+```
+
+同时每个函数前需要声明`// [[Rcpp::export]]`才可以被R调用。
+
+你也可以在C++注释块中插入R代码，在测试时，会被执行并在R终端输出结果（因为`source(echo = TRUE)`）：
+
+```cpp
+/*** R
+# This is R code
+*/
+```
+
+运行`sourceCpp("path/to/file.cpp")`会创建对应的R函数，并加载到当前环境。需要注意：这些函数无法被保存在`.Rdata`文件中，每次启动R都需要重新创建。
+
+例如，运行`sourceCpp()`加载下面的脚本，会创建一个名为`meanC`的函数，并加载到当前环境：
+
+```cpp
+#include <Rcpp.h>
+using namespace Rcpp;
+
+// [[Rcpp::export]]
+double meanC(NumericVector x) {
+  int n = x.size();
+  double total = 0;
+
+  for(int i = 0; i < n; ++i) {
+    total += x[i];
+  }
+  return total / n;
+}
+
+/*** R
+x <- runif(1e5)
+bench::mark(
+  mean(x),
+  meanC(x)
+)
+*/
+```
+
+在Rmarkdown中，可以设置`{r, engine = "Rcpp"}`进行编译，所以后续的C++函数定义都单独放在一个代码块中，此时不能添加注释了哦。
+
+## Other classes
