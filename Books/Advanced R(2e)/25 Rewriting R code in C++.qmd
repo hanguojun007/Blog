@@ -315,3 +315,92 @@ bench::mark(
 在Rmarkdown中，可以设置`{r, engine = "Rcpp"}`进行编译，所以后续的C++函数定义都单独放在一个代码块中，此时不能添加注释了哦。
 
 ## Other classes
+
+前面介绍了“Rcpp”支持的基础向量类型：`NumericVector`、`IntegerVector`、`CharacterVector`、`LogicalVector`，基础标量类型：`double`、`int`、`String`、`bool`。“Rcpp”也支持其他数据类型，重要的如，list，dataframe，function，attribute。同时它也对很多类提供支持如，`Environment`，`DottedPair`，`Language`，`Symbol`等，但超出了本书的范围。（所谓的“支持”就是说，C++代码可以访问R对象，也可以生成一个R对象。）
+
+### Lists and data frames
+
+“Rcpp”提供了对list和data frame的支持，但它们常用来作为输出使用，而非输入。这是因为它们可以有任意的附加属性，当作为输入时，C++需要提前知道这些属性。如果 list 的结构已知且固定，C++可以提取它的元素并使用`as()`将其转换为其他类型。例如：`lm()`生成的结果包含的内容是固定的，可以从结果中抽取对应的元素计算“平均百分比误差”（`mpe()`）。
+
+```{r, engine = "Rcpp"}
+#include <Rcpp.h>
+using namespace Rcpp;
+
+// [[Rcpp::export]]
+double mpe(List mod) {
+  if (!mod.inherits("lm")) stop("Input must be a linear model");
+
+  NumericVector resid = as<NumericVector>(mod["residuals"]);
+  NumericVector fitted = as<NumericVector>(mod["fitted.values"]);
+
+  int n = resid.size();
+  double err = 0;
+  for(int i = 0; i < n; ++i) {
+    err += resid[i] / (fitted[i] + resid[i]);
+  }
+  return err / n;
+}
+```
+
+注意：使用`.inherits()`检查对象类型是否真的是“lm”。
+
+```{r}
+mod <- lm(mpg ~ wt, data = mtcars)
+mpe(mod)
+```
+
+### Functions
+
+C++可以使用`Function`类直接访问R函数，但是因为输出的结果类型不确定，所以我们需要使用`RObject`类。
+
+```{r, engine = "Rcpp"}
+#include <Rcpp.h>
+using namespace Rcpp;
+
+// [[Rcpp::export]]
+RObject callWithOne(Function f) {
+  return f(1);
+}
+```
+
+```{r}
+callWithOne(function(x) x + 1)
+callWithOne(paste)
+```
+
+当函数`f`使用位置索引获取参数时：
+
+```cpp
+f("y", 1);
+```
+
+使用带有名称的参数：
+
+```cpp
+f(_["x"] = "y", _["value"] = 1);
+```
+
+### Attributes
+
+C++可以使用`.attr()`访问R对象的属性。`.names()`可以直接获取name属性。下面是一个示例，注意可以使用类方法`::create()`由C++标量创建R向量。
+
+```{r, engine = "Rcpp"}
+#include <Rcpp.h>
+using namespace Rcpp;
+
+// [[Rcpp::export]]
+NumericVector attribs() {
+  NumericVector out = NumericVector::create(1, 2, 3);
+
+  out.names() = CharacterVector::create("a", "b", "c");
+  out.attr("my-attr") = "my-value";
+  out.attr("class") = "my-class";
+
+  return out;
+}
+```
+
+对于S4对象，可以使用`.slot()`。
+
+### Missing values
+
