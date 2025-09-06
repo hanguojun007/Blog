@@ -37,3 +37,4 @@ website:
         - Books/Advanced R(2e)/22 Debugging.qmd
         - Books/Advanced R(2e)/23 Measuring performance.qmd
         - Books/Advanced R(2e)/24 Improving performance.qmd
+        - Books/Advanced R(2e)/25 Rewriting R code in C++.qmd

@@ -1,7 +1,7 @@
 ---
 title: "25 Rewriting R code in C++"
 date: "2025-08-30"
-date-modified: "2025-08-30"
+date-modified: "2025-09-06"
 
 format:
   html:
@@ -46,7 +46,7 @@ C++可以用来解析下面典型的瓶颈：
 
 -   需要使用R没有提供的高级数据结构和算法的问题。通过标准模板库（STL），C++高效地实现了许多重要的数据结构，从有序映射到双端队列。
 
-本章的目的是仅讨论C++和“Rcpp”的那些绝对必要的方面，以帮助消除代码中的瓶颈。我们不会在面向对象编程或模板等高级功能上花费太多时间，因为重点是编写小型、自包含的函数，而不是大型程序。C++的工作知识是有用的，但不是必不可少的。许多优秀的教程和参考资料可以免费获得，包括http://www.learncpp.com/和https://en.cppreference.com/w/cpp。对于更高级的主题，Scott Meyers的“Effective C++”系列是一个受欢迎的选择。
+本章的目的是仅讨论C++和“Rcpp”的那些绝对必要的方面，以帮助消除代码中的瓶颈。我们不会在面向对象编程或模板等高级功能上花费太多时间，因为重点是编写小型、自包含的函数，而不是大型程序。C++的工作知识是有用的，但不是必不可少的。许多优秀的教程和参考资料可以免费获得，包括 http://www.learncpp.com/ 和 https://en.cppreference.com/w/cpp 。对于更高级的主题，Scott Meyers的“Effective C++”系列是一个受欢迎的选择。
 
 ### Outline
 
@@ -95,13 +95,13 @@ add(1, 2, 3)
 
 让我们以一个非常简单的函数开始——没有任何参数，总是返回整数1：
 
-```r
+``` r
 one <- function() 1L
 ```
 
 等价的C++函数：
 
-```cpp
+``` cpp
 int one() {
   return 1;
 }
@@ -131,7 +131,7 @@ cppFunction(
 
 第二个例子是`sign()`函数的标量版本，接受一个标量输入，当输入为正数时返回1，为0时返回0，为负数时返回-1：
 
-```r
+``` r
 signR <- function(x) {
   if (x > 0) {
     1
@@ -269,7 +269,7 @@ bench::mark(
 
 独立的C++脚本需要加载`.cpp`插件：
 
-```cpp
+``` cpp
 #include <Rcpp.h>
 using namespace Rcpp;
 ```
@@ -278,7 +278,7 @@ using namespace Rcpp;
 
 你也可以在C++注释块中插入R代码，在测试时，会被执行并在R终端输出结果（因为`source(echo = TRUE)`）：
 
-```cpp
+``` cpp
 /*** R
 # This is R code
 */
@@ -288,7 +288,7 @@ using namespace Rcpp;
 
 例如，运行`sourceCpp()`加载下面的脚本，会创建一个名为`meanC`的函数，并加载到当前环境：
 
-```cpp
+``` cpp
 #include <Rcpp.h>
 using namespace Rcpp;
 
@@ -370,13 +370,13 @@ callWithOne(paste)
 
 当函数`f`使用位置索引获取参数时：
 
-```cpp
+``` cpp
 f("y", 1);
 ```
 
 使用带有名称的参数：
 
-```cpp
+``` cpp
 f(_["x"] = "y", _["value"] = 1);
 ```
 
@@ -402,5 +402,547 @@ NumericVector attribs() {
 
 对于S4对象，可以使用`.slot()`。
 
-### Missing values
+## Missing values
 
+如果你想使用缺失值，你需要知道两件事：
+
+-   C++的标量类型如何处理缺失值。
+-   C++的向量类型如何获取和设置缺失值。
+
+::: callout-note
+注意：下面对数据类型的定义，有些是C++原生类型，有些是Rcpp自定义。Rcpp定义的类型可以完美地适配缺失值。
+:::
+
+### Scalars
+
+下面的示例展示了：将R的缺失值转换为C++标量，然后再转回为R向量。这是一种有效的方法，帮助我们弄清楚到底发生了什么。
+
+```{r, engine = "Rcpp"}
+#include <Rcpp.h>
+using namespace Rcpp;
+
+// [[Rcpp::export]]
+List scalar_missings() {
+  int int_s = NA_INTEGER;
+  String chr_s = NA_STRING;
+  bool lgl_s = NA_LOGICAL;
+  double num_s = NA_REAL;
+
+  return List::create(int_s, chr_s, lgl_s, num_s);
+}
+```
+
+```{r}
+str(scalar_missings())
+```
+
+从结果来看，除了`bool`，其他类型的缺失值都正常。实际上，事情并不是如此简单。
+
+#### Integers
+
+在C++中，整数缺失值被储存为最小整数。如果你不对它做任何处理，它会显得很正常。如果你对它做了一些处理，如`NA_INTEGER + 1`，因为C++并不知道最小整数在此处代表缺失值，它会进行计算返回值。
+
+```{r}
+evalCpp("NA_INTEGER + 1")
+```
+
+如果你想应用整数缺失值，可以使用长度为1的`IntegerVector`或仔细控制代码对缺失值的处理。
+
+#### Doubles
+
+对于双精度浮点数，你或许可以不用理会缺失值，直接处理NaN（非数字）。这是因为R语言中的NA是 IEEE 754 浮点数 NaN 的一种特殊类型。因此，任何涉及NaN（在 C++ 中为 NAN）的逻辑表达式的求值结果都始终为 FALSE：
+
+```{r}
+evalCpp("NAN == 1")
+evalCpp("NAN < 1")
+evalCpp("NAN > 1")
+evalCpp("NAN == NAN")
+```
+
+任何数字与NaNcy进行计算都会产生NaN：
+
+```{r}
+evalCpp("NAN + 1")
+evalCpp("NAN - 1")
+evalCpp("NAN / 1")
+evalCpp("NAN * 1")
+```
+
+但是与布尔值计算时要小心：
+
+```{r}
+evalCpp("NAN && TRUE")
+evalCpp("NAN || FALSE")
+```
+
+#### Strings
+
+`String`由“Rcpp”定义，能够正确处理缺失值。
+
+#### Boolean
+
+C++中的`bool`类型只有`true`和`false`，而R语言中的`logical`类型有`TRUE`、`FALSE`和`NA`，你可以使用`int`类型来实现缺失值（`NA_INTEGER`）。如果你要将一个长度为1的R-logical向量转换为C++的`bool`，需要注意缺失值，因为它会被转换为`true`。
+
+### Vectors
+
+对于向量，“Rcpp”有定义好的缺失值类型：`NA_REAL`、`NA_INTEGER`、`NA_STRING`、`NA_LOGICAL`。
+
+```{r, engine = "Rcpp"}
+#include <Rcpp.h>
+using namespace Rcpp;
+
+// [[Rcpp::export]]
+List missing_sampler() {
+  return List::create(
+    NumericVector::create(NA_REAL),
+    IntegerVector::create(NA_INTEGER),
+    LogicalVector::create(NA_LOGICAL),
+    CharacterVector::create(NA_STRING)
+  );
+}
+```
+
+```{r}
+str(missing_sampler())
+```
+
+## Standard Template Library
+
+C++真实的优势体现在它的标准模板库上，当你需要执行复杂算法时，STL提供了一套极其有用的数据结构和算法。本节将解释一些最重要的算法和数据结构，并为指明正确的学习方向，希望这些示例能向你展示STL的强大功能，并说服你相信学习更多知识是有用的。
+
+如果你需要的某个数据结构或算法不在STL中，你可以在[boost](https://www.boost.org/libraries/latest/grid/)中找找。一旦你在电脑上安装了boost，你可以在头文件中写下`#include <boost/test.hpp>`来使用boost中的算法。
+
+### Using iterators
+
+迭代器（iterator）在STL中应用广泛，许多函数接受或返回迭代器。它们时基础for-loop的升级，抽象出底层数据结构的细节。迭代器有三个主要操作符：
+
+-   `*`：返回迭代器指向的元素。
+-   `++`：将迭代器指向下一个元素。
+-   `==`：比较两个迭代器是否指向同一个元素。
+
+例如，我们使用迭代器重写“sum”函数：
+
+``` cpp
+#include <Rcpp.h>
+using namespace Rcpp;
+
+// [[Rcpp::export]]
+double sum3(NumericVector x) {
+  double total = 0;
+
+  NumericVector::iterator it;
+  for(it = x.begin(); it != x.end(); ++it) {
+    total += *it;
+  }
+  return total;
+}
+```
+
+相较于for-loop，迭代器的主要改变有：
+
+-   循环开始于`x.begin()`，结束于`x.end()`。迭代器使用`x.end`储存了循环的末尾值，减少了每次迭代时进行查询末尾值的工作。
+
+-   使用解引符`*`获取迭代器指向的元素。
+
+-   每种数据类型有它自己的迭代器：`NumericVector::iterator`、`IntegerVector::iterator`、`LogicalVector::iterator`、`CharacterVector::iterator`。
+
+上面的代码可以使用C++11的range-based for-loop重写，Rcpp使用`[[Rcpp::plugins(cpp11)]]`激活：
+
+``` cpp
+// [[Rcpp::plugins(cpp11)]]
+#include <Rcpp.h>
+using namespace Rcpp;
+
+// [[Rcpp::export]]
+double sum4(NumericVector xs) {
+  double total = 0;
+
+  for(const auto &x : xs) {
+    total += x;
+  }
+  return total;
+}
+```
+
+迭代器也允许我们使用C++中相当于apply的函数。例如，我们可以使用`accumulate()`函数再次重写`sum()`，该函数接受一个起始迭代器和一个结束迭代器，并将`vector`中的所有值相加。`accumulate()`的第三个参数给出了初始值：它特别重要，因为它决定了`accumulate()`使用的数据类型（使用`0.0`表示`accumulate()`使用的是`double`，使用`0`表示`int`）。要使用`accumulate()`，我们需要在头文件中引入`<Numeric>`。
+
+``` cpp
+#include <numeric>
+#include <Rcpp.h>
+using namespace Rcpp;
+
+// [[Rcpp::export]]
+double sum5(NumericVector x) {
+  return std::accumulate(x.begin(), x.end(), 0.0);
+}
+```
+
+### Algorithms
+
+头文件`<algorithm>`提供了大量于使用迭代器的算法，你可以参考[en.cppreference.com](https://en.cppreference.com/w/cpp/algorithm)。
+
+`findInterval()`函数接受一个向量和一个区间向量，返回一个向量，该向量包含每个元素在区间向量中的索引：
+
+```{r}
+x <- 2:18
+v <- c(5, 10, 15) # create two bins [5,10) and [10,15)
+cbind(x, findInterval(x, v))
+```
+
+下面是Rcpp版的基础实现：
+
+``` cpp
+#include <algorithm>
+#include <Rcpp.h>
+using namespace Rcpp;
+
+// [[Rcpp::export]]
+IntegerVector findInterval2(NumericVector x, NumericVector breaks) {
+  IntegerVector out(x.size());
+
+  NumericVector::iterator it, pos;
+  IntegerVector::iterator out_it;
+
+  for(it = x.begin(), out_it = out.begin(); it != x.end();
+      ++it, ++out_it) {
+    pos = std::upper_bound(breaks.begin(), breaks.end(), *it);
+    *out_it = std::distance(breaks.begin(), pos);
+  }
+
+  return out;
+}
+```
+
+关键点：
+
+-   同时输入两个迭代器，`it`和`out_it`。
+
+-   使用`*out_it`来修改`out`的值。
+
+-   `upper_bound()`返回迭代器`pos`，然后使用`std::distance()`找到它在`breaks`中的索引。
+
+-   tips：R中的`findInterval()`已经是使用C实现的。如果想上面的函数和R中的一样快，我们需要计算一次对`.begin()`和`.end()`的调用，并保存结果。这样做会分散我们的注意力，所以忽略了这个优化。添加这一步骤可以生成比R的`findInterval()`更快的代码，但是代码量更少，大约是R底层的1/10。
+
+一般来说，使用ST 中的算法比使用手动循环更好。在《Effective STL》一书中，Scott Meyers 给出了三个原因：效率、正确性和可维护性。STL中的算法由C++专家编写，非常高效，而且它们已经存在了很长时间，并且经过了充分的测试。使用标准算法还能使代码的意图更加明确，有助于使其更加可读和可维护。
+
+### Data structures
+
+STL提供了大量数据结构：`array`, `bitset`, `list`, `forward_list`, `map`, `multimap`, `multiset`, `priority_queue`, `queue`, `deque`, `set`, `stack`, `unordered_map`, `unordered_set`, `unordered_multimap`, `unordered_multiset`, `vector`. 其中最重要的是：`vector`, `unordered_set`, `unordered_map`。本节我们将重点介绍这三种数据结构，其他数据结构的使用方法相似，只是性能略有不同。你可以参考[en.cppreference.com](https://en.cppreference.com/w/cpp/container)。
+
+Rcpp知道如何将许多STL数据结构转换为R等价物，因此你可以从函数中返回它们，而无需显式转换为R数据结构。
+
+#### Vectors
+
+STL vector 与R中的vector 类似，但它能高效扩容，适合在你不知道输出向量的大小时使用。需要注意的是，vector是模板化的，你需要包含不同元素的向量进行声明：`vector<int>`、`vector<bool>`、`vector<double>`、`vector<String>`。你可以使用`[]`访问元素，使用`.push_back()`追加元素，使用`.reserve()`为向量分配储存空间。
+
+`rle()`函数用来执行游程编码算法，统计**连续相同元素**的个数，返回values和其对应的length：
+
+```{r}
+x <- c(1,1,1,2,2,1,1,3,3,3,3,3,4,4)
+rle(x)
+```
+
+下面是Rcpp版：
+
+``` cpp
+#include <Rcpp.h>
+using namespace Rcpp;
+
+// [[Rcpp::export]]
+List rleC(NumericVector x) {
+  std::vector<int> lengths;
+  std::vector<double> values;
+
+  // Initialise first value
+  int i = 0;
+  double prev = x[0];
+  values.push_back(prev);
+  lengths.push_back(1);
+
+  NumericVector::iterator it;
+  for(it = x.begin() + 1; it != x.end(); ++it) {
+    if (prev == *it) {
+      lengths[i]++;
+    } else {
+      values.push_back(*it);
+      lengths.push_back(1);
+
+      i++;
+      prev = *it;
+    }
+  }
+
+  return List::create(
+    _["lengths"] = lengths,
+    _["values"] = values
+  );
+}
+```
+
+[vector](https://en.cppreference.com/w/cpp/container/vector)中描述了vector的更多方法。
+
+#### Sets
+
+set 包含的元素不能重复，可以有效解决查找重复或唯一元素的问题。C++提供了有序集合（`std::set`）和无序集合（`std::unordered_set`）两种数据结构。无序集合通常运行很快，有时可以使用无序集合+排序的两布走来替代有序集合。同vector一样，set也是模板化的，你需要包含不同元素的set进行声明：`set<int>`、`set<bool>`、`set<double>`、`set<String>`。更多信息你可以参考[set](https://en.cppreference.com/w/cpp/container/set)和[unordered_set](https://en.cppreference.com/w/cpp/container/unordered_set)。
+
+下面是R中`duplicated()`函数的Rcpp实现，注意`seen.insert(x[i]).second.insert()`返回一个pair值，它的`.first`值是一个指向元素的迭代器，`.second`值是一个判断是否新插入集合的布尔值：
+
+``` cpp
+// [[Rcpp::plugins(cpp11)]]
+#include <Rcpp.h>
+#include <unordered_set>
+using namespace Rcpp;
+
+// [[Rcpp::export]]
+LogicalVector duplicatedC(IntegerVector x) {
+  std::unordered_set<int> seen;
+  int n = x.size();
+  LogicalVector out(n);
+
+  for (int i = 0; i < n; ++i) {
+    out[i] = !seen.insert(x[i]).second;
+  }
+
+  return out;
+}
+```
+
+#### Map
+
+map与set类似，但是map不仅可以用来判断元素是否存在，还关联其他数据，它由键值对组成。十分适合R中类似`table()`或`match()`等函数的实现。map也是模板化的，但是由于它同时有键和值，所以需要声明两个类型，例如：`map<int, int>`、`map<bool, int>`、`map<double, int>`、`map<String, int>`。map同样分有序（`std::map`）和无序（`std::unordered_map`）两种。更多信息你可以参考[map](https://en.cppreference.com/w/cpp/container/map)和[unordered_map](https://en.cppreference.com/w/cpp/container/unordered_map)。 ）。
+
+下面是R中`table()`函数的Rcpp实现：
+
+``` cpp
+#include <Rcpp.h>
+using namespace Rcpp;
+
+// [[Rcpp::export]]
+std::map<double, int> tableC(NumericVector x) {
+  std::map<double, int> counts;
+
+  int n = x.size();
+  for (int i = 0; i < n; i++) {
+    counts[x[i]]++;
+  }
+
+  return counts;
+}
+```
+
+## Case studies
+
+下面是一些使用C++替换R中运行缓慢函数的例子。
+
+### Gibbs sampler
+
+示例来源自Dirk Eddelbuettel的[blog](http://dirk.eddelbuettel.com/blog/2011/07/14/)。R和C++的吉布斯采样函数实现类似，但是运行速度相差极大。Dirk在博客中还展示了另一种使速度更快的方法：使用GSL（R可以通过RcppGSL包轻访问）中更快的随机数生成器函数, 可以使速度再提高两到三倍。
+
+R版本：
+
+```{r}
+gibbs_r <- function(N, thin) {
+  mat <- matrix(nrow = N, ncol = 2)
+  x <- y <- 0
+
+  for (i in 1:N) {
+    for (j in 1:thin) {
+      x <- rgamma(1, 3, y * y + 4)
+      y <- rnorm(1, 1 / (x + 1), 1 / sqrt(2 * (x + 1)))
+    }
+    mat[i, ] <- c(x, y)
+  }
+  mat
+}
+```
+
+C++版本：
+
+-   声明所有变量的数据类型。
+-   使用`(`而不是`[`来获取矩阵索引。
+-   将`rgamma()`和`rnorm()`函数的结果由向量转换为标量。
+
+```{r, engine = "Rcpp"}
+#include <Rcpp.h>
+using namespace Rcpp;
+
+// [[Rcpp::export]]
+NumericMatrix gibbs_cpp(int N, int thin) {
+  NumericMatrix mat(N, 2);
+  double x = 0, y = 0;
+
+  for(int i = 0; i < N; i++) {
+    for(int j = 0; j < thin; j++) {
+      x = rgamma(1, 3, 1 / (y * y + 4))[0];
+      y = rnorm(1, 1 / (x + 1), 1 / sqrt(2 * (x + 1)))[0];
+    }
+    mat(i, 0) = x;
+    mat(i, 1) = y;
+  }
+
+  return(mat);
+}
+```
+
+基准测试两个方法：
+
+```{r}
+bench::mark(
+  gibbs_r(100, 10),
+  gibbs_cpp(100, 10),
+  check = FALSE
+)
+```
+
+### R vectorisation versus C++ vectorisation
+
+示例来源子[“Rcpp is smoking fast for agent-based models in data frames”](https://gweissman.github.io/post/rcpp-is-smoking-fast-for-agent-based-models-in-data-frames/)。它的目的是通过三个输入来预测一个模型的输出：
+
+```{r}
+vacc1a <- function(age, female, ily) {
+  p <- 0.25 + 0.3 * 1 / (1 - exp(0.04 * age)) + 0.1 * ily
+  p <- p * if (female) 1.25 else 0.75
+  p <- max(0, p)
+  p <- min(1, p)
+  p
+}
+```
+
+当三个输入是一个向量时，我们需要使用for-loop来处理：
+
+```{r}
+vacc1 <- function(age, female, ily) {
+  n <- length(age)
+  out <- numeric(n)
+  for (i in seq_len(n)) {
+    out[i] <- vacc1a(age[i], female[i], ily[i])
+  }
+  out
+}
+```
+
+结合前面章节，我们可以判定`vacc1()`运行速度会是慢的。有两种方法可以解决：
+
+-   使用R中的向量化函数`ifelse()`、`pmin()`和`pmax()`来代替for-loop。
+
+    ```{r}
+    vacc2 <- function(age, female, ily) {
+      p <- 0.25 + 0.3 * 1 / (1 - exp(0.04 * age)) + 0.1 * ily
+      p <- p * ifelse(female, 1.25, 0.75)
+      p <- pmax(0, p)
+      p <- pmin(1, p)
+      p
+    }
+    ```
+
+-   使用C++重构函数`vacc1a()`和`vacc1()`。
+
+    ```{r, engine = "Rcpp"}
+    #include <Rcpp.h>
+    using namespace Rcpp;
+
+    double vacc3a(double age, bool female, bool ily){
+      double p = 0.25 + 0.3 * 1 / (1 - exp(0.04 * age)) + 0.1 * ily;
+      p = p * (female ? 1.25 : 0.75);
+      p = std::max(p, 0.0);
+      p = std::min(p, 1.0);
+      return p;
+    }
+
+    // [[Rcpp::export]]
+    NumericVector vacc3(NumericVector age, LogicalVector female,
+                        LogicalVector ily) {
+      int n = age.size();
+      NumericVector out(n);
+
+      for(int i = 0; i < n; ++i) {
+        out[i] = vacc3a(age[i], female[i], ily[i]);
+      }
+
+      return out;
+    }
+    ```
+
+生成示例数据并进行基准测试：
+
+```{r}
+n <- 1000
+age <- rnorm(n, mean = 50, sd = 10)
+female <- sample(c(T, F), n, rep = TRUE)
+ily <- sample(c(T, F), n, prob = c(0.8, 0.2), rep = TRUE)
+
+stopifnot(
+  all.equal(vacc1(age, female, ily), vacc2(age, female, ily)),
+  all.equal(vacc1(age, female, ily), vacc3(age, female, ily))
+)
+
+bench::mark(
+  vacc1 = vacc1(age, female, ily),
+  vacc2 = vacc2(age, female, ily),
+  vacc3 = vacc3(age, female, ily)
+)
+```
+
+## Using Rcpp in a package
+
+`sourceCpp()`函数可以将C++脚本嵌入R包中。将C++脚本绑定到R包中有下面三点好处：
+
+-   使用者可以脱离C++开发工具，直接使用C++编写的函数。
+
+-   R包构建系统自动处理多个源文件及其依赖关系。
+
+-   软件包为测试、文档和一致性提供了额外的基础工具。
+
+在R包中使用`Rcpp`函数，你需要：
+
+-   在`scr/`目录下放置C++源文件。
+
+-   在`DESCRIPTION`文件中添加：
+
+    ```
+    LinkingTo: Rcpp
+    Imports: Rcpp
+    ```
+
+-   在`NAMESPACE`文件中添加：
+
+    ```
+    useDynLib(mypackage)
+    importFrom(Rcpp, sourceCpp)
+    ```
+
+    我们需要从Rcpp导入一些东西（任何东西）, 以便内部Rcpp代码能够正确加载。这是R中的一个bug（不确定现在是否修复）。
+
+可以使用`usethis::use_rcpp()`来快捷地添加这些内容。
+
+在构建R包时，你需要先运行`Rcpp::compileAttributes()`。该函数扫描C++脚本中有`Rcpp::export`属性的函数，并生成使函数在R中可用所需的代码。每当添加、删除或更改函数签名时，都会重新运行`compileAttributes()`。这是由devtools包和Rstudio自动完成的。
+
+更多细节可以参考`vignette("Rcpp-package")`。
+
+## Learning more
+
+本章只涉及了Rcpp的一小部分，提供了使用C++重写性能不佳的R代码的基本工具。如前所述，Rcpp还有许多其他功能，使得将R与现有C++代码接口变得容易，包括：
+
+-   属性的其他功能包括指定默认参数、链接外部C++依赖项以及从包导出C++接口。这些功能及更多内容将在`vinette("Rcpp-attributes")`中介绍。
+
+-   自动创建C++数据结构和R数据结构之间的包装，包括将C++类映射到引用类。对这个主题的一个很好的介绍是`vienette("Rcpp-modules")`。
+
+-   Rcpp快速参考指南`vignette("Rcpp-quickref")`包含了Rcpp类和常见编程习语的有用总结。
+
+可以关注一下[Rcpp homepage](https://www.rcpp.org/)或登录[Rcpp mailing list](http://lists.r-forge.r-project.org/cgi-bin/mailman/listinfo/rcpp-devel)以获取更多信息。
+
+下面是一些对学习C++很有帮助的资源：
+
+-   Effective C++、Effective STL。
+
+-   [C++ Annotations](http://www.icce.rug.nl/documents/cplusplus/cplusplus.html)
+
+-   [Algorithm Libraries](http://www.cs.helsinki.fi/u/tpkarkka/alglib/k06/)
+
+编写高性能代码也可能需要你重新思考你的基本方法，对基本数据结构和算法的扎实理解非常有帮助。你可以参考：
+
+-   Algorithm Design Manual
+
+-   MIT的[Introduction to Algorithms](http://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-046j-introduction-to-algorithms-sma-5503-fall-2005/)
+
+-   Algorithms 4th Edition，[textbook](https://algs4.cs.princeton.edu/home/)。

@@ -1,0 +1,1692 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.40">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<meta name="dcterms.date" content="2025-08-30">
+<title>25 Rewriting R code in C++</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../Books/Advanced R(2e)/24 Improving performance.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-e6e594f9697a8fc74d922f689f62e840.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light"><script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": true,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "Search",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script><link rel="stylesheet" href="../../styles.css">
+</head>
+<body class="nav-sidebar floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top"><nav class="navbar navbar-expand-lg " data-bs-theme="dark"><div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">RSSPtho</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+<li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-books" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Books</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-books">
+<li>
+    <a class="dropdown-item" href="../../Books/ggplot2/index.html">
+ <span class="dropdown-text">ggplot2</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Books/R4DS2/index.html">
+ <span class="dropdown-text">R for Data Science(2e)</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Books/Tidy Modeling with R/index.html">
+ <span class="dropdown-text">Tidy Modeling with R</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Books/Advanced R(2e)/index.html">
+ <span class="dropdown-text">Advanced R(2e)</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Books/quarto/Project Basics.html">
+ <span class="dropdown-text">Quarto</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Books/Js4R/00 Preface.html">
+ <span class="dropdown-text">Js4R</span></a>
+  </li>  
+    </ul>
+</li>
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About me</span></a>
+  </li>  
+</ul>
+<div class="quarto-navbar-tools">
+    <a href="https://github.com/hanguojun007" title="" class="quarto-navigation-tool px-1" aria-label=""><i class="bi bi-github"></i></a>
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav><nav class="quarto-secondary-nav"><div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../Books/Advanced R(2e)/25 Rewriting R code in C++.html">25 Rewriting R code in C++</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav></header><!-- content --><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto"><div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">index</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/1 Introduction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1 Introduction</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+ <span class="menu-text">Foundations</span>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/Foundations Introduction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Introduction</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/2 Names and values.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2 Names and values</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/3 Vectors.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">3 Vectors</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/4 Subsetting.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">4 Subsetting</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/5 Control flow.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">5 Control flow</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/6 Functions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">6 Functions</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/7 Environments.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">7 Environments</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/8 Conditions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">8 Conditions</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+ <span class="menu-text">Functional programming</span>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/Functional programming.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Introduction</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/9 Functionals.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">9 Functionals</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/10 Function factories.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">10 Function factories</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/11 Function operators.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">11 Function operators</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+ <span class="menu-text">Object-oriented Programming</span>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/Object-oriented Programming.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Introduction</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/12 Base types.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">12 Base types</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/13 S3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">13 S3</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/14 R6.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">14 R6</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/15 S4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">15 S4</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/16 Trade-offs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">16 Trade-offs</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+ <span class="menu-text">Metaprogramming</span>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/Metaprogramming Introduction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Introduction</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/17 Big picture.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">17 Big picture</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/18 Expressions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">18 Expressions</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/19 Quasiquotation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">19 Quasiquotation</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/20 Evaluation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">20 Evaluation</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/21 Translating R code.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">21 Translating R code</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/Techniques Introduction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Introduction</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/22 Debugging.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">22 Debugging</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/23 Measuring performance.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">23 Measuring performance</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/24 Improving performance.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">24 Improving performance</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Advanced R(2e)/25 Rewriting R code in C++.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">25 Rewriting R code in C++</span></a>
+  </div>
+</li>
+    </ul>
+</div>
+</nav><div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active"><h2 id="toc-title">On this page</h2>
+   
+  <ul>
+<li>
+<a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a>
+  <ul class="collapse">
+<li><a href="#outline" id="toc-outline" class="nav-link" data-scroll-target="#outline">Outline</a></li>
+  <li><a href="#prerequisites" id="toc-prerequisites" class="nav-link" data-scroll-target="#prerequisites">Prerequisites</a></li>
+  </ul>
+</li>
+  <li>
+<a href="#getting-started-with-c" id="toc-getting-started-with-c" class="nav-link" data-scroll-target="#getting-started-with-c">Getting started with C++</a>
+  <ul class="collapse">
+<li><a href="#no-inputs-scalar-output" id="toc-no-inputs-scalar-output" class="nav-link" data-scroll-target="#no-inputs-scalar-output">No inputs, scalar output</a></li>
+  <li><a href="#scalar-input-scalar-output" id="toc-scalar-input-scalar-output" class="nav-link" data-scroll-target="#scalar-input-scalar-output">Scalar input, scalar output</a></li>
+  <li><a href="#vector-input-scalar-output" id="toc-vector-input-scalar-output" class="nav-link" data-scroll-target="#vector-input-scalar-output">Vector input, scalar output</a></li>
+  <li><a href="#vector-input-vector-output" id="toc-vector-input-vector-output" class="nav-link" data-scroll-target="#vector-input-vector-output">Vector input, vector output</a></li>
+  <li><a href="#using-sourcecpp" id="toc-using-sourcecpp" class="nav-link" data-scroll-target="#using-sourcecpp">Using sourceCpp</a></li>
+  </ul>
+</li>
+  <li>
+<a href="#other-classes" id="toc-other-classes" class="nav-link" data-scroll-target="#other-classes">Other classes</a>
+  <ul class="collapse">
+<li><a href="#lists-and-data-frames" id="toc-lists-and-data-frames" class="nav-link" data-scroll-target="#lists-and-data-frames">Lists and data frames</a></li>
+  <li><a href="#functions" id="toc-functions" class="nav-link" data-scroll-target="#functions">Functions</a></li>
+  <li><a href="#attributes" id="toc-attributes" class="nav-link" data-scroll-target="#attributes">Attributes</a></li>
+  </ul>
+</li>
+  <li>
+<a href="#missing-values" id="toc-missing-values" class="nav-link" data-scroll-target="#missing-values">Missing values</a>
+  <ul class="collapse">
+<li><a href="#scalars" id="toc-scalars" class="nav-link" data-scroll-target="#scalars">Scalars</a></li>
+  <li><a href="#vectors" id="toc-vectors" class="nav-link" data-scroll-target="#vectors">Vectors</a></li>
+  </ul>
+</li>
+  <li>
+<a href="#standard-template-library" id="toc-standard-template-library" class="nav-link" data-scroll-target="#standard-template-library">Standard Template Library</a>
+  <ul class="collapse">
+<li><a href="#using-iterators" id="toc-using-iterators" class="nav-link" data-scroll-target="#using-iterators">Using iterators</a></li>
+  <li><a href="#algorithms" id="toc-algorithms" class="nav-link" data-scroll-target="#algorithms">Algorithms</a></li>
+  <li><a href="#data-structures" id="toc-data-structures" class="nav-link" data-scroll-target="#data-structures">Data structures</a></li>
+  </ul>
+</li>
+  <li>
+<a href="#case-studies" id="toc-case-studies" class="nav-link" data-scroll-target="#case-studies">Case studies</a>
+  <ul class="collapse">
+<li><a href="#gibbs-sampler" id="toc-gibbs-sampler" class="nav-link" data-scroll-target="#gibbs-sampler">Gibbs sampler</a></li>
+  <li><a href="#r-vectorisation-versus-c-vectorisation" id="toc-r-vectorisation-versus-c-vectorisation" class="nav-link" data-scroll-target="#r-vectorisation-versus-c-vectorisation">R vectorisation versus C++ vectorisation</a></li>
+  </ul>
+</li>
+  <li><a href="#using-rcpp-in-a-package" id="toc-using-rcpp-in-a-package" class="nav-link" data-scroll-target="#using-rcpp-in-a-package">Using Rcpp in a package</a></li>
+  <li><a href="#learning-more" id="toc-learning-more" class="nav-link" data-scroll-target="#learning-more">Learning more</a></li>
+  </ul></nav>
+    <div class="quarto-margin-footer"><div class="margin-footer-item">
+<p><img src="../..\logo.jpg" class="conditional-footer img-fluid" width="200"></p>
+</div></div></div>
+<!-- main -->
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
+<h1 class="title">25 Rewriting R code in C++</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">August 30, 2025</p>
+    </div>
+  </div>
+  
+    <div>
+    <div class="quarto-title-meta-heading">Modified</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date-modified">September 6, 2025</p>
+    </div>
+  </div>
+    
+  </div>
+  
+
+
+</header><section id="introduction" class="level2"><h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>有时，即便你找出来代码的运行瓶颈，同时做了所有可以在R中做的优化，运行依然很慢。这仅仅是因为R本身就是慢（🤦‍）。本章介绍如何使用“Rcpp”包实现用C++重写关键函数来提升性能。</p>
+<p>“Rcpp”包提供了干净可及的API来实现C++与R之间的链接，同时隔离R本身的复杂的C的API。虽然它也可以用来些C或Fortran代码，但相较C++稍显痛苦。</p>
+<p>C++可以用来解析下面典型的瓶颈：</p>
+<ul>
+<li><p>无法轻易向量化的循环，因为后续迭代依赖于先前的迭代。</p></li>
+<li><p>递归函数，或者涉及调用函数数百万次的问题。在C++中调用函数的开销比在R中低得多。</p></li>
+<li><p>需要使用R没有提供的高级数据结构和算法的问题。通过标准模板库（STL），C++高效地实现了许多重要的数据结构，从有序映射到双端队列。</p></li>
+</ul>
+<p>本章的目的是仅讨论C++和“Rcpp”的那些绝对必要的方面，以帮助消除代码中的瓶颈。我们不会在面向对象编程或模板等高级功能上花费太多时间，因为重点是编写小型、自包含的函数，而不是大型程序。C++的工作知识是有用的，但不是必不可少的。许多优秀的教程和参考资料可以免费获得，包括 http://www.learncpp.com/ 和 https://en.cppreference.com/w/cpp 。对于更高级的主题，Scott Meyers的“Effective C++”系列是一个受欢迎的选择。</p>
+<section id="outline" class="level3"><h3 class="anchored" data-anchor-id="outline">Outline</h3>
+<ul>
+<li>25.2节：介绍如何将简单的R函数转换为等价的C++函数，并以此介绍C++与R的不同之处。</li>
+<li>25.2.5小节：介绍如何使用<code><a href="https://rdrr.io/pkg/Rcpp/man/sourceCpp.html">sourceCpp()</a></code>函数加载C++代码。</li>
+<li>25.3节：介绍如何修改“Rcpp”中的属性，和一些其他重要的类。</li>
+<li>25.4节：介绍如何在C++中处理R的缺失值。</li>
+<li>25.5节：介绍如何使用标准模板库中的一些重要数据结构和算法。</li>
+<li>25.6节：介绍两个使用“Rcpp”极大提升性能的例子。</li>
+<li>25.7节：介绍如何将C++代码添加到R包中。</li>
+<li>25.8节：介绍更多有关“Rcpp”的资源。</li>
+</ul></section><section id="prerequisites" class="level3"><h3 class="anchored" data-anchor-id="prerequisites">Prerequisites</h3>
+<div class="cell">
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://www.rcpp.org">Rcpp</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>我们需要一个C++的编译环境：</p>
+<ul>
+<li>Windows：安装<a href="http://cran.r-project.org/bin/windows/Rtools/">Rtools</a>。</li>
+<li>Mac：安装Xcode。</li>
+<li>Linux：<code>sudo apt-get install r-base-dev</code>
+</li>
+</ul></section></section><section id="getting-started-with-c" class="level2"><h2 class="anchored" data-anchor-id="getting-started-with-c">Getting started with C++</h2>
+<p><code><a href="https://rdrr.io/pkg/Rcpp/man/cppFunction.html">cppFunction()</a></code>允许直接在R中编写C++代码：</p>
+<div class="cell">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/Rcpp/man/cppFunction.html">cppFunction</a></span><span class="op">(</span></span>
+<span>  <span class="st">"</span></span>
+<span><span class="st">  int add(int x, int y, int z) {</span></span>
+<span><span class="st">    int sum = x + y + z;</span></span>
+<span><span class="st">    return sum;</span></span>
+<span><span class="st">  }</span></span>
+<span><span class="st">  "</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co"># add works like a regular R function</span></span>
+<span><span class="va">add</span></span>
+<span><span class="co">#&gt; function (x, y, z) </span></span>
+<span><span class="co">#&gt; .Call(&lt;pointer: 0x00007ffc68b115f0&gt;, x, y, z)</span></span>
+<span><span class="fu">add</span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">3</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 6</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>运行这段代码时，“Rcpp”会编译C++代码，并将R函数<code>add</code>与C++函数<code>add</code>关联起来。关联过程的大量底层细节被“Rcpp”自行处理了。下面我们以不同的例子，由浅入深地介绍C++的语法。</p>
+<section id="no-inputs-scalar-output" class="level3"><h3 class="anchored" data-anchor-id="no-inputs-scalar-output">No inputs, scalar output</h3>
+<p>让我们以一个非常简单的函数开始——没有任何参数，总是返回整数1：</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">one</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="fl">1L</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>等价的C++函数：</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="dt">int</span> one<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>使用<code><a href="https://rdrr.io/pkg/Rcpp/man/cppFunction.html">cppFunction()</a></code>实现在R中使用这个C++函数：</p>
+<div class="cell">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/Rcpp/man/cppFunction.html">cppFunction</a></span><span class="op">(</span></span>
+<span>  <span class="st">"</span></span>
+<span><span class="st">  int one() {</span></span>
+<span><span class="st">    return 1;</span></span>
+<span><span class="st">  }</span></span>
+<span><span class="st">  "</span></span>
+<span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>上面的示例展示了R与C++之间的一些主要区别：</p>
+<ul>
+<li>创建函数的语法与调用函数的语法类似；不像在R中那样使用赋值来创建函数。</li>
+<li>必须声明函数返回结果的类型。</li>
+<li>标量（scalar）与向量（vector）不同。R中的数字、整数、字符、逻辑向量的对应符号是：<code>NumericVector</code>、<code>IntegerVector</code>、<code>CharacterVector</code>、<code>LogicalVector</code>。标量的对应符号是：<code>double</code>、<code>int</code>、<code>String</code>、<code>bool</code>。</li>
+<li>必须有清晰的<code>return</code>声明来返回值。</li>
+<li>每个声明必须以分号<code>;</code>结束。</li>
+</ul></section><section id="scalar-input-scalar-output" class="level3"><h3 class="anchored" data-anchor-id="scalar-input-scalar-output">Scalar input, scalar output</h3>
+<p>第二个例子是<code><a href="https://rdrr.io/r/base/sign.html">sign()</a></code>函数的标量版本，接受一个标量输入，当输入为正数时返回1，为0时返回0，为负数时返回-1：</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">signR</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="va">x</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="fl">1</span></span>
+<span>  <span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="va">x</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="fl">0</span></span>
+<span>  <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
+<span>    <span class="op">-</span><span class="fl">1</span></span>
+<span>  <span class="op">}</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/Rcpp/man/cppFunction.html">cppFunction</a></span><span class="op">(</span></span>
+<span>  <span class="st">"</span></span>
+<span><span class="st">  int signC(int x) {</span></span>
+<span><span class="st">    if (x &gt; 0) {</span></span>
+<span><span class="st">      return 1;</span></span>
+<span><span class="st">    } else if (x == 0) {</span></span>
+<span><span class="st">      return 0;</span></span>
+<span><span class="st">    } else {</span></span>
+<span><span class="st">      return -1;</span></span>
+<span><span class="st">    }</span></span>
+<span><span class="st">  }</span></span>
+<span><span class="st"> "</span></span>
+<span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>C++版的函数中：</p>
+<ul>
+<li>函数的输入与输出一样，也需要声明类型。</li>
+<li>
+<code>if</code>语句的语法一样，退出可以使用<code><a href="https://rdrr.io/r/base/Control.html">break</a></code>，但是跳过需要使用<code>continue</code>而非<code><a href="https://rdrr.io/r/base/Control.html">next</a></code> 。</li>
+</ul></section><section id="vector-input-scalar-output" class="level3"><h3 class="anchored" data-anchor-id="vector-input-scalar-output">Vector input, scalar output</h3>
+<p>R与C++有一个显著的不同是在for循环的资源消耗上，C++更低。例如，在for循环中执行<code>sum</code>函数：</p>
+<p>R版本：</p>
+<div class="cell">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">sumR</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">total</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
+<span>  <span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq_along</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">total</span> <span class="op">&lt;-</span> <span class="va">total</span> <span class="op">+</span> <span class="va">x</span><span class="op">[</span><span class="va">i</span><span class="op">]</span></span>
+<span>  <span class="op">}</span></span>
+<span>  <span class="va">total</span></span>
+<span><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>C++版本：</p>
+<div class="cell">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/Rcpp/man/cppFunction.html">cppFunction</a></span><span class="op">(</span></span>
+<span>  <span class="st">"</span></span>
+<span><span class="st">  double sumC(NumericVector x) {</span></span>
+<span><span class="st">    int n = x.size();</span></span>
+<span><span class="st">    double total = 0;</span></span>
+<span><span class="st">    for(int i = 0; i &lt; n; ++i) {</span></span>
+<span><span class="st">      total += x[i];</span></span>
+<span><span class="st">    }</span></span>
+<span><span class="st">    return total;</span></span>
+<span><span class="st">  }</span></span>
+<span><span class="st">  "</span></span>
+<span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>C++版与R版本在结构上很相似，但：</p>
+<ul>
+<li><p>获取向量长度，C++通过<code>.size()</code>方法完成。C++通过<code>.</code>来调用方法。</p></li>
+<li><p><code>for</code>的声明语法不一样：<code>for(init; check; increment)</code>。额外设置变量<code>i</code>，判断<code>i</code>与<code>n</code>的比较。</p></li>
+<li><p>C++中位置索引的起始是0。</p></li>
+<li><p>使用<code>=</code>赋值，而不是<code>&lt;-</code>。</p></li>
+<li><p>C++提供原位修改运算符：<code>total += x[i]</code>。除此还有<code>-=</code>、<code>*=</code>、<code>/=</code>。</p></li>
+</ul>
+<div class="cell">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="fl">1e3</span><span class="op">)</span></span>
+<span><span class="fu">bench</span><span class="fu">::</span><span class="fu"><a href="https://bench.r-lib.org/reference/mark.html">mark</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>,</span>
+<span>  <span class="fu">sumC</span><span class="op">(</span><span class="va">x</span><span class="op">)</span>,</span>
+<span>  <span class="fu">sumR</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">]</span></span>
+<span><span class="co">#&gt; # A tibble: 3 × 6</span></span>
+<span><span class="co">#&gt;   expression      min   median `itr/sec` mem_alloc `gc/sec`</span></span>
+<span><span class="co">#&gt;   &lt;bch:expr&gt; &lt;bch:tm&gt; &lt;bch:tm&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 sum(x)        700ns    800ns  1145751.        0B        0</span></span>
+<span><span class="co">#&gt; 2 sumC(x)       1.6µs    1.7µs   531629.        0B        0</span></span>
+<span><span class="co">#&gt; 3 sumR(x)      21.8µs   22.1µs    42750.      18KB        0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section><section id="vector-input-vector-output" class="level3"><h3 class="anchored" data-anchor-id="vector-input-vector-output">Vector input, vector output</h3>
+<p>下面我们创建一个计算单个值与向量的欧几里得距离：</p>
+<p>R版本：</p>
+<div class="cell">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">pdistR</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">ys</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">sqrt</a></span><span class="op">(</span><span class="op">(</span><span class="va">x</span> <span class="op">-</span> <span class="va">ys</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>在R中，我们没有在函数中定义<code>x</code>是标量，而是在文档中明确说明这一点。在C++版本中，则必须明确说明类型：</p>
+<div class="cell">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/Rcpp/man/cppFunction.html">cppFunction</a></span><span class="op">(</span></span>
+<span>  <span class="st">"</span></span>
+<span><span class="st">  NumericVector pdistC(double x, NumericVector ys) {</span></span>
+<span><span class="st">    int n = ys.size();</span></span>
+<span><span class="st">    NumericVector out(n);</span></span>
+<span><span class="st"></span></span>
+<span><span class="st">    for(int i = 0; i &lt; n; ++i) {</span></span>
+<span><span class="st">      out[i] = sqrt(pow(ys[i] - x, 2.0));</span></span>
+<span><span class="st">    }</span></span>
+<span><span class="st"></span></span>
+<span><span class="st">    return out;</span></span>
+<span><span class="st">  }</span></span>
+<span><span class="st">  "</span></span>
+<span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>这个C++函数引入了一些新概念：</p>
+<ul>
+<li><p>创建一个长度为<code>n</code>的数字向量需要构造器：<code>NumericVector out(n)</code>。拷贝一个需要：<code>NumericVector zs = clone(ys)</code>。</p></li>
+<li><p>使用<code>pow()</code>而非<code>^</code>计算幂。</p></li>
+</ul>
+<div class="cell">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="fl">1e6</span><span class="op">)</span></span>
+<span><span class="fu">bench</span><span class="fu">::</span><span class="fu"><a href="https://bench.r-lib.org/reference/mark.html">mark</a></span><span class="op">(</span></span>
+<span>  <span class="fu">pdistR</span><span class="op">(</span><span class="fl">0.5</span>, <span class="va">y</span><span class="op">)</span>,</span>
+<span>  <span class="fu">pdistC</span><span class="op">(</span><span class="fl">0.5</span>, <span class="va">y</span><span class="op">)</span></span>
+<span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">]</span></span>
+<span><span class="co">#&gt; # A tibble: 2 × 6</span></span>
+<span><span class="co">#&gt;   expression          min   median `itr/sec` mem_alloc `gc/sec`</span></span>
+<span><span class="co">#&gt;   &lt;bch:expr&gt;     &lt;bch:tm&gt; &lt;bch:tm&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 pdistR(0.5, y)   5.88ms   6.29ms      156.    7.63MB     81.6</span></span>
+<span><span class="co">#&gt; 2 pdistC(0.5, y)   3.39ms   3.89ms      245.    7.63MB    122.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>上面的结果显示，C++并没有比R快多少，节约的时间与开发C++函数的时间相比不值一提。而且C++运行快速的真正原因是它只是用了零时标量<code>ys[i] -x</code>，而R使用了临时向量<code>x - ys</code>，额外分配的内存会占用大量时间。</p>
+</section><section id="using-sourcecpp" class="level3"><h3 class="anchored" data-anchor-id="using-sourcecpp">Using sourceCpp</h3>
+<p>在实际开发中，我们往往需要使用<code><a href="https://rdrr.io/pkg/Rcpp/man/sourceCpp.html">sourceCpp()</a></code>来单独加载C++脚本。在使用支持C++的IDE编写脚本可以提供语法高亮，自动补齐，语法检查等功能。</p>
+<p>独立的C++脚本需要加载<code>.cpp</code>插件：</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;Rcpp.h&gt;</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> Rcpp<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>同时每个函数前需要声明<code>// [[Rcpp::export]]</code>才可以被R调用。</p>
+<p>你也可以在C++注释块中插入R代码，在测试时，会被执行并在R终端输出结果（因为<code>source(echo = TRUE)</code>）：</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co">/*** R</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="co"># This is R code</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co">*/</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>运行<code>sourceCpp("path/to/file.cpp")</code>会创建对应的R函数，并加载到当前环境。需要注意：这些函数无法被保存在<code>.Rdata</code>文件中，每次启动R都需要重新创建。</p>
+<p>例如，运行<code><a href="https://rdrr.io/pkg/Rcpp/man/sourceCpp.html">sourceCpp()</a></code>加载下面的脚本，会创建一个名为<code>meanC</code>的函数，并加载到当前环境：</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;Rcpp.h&gt;</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> Rcpp<span class="op">;</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> meanC<span class="op">(</span>NumericVector x<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> n <span class="op">=</span> x<span class="op">.</span>size<span class="op">();</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> total <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span><span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> n<span class="op">;</span> <span class="op">++</span>i<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>    total <span class="op">+=</span> x<span class="op">[</span>i<span class="op">];</span></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> total <span class="op">/</span> n<span class="op">;</span></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a><span class="co">/*** R</span></span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a><span class="co">x &lt;- runif(1e5)</span></span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a><span class="co">bench::mark(</span></span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a><span class="co">  mean(x),</span></span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a><span class="co">  meanC(x)</span></span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a><span class="co">)</span></span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a><span class="co">*/</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>在Rmarkdown中，可以设置<code>{r, engine = "Rcpp"}</code>进行编译，所以后续的C++函数定义都单独放在一个代码块中，此时不能添加注释了哦。</p>
+</section></section><section id="other-classes" class="level2"><h2 class="anchored" data-anchor-id="other-classes">Other classes</h2>
+<p>前面介绍了“Rcpp”支持的基础向量类型：<code>NumericVector</code>、<code>IntegerVector</code>、<code>CharacterVector</code>、<code>LogicalVector</code>，基础标量类型：<code>double</code>、<code>int</code>、<code>String</code>、<code>bool</code>。“Rcpp”也支持其他数据类型，重要的如，list，dataframe，function，attribute。同时它也对很多类提供支持如，<code>Environment</code>，<code>DottedPair</code>，<code>Language</code>，<code>Symbol</code>等，但超出了本书的范围。（所谓的“支持”就是说，C++代码可以访问R对象，也可以生成一个R对象。）</p>
+<section id="lists-and-data-frames" class="level3"><h3 class="anchored" data-anchor-id="lists-and-data-frames">Lists and data frames</h3>
+<p>“Rcpp”提供了对list和data frame的支持，但它们常用来作为输出使用，而非输入。这是因为它们可以有任意的附加属性，当作为输入时，C++需要提前知道这些属性。如果 list 的结构已知且固定，C++可以提取它的元素并使用<code>as()</code>将其转换为其他类型。例如：<code><a href="https://rdrr.io/r/stats/lm.html">lm()</a></code>生成的结果包含的内容是固定的，可以从结果中抽取对应的元素计算“平均百分比误差”（<code>mpe()</code>）。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;Rcpp.h&gt;</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> Rcpp<span class="op">;</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> mpe<span class="op">(</span>List mod<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="op">(!</span>mod<span class="op">.</span>inherits<span class="op">(</span><span class="st">"lm"</span><span class="op">))</span> stop<span class="op">(</span><span class="st">"Input must be a linear model"</span><span class="op">);</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  NumericVector resid <span class="op">=</span> as<span class="op">&lt;</span>NumericVector<span class="op">&gt;(</span>mod<span class="op">[</span><span class="st">"residuals"</span><span class="op">]);</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>  NumericVector fitted <span class="op">=</span> as<span class="op">&lt;</span>NumericVector<span class="op">&gt;(</span>mod<span class="op">[</span><span class="st">"fitted.values"</span><span class="op">]);</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> n <span class="op">=</span> resid<span class="op">.</span>size<span class="op">();</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> err <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span><span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> n<span class="op">;</span> <span class="op">++</span>i<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>    err <span class="op">+=</span> resid<span class="op">[</span>i<span class="op">]</span> <span class="op">/</span> <span class="op">(</span>fitted<span class="op">[</span>i<span class="op">]</span> <span class="op">+</span> resid<span class="op">[</span>i<span class="op">]);</span></span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> err <span class="op">/</span> n<span class="op">;</span></span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>注意：使用<code>.inherits()</code>检查对象类型是否真的是“lm”。</p>
+<div class="cell">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">mod</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="va">wt</span>, data <span class="op">=</span> <span class="va">mtcars</span><span class="op">)</span></span>
+<span><span class="fu">mpe</span><span class="op">(</span><span class="va">mod</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] -0.01541615</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section><section id="functions" class="level3"><h3 class="anchored" data-anchor-id="functions">Functions</h3>
+<p>C++可以使用<code>Function</code>类直接访问R函数，但是因为输出的结果类型不确定，所以我们需要使用<code>RObject</code>类。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;Rcpp.h&gt;</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> Rcpp<span class="op">;</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>RObject callWithOne<span class="op">(</span>Function f<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> f<span class="op">(</span><span class="dv">1</span><span class="op">);</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">callWithOne</span><span class="op">(</span><span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="va">x</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 2</span></span>
+<span><span class="fu">callWithOne</span><span class="op">(</span><span class="va">paste</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "1"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>当函数<code>f</code>使用位置索引获取参数时：</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>f<span class="op">(</span><span class="st">"y"</span><span class="op">,</span> <span class="dv">1</span><span class="op">);</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>使用带有名称的参数：</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>f<span class="op">(</span>_<span class="op">[</span><span class="st">"x"</span><span class="op">]</span> <span class="op">=</span> <span class="st">"y"</span><span class="op">,</span> _<span class="op">[</span><span class="st">"value"</span><span class="op">]</span> <span class="op">=</span> <span class="dv">1</span><span class="op">);</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section><section id="attributes" class="level3"><h3 class="anchored" data-anchor-id="attributes">Attributes</h3>
+<p>C++可以使用<code>.attr()</code>访问R对象的属性。<code>.names()</code>可以直接获取name属性。下面是一个示例，注意可以使用类方法<code>::create()</code>由C++标量创建R向量。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;Rcpp.h&gt;</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> Rcpp<span class="op">;</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>NumericVector attribs<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  NumericVector out <span class="op">=</span> NumericVector<span class="op">::</span>create<span class="op">(</span><span class="dv">1</span><span class="op">,</span> <span class="dv">2</span><span class="op">,</span> <span class="dv">3</span><span class="op">);</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>  out<span class="op">.</span>names<span class="op">()</span> <span class="op">=</span> CharacterVector<span class="op">::</span>create<span class="op">(</span><span class="st">"a"</span><span class="op">,</span> <span class="st">"b"</span><span class="op">,</span> <span class="st">"c"</span><span class="op">);</span></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>  out<span class="op">.</span>attr<span class="op">(</span><span class="st">"my-attr"</span><span class="op">)</span> <span class="op">=</span> <span class="st">"my-value"</span><span class="op">;</span></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>  out<span class="op">.</span>attr<span class="op">(</span><span class="st">"class"</span><span class="op">)</span> <span class="op">=</span> <span class="st">"my-class"</span><span class="op">;</span></span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> out<span class="op">;</span></span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>对于S4对象，可以使用<code>.slot()</code>。</p>
+</section></section><section id="missing-values" class="level2"><h2 class="anchored" data-anchor-id="missing-values">Missing values</h2>
+<p>如果你想使用缺失值，你需要知道两件事：</p>
+<ul>
+<li>C++的标量类型如何处理缺失值。</li>
+<li>C++的向量类型如何获取和设置缺失值。</li>
+</ul>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>注意：下面对数据类型的定义，有些是C++原生类型，有些是Rcpp自定义。Rcpp定义的类型可以完美地适配缺失值。</p>
+</div>
+</div>
+<section id="scalars" class="level3"><h3 class="anchored" data-anchor-id="scalars">Scalars</h3>
+<p>下面的示例展示了：将R的缺失值转换为C++标量，然后再转回为R向量。这是一种有效的方法，帮助我们弄清楚到底发生了什么。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;Rcpp.h&gt;</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> Rcpp<span class="op">;</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>List scalar_missings<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> int_s <span class="op">=</span> NA_INTEGER<span class="op">;</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>  String chr_s <span class="op">=</span> NA_STRING<span class="op">;</span></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>  <span class="dt">bool</span> lgl_s <span class="op">=</span> NA_LOGICAL<span class="op">;</span></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> num_s <span class="op">=</span> NA_REAL<span class="op">;</span></span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> List<span class="op">::</span>create<span class="op">(</span>int_s<span class="op">,</span> chr_s<span class="op">,</span> lgl_s<span class="op">,</span> num_s<span class="op">);</span></span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html">str</a></span><span class="op">(</span><span class="fu">scalar_missings</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; List of 4</span></span>
+<span><span class="co">#&gt;  $ : int NA</span></span>
+<span><span class="co">#&gt;  $ : chr NA</span></span>
+<span><span class="co">#&gt;  $ : logi TRUE</span></span>
+<span><span class="co">#&gt;  $ : num NA</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>从结果来看，除了<code>bool</code>，其他类型的缺失值都正常。实际上，事情并不是如此简单。</p>
+<section id="integers" class="level4"><h4 class="anchored" data-anchor-id="integers">Integers</h4>
+<p>在C++中，整数缺失值被储存为最小整数。如果你不对它做任何处理，它会显得很正常。如果你对它做了一些处理，如<code>NA_INTEGER + 1</code>，因为C++并不知道最小整数在此处代表缺失值，它会进行计算返回值。</p>
+<div class="cell">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/Rcpp/man/evalCpp.html">evalCpp</a></span><span class="op">(</span><span class="st">"NA_INTEGER + 1"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] -2147483647</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>如果你想应用整数缺失值，可以使用长度为1的<code>IntegerVector</code>或仔细控制代码对缺失值的处理。</p>
+</section><section id="doubles" class="level4"><h4 class="anchored" data-anchor-id="doubles">Doubles</h4>
+<p>对于双精度浮点数，你或许可以不用理会缺失值，直接处理NaN（非数字）。这是因为R语言中的NA是 IEEE 754 浮点数 NaN 的一种特殊类型。因此，任何涉及NaN（在 C++ 中为 NAN）的逻辑表达式的求值结果都始终为 FALSE：</p>
+<div class="cell">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/Rcpp/man/evalCpp.html">evalCpp</a></span><span class="op">(</span><span class="st">"NAN == 1"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] FALSE</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/Rcpp/man/evalCpp.html">evalCpp</a></span><span class="op">(</span><span class="st">"NAN &lt; 1"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] FALSE</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/Rcpp/man/evalCpp.html">evalCpp</a></span><span class="op">(</span><span class="st">"NAN &gt; 1"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] FALSE</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/Rcpp/man/evalCpp.html">evalCpp</a></span><span class="op">(</span><span class="st">"NAN == NAN"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] FALSE</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>任何数字与NaNcy进行计算都会产生NaN：</p>
+<div class="cell">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/Rcpp/man/evalCpp.html">evalCpp</a></span><span class="op">(</span><span class="st">"NAN + 1"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] NaN</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/Rcpp/man/evalCpp.html">evalCpp</a></span><span class="op">(</span><span class="st">"NAN - 1"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] NaN</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/Rcpp/man/evalCpp.html">evalCpp</a></span><span class="op">(</span><span class="st">"NAN / 1"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] NaN</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/Rcpp/man/evalCpp.html">evalCpp</a></span><span class="op">(</span><span class="st">"NAN * 1"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] NaN</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>但是与布尔值计算时要小心：</p>
+<div class="cell">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/Rcpp/man/evalCpp.html">evalCpp</a></span><span class="op">(</span><span class="st">"NAN &amp;&amp; TRUE"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/Rcpp/man/evalCpp.html">evalCpp</a></span><span class="op">(</span><span class="st">"NAN || FALSE"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section><section id="strings" class="level4"><h4 class="anchored" data-anchor-id="strings">Strings</h4>
+<p><code>String</code>由“Rcpp”定义，能够正确处理缺失值。</p>
+</section><section id="boolean" class="level4"><h4 class="anchored" data-anchor-id="boolean">Boolean</h4>
+<p>C++中的<code>bool</code>类型只有<code>true</code>和<code>false</code>，而R语言中的<code>logical</code>类型有<code>TRUE</code>、<code>FALSE</code>和<code>NA</code>，你可以使用<code>int</code>类型来实现缺失值（<code>NA_INTEGER</code>）。如果你要将一个长度为1的R-logical向量转换为C++的<code>bool</code>，需要注意缺失值，因为它会被转换为<code>true</code>。</p>
+</section></section><section id="vectors" class="level3"><h3 class="anchored" data-anchor-id="vectors">Vectors</h3>
+<p>对于向量，“Rcpp”有定义好的缺失值类型：<code>NA_REAL</code>、<code>NA_INTEGER</code>、<code>NA_STRING</code>、<code>NA_LOGICAL</code>。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;Rcpp.h&gt;</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> Rcpp<span class="op">;</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>List missing_sampler<span class="op">()</span> <span class="op">{</span></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> List<span class="op">::</span>create<span class="op">(</span></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>    NumericVector<span class="op">::</span>create<span class="op">(</span>NA_REAL<span class="op">),</span></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>    IntegerVector<span class="op">::</span>create<span class="op">(</span>NA_INTEGER<span class="op">),</span></span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>    LogicalVector<span class="op">::</span>create<span class="op">(</span>NA_LOGICAL<span class="op">),</span></span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>    CharacterVector<span class="op">::</span>create<span class="op">(</span>NA_STRING<span class="op">)</span></span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>  <span class="op">);</span></span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html">str</a></span><span class="op">(</span><span class="fu">missing_sampler</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; List of 4</span></span>
+<span><span class="co">#&gt;  $ : num NA</span></span>
+<span><span class="co">#&gt;  $ : int NA</span></span>
+<span><span class="co">#&gt;  $ : logi NA</span></span>
+<span><span class="co">#&gt;  $ : chr NA</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section></section><section id="standard-template-library" class="level2"><h2 class="anchored" data-anchor-id="standard-template-library">Standard Template Library</h2>
+<p>C++真实的优势体现在它的标准模板库上，当你需要执行复杂算法时，STL提供了一套极其有用的数据结构和算法。本节将解释一些最重要的算法和数据结构，并为指明正确的学习方向，希望这些示例能向你展示STL的强大功能，并说服你相信学习更多知识是有用的。</p>
+<p>如果你需要的某个数据结构或算法不在STL中，你可以在<a href="https://www.boost.org/libraries/latest/grid/">boost</a>中找找。一旦你在电脑上安装了boost，你可以在头文件中写下<code>#include &lt;boost/test.hpp&gt;</code>来使用boost中的算法。</p>
+<section id="using-iterators" class="level3"><h3 class="anchored" data-anchor-id="using-iterators">Using iterators</h3>
+<p>迭代器（iterator）在STL中应用广泛，许多函数接受或返回迭代器。它们时基础for-loop的升级，抽象出底层数据结构的细节。迭代器有三个主要操作符：</p>
+<ul>
+<li>
+<code>*</code>：返回迭代器指向的元素。</li>
+<li>
+<code>++</code>：将迭代器指向下一个元素。</li>
+<li>
+<code>==</code>：比较两个迭代器是否指向同一个元素。</li>
+</ul>
+<p>例如，我们使用迭代器重写“sum”函数：</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;Rcpp.h&gt;</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> Rcpp<span class="op">;</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> sum3<span class="op">(</span>NumericVector x<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> total <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>  NumericVector<span class="op">::</span>iterator it<span class="op">;</span></span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span><span class="op">(</span>it <span class="op">=</span> x<span class="op">.</span>begin<span class="op">();</span> it <span class="op">!=</span> x<span class="op">.</span>end<span class="op">();</span> <span class="op">++</span>it<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>    total <span class="op">+=</span> <span class="op">*</span>it<span class="op">;</span></span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> total<span class="op">;</span></span>
+<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>相较于for-loop，迭代器的主要改变有：</p>
+<ul>
+<li><p>循环开始于<code>x.begin()</code>，结束于<code>x.end()</code>。迭代器使用<code>x.end</code>储存了循环的末尾值，减少了每次迭代时进行查询末尾值的工作。</p></li>
+<li><p>使用解引符<code>*</code>获取迭代器指向的元素。</p></li>
+<li><p>每种数据类型有它自己的迭代器：<code>NumericVector::iterator</code>、<code>IntegerVector::iterator</code>、<code>LogicalVector::iterator</code>、<code>CharacterVector::iterator</code>。</p></li>
+</ul>
+<p>上面的代码可以使用C++11的range-based for-loop重写，Rcpp使用<code>[[Rcpp::plugins(cpp11)]]</code>激活：</p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::plugins(cpp11)]]</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;Rcpp.h&gt;</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> Rcpp<span class="op">;</span></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> sum4<span class="op">(</span>NumericVector xs<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> total <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span><span class="op">(</span><span class="at">const</span> <span class="kw">auto</span> <span class="op">&amp;</span>x <span class="op">:</span> xs<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>    total <span class="op">+=</span> x<span class="op">;</span></span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> total<span class="op">;</span></span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>迭代器也允许我们使用C++中相当于apply的函数。例如，我们可以使用<code>accumulate()</code>函数再次重写<code><a href="https://rdrr.io/r/base/sum.html">sum()</a></code>，该函数接受一个起始迭代器和一个结束迭代器，并将<code>vector</code>中的所有值相加。<code>accumulate()</code>的第三个参数给出了初始值：它特别重要，因为它决定了<code>accumulate()</code>使用的数据类型（使用<code>0.0</code>表示<code>accumulate()</code>使用的是<code>double</code>，使用<code>0</code>表示<code>int</code>）。要使用<code>accumulate()</code>，我们需要在头文件中引入<code>&lt;Numeric&gt;</code>。</p>
+<div class="sourceCode" id="cb33"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;numeric&gt;</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;Rcpp.h&gt;</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> Rcpp<span class="op">;</span></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> sum5<span class="op">(</span>NumericVector x<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="bu">std::</span>accumulate<span class="op">(</span>x<span class="op">.</span>begin<span class="op">(),</span> x<span class="op">.</span>end<span class="op">(),</span> <span class="fl">0.0</span><span class="op">);</span></span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section><section id="algorithms" class="level3"><h3 class="anchored" data-anchor-id="algorithms">Algorithms</h3>
+<p>头文件<code>&lt;algorithm&gt;</code>提供了大量于使用迭代器的算法，你可以参考<a href="https://en.cppreference.com/w/cpp/algorithm">en.cppreference.com</a>。</p>
+<p><code><a href="https://rdrr.io/r/base/findInterval.html">findInterval()</a></code>函数接受一个向量和一个区间向量，返回一个向量，该向量包含每个元素在区间向量中的索引：</p>
+<div class="cell">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fl">2</span><span class="op">:</span><span class="fl">18</span></span>
+<span><span class="va">v</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">10</span>, <span class="fl">15</span><span class="op">)</span> <span class="co"># create two bins [5,10) and [10,15)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="va">x</span>, <span class="fu"><a href="https://rdrr.io/r/base/findInterval.html">findInterval</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">v</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;        x  </span></span>
+<span><span class="co">#&gt;  [1,]  2 0</span></span>
+<span><span class="co">#&gt;  [2,]  3 0</span></span>
+<span><span class="co">#&gt;  [3,]  4 0</span></span>
+<span><span class="co">#&gt;  [4,]  5 1</span></span>
+<span><span class="co">#&gt;  [5,]  6 1</span></span>
+<span><span class="co">#&gt;  [6,]  7 1</span></span>
+<span><span class="co">#&gt;  [7,]  8 1</span></span>
+<span><span class="co">#&gt;  [8,]  9 1</span></span>
+<span><span class="co">#&gt;  [9,] 10 2</span></span>
+<span><span class="co">#&gt; [10,] 11 2</span></span>
+<span><span class="co">#&gt; [11,] 12 2</span></span>
+<span><span class="co">#&gt; [12,] 13 2</span></span>
+<span><span class="co">#&gt; [13,] 14 2</span></span>
+<span><span class="co">#&gt; [14,] 15 3</span></span>
+<span><span class="co">#&gt; [15,] 16 3</span></span>
+<span><span class="co">#&gt; [16,] 17 3</span></span>
+<span><span class="co">#&gt; [17,] 18 3</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>下面是Rcpp版的基础实现：</p>
+<div class="sourceCode" id="cb35"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;algorithm&gt;</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;Rcpp.h&gt;</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> Rcpp<span class="op">;</span></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>IntegerVector findInterval2<span class="op">(</span>NumericVector x<span class="op">,</span> NumericVector breaks<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>  IntegerVector out<span class="op">(</span>x<span class="op">.</span>size<span class="op">());</span></span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>  NumericVector<span class="op">::</span>iterator it<span class="op">,</span> pos<span class="op">;</span></span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>  IntegerVector<span class="op">::</span>iterator out_it<span class="op">;</span></span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span><span class="op">(</span>it <span class="op">=</span> x<span class="op">.</span>begin<span class="op">(),</span> out_it <span class="op">=</span> out<span class="op">.</span>begin<span class="op">();</span> it <span class="op">!=</span> x<span class="op">.</span>end<span class="op">();</span></span>
+<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a>      <span class="op">++</span>it<span class="op">,</span> <span class="op">++</span>out_it<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a>    pos <span class="op">=</span> <span class="bu">std::</span>upper_bound<span class="op">(</span>breaks<span class="op">.</span>begin<span class="op">(),</span> breaks<span class="op">.</span>end<span class="op">(),</span> <span class="op">*</span>it<span class="op">);</span></span>
+<span id="cb35-15"><a href="#cb35-15" aria-hidden="true" tabindex="-1"></a>    <span class="op">*</span>out_it <span class="op">=</span> <span class="bu">std::</span>distance<span class="op">(</span>breaks<span class="op">.</span>begin<span class="op">(),</span> pos<span class="op">);</span></span>
+<span id="cb35-16"><a href="#cb35-16" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb35-17"><a href="#cb35-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-18"><a href="#cb35-18" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> out<span class="op">;</span></span>
+<span id="cb35-19"><a href="#cb35-19" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>关键点：</p>
+<ul>
+<li><p>同时输入两个迭代器，<code>it</code>和<code>out_it</code>。</p></li>
+<li><p>使用<code>*out_it</code>来修改<code>out</code>的值。</p></li>
+<li><p><code>upper_bound()</code>返回迭代器<code>pos</code>，然后使用<code>std::distance()</code>找到它在<code>breaks</code>中的索引。</p></li>
+<li><p>tips：R中的<code><a href="https://rdrr.io/r/base/findInterval.html">findInterval()</a></code>已经是使用C实现的。如果想上面的函数和R中的一样快，我们需要计算一次对<code>.begin()</code>和<code>.end()</code>的调用，并保存结果。这样做会分散我们的注意力，所以忽略了这个优化。添加这一步骤可以生成比R的<code><a href="https://rdrr.io/r/base/findInterval.html">findInterval()</a></code>更快的代码，但是代码量更少，大约是R底层的1/10。</p></li>
+</ul>
+<p>一般来说，使用ST 中的算法比使用手动循环更好。在《Effective STL》一书中，Scott Meyers 给出了三个原因：效率、正确性和可维护性。STL中的算法由C++专家编写，非常高效，而且它们已经存在了很长时间，并且经过了充分的测试。使用标准算法还能使代码的意图更加明确，有助于使其更加可读和可维护。</p>
+</section><section id="data-structures" class="level3"><h3 class="anchored" data-anchor-id="data-structures">Data structures</h3>
+<p>STL提供了大量数据结构：<code>array</code>,&nbsp;<code>bitset</code>,&nbsp;<code>list</code>,&nbsp;<code>forward_list</code>,&nbsp;<code>map</code>,&nbsp;<code>multimap</code>,&nbsp;<code>multiset</code>,&nbsp;<code>priority_queue</code>,&nbsp;<code>queue</code>,&nbsp;<code>deque</code>,&nbsp;<code>set</code>,&nbsp;<code>stack</code>,&nbsp;<code>unordered_map</code>,&nbsp;<code>unordered_set</code>,&nbsp;<code>unordered_multimap</code>,&nbsp;<code>unordered_multiset</code>, <code>vector</code>. 其中最重要的是：<code>vector</code>, <code>unordered_set</code>,&nbsp;<code>unordered_map</code>。本节我们将重点介绍这三种数据结构，其他数据结构的使用方法相似，只是性能略有不同。你可以参考<a href="https://en.cppreference.com/w/cpp/container">en.cppreference.com</a>。</p>
+<p>Rcpp知道如何将许多STL数据结构转换为R等价物，因此你可以从函数中返回它们，而无需显式转换为R数据结构。</p>
+<section id="vectors-1" class="level4"><h4 class="anchored" data-anchor-id="vectors-1">Vectors</h4>
+<p>STL vector 与R中的vector 类似，但它能高效扩容，适合在你不知道输出向量的大小时使用。需要注意的是，vector是模板化的，你需要包含不同元素的向量进行声明：<code>vector&lt;int&gt;</code>、<code>vector&lt;bool&gt;</code>、<code>vector&lt;double&gt;</code>、<code>vector&lt;String&gt;</code>。你可以使用<code>[]</code>访问元素，使用<code>.push_back()</code>追加元素，使用<code>.reserve()</code>为向量分配储存空间。</p>
+<p><code><a href="https://rdrr.io/r/base/rle.html">rle()</a></code>函数用来执行游程编码算法，统计<strong>连续相同元素</strong>的个数，返回values和其对应的length：</p>
+<div class="cell">
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">2</span>,<span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">3</span>,<span class="fl">3</span>,<span class="fl">3</span>,<span class="fl">3</span>,<span class="fl">3</span>,<span class="fl">4</span>,<span class="fl">4</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/rle.html">rle</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Run Length Encoding</span></span>
+<span><span class="co">#&gt;   lengths: int [1:5] 3 2 2 5 2</span></span>
+<span><span class="co">#&gt;   values : num [1:5] 1 2 1 3 4</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>下面是Rcpp版：</p>
+<div class="sourceCode" id="cb37"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;Rcpp.h&gt;</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> Rcpp<span class="op">;</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>List rleC<span class="op">(</span>NumericVector x<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>  <span class="bu">std::</span>vector<span class="op">&lt;</span><span class="dt">int</span><span class="op">&gt;</span> lengths<span class="op">;</span></span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>  <span class="bu">std::</span>vector<span class="op">&lt;</span><span class="dt">double</span><span class="op">&gt;</span> values<span class="op">;</span></span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>  <span class="co">// Initialise first value</span></span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> prev <span class="op">=</span> x<span class="op">[</span><span class="dv">0</span><span class="op">];</span></span>
+<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a>  values<span class="op">.</span>push_back<span class="op">(</span>prev<span class="op">);</span></span>
+<span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a>  lengths<span class="op">.</span>push_back<span class="op">(</span><span class="dv">1</span><span class="op">);</span></span>
+<span id="cb37-14"><a href="#cb37-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-15"><a href="#cb37-15" aria-hidden="true" tabindex="-1"></a>  NumericVector<span class="op">::</span>iterator it<span class="op">;</span></span>
+<span id="cb37-16"><a href="#cb37-16" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span><span class="op">(</span>it <span class="op">=</span> x<span class="op">.</span>begin<span class="op">()</span> <span class="op">+</span> <span class="dv">1</span><span class="op">;</span> it <span class="op">!=</span> x<span class="op">.</span>end<span class="op">();</span> <span class="op">++</span>it<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb37-17"><a href="#cb37-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="op">(</span>prev <span class="op">==</span> <span class="op">*</span>it<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb37-18"><a href="#cb37-18" aria-hidden="true" tabindex="-1"></a>      lengths<span class="op">[</span>i<span class="op">]++;</span></span>
+<span id="cb37-19"><a href="#cb37-19" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span> <span class="cf">else</span> <span class="op">{</span></span>
+<span id="cb37-20"><a href="#cb37-20" aria-hidden="true" tabindex="-1"></a>      values<span class="op">.</span>push_back<span class="op">(*</span>it<span class="op">);</span></span>
+<span id="cb37-21"><a href="#cb37-21" aria-hidden="true" tabindex="-1"></a>      lengths<span class="op">.</span>push_back<span class="op">(</span><span class="dv">1</span><span class="op">);</span></span>
+<span id="cb37-22"><a href="#cb37-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-23"><a href="#cb37-23" aria-hidden="true" tabindex="-1"></a>      i<span class="op">++;</span></span>
+<span id="cb37-24"><a href="#cb37-24" aria-hidden="true" tabindex="-1"></a>      prev <span class="op">=</span> <span class="op">*</span>it<span class="op">;</span></span>
+<span id="cb37-25"><a href="#cb37-25" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb37-26"><a href="#cb37-26" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb37-27"><a href="#cb37-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-28"><a href="#cb37-28" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> List<span class="op">::</span>create<span class="op">(</span></span>
+<span id="cb37-29"><a href="#cb37-29" aria-hidden="true" tabindex="-1"></a>    _<span class="op">[</span><span class="st">"lengths"</span><span class="op">]</span> <span class="op">=</span> lengths<span class="op">,</span></span>
+<span id="cb37-30"><a href="#cb37-30" aria-hidden="true" tabindex="-1"></a>    _<span class="op">[</span><span class="st">"values"</span><span class="op">]</span> <span class="op">=</span> values</span>
+<span id="cb37-31"><a href="#cb37-31" aria-hidden="true" tabindex="-1"></a>  <span class="op">);</span></span>
+<span id="cb37-32"><a href="#cb37-32" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><a href="https://en.cppreference.com/w/cpp/container/vector">vector</a>中描述了vector的更多方法。</p>
+</section><section id="sets" class="level4"><h4 class="anchored" data-anchor-id="sets">Sets</h4>
+<p>set 包含的元素不能重复，可以有效解决查找重复或唯一元素的问题。C++提供了有序集合（<code>std::set</code>）和无序集合（<code>std::unordered_set</code>）两种数据结构。无序集合通常运行很快，有时可以使用无序集合+排序的两布走来替代有序集合。同vector一样，set也是模板化的，你需要包含不同元素的set进行声明：<code>set&lt;int&gt;</code>、<code>set&lt;bool&gt;</code>、<code>set&lt;double&gt;</code>、<code>set&lt;String&gt;</code>。更多信息你可以参考<a href="https://en.cppreference.com/w/cpp/container/set">set</a>和<a href="https://en.cppreference.com/w/cpp/container/unordered_set">unordered_set</a>。</p>
+<p>下面是R中<code><a href="https://rdrr.io/r/base/duplicated.html">duplicated()</a></code>函数的Rcpp实现，注意<code>seen.insert(x[i]).second.insert()</code>返回一个pair值，它的<code>.first</code>值是一个指向元素的迭代器，<code>.second</code>值是一个判断是否新插入集合的布尔值：</p>
+<div class="sourceCode" id="cb38"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::plugins(cpp11)]]</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;Rcpp.h&gt;</span></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;unordered_set&gt;</span></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> Rcpp<span class="op">;</span></span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>LogicalVector duplicatedC<span class="op">(</span>IntegerVector x<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>  <span class="bu">std::</span>unordered_set<span class="op">&lt;</span><span class="dt">int</span><span class="op">&gt;</span> seen<span class="op">;</span></span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> n <span class="op">=</span> x<span class="op">.</span>size<span class="op">();</span></span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>  LogicalVector out<span class="op">(</span>n<span class="op">);</span></span>
+<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> n<span class="op">;</span> <span class="op">++</span>i<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb38-13"><a href="#cb38-13" aria-hidden="true" tabindex="-1"></a>    out<span class="op">[</span>i<span class="op">]</span> <span class="op">=</span> <span class="op">!</span>seen<span class="op">.</span>insert<span class="op">(</span>x<span class="op">[</span>i<span class="op">]).</span>second<span class="op">;</span></span>
+<span id="cb38-14"><a href="#cb38-14" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb38-15"><a href="#cb38-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-16"><a href="#cb38-16" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> out<span class="op">;</span></span>
+<span id="cb38-17"><a href="#cb38-17" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section><section id="map" class="level4"><h4 class="anchored" data-anchor-id="map">Map</h4>
+<p>map与set类似，但是map不仅可以用来判断元素是否存在，还关联其他数据，它由键值对组成。十分适合R中类似<code><a href="https://rdrr.io/r/base/table.html">table()</a></code>或<code><a href="https://rdrr.io/r/base/match.html">match()</a></code>等函数的实现。map也是模板化的，但是由于它同时有键和值，所以需要声明两个类型，例如：<code>map&lt;int, int&gt;</code>、<code>map&lt;bool, int&gt;</code>、<code>map&lt;double, int&gt;</code>、<code>map&lt;String, int&gt;</code>。map同样分有序（<code>std::map</code>）和无序（<code>std::unordered_map</code>）两种。更多信息你可以参考<a href="https://en.cppreference.com/w/cpp/container/map">map</a>和<a href="https://en.cppreference.com/w/cpp/container/unordered_map">unordered_map</a>。 ）。</p>
+<p>下面是R中<code><a href="https://rdrr.io/r/base/table.html">table()</a></code>函数的Rcpp实现：</p>
+<div class="sourceCode" id="cb39"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;Rcpp.h&gt;</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> Rcpp<span class="op">;</span></span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a><span class="bu">std::</span>map<span class="op">&lt;</span><span class="dt">double</span><span class="op">,</span> <span class="dt">int</span><span class="op">&gt;</span> tableC<span class="op">(</span>NumericVector x<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>  <span class="bu">std::</span>map<span class="op">&lt;</span><span class="dt">double</span><span class="op">,</span> <span class="dt">int</span><span class="op">&gt;</span> counts<span class="op">;</span></span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> n <span class="op">=</span> x<span class="op">.</span>size<span class="op">();</span></span>
+<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> <span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> n<span class="op">;</span> i<span class="op">++)</span> <span class="op">{</span></span>
+<span id="cb39-10"><a href="#cb39-10" aria-hidden="true" tabindex="-1"></a>    counts<span class="op">[</span>x<span class="op">[</span>i<span class="op">]]++;</span></span>
+<span id="cb39-11"><a href="#cb39-11" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb39-12"><a href="#cb39-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-13"><a href="#cb39-13" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> counts<span class="op">;</span></span>
+<span id="cb39-14"><a href="#cb39-14" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section></section></section><section id="case-studies" class="level2"><h2 class="anchored" data-anchor-id="case-studies">Case studies</h2>
+<p>下面是一些使用C++替换R中运行缓慢函数的例子。</p>
+<section id="gibbs-sampler" class="level3"><h3 class="anchored" data-anchor-id="gibbs-sampler">Gibbs sampler</h3>
+<p>示例来源自Dirk Eddelbuettel的<a href="http://dirk.eddelbuettel.com/blog/2011/07/14/">blog</a>。R和C++的吉布斯采样函数实现类似，但是运行速度相差极大。Dirk在博客中还展示了另一种使速度更快的方法：使用GSL（R可以通过RcppGSL包轻访问）中更快的随机数生成器函数, 可以使速度再提高两到三倍。</p>
+<p>R版本：</p>
+<div class="cell">
+<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">gibbs_r</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">N</span>, <span class="va">thin</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">mat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span><span class="op">(</span>nrow <span class="op">=</span> <span class="va">N</span>, ncol <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span>  <span class="va">x</span> <span class="op">&lt;-</span> <span class="va">y</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
+<span></span>
+<span>  <span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="va">N</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="kw">for</span> <span class="op">(</span><span class="va">j</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="va">thin</span><span class="op">)</span> <span class="op">{</span></span>
+<span>      <span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/GammaDist.html">rgamma</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">3</span>, <span class="va">y</span> <span class="op">*</span> <span class="va">y</span> <span class="op">+</span> <span class="fl">4</span><span class="op">)</span></span>
+<span>      <span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span> <span class="op">/</span> <span class="op">(</span><span class="va">x</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span>, <span class="fl">1</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">sqrt</a></span><span class="op">(</span><span class="fl">2</span> <span class="op">*</span> <span class="op">(</span><span class="va">x</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="op">}</span></span>
+<span>    <span class="va">mat</span><span class="op">[</span><span class="va">i</span>, <span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span>  <span class="va">mat</span></span>
+<span><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>C++版本：</p>
+<ul>
+<li>声明所有变量的数据类型。</li>
+<li>使用<code>(</code>而不是<code>[</code>来获取矩阵索引。</li>
+<li>将<code><a href="https://rdrr.io/r/stats/GammaDist.html">rgamma()</a></code>和<code><a href="https://rdrr.io/r/stats/Normal.html">rnorm()</a></code>函数的结果由向量转换为标量。</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;Rcpp.h&gt;</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> Rcpp<span class="op">;</span></span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>NumericMatrix gibbs_cpp<span class="op">(</span><span class="dt">int</span> N<span class="op">,</span> <span class="dt">int</span> thin<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>  NumericMatrix mat<span class="op">(</span>N<span class="op">,</span> <span class="dv">2</span><span class="op">);</span></span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> x <span class="op">=</span> <span class="dv">0</span><span class="op">,</span> y <span class="op">=</span> <span class="dv">0</span><span class="op">;</span></span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span><span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> N<span class="op">;</span> i<span class="op">++)</span> <span class="op">{</span></span>
+<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span><span class="op">(</span><span class="dt">int</span> j <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> j <span class="op">&lt;</span> thin<span class="op">;</span> j<span class="op">++)</span> <span class="op">{</span></span>
+<span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a>      x <span class="op">=</span> rgamma<span class="op">(</span><span class="dv">1</span><span class="op">,</span> <span class="dv">3</span><span class="op">,</span> <span class="dv">1</span> <span class="op">/</span> <span class="op">(</span>y <span class="op">*</span> y <span class="op">+</span> <span class="dv">4</span><span class="op">))[</span><span class="dv">0</span><span class="op">];</span></span>
+<span id="cb41-12"><a href="#cb41-12" aria-hidden="true" tabindex="-1"></a>      y <span class="op">=</span> rnorm<span class="op">(</span><span class="dv">1</span><span class="op">,</span> <span class="dv">1</span> <span class="op">/</span> <span class="op">(</span>x <span class="op">+</span> <span class="dv">1</span><span class="op">),</span> <span class="dv">1</span> <span class="op">/</span> sqrt<span class="op">(</span><span class="dv">2</span> <span class="op">*</span> <span class="op">(</span>x <span class="op">+</span> <span class="dv">1</span><span class="op">)))[</span><span class="dv">0</span><span class="op">];</span></span>
+<span id="cb41-13"><a href="#cb41-13" aria-hidden="true" tabindex="-1"></a>    <span class="op">}</span></span>
+<span id="cb41-14"><a href="#cb41-14" aria-hidden="true" tabindex="-1"></a>    mat<span class="op">(</span>i<span class="op">,</span> <span class="dv">0</span><span class="op">)</span> <span class="op">=</span> x<span class="op">;</span></span>
+<span id="cb41-15"><a href="#cb41-15" aria-hidden="true" tabindex="-1"></a>    mat<span class="op">(</span>i<span class="op">,</span> <span class="dv">1</span><span class="op">)</span> <span class="op">=</span> y<span class="op">;</span></span>
+<span id="cb41-16"><a href="#cb41-16" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb41-17"><a href="#cb41-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-18"><a href="#cb41-18" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span><span class="op">(</span>mat<span class="op">);</span></span>
+<span id="cb41-19"><a href="#cb41-19" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>基准测试两个方法：</p>
+<div class="cell">
+<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">bench</span><span class="fu">::</span><span class="fu"><a href="https://bench.r-lib.org/reference/mark.html">mark</a></span><span class="op">(</span></span>
+<span>  <span class="fu">gibbs_r</span><span class="op">(</span><span class="fl">100</span>, <span class="fl">10</span><span class="op">)</span>,</span>
+<span>  <span class="fu">gibbs_cpp</span><span class="op">(</span><span class="fl">100</span>, <span class="fl">10</span><span class="op">)</span>,</span>
+<span>  check <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 2 × 6</span></span>
+<span><span class="co">#&gt;   expression              min   median `itr/sec` mem_alloc `gc/sec`</span></span>
+<span><span class="co">#&gt;   &lt;bch:expr&gt;         &lt;bch:tm&gt; &lt;bch:tm&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 gibbs_r(100, 10)     1.99ms   2.14ms      441.   102.8KB     17.5</span></span>
+<span><span class="co">#&gt; 2 gibbs_cpp(100, 10)  216.8µs 239.65µs     4000.    1.61KB     16.9</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section><section id="r-vectorisation-versus-c-vectorisation" class="level3"><h3 class="anchored" data-anchor-id="r-vectorisation-versus-c-vectorisation">R vectorisation versus C++ vectorisation</h3>
+<p>示例来源子<a href="https://gweissman.github.io/post/rcpp-is-smoking-fast-for-agent-based-models-in-data-frames/">“Rcpp is smoking fast for agent-based models in data frames”</a>。它的目的是通过三个输入来预测一个模型的输出：</p>
+<div class="cell">
+<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">vacc1a</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">age</span>, <span class="va">female</span>, <span class="va">ily</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">p</span> <span class="op">&lt;-</span> <span class="fl">0.25</span> <span class="op">+</span> <span class="fl">0.3</span> <span class="op">*</span> <span class="fl">1</span> <span class="op">/</span> <span class="op">(</span><span class="fl">1</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="fl">0.04</span> <span class="op">*</span> <span class="va">age</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fl">0.1</span> <span class="op">*</span> <span class="va">ily</span></span>
+<span>  <span class="va">p</span> <span class="op">&lt;-</span> <span class="va">p</span> <span class="op">*</span> <span class="kw">if</span> <span class="op">(</span><span class="va">female</span><span class="op">)</span> <span class="fl">1.25</span> <span class="kw">else</span> <span class="fl">0.75</span></span>
+<span>  <span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">p</span><span class="op">)</span></span>
+<span>  <span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">min</a></span><span class="op">(</span><span class="fl">1</span>, <span class="va">p</span><span class="op">)</span></span>
+<span>  <span class="va">p</span></span>
+<span><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>当三个输入是一个向量时，我们需要使用for-loop来处理：</p>
+<div class="cell">
+<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">vacc1</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">age</span>, <span class="va">female</span>, <span class="va">ily</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">age</span><span class="op">)</span></span>
+<span>  <span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">numeric</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span></span>
+<span>  <span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq_len</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">out</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu">vacc1a</span><span class="op">(</span><span class="va">age</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>, <span class="va">female</span><span class="op">[</span><span class="va">i</span><span class="op">]</span>, <span class="va">ily</span><span class="op">[</span><span class="va">i</span><span class="op">]</span><span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span>  <span class="va">out</span></span>
+<span><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>结合前面章节，我们可以判定<code>vacc1()</code>运行速度会是慢的。有两种方法可以解决：</p>
+<ul>
+<li>
+<p>使用R中的向量化函数<code><a href="https://rdrr.io/r/base/ifelse.html">ifelse()</a></code>、<code><a href="https://rdrr.io/r/base/Extremes.html">pmin()</a></code>和<code><a href="https://rdrr.io/r/base/Extremes.html">pmax()</a></code>来代替for-loop。</p>
+<div class="cell">
+<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">vacc2</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">age</span>, <span class="va">female</span>, <span class="va">ily</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">p</span> <span class="op">&lt;-</span> <span class="fl">0.25</span> <span class="op">+</span> <span class="fl">0.3</span> <span class="op">*</span> <span class="fl">1</span> <span class="op">/</span> <span class="op">(</span><span class="fl">1</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="fl">0.04</span> <span class="op">*</span> <span class="va">age</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fl">0.1</span> <span class="op">*</span> <span class="va">ily</span></span>
+<span>  <span class="va">p</span> <span class="op">&lt;-</span> <span class="va">p</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html">ifelse</a></span><span class="op">(</span><span class="va">female</span>, <span class="fl">1.25</span>, <span class="fl">0.75</span><span class="op">)</span></span>
+<span>  <span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">pmax</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">p</span><span class="op">)</span></span>
+<span>  <span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">pmin</a></span><span class="op">(</span><span class="fl">1</span>, <span class="va">p</span><span class="op">)</span></span>
+<span>  <span class="va">p</span></span>
+<span><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</li>
+<li>
+<p>使用C++重构函数<code>vacc1a()</code>和<code>vacc1()</code>。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode cpp code-with-copy"><code class="sourceCode cpp"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#include </span><span class="im">&lt;Rcpp.h&gt;</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a><span class="kw">using</span> <span class="kw">namespace</span> Rcpp<span class="op">;</span></span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a><span class="dt">double</span> vacc3a<span class="op">(</span><span class="dt">double</span> age<span class="op">,</span> <span class="dt">bool</span> female<span class="op">,</span> <span class="dt">bool</span> ily<span class="op">){</span></span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>  <span class="dt">double</span> p <span class="op">=</span> <span class="fl">0.25</span> <span class="op">+</span> <span class="fl">0.3</span> <span class="op">*</span> <span class="dv">1</span> <span class="op">/</span> <span class="op">(</span><span class="dv">1</span> <span class="op">-</span> exp<span class="op">(</span><span class="fl">0.04</span> <span class="op">*</span> age<span class="op">))</span> <span class="op">+</span> <span class="fl">0.1</span> <span class="op">*</span> ily<span class="op">;</span></span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>  p <span class="op">=</span> p <span class="op">*</span> <span class="op">(</span>female <span class="op">?</span> <span class="fl">1.25</span> <span class="op">:</span> <span class="fl">0.75</span><span class="op">);</span></span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a>  p <span class="op">=</span> <span class="bu">std::</span>max<span class="op">(</span>p<span class="op">,</span> <span class="fl">0.0</span><span class="op">);</span></span>
+<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a>  p <span class="op">=</span> <span class="bu">std::</span>min<span class="op">(</span>p<span class="op">,</span> <span class="fl">1.0</span><span class="op">);</span></span>
+<span id="cb46-9"><a href="#cb46-9" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> p<span class="op">;</span></span>
+<span id="cb46-10"><a href="#cb46-10" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span>
+<span id="cb46-11"><a href="#cb46-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-12"><a href="#cb46-12" aria-hidden="true" tabindex="-1"></a><span class="co">// [[Rcpp::export]]</span></span>
+<span id="cb46-13"><a href="#cb46-13" aria-hidden="true" tabindex="-1"></a>NumericVector vacc3<span class="op">(</span>NumericVector age<span class="op">,</span> LogicalVector female<span class="op">,</span></span>
+<span id="cb46-14"><a href="#cb46-14" aria-hidden="true" tabindex="-1"></a>                    LogicalVector ily<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb46-15"><a href="#cb46-15" aria-hidden="true" tabindex="-1"></a>  <span class="dt">int</span> n <span class="op">=</span> age<span class="op">.</span>size<span class="op">();</span></span>
+<span id="cb46-16"><a href="#cb46-16" aria-hidden="true" tabindex="-1"></a>  NumericVector out<span class="op">(</span>n<span class="op">);</span></span>
+<span id="cb46-17"><a href="#cb46-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-18"><a href="#cb46-18" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span><span class="op">(</span><span class="dt">int</span> i <span class="op">=</span> <span class="dv">0</span><span class="op">;</span> i <span class="op">&lt;</span> n<span class="op">;</span> <span class="op">++</span>i<span class="op">)</span> <span class="op">{</span></span>
+<span id="cb46-19"><a href="#cb46-19" aria-hidden="true" tabindex="-1"></a>    out<span class="op">[</span>i<span class="op">]</span> <span class="op">=</span> vacc3a<span class="op">(</span>age<span class="op">[</span>i<span class="op">],</span> female<span class="op">[</span>i<span class="op">],</span> ily<span class="op">[</span>i<span class="op">]);</span></span>
+<span id="cb46-20"><a href="#cb46-20" aria-hidden="true" tabindex="-1"></a>  <span class="op">}</span></span>
+<span id="cb46-21"><a href="#cb46-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-22"><a href="#cb46-22" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> out<span class="op">;</span></span>
+<span id="cb46-23"><a href="#cb46-23" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</li>
+</ul>
+<p>生成示例数据并进行基准测试：</p>
+<div class="cell">
+<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fl">1000</span></span>
+<span><span class="va">age</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="va">n</span>, mean <span class="op">=</span> <span class="fl">50</span>, sd <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
+<span><span class="va">female</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="cn">T</span>, <span class="cn">F</span><span class="op">)</span>, <span class="va">n</span>, rep <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">ily</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="cn">T</span>, <span class="cn">F</span><span class="op">)</span>, <span class="va">n</span>, prob <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.8</span>, <span class="fl">0.2</span><span class="op">)</span>, rep <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html">stopifnot</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span><span class="op">(</span><span class="fu">vacc1</span><span class="op">(</span><span class="va">age</span>, <span class="va">female</span>, <span class="va">ily</span><span class="op">)</span>, <span class="fu">vacc2</span><span class="op">(</span><span class="va">age</span>, <span class="va">female</span>, <span class="va">ily</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/all.equal.html">all.equal</a></span><span class="op">(</span><span class="fu">vacc1</span><span class="op">(</span><span class="va">age</span>, <span class="va">female</span>, <span class="va">ily</span><span class="op">)</span>, <span class="fu">vacc3</span><span class="op">(</span><span class="va">age</span>, <span class="va">female</span>, <span class="va">ily</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">bench</span><span class="fu">::</span><span class="fu"><a href="https://bench.r-lib.org/reference/mark.html">mark</a></span><span class="op">(</span></span>
+<span>  vacc1 <span class="op">=</span> <span class="fu">vacc1</span><span class="op">(</span><span class="va">age</span>, <span class="va">female</span>, <span class="va">ily</span><span class="op">)</span>,</span>
+<span>  vacc2 <span class="op">=</span> <span class="fu">vacc2</span><span class="op">(</span><span class="va">age</span>, <span class="va">female</span>, <span class="va">ily</span><span class="op">)</span>,</span>
+<span>  vacc3 <span class="op">=</span> <span class="fu">vacc3</span><span class="op">(</span><span class="va">age</span>, <span class="va">female</span>, <span class="va">ily</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 3 × 6</span></span>
+<span><span class="co">#&gt;   expression      min   median `itr/sec` mem_alloc `gc/sec`</span></span>
+<span><span class="co">#&gt;   &lt;bch:expr&gt; &lt;bch:tm&gt; &lt;bch:tm&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 vacc1        1.17ms   1.25ms      768.    7.86KB    27.1 </span></span>
+<span><span class="co">#&gt; 2 vacc2        64.5µs   73.1µs    12610.  146.67KB    45.2 </span></span>
+<span><span class="co">#&gt; 3 vacc3        36.2µs   38.2µs    25475.   11.98KB     2.55</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section></section><section id="using-rcpp-in-a-package" class="level2"><h2 class="anchored" data-anchor-id="using-rcpp-in-a-package">Using Rcpp in a package</h2>
+<p><code><a href="https://rdrr.io/pkg/Rcpp/man/sourceCpp.html">sourceCpp()</a></code>函数可以将C++脚本嵌入R包中。将C++脚本绑定到R包中有下面三点好处：</p>
+<ul>
+<li><p>使用者可以脱离C++开发工具，直接使用C++编写的函数。</p></li>
+<li><p>R包构建系统自动处理多个源文件及其依赖关系。</p></li>
+<li><p>软件包为测试、文档和一致性提供了额外的基础工具。</p></li>
+</ul>
+<p>在R包中使用<code>Rcpp</code>函数，你需要：</p>
+<ul>
+<li><p>在<code>scr/</code>目录下放置C++源文件。</p></li>
+<li>
+<p>在<code>DESCRIPTION</code>文件中添加：</p>
+<pre><code>LinkingTo: Rcpp
+Imports: Rcpp</code></pre>
+</li>
+<li>
+<p>在<code>NAMESPACE</code>文件中添加：</p>
+<pre><code>useDynLib(mypackage)
+importFrom(Rcpp, sourceCpp)</code></pre>
+<p>我们需要从Rcpp导入一些东西（任何东西）, 以便内部Rcpp代码能够正确加载。这是R中的一个bug（不确定现在是否修复）。</p>
+</li>
+</ul>
+<p>可以使用<code><a href="https://usethis.r-lib.org/reference/use_rcpp.html">usethis::use_rcpp()</a></code>来快捷地添加这些内容。</p>
+<p>在构建R包时，你需要先运行<code><a href="https://rdrr.io/pkg/Rcpp/man/compileAttributes.html">Rcpp::compileAttributes()</a></code>。该函数扫描C++脚本中有<code>Rcpp::export</code>属性的函数，并生成使函数在R中可用所需的代码。每当添加、删除或更改函数签名时，都会重新运行<code><a href="https://rdrr.io/pkg/Rcpp/man/compileAttributes.html">compileAttributes()</a></code>。这是由devtools包和Rstudio自动完成的。</p>
+<p>更多细节可以参考<code><a href="https://cran.rstudio.com/web/packages/Rcpp/vignettes/Rcpp-package.pdf">vignette("Rcpp-package")</a></code>。</p>
+</section><section id="learning-more" class="level2"><h2 class="anchored" data-anchor-id="learning-more">Learning more</h2>
+<p>本章只涉及了Rcpp的一小部分，提供了使用C++重写性能不佳的R代码的基本工具。如前所述，Rcpp还有许多其他功能，使得将R与现有C++代码接口变得容易，包括：</p>
+<ul>
+<li><p>属性的其他功能包括指定默认参数、链接外部C++依赖项以及从包导出C++接口。这些功能及更多内容将在<code>vinette("Rcpp-attributes")</code>中介绍。</p></li>
+<li><p>自动创建C++数据结构和R数据结构之间的包装，包括将C++类映射到引用类。对这个主题的一个很好的介绍是<code>vienette("Rcpp-modules")</code>。</p></li>
+<li><p>Rcpp快速参考指南<code><a href="https://cran.rstudio.com/web/packages/Rcpp/vignettes/Rcpp-quickref.pdf">vignette("Rcpp-quickref")</a></code>包含了Rcpp类和常见编程习语的有用总结。</p></li>
+</ul>
+<p>可以关注一下<a href="https://www.rcpp.org/">Rcpp homepage</a>或登录<a href="http://lists.r-forge.r-project.org/cgi-bin/mailman/listinfo/rcpp-devel">Rcpp mailing list</a>以获取更多信息。</p>
+<p>下面是一些对学习C++很有帮助的资源：</p>
+<ul>
+<li><p>Effective C++、Effective STL。</p></li>
+<li><p><a href="http://www.icce.rug.nl/documents/cplusplus/cplusplus.html">C++ Annotations</a></p></li>
+<li><p><a href="http://www.cs.helsinki.fi/u/tpkarkka/alglib/k06/">Algorithm Libraries</a></p></li>
+</ul>
+<p>编写高性能代码也可能需要你重新思考你的基本方法，对基本数据结构和算法的扎实理解非常有帮助。你可以参考：</p>
+<ul>
+<li><p>Algorithm Design Manual</p></li>
+<li><p>MIT的<a href="http://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-046j-introduction-to-algorithms-sma-5503-fall-2005/">Introduction to Algorithms</a></p></li>
+<li><p>Algorithms 4th Edition，<a href="https://algs4.cs.princeton.edu/home/">textbook</a>。</p></li>
+</ul>
+
+
+</section><a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script><script src="https://utteranc.es/client.js" repo="hanguojun007/Blog" issue-term="pathname" theme="github-light" crossorigin="anonymous" async="">
+</script><nav class="page-navigation"><div class="nav-page nav-page-previous">
+      <a href="../../Books/Advanced R(2e)/24 Improving performance.html" class="pagination-link" aria-label="24 Improving performance">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">24 Improving performance</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+</body></html>
