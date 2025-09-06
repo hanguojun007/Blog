@@ -1,0 +1,40 @@
+---
+title: "暴露组学关联分析"
+author: "大番薯本薯"
+date: "2025-09-06"
+date-modified: "2025-09-06"
+draft: false
+categories: []
+
+format:
+  html:
+    code-link: true
+
+fig-width: 6
+fig-asp: 0.618
+out-width: 70%
+fig-align: center
+
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: "#>"
+    R.options:
+      dplyr.print_min: 6
+      dplyr.print_max: 6
+      pillar.max_footer_lines: 2
+      pillar.min_chars: 15
+      stringr.view_n: 6
+      cli.num_colors: 0
+      cli.hyperlink: FALSE
+      pillar.bold: TRUE
+      width: 77
+
+execute:
+  warning: true
+  error: true
+---
+
+暴露组-多组学关联分析的分析思路来自于[omicRexposome](https://github.com/isglobal-brge/omicRexposome/blob/master/R/MultiDataSet-association.R)，该包相关文献为[Multi-omics signatures of the human earlylife exposome](https://www.nature.com/articles/s41467-022-34422-2)。
+
+##
