@@ -737,7 +737,7 @@
     "href": "blog.html",
     "title": "",
     "section": "",
-    "text": "Order By\n       Default\n         \n          Title\n        \n         \n          Date - Oldest\n        \n         \n          Date - Newest\n        \n     \n  \n    \n      \n      \n    \n\n\n\n\n\n\n\n\n\n\nquarto 中R代码块的设置\n\n\n\n\n\n\nquarto\n\n\n\n\n\n\n\n\n\n2025-03-15\n\n\n大番薯本薯\n\n\n\n\n\n\n\n\n\n\n\n\nR 中的面向对象(1)\n\n\n\n\n\n\n面向对象\n\n\n\n\n\n\n\n\n\n2025-03-16\n\n\n大番薯本薯\n\n\n\n\n\n\n\n\n\n\n\n\nData Masking(1)\n\n\n\n\n\n\nrlang\n\n\ntidyverse\n\n\n\n\n\n\n\n\n\n2025-04-25\n\n\n大番薯本薯\n\n\n\n\n\n\n\n\n\n\n\n\n相关性计算\n\n\n\n\n\n\ntriky skill\n\n\n\n\n\n\n\n\n\n2025-06-27\n\n\n大番薯本薯\n\n\n\n\n\n\n\n\n\n\n\n\n绘制点脊图\n\n\n\n\n\n\nggplot2\n\n\n\n\n\n\n\n\n\n2025-07-03\n\n\n大番薯本薯\n\n\n\n\n\n\n\n\n\n\n\n\n替换多对字符串\n\n\n\n\n\n\npurrr\n\n\ntidyverse\n\n\n\n\n\n\n\n\n\n2025-07-24\n\n\n大番薯本薯\n\n\n\n\n\n\nNo matching items\n\n Back to top"
+    "text": "Order By\n       Default\n         \n          Date - Oldest\n        \n         \n          Date - Newest\n        \n         \n          Title\n        \n     \n  \n    \n      \n      \n    \n\n\n\n\n\n\n\n\n\n\n双环网络图\n\n\n\n\n\n\nggraph\n\n\n\n\n\n\n\n\n\n2025-09-06\n\n\n大番薯本薯\n\n\n\n\n\n\n\n\n\n\n\n\n替换多对字符串\n\n\n\n\n\n\npurrr\n\n\ntidyverse\n\n\n\n\n\n\n\n\n\n2025-07-24\n\n\n大番薯本薯\n\n\n\n\n\n\n\n\n\n\n\n\n绘制点脊图\n\n\n\n\n\n\nggplot2\n\n\n\n\n\n\n\n\n\n2025-07-03\n\n\n大番薯本薯\n\n\n\n\n\n\n\n\n\n\n\n\n相关性计算\n\n\n\n\n\n\ntriky skill\n\n\n\n\n\n\n\n\n\n2025-06-27\n\n\n大番薯本薯\n\n\n\n\n\n\n\n\n\n\n\n\nData Masking(1)\n\n\n\n\n\n\nrlang\n\n\ntidyverse\n\n\n\n\n\n\n\n\n\n2025-04-25\n\n\n大番薯本薯\n\n\n\n\n\n\n\n\n\n\n\n\nR 中的面向对象(1)\n\n\n\n\n\n\n面向对象\n\n\n\n\n\n\n\n\n\n2025-03-16\n\n\n大番薯本薯\n\n\n\n\n\n\n\n\n\n\n\n\nquarto 中R代码块的设置\n\n\n\n\n\n\nquarto\n\n\n\n\n\n\n\n\n\n2025-03-15\n\n\n大番薯本薯\n\n\n\n\n\n\nNo matching items\n\n Back to top"
   },
   {
     "objectID": "Books/Advanced R(2e)/4 Subsetting.html",
@@ -2910,5 +2910,54 @@
     "crumbs": [
       "25 Rewriting R code in C++"
     ]
+  },
+  {
+    "objectID": "Blog/双环网络图.html",
+    "href": "Blog/双环网络图.html",
+    "title": "双环网络图",
+    "section": "",
+    "text": "双环网络图的使用情景：图是二分图，即：A组与B组之间元素有关联，但组内元素没有关联；组间元素的关联呈现出聚集状。可以使用igraph::is_bipartite(g)进行二分图的判断。"
+  },
+  {
+    "objectID": "Blog/双环网络图.html#生成示例数据",
+    "href": "Blog/双环网络图.html#生成示例数据",
+    "title": "双环网络图",
+    "section": "生成示例数据",
+    "text": "生成示例数据\n\nA &lt;- paste0(\"groupA\", 1:30)\nB &lt;- paste0(\"groupB\", 1:10)\n\nnode &lt;- tibble::tibble(\n  name = c(A, B),\n  type = c(rep(FALSE, length(A)), rep(TRUE, length(B))),\n  Class = c(rep(\"A\", length(A)), rep(\"B\", length(B)))\n)\n\nset.seed(123)\nconnnectNum &lt;- vapply(\n  seq_along(A),\n  function(x) {\n    sample(1:7, 1)\n  },\n  FUN.VALUE = 1\n)\n\ngetB &lt;- function(a, b, size) {\n  tibble::tibble(\n    from = a,\n    to = sample(b, min(size, length(B)), replace = TRUE),\n    cor = sample(60:100, min(size, length(B)), replace = TRUE) / 100\n  )\n}\n\nedge &lt;- purrr::imap(\n  A, function(x, i) {\n    if (i &lt; 15) {\n      getB(x, B[1:5], connnectNum[i])\n    } else if (i &lt; 25) {\n      getB(x, B[5:8], connnectNum[i])\n    } else {\n      getB(x, B[9:10], connnectNum[i])\n    }\n  }\n) |&gt;\n  purrr::list_rbind()\n\n在生成node时，添加了额外的列type，这是识别二分图的标志，我们可以手动添加，也可以使用igraph::V(g)$type &lt;- bipartite_mapping(g)$type来添加。"
+  },
+  {
+    "objectID": "Blog/双环网络图.html#创建网络图对象并添加度信息",
+    "href": "Blog/双环网络图.html#创建网络图对象并添加度信息",
+    "title": "双环网络图",
+    "section": "创建网络图对象，并添加度信息",
+    "text": "创建网络图对象，并添加度信息\n\ng &lt;- igraph::graph_from_data_frame(edge, vertices = node, directed = FALSE) |&gt; # igraph 生成对象\n  igraph::simplify(remove.multiple = TRUE, remove.loops = TRUE, edge.attr.comb = \"first\") |&gt; # 使用igraph函数去除重复边，去除自环，边属性保留第一个，因为都一样\n  tidygraph::as_tbl_graph() |&gt; # tidygraph 生成对象\n  tidygraph::activate(\"nodes\") |&gt;\n  dplyr::mutate(Degree = tidygraph::centrality_degree()) # 生成节点度信息"
+  },
+  {
+    "objectID": "Blog/双环网络图.html#检查是否是二分图",
+    "href": "Blog/双环网络图.html#检查是否是二分图",
+    "title": "双环网络图",
+    "section": "检查是否是二分图",
+    "text": "检查是否是二分图\n\nigraph::is_bipartite(g)\n#&gt; [1] TRUE"
+  },
+  {
+    "objectID": "Blog/双环网络图.html#绘制二分图",
+    "href": "Blog/双环网络图.html#绘制二分图",
+    "title": "双环网络图",
+    "section": "绘制二分图",
+    "text": "绘制二分图\n注意：在设置type列时，值为TRUE的节点位于下方，值为FALSE的节点位于上方。这在转换极坐标系时用于区分内外圈，TRUE的节点位于内圈，值为FALSE的节点位于外圈。\n\np &lt;- ggraph::ggraph(g, layout = \"bipartite\") +\n  ggraph::geom_edge_link() +\n  ggraph::geom_node_point(\n    ggplot2::aes(color = Class, size = Degree),\n    shape = 19,\n    alpha = 1\n  ) +\n  ggplot2::theme_void()\np"
+  },
+  {
+    "objectID": "Blog/双环网络图.html#转换成极坐标系",
+    "href": "Blog/双环网络图.html#转换成极坐标系",
+    "title": "双环网络图",
+    "section": "转换成极坐标系",
+    "text": "转换成极坐标系\n\ncoords &lt;- g |&gt;\n  ggraph::create_layout(layout = \"bipartite\") |&gt;\n  dplyr::select(x, y) |&gt;\n  dplyr::mutate(\n    y = ifelse(y == 0, 0.3, y),\n    theta = x / (max(x) + 1) * 2 * pi,\n    r = y + 1,\n    x = r * cos(theta),\n    y = r * sin(theta),\n  )"
+  },
+  {
+    "objectID": "Blog/双环网络图.html#绘制双环网络图",
+    "href": "Blog/双环网络图.html#绘制双环网络图",
+    "title": "双环网络图",
+    "section": "绘制双环网络图",
+    "text": "绘制双环网络图\n\np &lt;- ggraph::ggraph(g, layout = \"manual\", x = coords$x, y = coords$y) +\n  ggraph::geom_edge_link() +\n  ggraph::geom_node_point(\n    ggplot2::aes(color = Class, size = Degree),\n    shape = 19,\n    alpha = 1\n  ) +\n  ggplot2::theme_void()\np\n\n\n\n\n\n\n\n稍稍美化一下图\n\npal &lt;- colorRampPalette(c(\"#3a9ab2\", \"#ddc744\", \"#f11b00\"))(100)\n\np &lt;- ggraph::ggraph(g, layout = \"manual\", x = coords$x, y = coords$y) +\n  ggraph::geom_edge_diagonal(\n    ggplot2::aes(color = cor, edge_width = cor)\n  ) +\n  ggraph::geom_node_point(\n    ggplot2::aes(color = Class, size = Degree),\n    shape = 19,\n    alpha = 1\n  ) +\n  ggraph::geom_node_text(\n    ggplot2::aes(\n      x = ifelse(Class == \"B\", x * 0.95, x * 1.03),\n      y = ifelse(Class == \"B\", y * 0.95, y * 1.03),\n      label = name,\n      hjust = ifelse(Class == \"B\", \"inward\", \"outward\"),\n      angle = -((-ggraph::node_angle(x, y) + 90) %% 180) + 90,\n      colour = Class\n    ),\n    repel = FALSE,\n    size = 8 / ggplot2::.pt\n  ) +\n  ggplot2::scale_color_manual(values = c(\"A\" = \"#f8766d\", \"B\" = \"#00bfc4\")) +\n  ggplot2::scale_size_continuous(range = c(1, 5)) +\n  ggraph::scale_edge_color_gradientn(colours = pal) +\n  ggraph::scale_edge_width_continuous(range = c(0.1, 1)) +\n  ggplot2::scale_x_continuous(expand = ggplot2::expansion(mult = .1)) +\n  ggplot2::scale_y_continuous(expand = ggplot2::expansion(mult = .1)) +\n  ggplot2::coord_fixed() +\n  ggplot2::guides(\n    edge_color = ggraph::guide_edge_colorbar(order = 1),\n    edge_width = ggplot2::guide_legend(order = 2, override.aes = list(color = \"black\")),\n    color = ggplot2::guide_legend(order = 3, override.aes = list(size = 5)),\n    size = ggplot2::guide_legend(order = 4)\n  ) +\n  ggplot2::theme_void() +\n  ggplot2::theme(\n    plot.margin = ggplot2::margin(1, 1, 1, 1, \"cm\"),\n    legend.text = ggplot2::element_text(size = 8),\n    legend.title = ggplot2::element_text(size = 10)\n    # legend.position = c(0.5, 0.5),\n    # legend.box = \"horizontal\"\n  )\np"
   }
 ]

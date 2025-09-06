@@ -78,7 +78,7 @@ ul.task-list li input[type="checkbox"] {
     const options = {
       valueNames: ['listing-date','listing-title','listing-author','listing-image','listing-description','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] }],
       
-      searchColumns: ["listing-title","listing-date"],
+      searchColumns: ["listing-date","listing-title"],
     };
 
     window['quarto-listings'] = window['quarto-listings'] || {};
@@ -208,7 +208,7 @@ window.Quarto = {
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         
-    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(6)</span></div><div class="category" data-category="Z2dwbG90Mg==">ggplot2 <span class="quarto-category-count">(1)</span></div><div class="category" data-category="cHVycnI=">purrr <span class="quarto-category-count">(1)</span></div><div class="category" data-category="cXVhcnRv">quarto <span class="quarto-category-count">(1)</span></div><div class="category" data-category="cmxhbmc=">rlang <span class="quarto-category-count">(1)</span></div><div class="category" data-category="dGlkeXZlcnNl">tidyverse <span class="quarto-category-count">(2)</span></div><div class="category" data-category="dHJpa3klMjBza2lsbA==">triky skill <span class="quarto-category-count">(1)</span></div><div class="category" data-category="JUU5JTlEJUEyJUU1JTkwJTkxJUU1JUFGJUI5JUU4JUIxJUEx">面向对象 <span class="quarto-category-count">(1)</span></div></div><div class="quarto-margin-footer"><div class="margin-footer-item">
+    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(7)</span></div><div class="category" data-category="Z2dwbG90Mg==">ggplot2 <span class="quarto-category-count">(1)</span></div><div class="category" data-category="Z2dyYXBo">ggraph <span class="quarto-category-count">(1)</span></div><div class="category" data-category="cHVycnI=">purrr <span class="quarto-category-count">(1)</span></div><div class="category" data-category="cXVhcnRv">quarto <span class="quarto-category-count">(1)</span></div><div class="category" data-category="cmxhbmc=">rlang <span class="quarto-category-count">(1)</span></div><div class="category" data-category="dGlkeXZlcnNl">tidyverse <span class="quarto-category-count">(2)</span></div><div class="category" data-category="dHJpa3klMjBza2lsbA==">triky skill <span class="quarto-category-count">(1)</span></div><div class="category" data-category="JUU5JTlEJUEyJUU1JTkwJTkxJUU1JUFGJUI5JUU4JUIxJUEx">面向对象 <span class="quarto-category-count">(1)</span></div></div><div class="quarto-margin-footer"><div class="margin-footer-item">
 <p><img src=".\logo.jpg" class="conditional-footer img-fluid" width="200"></p>
 </div></div></div>
 <!-- main -->
@@ -228,14 +228,14 @@ window.Quarto = {
      <select id="listing-listing-sort" class="form-select" aria-label="Order By" onchange="window['quarto-listings']['listing-listing'].sort(this.options[this.selectedIndex].value, { order: this.options[this.selectedIndex].getAttribute('data-direction')})">
        <option value="" disabled="" selected="" hidden="">Order By</option>
        <option value="index" data-direction="asc">Default</option>
-         <option value="listing-title" data-direction="asc">
-          Title
-        </option>
          <option value="listing-date-sort" data-direction="asc">
           Date - Oldest
         </option>
          <option value="listing-date-sort" data-direction="desc">
           Date - Newest
+        </option>
+         <option value="listing-title" data-direction="asc">
+          Title
         </option>
      </select>
   </div>
@@ -245,32 +245,32 @@ window.Quarto = {
     </div>
 </div>
 <div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="cXVhcnRv" data-listing-date-sort="1741968000000" data-listing-file-modified-sort="1743235900546" data-listing-date-modified-sort="1741968000000" data-listing-reading-time-sort="1" data-listing-word-count-sort="42">
+<div class="quarto-post image-right" data-index="0" data-categories="Z2dyYXBo" data-listing-date-sort="1757088000000" data-listing-file-modified-sort="1757145934971" data-listing-date-modified-sort="1757088000000" data-listing-reading-time-sort="4" data-listing-word-count-sort="638">
 <div class="thumbnail">
-<p><a href="./Blog/Code chunks.html" class="no-external"></a></p><a href="./Blog/Code chunks.html" class="no-external">
-<p class="card-img-top"><img src="Blog\images\execute.png"  class="thumbnail-image card-img"/></p>
-</a><p><a href="./Blog/Code chunks.html" class="no-external"></a></p>
+<p><a href="./Blog/双环网络图.html" class="no-external"></a></p><a href="./Blog/双环网络图.html" class="no-external">
+<p class="card-img-top"><img src="Blog\双环网络图_files\figure-html\unnamed-chunk-4-1.png"  class="thumbnail-image card-img"/></p>
+</a><p><a href="./Blog/双环网络图.html" class="no-external"></a></p>
 </div>
 <div class="body">
 <h3 class="no-anchor listing-title">
-<a href="./Blog/Code chunks.html" class="no-external">quarto 中R代码块的设置</a>
+<a href="./Blog/双环网络图.html" class="no-external">双环网络图</a>
 </h3>
 <div class="listing-subtitle">
-<a href="./Blog/Code chunks.html" class="no-external"></a>
+<a href="./Blog/双环网络图.html" class="no-external"></a>
 </div>
 <div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('cXVhcnRv'); return false;">
-quarto
+<div class="listing-category" onclick="window.quartoListingCategory('Z2dyYXBo'); return false;">
+ggraph
 </div>
 </div>
 <div class="listing-description">
-<a href="./Blog/Code chunks.html" class="no-external">每个代码块可以设置一个label，用来标记代码块和代码块的结果，可以用于交叉引用。</a>
+<a href="./Blog/双环网络图.html" class="no-external">双环网络图的使用情景：图是二分图，即：A组与B组之间元素有关联，但组内元素没有关联；组间元素的关联呈现出聚集状。可以使用<code>igraph::is_bipartite(g)</code>进行二分图的判断。</a>
 </div>
 </div>
 <div class="metadata">
-<a href="./Blog/Code chunks.html" class="no-external">
+<a href="./Blog/双环网络图.html" class="no-external">
 <div class="listing-date">
-2025-03-15
+2025-09-06
 </div>
 <div class="listing-author">
 大番薯本薯
@@ -278,68 +278,68 @@ quarto
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="1" data-categories="JUU5JTlEJUEyJUU1JTkwJTkxJUU1JUFGJUI5JUU4JUIxJUEx" data-listing-date-sort="1742054400000" data-listing-file-modified-sort="1743235900548" data-listing-date-modified-sort="1742054400000" data-listing-reading-time-sort="1" data-listing-word-count-sort="60">
+<div class="quarto-post image-right" data-index="1" data-categories="cHVycnIlMkN0aWR5dmVyc2U=" data-listing-date-sort="1753286400000" data-listing-file-modified-sort="1753318076611" data-listing-date-modified-sort="1753286400000" data-listing-reading-time-sort="3" data-listing-word-count-sort="419">
 <div class="thumbnail">
-<p><a href="./Blog/Object in R1.html" class="no-external"></a></p><a href="./Blog/Object in R1.html" class="no-external">
-<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-</a><p><a href="./Blog/Object in R1.html" class="no-external"></a></p>
+<p><a href="./Blog/替换多对字符串.html" class="no-external"></a></p><a href="./Blog/替换多对字符串.html" class="no-external">
+<p class="card-img-top"><img src="Blog\替换多对字符串_files\figure-html\unnamed-chunk-4-1.png"  class="thumbnail-image card-img"/></p>
+</a><p><a href="./Blog/替换多对字符串.html" class="no-external"></a></p>
 </div>
 <div class="body">
 <h3 class="no-anchor listing-title">
-<a href="./Blog/Object in R1.html" class="no-external">R 中的面向对象(1)</a>
+<a href="./Blog/替换多对字符串.html" class="no-external">替换多对字符串</a>
 </h3>
 <div class="listing-subtitle">
-<a href="./Blog/Object in R1.html" class="no-external"></a>
+<a href="./Blog/替换多对字符串.html" class="no-external"></a>
 </div>
 <div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('JUU5JTlEJUEyJUU1JTkwJTkxJUU1JUFGJUI5JUU4JUIxJUEx'); return false;">
-面向对象
-</div>
-</div>
-<div class="listing-description">
-<a href="./Blog/Object in R1.html" class="no-external">定义一个<strong>类</strong>，这个类有一些属性和方法，方法被<strong>封装</strong>为接口和实现；类可以实例化一个<strong>对象</strong>；类之间具有父子关系，子类可以<strong>继承</strong>父类的属性和方法；不同类的方法名是重复的，可以根据类选择对应的实现，这称之为<strong>多态</strong>。</a>
-</div>
-</div>
-<div class="metadata">
-<a href="./Blog/Object in R1.html" class="no-external">
-<div class="listing-date">
-2025-03-16
-</div>
-<div class="listing-author">
-大番薯本薯
-</div>
-</a>
-</div>
-</div>
-<div class="quarto-post image-right" data-index="2" data-categories="cmxhbmclMkN0aWR5dmVyc2U=" data-listing-date-sort="1745510400000" data-listing-file-modified-sort="1752797422904" data-listing-date-modified-sort="1746979200000" data-listing-reading-time-sort="2" data-listing-word-count-sort="346">
-<div class="thumbnail">
-<p><a href="./Blog/Data Masking.html" class="no-external"></a></p><a href="./Blog/Data Masking.html" class="no-external">
-<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-</a><p><a href="./Blog/Data Masking.html" class="no-external"></a></p>
-</div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="./Blog/Data Masking.html" class="no-external">Data Masking(1)</a>
-</h3>
-<div class="listing-subtitle">
-<a href="./Blog/Data Masking.html" class="no-external"></a>
-</div>
-<div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('cmxhbmc='); return false;">
-rlang
+<div class="listing-category" onclick="window.quartoListingCategory('cHVycnI='); return false;">
+purrr
 </div>
 <div class="listing-category" onclick="window.quartoListingCategory('dGlkeXZlcnNl'); return false;">
 tidyverse
 </div>
 </div>
 <div class="listing-description">
-<a href="./Blog/Data Masking.html" class="no-external">Data-masking 是一种允许直接调用数据框中的列名作为一个正常环境变量的技术。例如下例，使用<code>with</code>函数实现该目的：</a>
+<a href="./Blog/替换多对字符串.html" class="no-external">考虑下面的情景：你提取到每个物种特有的keggID号，为了节省空间，你将keggID号拼接了起来。与此同时，你需要将keggID号对应得代谢物名称追加到数据集中。</a>
 </div>
 </div>
 <div class="metadata">
-<a href="./Blog/Data Masking.html" class="no-external">
+<a href="./Blog/替换多对字符串.html" class="no-external">
 <div class="listing-date">
-2025-04-25
+2025-07-24
+</div>
+<div class="listing-author">
+大番薯本薯
+</div>
+</a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="2" data-categories="Z2dwbG90Mg==" data-listing-date-sort="1751472000000" data-listing-file-modified-sort="1757144976555" data-listing-date-modified-sort="1751472000000" data-listing-reading-time-sort="1" data-listing-word-count-sort="67">
+<div class="thumbnail">
+<p><a href="./Blog/绘制点脊图.html" class="no-external"></a></p><a href="./Blog/绘制点脊图.html" class="no-external">
+<p class="card-img-top"><img src="Blog\绘制点脊图_files\figure-html\unnamed-chunk-2-1.png"  class="thumbnail-image card-img"/></p>
+</a><p><a href="./Blog/绘制点脊图.html" class="no-external"></a></p>
+</div>
+<div class="body">
+<h3 class="no-anchor listing-title">
+<a href="./Blog/绘制点脊图.html" class="no-external">绘制点脊图</a>
+</h3>
+<div class="listing-subtitle">
+<a href="./Blog/绘制点脊图.html" class="no-external"></a>
+</div>
+<div class="listing-categories">
+<div class="listing-category" onclick="window.quartoListingCategory('Z2dwbG90Mg=='); return false;">
+ggplot2
+</div>
+</div>
+<div class="listing-description">
+<a href="./Blog/绘制点脊图.html" class="no-external">最近在绘制气泡图时，发现点太密集了，想再绘制一个核密度图，来展示数据的分布。</a>
+</div>
+</div>
+<div class="metadata">
+<a href="./Blog/绘制点脊图.html" class="no-external">
+<div class="listing-date">
+2025-07-03
 </div>
 <div class="listing-author">
 大番薯本薯
@@ -380,32 +380,35 @@ triky skill
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="4" data-categories="Z2dwbG90Mg==" data-listing-date-sort="1751472000000" data-listing-file-modified-sort="1751541438133" data-listing-date-modified-sort="1751472000000" data-listing-reading-time-sort="1" data-listing-word-count-sort="67">
+<div class="quarto-post image-right" data-index="4" data-categories="cmxhbmclMkN0aWR5dmVyc2U=" data-listing-date-sort="1745510400000" data-listing-file-modified-sort="1752797422904" data-listing-date-modified-sort="1746979200000" data-listing-reading-time-sort="2" data-listing-word-count-sort="346">
 <div class="thumbnail">
-<p><a href="./Blog/绘制点脊图.html" class="no-external"></a></p><a href="./Blog/绘制点脊图.html" class="no-external">
-<p class="card-img-top"><img src="Blog\绘制点脊图_files\figure-html\unnamed-chunk-2-1.png"  class="thumbnail-image card-img"/></p>
-</a><p><a href="./Blog/绘制点脊图.html" class="no-external"></a></p>
+<p><a href="./Blog/Data Masking.html" class="no-external"></a></p><a href="./Blog/Data Masking.html" class="no-external">
+<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
+</a><p><a href="./Blog/Data Masking.html" class="no-external"></a></p>
 </div>
 <div class="body">
 <h3 class="no-anchor listing-title">
-<a href="./Blog/绘制点脊图.html" class="no-external">绘制点脊图</a>
+<a href="./Blog/Data Masking.html" class="no-external">Data Masking(1)</a>
 </h3>
 <div class="listing-subtitle">
-<a href="./Blog/绘制点脊图.html" class="no-external"></a>
+<a href="./Blog/Data Masking.html" class="no-external"></a>
 </div>
 <div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('Z2dwbG90Mg=='); return false;">
-ggplot2
+<div class="listing-category" onclick="window.quartoListingCategory('cmxhbmc='); return false;">
+rlang
+</div>
+<div class="listing-category" onclick="window.quartoListingCategory('dGlkeXZlcnNl'); return false;">
+tidyverse
 </div>
 </div>
 <div class="listing-description">
-<a href="./Blog/绘制点脊图.html" class="no-external">最近在绘制气泡图时，发现点太密集了，想再绘制一个核密度图，来展示数据的分布。</a>
+<a href="./Blog/Data Masking.html" class="no-external">Data-masking 是一种允许直接调用数据框中的列名作为一个正常环境变量的技术。例如下例，使用<code>with</code>函数实现该目的：</a>
 </div>
 </div>
 <div class="metadata">
-<a href="./Blog/绘制点脊图.html" class="no-external">
+<a href="./Blog/Data Masking.html" class="no-external">
 <div class="listing-date">
-2025-07-03
+2025-04-25
 </div>
 <div class="listing-author">
 大番薯本薯
@@ -413,35 +416,65 @@ ggplot2
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="5" data-categories="cHVycnIlMkN0aWR5dmVyc2U=" data-listing-date-sort="1753286400000" data-listing-file-modified-sort="1753318076611" data-listing-date-modified-sort="1753286400000" data-listing-reading-time-sort="3" data-listing-word-count-sort="419">
+<div class="quarto-post image-right" data-index="5" data-categories="JUU5JTlEJUEyJUU1JTkwJTkxJUU1JUFGJUI5JUU4JUIxJUEx" data-listing-date-sort="1742054400000" data-listing-file-modified-sort="1743235900548" data-listing-date-modified-sort="1742054400000" data-listing-reading-time-sort="1" data-listing-word-count-sort="60">
 <div class="thumbnail">
-<p><a href="./Blog/替换多对字符串.html" class="no-external"></a></p><a href="./Blog/替换多对字符串.html" class="no-external">
-<p class="card-img-top"><img src="Blog\替换多对字符串_files\figure-html\unnamed-chunk-4-1.png"  class="thumbnail-image card-img"/></p>
-</a><p><a href="./Blog/替换多对字符串.html" class="no-external"></a></p>
+<p><a href="./Blog/Object in R1.html" class="no-external"></a></p><a href="./Blog/Object in R1.html" class="no-external">
+<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
+</a><p><a href="./Blog/Object in R1.html" class="no-external"></a></p>
 </div>
 <div class="body">
 <h3 class="no-anchor listing-title">
-<a href="./Blog/替换多对字符串.html" class="no-external">替换多对字符串</a>
+<a href="./Blog/Object in R1.html" class="no-external">R 中的面向对象(1)</a>
 </h3>
 <div class="listing-subtitle">
-<a href="./Blog/替换多对字符串.html" class="no-external"></a>
+<a href="./Blog/Object in R1.html" class="no-external"></a>
 </div>
 <div class="listing-categories">
-<div class="listing-category" onclick="window.quartoListingCategory('cHVycnI='); return false;">
-purrr
-</div>
-<div class="listing-category" onclick="window.quartoListingCategory('dGlkeXZlcnNl'); return false;">
-tidyverse
+<div class="listing-category" onclick="window.quartoListingCategory('JUU5JTlEJUEyJUU1JTkwJTkxJUU1JUFGJUI5JUU4JUIxJUEx'); return false;">
+面向对象
 </div>
 </div>
 <div class="listing-description">
-<a href="./Blog/替换多对字符串.html" class="no-external">考虑下面的情景：你提取到每个物种特有的keggID号，为了节省空间，你将keggID号拼接了起来。与此同时，你需要将keggID号对应得代谢物名称追加到数据集中。</a>
+<a href="./Blog/Object in R1.html" class="no-external">定义一个<strong>类</strong>，这个类有一些属性和方法，方法被<strong>封装</strong>为接口和实现；类可以实例化一个<strong>对象</strong>；类之间具有父子关系，子类可以<strong>继承</strong>父类的属性和方法；不同类的方法名是重复的，可以根据类选择对应的实现，这称之为<strong>多态</strong>。</a>
 </div>
 </div>
 <div class="metadata">
-<a href="./Blog/替换多对字符串.html" class="no-external">
+<a href="./Blog/Object in R1.html" class="no-external">
 <div class="listing-date">
-2025-07-24
+2025-03-16
+</div>
+<div class="listing-author">
+大番薯本薯
+</div>
+</a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="6" data-categories="cXVhcnRv" data-listing-date-sort="1741968000000" data-listing-file-modified-sort="1743235900546" data-listing-date-modified-sort="1741968000000" data-listing-reading-time-sort="1" data-listing-word-count-sort="42">
+<div class="thumbnail">
+<p><a href="./Blog/Code chunks.html" class="no-external"></a></p><a href="./Blog/Code chunks.html" class="no-external">
+<p class="card-img-top"><img src="Blog\images\execute.png"  class="thumbnail-image card-img"/></p>
+</a><p><a href="./Blog/Code chunks.html" class="no-external"></a></p>
+</div>
+<div class="body">
+<h3 class="no-anchor listing-title">
+<a href="./Blog/Code chunks.html" class="no-external">quarto 中R代码块的设置</a>
+</h3>
+<div class="listing-subtitle">
+<a href="./Blog/Code chunks.html" class="no-external"></a>
+</div>
+<div class="listing-categories">
+<div class="listing-category" onclick="window.quartoListingCategory('cXVhcnRv'); return false;">
+quarto
+</div>
+</div>
+<div class="listing-description">
+<a href="./Blog/Code chunks.html" class="no-external">每个代码块可以设置一个label，用来标记代码块和代码块的结果，可以用于交叉引用。</a>
+</div>
+</div>
+<div class="metadata">
+<a href="./Blog/Code chunks.html" class="no-external">
+<div class="listing-date">
+2025-03-15
 </div>
 <div class="listing-author">
 大番薯本薯
