@@ -1,22 +1,36 @@
 ---
 title: "index"
-date: "2025-03-17"
-date-modified: "2025-03-17"
-format: "html"
+date: "2025-09-08"
+date-modified: "2025-09-08"
+
+format:
+  html:
+    code-link: true
+
+fig-width: 6
+fig-asp: 0.618
+out-width: 70%
+fig-align: center
+
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: "#>"
+    R.options:
+      dplyr.print_min: 6
+      dplyr.print_max: 6
+      pillar.max_footer_lines: 2
+      pillar.min_chars: 15
+      stringr.view_n: 6
+      cli.num_colors: 0
+      cli.hyperlink: FALSE
+      pillar.bold: TRUE
+      width: 77
+
 execute:
-  warning: false
-  fig-width: 6
-  fig-asp: 0.618
-  out-width: 70%
-  fig-align: center
+  warning: true
+  error: true
 ---
-
-```{r}
-#| echo: false
-
-source("_common.R")
-```
-
 
 本篇为书籍`Tidy Modeling with R`的学习笔记。
 
@@ -32,11 +46,9 @@ tidymodels R包官方网站：[https://www.tidymodels.org](https://www.tidymodel
 
 下面是全文概览：
 
--   第1章：概述模型的分类，强调什么是好的建模软件。
--   第2章：回顾 tidyverse 语法。
--   第3章：base R中的统计建模总览及其不足。
--   第4~9章：tidymodel系列包的介绍：recipes，parsnip，workflows，yardstick等。
+-   第1章，概述模型的分类，及优质建模软件的特征。第2章，回顾 tidyverse 的语法和思想。第3章，介绍 base R 中的统计建模及其不足。
+-   第4~9章：以一个示例介绍tidymodel系列包：recipes，parsnip，workflows，yardstick等。
 -   第10~15章：模型性能评估与调参。
--   第16~21章：如何理解和解构模型。
+-   第16~21章：介绍特征工程，如降维和高基数预测变量编码；模型的可解释性与可信度。
 
 
