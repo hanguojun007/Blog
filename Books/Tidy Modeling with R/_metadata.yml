@@ -4,3 +4,4 @@ website:
       title: Tidy Modeling with R
       contents:
         - Books/Tidy Modeling with R/index.qmd
+        - Books/Tidy Modeling with R/1 Software for modeling.qmd
