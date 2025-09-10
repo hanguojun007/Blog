@@ -1,0 +1,104 @@
+---
+title: "2 A Tidyverse Primer"
+date: "2025-09-10"
+date-modified: "2025-09-10"
+
+format:
+  html:
+    code-link: true
+
+fig-width: 6
+fig-asp: 0.618
+out-width: 70%
+fig-align: center
+
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: "#>"
+    R.options:
+      dplyr.print_min: 6
+      dplyr.print_max: 6
+      pillar.max_footer_lines: 2
+      pillar.min_chars: 15
+      stringr.view_n: 6
+      cli.num_colors: 0
+      cli.hyperlink: FALSE
+      pillar.bold: TRUE
+      width: 77
+
+execute:
+  warning: true
+  error: true
+---
+
+什么是tidyverse，tidymodels框架又在其中扮演什么角色呢？tidyverse是一系列R数据分析包的集合，这些包是基于共同的理念和规范开发的。用Wickham等人的话讲：
+
+“At a high level, the tidyverse is a language for solving data science challenges with R code. Its primary goal is to facilitate a conversation between a human and a computer about data. Less abstractly, the tidyverse is a collection of R packages that share a high-level design philosophy and low-level grammar and data structures, so that learning one package makes it easier to learn the next.”
+
+在本章中，我们简要讨论tidyverse设计理念的重要原则，以及这些原则如何应用于易于正确使用且支持良好统计实践的建模软件中。下一章将介绍base R中的建模惯例。通过这些讨论，你可以理解tidyverse、tidymodels与base R之间的关系。tidymodels和tidyverse都建立在base R之上，而tidymodels则将tidyverse的原则应用于模型构建。
+
+## Tidyverse Principles
+
+有关以tidyverse风格编写R代码的全套策略和技巧，可以在网站[https://design.tidyverse.org](https://design.tidyverse.org)上找到。在这里，我们可以简要介绍tidyverse的几个通用设计原则、其背后的动机，以及我们如何将建模视为这些原则的一种应用。
+
+### Design for humans
+
+tidyverse 致力于设计易于广大人群理解和使用的R包及函数。无论是过去还是现在，很大一部分R用户并非是创建软件或工具的人，而是进行分析或建模的人。因此，R用户通常没有（也不需要）计算机科学背景，而且许多人对编写自己的R包并不感兴趣。
+
+出于这个原因，R代码必须易于操作以实现你的目标，这一点至关重要。文档、培训、可及性以及其他因素在实现这一目标中发挥着重要作用。然而，如果语法本身难以被人们轻松理解，那么文档就不是一个好的解决方案。软件本身必须具有直观性。
+
+为了将tidyverse方法与更传统的R语义进行对比，我们来考虑对数据框进行排序。数据框的每一列可以表示不同类型的数据，每一行可以包含多个值。仅使用核心语言时，我们可以结合R的抽取规则和`order()`函数，通过重新排列行的顺序，依据一个或多个列对数据框进行排序；在这种情况下，你可能会因为一个函数的名称而想用它，但实际上用`sort()`是无法成功的。要依据`mtcars`数据中的两列对其进行排序，调用方式可能如下：
+
+```r
+mtcars[order(mtcars$gear, mtcars$mpg), ]
+```
+
+虽然计算效率很高，但很难说这是一个直观的用户界面。相比之下，在dplyr中，tidyverse函数`arrange()`直接将一组变量名作为输入参数：
+
+```r
+library(dplyr)
+arrange(.data = mtcars, gear, mpg)
+```
+
+这里使用的变量名是“未加引号的”；许多传统的R函数需要用字符串来指定变量，但tidyverse函数接受未加引号的名称或选择器函数。这些选择器允许应用一个或多个易懂的规则到列名上。例如，`ends_with("t")`会选择`mtcars`数据框中的`drat`列和`wt`列。
+
+此外，命名至关重要。如果你是R语言新手，正在编写涉及线性代数的数据分析或建模代码，那么在寻找计算矩阵逆的函数时可能会遇到困难。使用`apropos("inv")`不会得到任何候选结果。事实证明，基础R语言中用于此任务的函数是`solve()`，它用于求解线性方程组。对于矩阵`X`，你可以使用`solve(X)`来求`X`的逆（此时方程右侧没有向量）。这一点仅在帮助文件中某个参数的描述中有所说明。本质上，你需要知道解决方案的名称才能找到该解决方案。
+
+tidyverse的做法是使用描述性强且明确的函数名，而非简短且隐晦的函数名。通用方法侧重于动词（例如，`fit`、`arrange`等）。动词-名词组合尤其有效，不妨考虑将`invert_matrix()`作为一个假设的函数名。在建模的语境下，避免使用高度专业的术语也很重要，比如希腊字母或生僻词汇。函数名应尽可能做到自说明。
+
+当一个包中存在类似的函数时，函数名的设计会针对制表符补全进行优化。例如，glue包中有一系列函数都以一个共同的前缀（`glue_`）开头，这能让用户快速找到他们想要的函数。
+
+### Reuse existing data structures
+
+只要有可能，函数应避免返回全新的数据结构。如果结果适合现有的数据结构，就应使用该数据结构。这会减轻使用软件时的认知负担，无需额外的语法或方法。
+
+数据框是tidyverse和tidymodels包中首选的数据结构，因为其结构非常适合大量的数据科学任务。具体来说，tidyverse和tidymodels更倾向于使用tibble，这是对R语言数据框的现代重塑，我们将在下一节关于tidyverse语法示例的内容中对其进行介绍。
+
+例如，rsample包可用于创建数据集的**重采样**，如交叉验证或自助法（在第10章中描述）。重采样函数返回一个tibble，其中包含一个名为`splits`的列，该列中的对象定义了重采样后的数据集。一个数据集的三个自助样本可能如下所示：
+
+```{r}
+boot_samp <- rsample::bootstraps(mtcars, times = 3)
+boot_samp
+class(boot_samp)
+```
+
+通过这种方法，基于向量的函数可以用于这些列，例如`vapply()`或`purrr::map()`。这个`boot_samp`对象有多个类，但继承了数据框（`"data.frame"`）和 tibble（`"tbl_df"`）的方法。此外，可以向结果中添加新列，而不会影响数据的类。与完全新的、其数据结构不明确的对象类型相比，这对用户来说更容易使用，也更具通用性。
+
+依赖常见数据结构的一个缺点是可能会损失计算性能。在某些情况下，数据可以用专门的格式进行编码，这些格式能更高效地表示数据。例如：
+
+-   在计算化学中，结构数据文件格式（SDF）是一种工具，它能获取化学结构并将其编码为便于计算处理的格式。
+
+-   具有大量相同值（例如二进制数据中的零）的数据可以存储在稀疏矩阵格式中。这种格式不仅可以减小数据的大小，还能启用更高效的计算技术。
+
+当问题范围明确，且潜在的数据处理方法既定义清晰又适合这种格式时，这些格式就具有优势。然而，一旦这些约束条件被违反，专用数据格式的用处就会减小。例如，如果我们对数据进行转换，将其转换为分数，那么输出就不再是稀疏的；稀疏矩阵表示有助于建模中的某个特定算法步骤，但在该特定步骤之前或之后，情况往往并非如此。专用数据结构不像通用数据结构那样，足以灵活应对整个建模工作流程。
+
+rsample生成的tibble中有一个重要特征，即`splits`列是一个列表。在这种情况下，该列表的每个元素都属于同一类型的对象——`rsplit`对象，其中包含关于`mtcars`的哪些行属于自助抽样样本的信息。列表列在数据分析中非常有用，并且正如本书通篇将要介绍的那样，它们对tidymodels而言也很重要。
+
+###  Design for the pipe and functional programming
+
+
+## Examples of Tidyverse Syntax
+
+
+## Chapter Summary
