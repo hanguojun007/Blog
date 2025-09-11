@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.24">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<meta name="dcterms.date" content="2025-09-10">
+<title>2 A Tidyverse Primer</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../Books/Tidy Modeling with R/1 Software for modeling.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dc55a5b9e770e841cd82e46aadbfb9b0.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-2bc269ba33bfe0c9779ec90686b7c52e.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light"><script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": true,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "Search",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script><link rel="stylesheet" href="../../styles.css">
+</head>
+<body class="nav-sidebar floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top"><nav class="navbar navbar-expand-lg " data-bs-theme="dark"><div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">RSSPtho</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+<li class="nav-item">
+    <a class="nav-link active" href="../../index.html" aria-current="page"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-books" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Books</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-books">
+<li>
+    <a class="dropdown-item" href="../../Books/ggplot2/index.html">
+ <span class="dropdown-text">ggplot2</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Books/R4DS2/index.html">
+ <span class="dropdown-text">R for Data Science(2e)</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Books/Tidy Modeling with R/index.html">
+ <span class="dropdown-text">Tidy Modeling with R</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Books/Advanced R(2e)/index.html">
+ <span class="dropdown-text">Advanced R(2e)</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Books/quarto/Project Basics.html">
+ <span class="dropdown-text">Quarto</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Books/Js4R/00 Preface.html">
+ <span class="dropdown-text">Js4R</span></a>
+  </li>  
+    </ul>
+</li>
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About me</span></a>
+  </li>  
+</ul>
+<div class="quarto-navbar-tools">
+    <a href="https://github.com/hanguojun007" title="" class="quarto-navigation-tool px-1" aria-label=""><i class="bi bi-github"></i></a>
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav><nav class="quarto-secondary-nav"><div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../Books/Tidy Modeling with R/2 A Tidyverse Primer.html">2 A Tidyverse Primer</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav></header><!-- content --><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto"><div class="pt-lg-2 mt-2 text-left sidebar-header sidebar-header-stacked">
+      <a href="../../index.html" class="sidebar-logo-link">
+      </a>
+      </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">index</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/1 Software for modeling.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1 Software for modeling</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/2 A Tidyverse Primer.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">2 A Tidyverse Primer</span></a>
+  </div>
+</li>
+    </ul>
+</div>
+</nav><div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active"><h2 id="toc-title">On this page</h2>
+   
+  <ul>
+<li>
+<a href="#tidyverse-principles" id="toc-tidyverse-principles" class="nav-link active" data-scroll-target="#tidyverse-principles">Tidyverse Principles</a>
+  <ul class="collapse">
+<li><a href="#design-for-humans" id="toc-design-for-humans" class="nav-link" data-scroll-target="#design-for-humans">Design for humans</a></li>
+  <li><a href="#reuse-existing-data-structures" id="toc-reuse-existing-data-structures" class="nav-link" data-scroll-target="#reuse-existing-data-structures">Reuse existing data structures</a></li>
+  <li><a href="#design-for-the-pipe" id="toc-design-for-the-pipe" class="nav-link" data-scroll-target="#design-for-the-pipe">Design for the pipe</a></li>
+  <li><a href="#design-for-functional-programming" id="toc-design-for-functional-programming" class="nav-link" data-scroll-target="#design-for-functional-programming">Design for functional programming</a></li>
+  </ul>
+</li>
+  <li><a href="#examples-of-tidyverse-syntax" id="toc-examples-of-tidyverse-syntax" class="nav-link" data-scroll-target="#examples-of-tidyverse-syntax">Examples of Tidyverse Syntax</a></li>
+  <li><a href="#chapter-summary" id="toc-chapter-summary" class="nav-link" data-scroll-target="#chapter-summary">Chapter Summary</a></li>
+  </ul></nav>
+    <div class="quarto-margin-footer"><div class="margin-footer-item">
+<p><img src="../..\logo.jpg" class="conditional-footer img-fluid" width="200"></p>
+</div></div></div>
+<!-- main -->
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
+<h1 class="title">2 A Tidyverse Primer</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">September 10, 2025</p>
+    </div>
+  </div>
+  
+    <div>
+    <div class="quarto-title-meta-heading">Modified</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date-modified">September 10, 2025</p>
+    </div>
+  </div>
+    
+  </div>
+  
+
+
+</header><p>什么是tidyverse，tidymodels框架又在其中扮演什么角色呢？tidyverse是一系列R数据分析包的集合，这些包是基于共同的理念和规范开发的。用Wickham等人的话讲：</p>
+<p>“At a high level, the tidyverse is a language for solving data science challenges with R code. Its primary goal is to facilitate a conversation between a human and a computer about data. Less abstractly, the tidyverse is a collection of R packages that share a high-level design philosophy and low-level grammar and data structures, so that learning one package makes it easier to learn the next.”</p>
+<p>在本章中，我们简要讨论tidyverse设计理念的重要原则，以及这些原则如何应用于易于正确使用且支持良好统计实践的建模软件中。下一章将介绍base R中的建模惯例。通过这些讨论，你可以理解tidyverse、tidymodels与base R之间的关系：tidymodels和tidyverse都建立在base R之上，而tidymodels则将tidyverse的原则应用于模型构建。</p>
+<section id="tidyverse-principles" class="level2"><h2 class="anchored" data-anchor-id="tidyverse-principles">Tidyverse Principles</h2>
+<p>有关以tidyverse风格编写R代码的全套策略和技巧，可以在网站<a href="https://design.tidyverse.org">https://design.tidyverse.org</a>上找到。在这里，我们可以简要介绍tidyverse的几个通用设计原则、其背后的动机，以及我们如何将建模视为这些原则的一种应用。</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org">tidyverse</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; ── Attaching core tidyverse packages ───────────────────── tidyverse 2.0.0 ──</span></span>
+<span><span class="co">#&gt; ✔ dplyr     1.1.4     ✔ readr     2.1.5</span></span>
+<span><span class="co">#&gt; ✔ forcats   1.0.0     ✔ stringr   1.5.1</span></span>
+<span><span class="co">#&gt; ✔ ggplot2   3.5.2     ✔ tibble    3.2.1</span></span>
+<span><span class="co">#&gt; ✔ lubridate 1.9.4     ✔ tidyr     1.3.1</span></span>
+<span><span class="co">#&gt; ✔ purrr     1.0.4     </span></span>
+<span><span class="co">#&gt; ── Conflicts ─────────────────────────────────────── tidyverse_conflicts() ──</span></span>
+<span><span class="co">#&gt; ✖ dplyr::filter() masks stats::filter()</span></span>
+<span><span class="co">#&gt; ✖ dplyr::lag()    masks stats::lag()</span></span>
+<span><span class="co">#&gt; ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<section id="design-for-humans" class="level3"><h3 class="anchored" data-anchor-id="design-for-humans">Design for humans</h3>
+<p>tidyverse 致力于设计易于广大人群理解和使用的R包及函数。无论是过去还是现在，很大一部分R用户并非是创建软件或工具的人，而是进行分析或建模的人。因此，R用户通常没有（也不需要）计算机科学背景，而且许多人对编写自己的R包并不感兴趣。</p>
+<p>出于这个原因，<strong>R代码必须易于操作</strong>以实现你的目标，这一点至关重要。文档、培训、可及性以及其他因素在实现这一目标中发挥着重要作用。然而，如果语法本身难以被人们轻松理解，那么文档就不是一个好的解决方案。软件本身必须具有直观性。</p>
+<p>为了将tidyverse方法与更传统的R语义进行对比，我们来考虑对数据框进行排序。数据框的每一列可以表示不同类型的数据，每一行可以包含多个值。仅使用核心语言时，我们可以结合R的抽取规则和<code><a href="https://rdrr.io/r/base/order.html">order()</a></code>函数，通过重新排列行的顺序，依据一个或多个列对数据框进行排序；在这种情况下，你可能会因为一个函数的名称而想用它，但实际上用<code><a href="https://rdrr.io/r/base/sort.html">sort()</a></code>是无法成功的。要依据<code>mtcars</code>数据中的两列对其进行排序，调用方式可能如下：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">mtcars</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html">order</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">$</span><span class="va">gear</span>, <span class="va">mtcars</span><span class="op">$</span><span class="va">mpg</span><span class="op">)</span>, <span class="op">]</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>虽然计算效率很高，但很难说这是一个直观的用户界面。相比之下，在dplyr中，tidyverse函数<code><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange()</a></code>直接将一组变量名作为输入参数：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span><span class="op">(</span>.data <span class="op">=</span> <span class="va">mtcars</span>, <span class="va">gear</span>, <span class="va">mpg</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>这里使用的变量名是“未加引号的”；许多传统的R函数需要用字符串来指定变量，但tidyverse函数接受未加引号的名称或选择器函数。这些选择器允许应用一个或多个易懂的规则到列名上。例如，<code>ends_with("t")</code>会选择<code>mtcars</code>数据框中的<code>drat</code>列和<code>wt</code>列。</p>
+<p>此外，<strong>命名至关重要</strong>。如果你是R语言新手，正在编写涉及线性代数的数据分析或建模代码，那么在寻找计算矩阵逆的函数时可能会遇到困难。使用<code>apropos("inv")</code>不会得到任何候选结果。事实证明，base R中用于此任务的函数是<code><a href="https://rdrr.io/r/base/solve.html">solve()</a></code>，它用于求解线性方程组。对于矩阵<code>X</code>，你可以使用<code>solve(X)</code>来求<code>X</code>的逆（此时方程右侧没有向量）。这一点仅在帮助文件中某个参数的描述中有所说明。本质上，你需要知道解决方案的名称才能找到该解决方案。</p>
+<p>tidyverse的做法是使用描述性强且明确的函数名，而非简短且隐晦的函数名。通用方法侧重于动词（例如，<code>fit</code>、<code>arrange</code>等）。动词-名词组合尤其有效，不妨考虑将<code>invert_matrix()</code>作为一个假设的函数名。在建模的语境下，避免使用高度专业的术语也很重要，比如希腊字母或生僻词汇。函数名应尽可能做到自说明。</p>
+<p>当一个包中存在类似的函数时，函数名的设计会针对制表符补全进行优化。例如，glue包中有一系列函数都以一个共同的前缀（<code>glue_</code>）开头，这能让用户快速找到他们想要的函数。</p>
+</section><section id="reuse-existing-data-structures" class="level3"><h3 class="anchored" data-anchor-id="reuse-existing-data-structures">Reuse existing data structures</h3>
+<p>只要有可能，函数应<strong>避免返回全新的数据结构</strong>。如果结果适合现有的数据结构，就应使用该数据结构。这会减轻使用软件时的认知负担，无需额外的语法或方法。</p>
+<p>数据框是tidyverse和tidymodels包中首选的数据结构，因为其结构非常适合大量的数据科学任务。具体来说，tidyverse和tidymodels更倾向于使用tibble，这是对R语言数据框的现代重塑，我们将在下一节关于tidyverse语法示例的内容中对其进行介绍。</p>
+<p>例如，rsample包可用于创建数据集的<strong>重采样</strong>，如交叉验证或自助法（在第10章中描述）。重采样函数返回一个tibble，其中包含一个名为<code>splits</code>的列，该列中的对象定义了重采样后的数据集。一个数据集的三个自助样本可能如下所示：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">boot_samp</span> <span class="op">&lt;-</span> <span class="fu">rsample</span><span class="fu">::</span><span class="fu"><a href="https://rsample.tidymodels.org/reference/bootstraps.html">bootstraps</a></span><span class="op">(</span><span class="va">mtcars</span>, times <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
+<span><span class="va">boot_samp</span></span>
+<span><span class="co">#&gt; # Bootstrap sampling </span></span>
+<span><span class="co">#&gt; # A tibble: 3 × 2</span></span>
+<span><span class="co">#&gt;   splits          id        </span></span>
+<span><span class="co">#&gt;   &lt;list&gt;          &lt;chr&gt;     </span></span>
+<span><span class="co">#&gt; 1 &lt;split [32/13]&gt; Bootstrap1</span></span>
+<span><span class="co">#&gt; 2 &lt;split [32/16]&gt; Bootstrap2</span></span>
+<span><span class="co">#&gt; 3 &lt;split [32/12]&gt; Bootstrap3</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/class.html">class</a></span><span class="op">(</span><span class="va">boot_samp</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "bootstraps" "rset"       "tbl_df"     "tbl"        "data.frame"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>通过这种方法，基于向量的函数可以用于这些列，例如<code><a href="https://rdrr.io/r/base/lapply.html">vapply()</a></code>或<code><a href="https://purrr.tidyverse.org/reference/map.html">purrr::map()</a></code>。这个<code>boot_samp</code>对象有多个类，但继承了数据框（<code>"data.frame"</code>）和 tibble（<code>"tbl_df"</code>）的方法。此外，可以向结果中添加新列，而不会影响数据的类。与完全新的、其数据结构不明确的对象类型相比，这对用户来说更容易使用，也更具通用性。</p>
+<p>依赖常见数据结构的一个缺点是可能会损失计算性能。在某些情况下，数据可以用专门的格式进行编码，这些格式能更高效地表示数据。例如：</p>
+<ul>
+<li><p>在计算化学中，结构数据文件格式（SDF）是一种工具，它能获取化学结构并将其编码为便于计算处理的格式。</p></li>
+<li><p>具有大量相同值（例如二进制数据中的零）的数据可以存储在稀疏矩阵格式中。这种格式不仅可以减小数据的大小，还能启用更高效的计算技术。</p></li>
+</ul>
+<p>当问题范围明确，且潜在的数据处理方法既定义清晰又适合这种格式时，这些格式就具有优势。然而，一旦这些约束条件被违反，专用数据格式的用处就会减小。例如，如果我们对数据进行转换，将其转换为分数，那么输出就不再是稀疏的；稀疏矩阵表示有助于建模中的某个特定算法步骤，但在该特定步骤之前或之后，情况往往并非如此。专用数据结构不像通用数据结构那样，足以灵活应对整个建模工作流程。</p>
+<p>rsample生成的tibble中有一个重要特征，即<code>splits</code>列是一个列表。在这种情况下，该列表的每个元素都属于同一类型的对象——<code>rsplit</code>对象，其中包含关于<code>mtcars</code>的哪些行属于自助抽样样本的信息。列表列在数据分析中非常有用，并且正如本书通篇将要介绍的那样，它们对tidymodels而言也很重要。</p>
+</section><section id="design-for-the-pipe" class="level3"><h3 class="anchored" data-anchor-id="design-for-the-pipe">Design for the pipe</h3>
+<p>magrittr包中的管道符<code>%&gt;%</code>(R 4.0版本后引入<code>|&gt;</code>)是一种将一系列R函数链接在一起的工具。为了说明这一点，考虑以下命令，对数据框进行排序，然后保留前10行：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">small_mtcars</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span><span class="op">(</span><span class="va">mtcars</span>, <span class="va">gear</span><span class="op">)</span></span>
+<span><span class="va">small_mtcars</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html">slice</a></span><span class="op">(</span><span class="va">small_mtcars</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># or more compactly:</span></span>
+<span><span class="va">small_mtcars</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html">slice</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span><span class="op">(</span><span class="va">mtcars</span>, <span class="va">gear</span><span class="op">)</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>管道符可以将左侧函数的运行结果替换为右侧函数的第一个参数，因此我们可以通过以下方式实现与之前相同的结果：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">small_mtcars</span> <span class="op">&lt;-</span></span>
+<span>  <span class="va">mtcars</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html">arrange</a></span><span class="op">(</span><span class="va">gear</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html">slice</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>这一系列函数的管道符版本更具可读性；随着更多操作被添加，这种可读性会进一步提高。这一系列函数可以被管道符串联起来，是因为所有函数都返回相同的数据结构（一个数据框），而这个数据结构随后会成为下一个函数的第一个参数。这是有意设计的，在可能的情况下，应创建能够整合到管道符中的函数。</p>
+<p>管道符在建模工作流中非常有用，不过建模时管道符间传递的可以不是数据框，而是诸如模型组件之类的对象。</p>
+</section><section id="design-for-functional-programming" class="level3"><h3 class="anchored" data-anchor-id="design-for-functional-programming">Design for functional programming</h3>
+<p>R语言拥有出色的工具来创建、修改函数以及对函数进行操作，这使其成为一门非常适合函数式编程的语言。这种方法在很多情况下可以替代迭代循环，例如当函数返回一个值且没有其他副作用时。</p>
+<p>让我们来看一个例子。假设你对燃油效率与汽车重量之比的对数感兴趣。对于那些刚接触R语言或者从其他编程语言转过来的人来说，循环可能看起来是个不错的选择：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">)</span></span>
+<span><span class="va">ratios</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="cn">NA_real_</span>, <span class="va">n</span><span class="op">)</span></span>
+<span><span class="kw">for</span> <span class="op">(</span><span class="va">car</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="va">n</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">ratios</span><span class="op">[</span><span class="va">car</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">$</span><span class="va">mpg</span><span class="op">[</span><span class="va">car</span><span class="op">]</span><span class="op">/</span><span class="va">mtcars</span><span class="op">$</span><span class="va">wt</span><span class="op">[</span><span class="va">car</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">ratios</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 2.081348 1.988470 2.285193 1.895564 1.693052 1.654643</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>那些在R语言方面有更多经验的人可能知道，有一种更简单、更快的向量化版本可以通过以下方式计算：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">ratios</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">$</span><span class="va">mpg</span><span class="op">/</span><span class="va">mtcars</span><span class="op">$</span><span class="va">wt</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>然而，在许多现实世界的案例中，我们所关注的逐元素运算对于矢量化解决方案来说过于复杂。在这种情况下，一个好的方法是编写一个函数来进行计算。当我们进行函数式编程设计时，重要的是输出应仅取决于输入，且函数没有副作用。以下函数中违背这些原则的地方已用注释标出：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">compute_log_ratio</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">mpg</span>, <span class="va">wt</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">log_base</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html">getOption</a></span><span class="op">(</span><span class="st">"log_base"</span>, default <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="co"># gets external data</span></span>
+<span>  <span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">mpg</span><span class="op">/</span><span class="va">wt</span>, base <span class="op">=</span> <span class="va">log_base</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span><span class="op">)</span>                                <span class="co"># prints to the console</span></span>
+<span>  <span class="va">done</span> <span class="op">&lt;&lt;-</span> <span class="cn">TRUE</span>                                       <span class="co"># sets external data</span></span>
+<span>  <span class="va">results</span></span>
+<span><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>一个更好的版本是：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">compute_log_ratio</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">mpg</span>, <span class="va">wt</span>, <span class="va">log_base</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">mpg</span><span class="op">/</span><span class="va">wt</span>, base <span class="op">=</span> <span class="va">log_base</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>purrr包包含用于函数式编程的工具。让我们重点关注<code><a href="https://purrr.tidyverse.org/reference/map.html">map()</a></code>函数族，它们对向量进行操作，并且总是返回相同类型的输出。最基本的函数<code><a href="https://purrr.tidyverse.org/reference/map.html">map()</a></code>总是返回一个列表，其基本语法为<code>map(vector, function)</code>。例如，要对我们的数据求平方根，我们可以：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html">map</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">$</span><span class="va">mpg</span>, <span class="fl">3</span><span class="op">)</span>, <span class="va">sqrt</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [[1]]</span></span>
+<span><span class="co">#&gt; [1] 4.582576</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; [[2]]</span></span>
+<span><span class="co">#&gt; [1] 4.582576</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; [[3]]</span></span>
+<span><span class="co">#&gt; [1] 4.774935</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>存在map()的专门变体，当我们知道或预期函数将生成基本向量类型之一时，这些变体就会返回值。例如，由于平方根会返回双精度数：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html">map_dbl</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">$</span><span class="va">mpg</span>, <span class="fl">3</span><span class="op">)</span>, <span class="va">sqrt</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 4.582576 4.582576 4.774935</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>还有一些映射函数可以跨多个向量进行操作：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">log_ratios</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://purrr.tidyverse.org/reference/map2.html">map2_dbl</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">$</span><span class="va">mpg</span>, <span class="va">mtcars</span><span class="op">$</span><span class="va">wt</span>, <span class="va">compute_log_ratio</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">log_ratios</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 2.081348 1.988470 2.285193 1.895564 1.693052 1.654643</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><code><a href="https://purrr.tidyverse.org/reference/map.html">map()</a></code>函数还允许使用波浪号定义临时的匿名函数。对于<code><a href="https://purrr.tidyverse.org/reference/map2.html">map2()</a></code>，参数值为<code>.x</code>和<code>.y</code>：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map2.html">map2_dbl</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">$</span><span class="va">mpg</span>, <span class="va">mtcars</span><span class="op">$</span><span class="va">wt</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">.x</span><span class="op">/</span><span class="va">.y</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 2.081348 1.988470 2.285193 1.895564 1.693052 1.654643</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>这些示例虽然简单，但在后面的章节中，它们将被应用于更复杂的问题。在整洁建模的函数式编程中，定义的函数应确保能被像<code><a href="https://purrr.tidyverse.org/reference/map.html">map()</a></code>这样的函数使用，便于迭代计算。</p>
+</section></section><section id="examples-of-tidyverse-syntax" class="level2"><h2 class="anchored" data-anchor-id="examples-of-tidyverse-syntax">Examples of Tidyverse Syntax</h2>
+<p>让我们通过更深入地探究什么是tibble以及tibble的工作原理，来开始对tidyverse语法的讨论。在R语言中，tibble与基本数据框（data.frame）的规则略有不同。例如，tibble自然支持那些不符合语法规则的变量名作为列名：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Wants valid names:</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>`variable 1` <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, two <span class="op">=</span> <span class="fl">3</span><span class="op">:</span><span class="fl">4</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   variable.1 two</span></span>
+<span><span class="co">#&gt; 1          1   3</span></span>
+<span><span class="co">#&gt; 2          2   4</span></span>
+<span><span class="co"># But can be coerced to use them with an extra option:</span></span>
+<span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>`variable 1` <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, two <span class="op">=</span> <span class="fl">3</span><span class="op">:</span><span class="fl">4</span>, check.names <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="va">df</span></span>
+<span><span class="co">#&gt;   variable 1 two</span></span>
+<span><span class="co">#&gt; 1          1   3</span></span>
+<span><span class="co">#&gt; 2          2   4</span></span>
+<span></span>
+<span><span class="co"># But tibbles just work:</span></span>
+<span><span class="va">tbbl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html">tibble</a></span><span class="op">(</span>`variable 1` <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, two <span class="op">=</span> <span class="fl">3</span><span class="op">:</span><span class="fl">4</span><span class="op">)</span></span>
+<span><span class="va">tbbl</span></span>
+<span><span class="co">#&gt; # A tibble: 2 × 2</span></span>
+<span><span class="co">#&gt;   `variable 1`   two</span></span>
+<span><span class="co">#&gt;          &lt;int&gt; &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1            1     3</span></span>
+<span><span class="co">#&gt; 2            2     4</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>标准数据框支持参数的部分匹配，因此仅使用列名的一部分的代码仍然可以运行。而tibble会阻止这种情况发生，因为这可能会导致意外错误。</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">df</span><span class="op">$</span><span class="va">tw</span></span>
+<span><span class="co">#&gt; [1] 3 4</span></span>
+<span></span>
+<span><span class="va">tbbl</span><span class="op">$</span><span class="va">tw</span></span>
+<span><span class="co">#&gt; Warning: Unknown or uninitialised column: `tw`.</span></span>
+<span><span class="co">#&gt; NULL</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Tibbles还能避免一种最常见的R语言错误：维度丢失。如果标准数据框将列子集化到只剩一列，该对象会被转换为向量。而Tibbles绝不会这样做：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">df</span><span class="op">[</span>, <span class="st">"two"</span><span class="op">]</span></span>
+<span><span class="co">#&gt; [1] 3 4</span></span>
+<span></span>
+<span><span class="va">tbbl</span><span class="op">[</span>, <span class="st">"two"</span><span class="op">]</span></span>
+<span><span class="co">#&gt; # A tibble: 2 × 1</span></span>
+<span><span class="co">#&gt;     two</span></span>
+<span><span class="co">#&gt;   &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1     3</span></span>
+<span><span class="co">#&gt; 2     4</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>使用tibble而非数据框还有其他优势，比如更好的打印效果等等。</p>
+<p>为了演示一些语法，让我们使用tidyverse函数读取可用于建模的数据。该数据集来自芝加哥市的数据门户，包含该市高架火车站的每日客流量数据。该数据集包含以下列：</p>
+<ul>
+<li>the station identifier (numeric)</li>
+<li>the station name (character)</li>
+<li>the date (character in <code>mm/dd/yyyy</code> format)</li>
+<li>the day of the week (character)</li>
+<li>the number of riders (numeric)</li>
+</ul>
+<p>我们的tidyverse流程将按顺序执行以下任务：</p>
+<ul>
+<li><p>使用tidyverse包中的<strong>readr</strong>从源网站读取数据并将其转换为tibble格式。要实现这一点，<code><a href="https://readr.tidyverse.org/reference/read_delim.html">read_csv()</a></code>函数可以通过读取初始的若干行来确定数据类型。或者，如果列名和类型已知，可以在R中创建列规范并将其传递给<code><a href="https://readr.tidyverse.org/reference/read_delim.html">read_csv()</a></code>。</p></li>
+<li><p>筛选数据以删除一些不需要的列（例如station ID），并将列<code>stationname</code>更改为<code>station</code>。此操作使用<code><a href="https://dplyr.tidyverse.org/reference/select.html">select()</a></code>函数。筛选时，可以使用列名或<strong>dplyr</strong>选择器函数。选择名称时，可以使用<code>new_name = old_name</code>的参数格式来声明新的变量名。</p></li>
+<li><p>使用<strong>lubridate</strong>包中的<code><a href="https://lubridate.tidyverse.org/reference/ymd.html">mdy()</a></code>函数将日期字段转换为R日期格式。我们还将客流量数据转换为以千为单位。这两项计算都是通过<code><a href="https://dplyr.tidyverse.org/reference/mutate.html">dplyr::mutate()</a></code>函数执行的。</p></li>
+<li><p>对每个车站和日期的组合，采用最大的骑行次数。这能缓解少数日期在特定车站出现多条骑行次数记录的问题。我们按车站和日期对骑行数据进行分组，然后在1999个独特组合的每个组合内，用最大值统计量进行汇总。</p></li>
+</ul>
+<p>这些步骤的tidyverse代码如下：</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org">tidyverse</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://lubridate.tidyverse.org">lubridate</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">url</span> <span class="op">&lt;-</span> <span class="st">"https://data.cityofchicago.org/api/views/5neh-572f/rows.csv?accessType=DOWNLOAD&amp;bom=true&amp;format=true"</span></span>
+<span></span>
+<span><span class="va">all_stations</span> <span class="op">&lt;-</span></span>
+<span>  <span class="co"># Step 1: Read in the data.</span></span>
+<span>  <span class="fu"><a href="https://readr.tidyverse.org/reference/read_delim.html">read_csv</a></span><span class="op">(</span><span class="va">url</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="co"># Step 2: filter columns and rename stationname</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span>station <span class="op">=</span> <span class="va">stationname</span>, <span class="va">date</span>, <span class="va">rides</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="co"># Step 3: Convert the character date field to a date encoding.</span></span>
+<span>  <span class="co"># Also, put the data in units of 1K rides</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>date <span class="op">=</span> <span class="fu"><a href="https://lubridate.tidyverse.org/reference/ymd.html">mdy</a></span><span class="op">(</span><span class="va">date</span><span class="op">)</span>, rides <span class="op">=</span> <span class="va">rides</span> <span class="op">/</span> <span class="fl">1000</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="co"># Step 4: Summarize the multiple records using the maximum.</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span><span class="op">(</span><span class="va">date</span>, <span class="va">station</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarize</a></span><span class="op">(</span>rides <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span><span class="op">(</span><span class="va">rides</span><span class="op">)</span>, .groups <span class="op">=</span> <span class="st">"drop"</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>这一系列操作流程说明了tidyverse广受欢迎的原因。它采用了一系列数据处理方法，每个转换都有简单易懂的函数；这一系列操作以一种简洁、易读的方式组合在一起。其核心在于用户与软件的交互方式。这种方法让更多人能够学习R语言并实现他们的分析目标，而将这些相同的原则应用于R语言中的建模也能带来同样的好处。</p>
+</section><section id="chapter-summary" class="level2"><h2 class="anchored" data-anchor-id="chapter-summary">Chapter Summary</h2>
+<p>本章介绍了tidyverse，重点讲解了其在建模方面的应用，以及tidyverse的设计原则如何为tidymodels框架提供指导。可以将tidymodels框架看作是将tidyverse原则应用于模型构建领域。我们阐述了tidyverse与base R在约定上的差异，并介绍了tidyverse系统的两个重要组成部分：tibbles和管道运算符<code>%&gt;%</code>。数据清理和处理有时可能会让人觉得枯燥，但这些任务在现实世界的建模中至关重要；我们通过一个数据导入和处理的示例，说明了如何使用tibbles、管道以及tidyverse函数。</p>
+
+
+</section><a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script><script src="https://utteranc.es/client.js" repo="hanguojun007/Blog" issue-term="pathname" theme="github-light" crossorigin="anonymous" async="">
+</script><nav class="page-navigation"><div class="nav-page nav-page-previous">
+      <a href="../../Books/Tidy Modeling with R/1 Software for modeling.html" class="pagination-link" aria-label="1 Software for modeling">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">1 Software for modeling</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+</body></html>

@@ -2,3 +2,4 @@
 /_freeze/
 /renv/
 .Rprofile
+**/*.quarto_ipynb
