@@ -1,0 +1,170 @@
+---
+title: "3 A Review of R Modeling Fundamentals"
+date: "2025-09-12"
+date-modified: "2025-09-12"
+
+format:
+  html:
+    code-link: true
+
+fig-width: 6
+fig-asp: 0.618
+out-width: 70%
+fig-align: center
+
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: "#>"
+    R.options:
+      dplyr.print_min: 6
+      dplyr.print_max: 6
+      pillar.max_footer_lines: 2
+      pillar.min_chars: 15
+      stringr.view_n: 6
+      cli.num_colors: 0
+      cli.hyperlink: FALSE
+      pillar.bold: TRUE
+      width: 77
+
+execute:
+  warning: true
+  error: true
+---
+
+在介绍如何使用tidymodels将整洁数据原则应用于用R构建模型之前，让我们先回顾一下在核心R语言（通常称为“base R”）中模型是如何创建、训练和使用的。本章简要介绍了base R中的一些约定，即使你根本不会使用base R来构建模型，了解这些约定也很重要。本章内容并非详尽无遗，但它为读者（尤其是那些刚接触R的读者）提供了最基本、最常用的模式。
+
+R所基于的S语言，自Chambers和Hastie的著作（通常被称为《白皮书》）出版以来，就拥有了丰富的数据分析环境。这个版本的S语言引入了如今R用户所熟悉的标准基础设施组件，例如符号模型公式、模型矩阵和数据框，以及用于数据分析的标准面向对象编程方法。从那以后，这些用户界面并未发生实质性的变化。
+
+## An Example
+
+为了演示在base R中建模的一些基本原理，让我们使用McDonald的实验数据，该数据由Mangiafico提供，研究的是环境温度与蟋蟀每分钟鸣叫次数之间的关系。收集的数据涉及两个物种：O.exclamationis和O.niveus。这些数据包含在一个名为`crickets`的数据框中，共有31个数据点。图3.1展示了这些数据，使用的是以下ggplot2代码：
+
+```{r}
+#| fig-cap: "Relationship between chirp rate and temperature for two different species of crickets"
+library(tidyverse)
+
+data(crickets, package = "modeldata")
+names(crickets)
+
+# Plot the temperature on the x-axis, the chirp rate on the y-axis. The plot
+# elements will be colored differently for each species:
+ggplot(
+  crickets,
+  aes(x = temp, y = rate, color = species, pch = species, lty = species)
+) +
+  # Plot points for each data point and color by species
+  geom_point(size = 2) +
+  # Show a simple linear model fit created separately for each species:
+  geom_smooth(method = lm, se = FALSE, alpha = 0.5) +
+  scale_color_brewer(palette = "Paired") +
+  labs(x = "Temperature (C)", y = "Chirp Rate (per minute)")
+```
+
+这些数据对每个物种都呈现出相当线性的趋势。在给定温度下，O.exclamationis每分钟的鸣叫次数似乎比O.
+
+-   温度对鸣叫率没有影响。
+
+-   不同物种的鸣叫率之间没有差异。
+
+预测鸣叫率可能具有一定的科学或实际价值，但在本示例中，我们将重点关注推断。
+
+要在R中拟合普通线性模型，通常会使用`lm()`函数。该函数的重要参数包括模型公式和包含数据的数据框。这个公式是**符号化**的。例如，简单的公式：`r rate ~ temp`。指定鸣叫率是结果（因为它位于波浪号~的左侧），而温度值是预测因子。假设数据中包含一个名为time的列，其中记录了获取测量值的一天中的时间，则公式可以是： `r rate ~ temp + time`。这个公式象征性地表示，温度和时间应作为单独的主效应（主效应是包含单个预测变量的模型项）添加到模型中，而不是将时间和温度值相加。这些数据中没有时间测量值，但可以用同样的方式将物种添加到模型中：`r rate ~ temp + species`。
+
+物种不是一个数值型变量；在数据框中，它被表示为一个因子列，其水平为"O.exclamationis"和"O.niveus"。绝大多数模型函数无法处理非数值数据。对于物种，模型需要将物种数据编码为数值格式。最常见的方法是使用指示变量（也称为虚拟变量）来替代原始的定性值。在这种情况下，由于物种有两个可能的值，模型公式会通过添加一个新列将该列自动编码为数值，当物种是"O.exclamationis"时，该新列的值为0；当数据对应于"O.niveus"时，该新列的值为1。底层的公式机制会自动转换用于创建模型的数据集以及任何新数据点（例如，当模型用于预测时）的这些值。
+
+假设存在五个物种而非两个。在这种情况下，模型公式会创建四个二进制列，作为其中四个物种的二进制指示器。该因子的参考水平（即第一个水平）总是会被排除在预测变量集之外。其原理是，如果你知道这四个指示变量的值，就能确定物种的取值。我们将在8.4.1节中更详细地讨论二进制指示变量。
+
+模型公式`r rate ~ temp + species`构建了一个针对每个物种具有不同y轴截距的模型；回归线的斜率也可能因物种而异。为了适应这种结构，可以在模型中添加交互项。这可以通过几种不同的方式来指定，其中最基本的方式是使用冒号：
+
+```r
+rate ~ temp + species + temp:species
+
+# A shortcut can be used to expand all interactions containing
+# interactions with two variables:
+rate ~ (temp + species)^2
+
+# Another shortcut to expand factors to include all possible
+# interactions (equivalent for this example):
+rate ~ temp * species
+```
+
+除了能便捷地自动创建指示变量外，该公式还具备其他一些优点：
+
+-   内嵌函数可用于公式中。例如，要使用温度的自然对数，我们可以创建公式`rate ~ log(temp)`。由于公式默认是符号性的，也可以使用恒等函数`I()`对预测变量应用实际数学运算。要使用华氏度单位，可通过公式`rate ~ I( (temp * 9/5) + 32 )`从摄氏度进行转换。
+
+-   R有许多在公式中很有用的函数。例如，`poly(x, 3)`会为模型添加`x`的线性项、二次项和三次项作为主效应。splines包也有几个函数可用于在公式中创建非线性样条项。
+
+-   对于存在许多预测变量的数据集，可以使用句点快捷方式。句点代表了所有不在波浪号左侧的列的主效应。使用`~ (.)^3`会将主效应以及所有双变量和三变量交互项添加到模型中。
+
+回到我们的鸣虫（蟋蟀）问题，让我们使用双向交互模型。在本书中，我们对经过拟合的R模型对象使用后缀`_fit`。
+
+```{r}
+interaction_fit <- lm(rate ~ (temp + species)^2, data = crickets)
+
+# To print a short summary of the model:
+interaction_fit
+```
+
+这个输出有点难以阅读。对于物种指示变量，R将变量名（species）和因子水平（O.niveus）合并在一起，没有分隔符。
+
+在深入探讨该模型的任何推断结果之前，应使用诊断图来评估拟合情况。我们可以对`lm`对象使用`plot()`方法。该方法会为对象生成一组四个图，每个图都展示了拟合的不同方面，如图3.2所示。
+
+```{r}
+#| fig-cap: "Residual diagnostic plots for the linear model with interactions, which appear reasonable enough to conduct inferential analysis"
+
+# Place two plots next to one another:
+par(mfrow = c(1, 2))
+
+# Show residuals vs predicted values:
+plot(interaction_fit, which = 1)
+
+# A normal quantile plot on the residuals:
+plot(interaction_fit, which = 2)
+```
+
+在评估表达式的技术细节方面，R语言是**惰性的**（而非急切的）。这意味着模型拟合函数通常会在最后一刻才计算尽可能少的量。例如，如果你想获取每个模型项的系数表，它不会随模型自动计算，而是通过`summary()`方法来计算。
+
+我们接下来关于蟋蟀的工作是评估是否有必要纳入交互项。对于这个模型，最合适的方法是重新计算不含交互项的模型，并使用`anova()`方法。
+
+```{r}
+# Fit a reduced model:
+main_effect_fit <- lm(rate ~ temp + species, data = crickets)
+
+# Compare the two:
+anova(main_effect_fit, interaction_fit)
+```
+
+该统计检验生成的p值为0.25。这意味着缺乏证据反驳模型不需要交互项这一零假设。因此，我们将对不含交互项的模型进行进一步分析。
+
+应该重新评估残差图，以确保我们的理论假设足够有效，从而可以信任模型产生的p值（此处未展示这些图，但先透露一下：这些假设是有效的）。
+
+我们可以使用`summary()`方法来查看每个模型项的系数、标准误差和p值：
+
+```{r}
+summary(interaction_fit)
+```
+
+每个物种的鸣叫率会随着温度每升高1度而增加3.6次鸣叫。p值表明，这个项具有很强的统计显著性。物种项的值为-10.07。这表明，在所有温度值下，雪白油葫芦（O. niveus）的鸣叫率大约比惊叫油葫芦（O. exclamationis）每分钟少10次。与温度项类似，物种效应也与一个非常小的p值相关。
+
+本分析中唯一的问题是截距值。它表明在0°C时，两个物种的每分钟鸣叫次数都是负数。虽然这毫无意义，但数据中温度最低仅为17.2°C，而在0°C时对模型进行解释属于外推法，这不是个好主意。话虽如此，在温度值的适用范围内，模型拟合效果良好；结论应仅限于观测到的温度范围。
+
+如果我们需要在实验中未观测到的温度下估计鸣叫率，我们可以使用`predict()`方法。该方法需要模型对象和一个包含用于预测的新值的数据框。例如，模型对15°C至20°C之间温度下的O. exclamationis的鸣叫率估计可以通过以下方式计算：
+
+```{r}
+new_values <- data.frame(species = "O. exclamationis", temp = 15:20)
+predict(main_effect_fit, new_values)
+```
+
+请注意，传递给`predict()`方法的是`species`的非数值型值，而非数值型的二元指示变量。
+
+虽然本分析显然并未全面展示R的建模能力，但它确实强调了对本书其余部分而言很重要的一些主要功能：
+
+-   这种语言具有富有表现力的语法，可用于为简单模型和相当复杂的模型指定模型项。
+
+-   R语言的公式方法在建模方面有许多便利之处，这些便利之处在生成预测时也会应用于新数据。
+
+-   有许多辅助函数（例如`anova()`、`summary()`和`predict()`），你可以在创建拟合模型后使用它们来进行特定的计算。
+
+最后，如前所述，该框架于1992年首次发表。其中的大部分理念和方法都是在那个时期发展出来的，但直到今天仍然具有显著的相关性。这凸显出S语言以及由此衍生的R语言从一开始就专为数据分析而设计。
+
