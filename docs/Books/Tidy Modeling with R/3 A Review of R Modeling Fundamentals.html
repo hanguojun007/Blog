@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.40">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<meta name="dcterms.date" content="2025-09-12">
+<title>3 A Review of R Modeling Fundamentals</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../Books/Tidy Modeling with R/2 A Tidyverse Primer.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-e6e594f9697a8fc74d922f689f62e840.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light"><script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": true,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "Search",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script><link rel="stylesheet" href="../../styles.css">
+</head>
+<body class="nav-sidebar floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top"><nav class="navbar navbar-expand-lg " data-bs-theme="dark"><div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">RSSPtho</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+<li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-books" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Books</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-books">
+<li>
+    <a class="dropdown-item" href="../../Books/ggplot2/index.html">
+ <span class="dropdown-text">ggplot2</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Books/R4DS2/index.html">
+ <span class="dropdown-text">R for Data Science(2e)</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Books/Tidy Modeling with R/index.html">
+ <span class="dropdown-text">Tidy Modeling with R</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Books/Advanced R(2e)/index.html">
+ <span class="dropdown-text">Advanced R(2e)</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Books/quarto/Project Basics.html">
+ <span class="dropdown-text">Quarto</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Books/Js4R/00 Preface.html">
+ <span class="dropdown-text">Js4R</span></a>
+  </li>  
+    </ul>
+</li>
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About me</span></a>
+  </li>  
+</ul>
+<div class="quarto-navbar-tools">
+    <a href="https://github.com/hanguojun007" title="" class="quarto-navigation-tool px-1" aria-label=""><i class="bi bi-github"></i></a>
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav><nav class="quarto-secondary-nav"><div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../Books/Tidy Modeling with R/3 A Review of R Modeling Fundamentals.html">3 A Review of R Modeling Fundamentals</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav></header><!-- content --><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto"><div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">index</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/1 Software for modeling.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1 Software for modeling</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/2 A Tidyverse Primer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2 A Tidyverse Primer</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/3 A Review of R Modeling Fundamentals.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">3 A Review of R Modeling Fundamentals</span></a>
+  </div>
+</li>
+    </ul>
+</div>
+</nav><div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active"><h2 id="toc-title">On this page</h2>
+   
+  <ul>
+<li>
+<a href="#an-example" id="toc-an-example" class="nav-link active" data-scroll-target="#an-example">An Example</a>
+  <ul class="collapse">
+<li><a href="#liner-regression" id="toc-liner-regression" class="nav-link" data-scroll-target="#liner-regression">Liner Regression</a></li>
+  <li><a href="#anova" id="toc-anova" class="nav-link" data-scroll-target="#anova">Anova</a></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary">Summary</a></li>
+  </ul>
+</li>
+  <li><a href="#what-does-the-r-formula-do" id="toc-what-does-the-r-formula-do" class="nav-link" data-scroll-target="#what-does-the-r-formula-do">What Does the R Formula Do?</a></li>
+  <li>
+<a href="#why-tidiness-is-important-for-modeling" id="toc-why-tidiness-is-important-for-modeling" class="nav-link" data-scroll-target="#why-tidiness-is-important-for-modeling">Why Tidiness Is Important for Modeling</a>
+  <ul class="collapse">
+<li><a href="#rs-diversity" id="toc-rs-diversity" class="nav-link" data-scroll-target="#rs-diversity">R’s diversity</a></li>
+  <li><a href="#missing-value" id="toc-missing-value" class="nav-link" data-scroll-target="#missing-value">Missing value</a></li>
+  <li><a href="#broomtidy" id="toc-broomtidy" class="nav-link" data-scroll-target="#broomtidy"><code>broom::tidy()</code></a></li>
+  </ul>
+</li>
+  <li><a href="#combining-base-r-models-and-the-tidyverse" id="toc-combining-base-r-models-and-the-tidyverse" class="nav-link" data-scroll-target="#combining-base-r-models-and-the-tidyverse">Combining Base R Models and the Tidyverse</a></li>
+  <li><a href="#the-tidymodels-metapackage" id="toc-the-tidymodels-metapackage" class="nav-link" data-scroll-target="#the-tidymodels-metapackage">The tidymodels Metapackage</a></li>
+  <li><a href="#chapter-summary" id="toc-chapter-summary" class="nav-link" data-scroll-target="#chapter-summary">Chapter Summary</a></li>
+  </ul></nav>
+    <div class="quarto-margin-footer"><div class="margin-footer-item">
+<p><img src="../..\logo.jpg" class="conditional-footer img-fluid" width="200"></p>
+</div></div></div>
+<!-- main -->
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
+<h1 class="title">3 A Review of R Modeling Fundamentals</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">September 12, 2025</p>
+    </div>
+  </div>
+  
+    <div>
+    <div class="quarto-title-meta-heading">Modified</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date-modified">September 13, 2025</p>
+    </div>
+  </div>
+    
+  </div>
+  
+
+
+</header><p>在介绍如何使用tidymodels将整洁数据原则应用于用R构建模型之前，让我们先回顾一下在核心R语言（通常称为“base R”）中模型是如何创建、训练和使用的。本章简要介绍了base R中的一些约定，即使你根本不会使用base R来构建模型，了解这些约定也很重要。本章内容并非详尽无遗，但它为读者（尤其是那些刚接触R的读者）提供了最基本、最常用的模式。</p>
+<p>R所基于的S语言，自Chambers和Hastie的著作（通常被称为《白皮书》）出版以来，就拥有了丰富的数据分析环境。这个版本的S语言引入了如今R用户所熟悉的标准基础设施组件，例如符号模型公式、模型矩阵和数据框，以及用于数据分析的标准面向对象编程方法。从那以后，这些用户界面并未发生实质性的变化。</p>
+<section id="an-example" class="level2"><h2 class="anchored" data-anchor-id="an-example">An Example</h2>
+<p>为了演示在base R中建模的一些基本原理，让我们使用McDonald的实验数据，该数据由Mangiafico提供，研究的是环境温度与蟋蟀每分钟鸣叫次数之间的关系。收集的数据涉及两个物种：O.exclamationis和O.niveus。这些数据包含在一个名为<code>crickets</code>的数据框中，共有31个数据点。图3.1展示了这些数据，使用的是以下ggplot2代码：</p>
+<div class="cell">
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org">tidyverse</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; ── Attaching core tidyverse packages ───────────────────── tidyverse 2.0.0 ──</span></span>
+<span><span class="co">#&gt; ✔ dplyr     1.1.4     ✔ readr     2.1.5</span></span>
+<span><span class="co">#&gt; ✔ forcats   1.0.0     ✔ stringr   1.5.1</span></span>
+<span><span class="co">#&gt; ✔ ggplot2   3.5.2     ✔ tibble    3.2.1</span></span>
+<span><span class="co">#&gt; ✔ lubridate 1.9.4     ✔ tidyr     1.3.1</span></span>
+<span><span class="co">#&gt; ✔ purrr     1.1.0     </span></span>
+<span><span class="co">#&gt; ── Conflicts ─────────────────────────────────────── tidyverse_conflicts() ──</span></span>
+<span><span class="co">#&gt; ✖ dplyr::filter() masks stats::filter()</span></span>
+<span><span class="co">#&gt; ✖ dplyr::lag()    masks stats::lag()</span></span>
+<span><span class="co">#&gt; ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="va">crickets</span>, package <span class="op">=</span> <span class="st">"modeldata"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">crickets</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "species" "temp"    "rate"</span></span>
+<span></span>
+<span><span class="co"># Plot the temperature on the x-axis, the chirp rate on the y-axis. The plot</span></span>
+<span><span class="co"># elements will be colored differently for each species:</span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span></span>
+<span>  <span class="va">crickets</span>,</span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">temp</span>, y <span class="op">=</span> <span class="va">rate</span>, color <span class="op">=</span> <span class="va">species</span>, pch <span class="op">=</span> <span class="va">species</span>, lty <span class="op">=</span> <span class="va">species</span><span class="op">)</span></span>
+<span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="co"># Plot points for each data point and color by species</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="co"># Show a simple linear model fit created separately for each species:</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_smooth.html">geom_smooth</a></span><span class="op">(</span>method <span class="op">=</span> <span class="va">lm</span>, se <span class="op">=</span> <span class="cn">FALSE</span>, alpha <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_brewer.html">scale_color_brewer</a></span><span class="op">(</span>palette <span class="op">=</span> <span class="st">"Paired"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Temperature (C)"</span>, y <span class="op">=</span> <span class="st">"Chirp Rate (per minute)"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; `geom_smooth()` using formula = 'y ~ x'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure"><p><img src="3-A-Review-of-R-Modeling-Fundamentals_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid figure-img" width="576"></p>
+<figcaption>Relationship between chirp rate and temperature for two different species of crickets</figcaption></figure>
+</div>
+</div>
+</div>
+<p>这些数据对每个物种都呈现出相当线性的趋势。在给定温度下，O.exclamationis每分钟的鸣叫次数似乎比O.niveus更多。对于推断模型，研究人员在查看数据之前可能已经指定了以下零假设：</p>
+<ul>
+<li><p>温度对鸣叫率没有影响。</p></li>
+<li><p>不同物种的鸣叫率之间没有差异。</p></li>
+</ul>
+<p>预测鸣叫率可能具有一定的科学或实际价值，但在本示例中，我们将重点关注推断。</p>
+<section id="liner-regression" class="level3"><h3 class="anchored" data-anchor-id="liner-regression">Liner Regression</h3>
+<p>要在R中拟合普通线性模型，通常会使用<code><a href="https://rdrr.io/r/stats/lm.html">lm()</a></code>函数。该函数的重要参数包括模型公式和包含数据的数据框。这个公式是<strong>符号化</strong>的。例如，简单的公式：<code>rate ~ temp</code>。指定鸣叫率是结果（因为它位于波浪号~的左侧），而温度值是预测因子。假设数据中包含一个名为time的列，其中记录了获取测量值的一天中的时间，则公式可以是：<code>rate ~ temp + time</code>。这个公式象征性地表示，温度和时间应作为单独的主效应（主效应是包含单个预测变量的模型项）添加到模型中，而不是将时间和温度值相加。这些数据中没有时间测量值，但可以用同样的方式将物种添加到模型中：<code>rate ~ temp + species</code>。</p>
+<p>物种不是一个数值型变量；在数据框中，它被表示为一个因子列，其水平为”O.exclamationis”和”O.niveus”。绝大多数模型函数无法处理非数值数据。对于物种，模型需要将物种数据编码为数值格式。最常见的方法是使用指示变量（也称为虚拟变量）来替代原始的定性值。在这种情况下，由于物种有两个可能的值，模型公式会通过添加一个新列将该列自动编码为数值，当物种是”O.exclamationis”时，该新列的值为0；当数据对应于”O.niveus”时，该新列的值为1。底层的公式机制会自动转换用于创建模型的数据集以及任何新数据点（例如，当模型用于预测时）的这些值。</p>
+<p>假设存在五个物种而非两个。在这种情况下，模型公式会创建四个二进制列，作为其中四个物种的二进制指示器。该因子的参考水平（即第一个水平）总是会被排除在预测变量集之外。其原理是，如果你知道这四个指示变量的值，就能确定物种的取值。我们将在8.4.1节中更详细地讨论二进制指示变量。</p>
+<p>模型公式<code>rate ~ temp + species</code>构建了一个针对每个物种具有相同斜率但不同y轴截距的模型。考虑到回归线的斜率也可能因物种而异，可以在模型中添加交互项。所谓交互项，是指某个变量对响应变量的影响，依赖于另一个或多个变量的取值（在图上直观地显示为斜率不同）。交互项可以通过几种不同的方式来指定（下面三种都是等价的），其中最基本的方式是使用冒号：</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">rate</span> <span class="op">~</span> <span class="va">temp</span> <span class="op">+</span> <span class="va">species</span> <span class="op">+</span> <span class="va">temp</span><span class="op">:</span><span class="va">species</span></span>
+<span></span>
+<span><span class="co"># A shortcut can be used to expand all interactions containing</span></span>
+<span><span class="co"># interactions with two variables:</span></span>
+<span><span class="va">rate</span> <span class="op">~</span> <span class="op">(</span><span class="va">temp</span> <span class="op">+</span> <span class="va">species</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span></span>
+<span></span>
+<span><span class="co"># Another shortcut to expand factors to include all possible</span></span>
+<span><span class="co"># interactions (equivalent for this example):</span></span>
+<span><span class="va">rate</span> <span class="op">~</span> <span class="va">temp</span> <span class="op">*</span> <span class="va">species</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>除了能便捷地自动创建指示变量外，该公式还具备其他一些优点：</p>
+<ul>
+<li><p>内嵌函数可用于公式中。例如，要使用温度的自然对数，我们可以创建公式<code>rate ~ log(temp)</code>。由于公式默认是符号性(symbol)的，也可以使用恒等函数<code><a href="https://rdrr.io/r/base/AsIs.html">I()</a></code>对预测变量应用实际数学运算。要使用华氏度单位，可通过公式<code>rate ~ I( (temp * 9/5) + 32 )</code>从摄氏度进行转换。</p></li>
+<li><p>R有许多在公式中很有用的函数。例如，<code>poly(x, 3)</code>会为模型添加<code>x</code>的线性项、二次项和三次项作为主效应。splines包也有几个函数可用于在公式中创建非线性样条项。</p></li>
+<li><p>对于存在许多预测变量的数据集，可以使用句点快捷方式。句点代表了所有不在波浪号左侧的列的主效应。使用<code>~ (.)^3</code>会将主效应以及所有双变量和三变量交互项添加到模型中。</p></li>
+</ul>
+<p>回到我们的鸣虫（蟋蟀）问题，让我们使用双向交互模型。在本书中，我们对经过拟合的R模型对象使用后缀<code>_fit</code>。</p>
+<div class="cell">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">interaction_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">rate</span> <span class="op">~</span> <span class="op">(</span><span class="va">temp</span> <span class="op">+</span> <span class="va">species</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span>, data <span class="op">=</span> <span class="va">crickets</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># To print a short summary of the model:</span></span>
+<span><span class="va">interaction_fit</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Call:</span></span>
+<span><span class="co">#&gt; lm(formula = rate ~ (temp + species)^2, data = crickets)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Coefficients:</span></span>
+<span><span class="co">#&gt;           (Intercept)                   temp       speciesO. niveus  </span></span>
+<span><span class="co">#&gt;               -11.041                  3.751                 -4.348  </span></span>
+<span><span class="co">#&gt; temp:speciesO. niveus  </span></span>
+<span><span class="co">#&gt;                -0.234</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>这个输出有点难以阅读。对于物种指示变量，R将变量名（species）和因子水平（O.niveus）合并在一起，没有分隔符。</p>
+<p>在深入探讨该模型的任何推断结果之前，应使用诊断图来评估拟合情况。我们可以对<code>lm</code>对象使用<code><a href="https://rdrr.io/r/graphics/plot.default.html">plot()</a></code>方法。该方法会为对象生成一组四个图，每个图都展示了拟合的不同方面，如图3.2所示：</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">interaction_fit</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell quarto-layout-panel" data-layout-ncol="2">
+<div class="quarto-layout-row">
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure"><p><img src="3-A-Review-of-R-Modeling-Fundamentals_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="576"></p>
+<figcaption>Residuals-Fitted</figcaption></figure>
+</div>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure"><p><img src="3-A-Review-of-R-Modeling-Fundamentals_files/figure-html/unnamed-chunk-3-2.png" class="img-fluid figure-img" width="576"></p>
+<figcaption>Q-Q Residuals</figcaption></figure>
+</div>
+</div>
+</div>
+<div class="quarto-layout-row">
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure"><p><img src="3-A-Review-of-R-Modeling-Fundamentals_files/figure-html/unnamed-chunk-3-3.png" class="img-fluid figure-img" width="576"></p>
+<figcaption>Scale-Location</figcaption></figure>
+</div>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure"><p><img src="3-A-Review-of-R-Modeling-Fundamentals_files/figure-html/unnamed-chunk-3-4.png" class="img-fluid figure-img" width="576"></p>
+<figcaption>Residuals-Leverage</figcaption></figure>
+</div>
+</div>
+</div>
+<div class="quarto-layout-row">
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: flex-start;">
+<p>Residual diagnostic plots for the linear model with interactions, which appear reasonable enough to conduct inferential analysis</p>
+</div>
+</div>
+</div>
+<ul>
+<li><p>Residuals-Fitted：描述残差与拟合值的关系，理想情况下，残差应该随机分布，没有明显的模式或趋势。如果出现明显的曲线或其他模式，可能表明模型未能捕捉到数据中的某些结构，或者存在非线性关系。图中还显示了几个标记点，如“21”、“13”等，这些可能是异常值或具有高影响力的观测点。</p></li>
+<li><p>Q-Q Residuals：描述标准化残差值与正态分布理论值的关系，检查残差的分布是否接近正态分布。如果残差是正态分布的，那么它们应该大致沿着图中的直线排列。图中这种情况意味着残差的分布有轻微的偏斜或重尾。</p></li>
+<li><p>Scale-Location：描述标准化残差的绝对值开方法后与拟合值的关系，检查残差的方差是否随拟合值的变化而变化，即方差齐性。如果存在异方差性，图中可能会显示出某种趋势或模式。</p></li>
+<li><p>Residuals-Leverage：描述标准残差值与观测点leverage（或权重）之间的关系，同时添加Cook距离线，检查某个观测点是否对模型影响很大。如果某个观测点位于Cook距离线附近，则这些点对模型影响较大，例如“13”。</p></li>
+</ul>
+<p>在评估表达式的技术细节方面，R语言是<strong>惰性的</strong>（而非急切的）。这意味着模型拟合函数通常会在最后一刻才计算尽可能少的量。例如，如果你想获取每个模型项的系数表，它不会随模型自动计算，而是通过<code><a href="https://rdrr.io/r/base/summary.html">summary()</a></code>方法来计算。</p>
+</section><section id="anova" class="level3"><h3 class="anchored" data-anchor-id="anova">Anova</h3>
+<p>我们接下来关于蟋蟀的工作是评估是否有必要纳入交互项。对于这个模型，最合适的方法是重新计算不含交互项的模型，并使用<code><a href="https://rdrr.io/r/stats/anova.html">anova()</a></code>方法。</p>
+<div class="cell">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Fit a reduced model:</span></span>
+<span><span class="va">main_effect_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">rate</span> <span class="op">~</span> <span class="va">temp</span> <span class="op">+</span> <span class="va">species</span>, data <span class="op">=</span> <span class="va">crickets</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Compare the two:</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/anova.html">anova</a></span><span class="op">(</span><span class="va">main_effect_fit</span>, <span class="va">interaction_fit</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Analysis of Variance Table</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Model 1: rate ~ temp + species</span></span>
+<span><span class="co">#&gt; Model 2: rate ~ (temp + species)^2</span></span>
+<span><span class="co">#&gt;   Res.Df    RSS Df Sum of Sq     F Pr(&gt;F)</span></span>
+<span><span class="co">#&gt; 1     28 89.350                          </span></span>
+<span><span class="co">#&gt; 2     27 85.074  1    4.2758 1.357 0.2542</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>该统计检验生成的p值为0.25。这意味着缺乏证据反驳模型不需要交互项这一零假设。因此，我们将对不含交互项的模型进行进一步分析。</p>
+<p>应该重新评估残差图，以确保我们的理论假设足够有效，从而可以信任模型产生的p值（此处未展示这些图，但先透露一下：这些假设是有效的）。</p>
+<p>我们可以使用<code><a href="https://rdrr.io/r/base/summary.html">summary()</a></code>方法来查看每个模型项的系数、标准误差和p值：</p>
+<div class="cell">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">main_effect_fit</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Call:</span></span>
+<span><span class="co">#&gt; lm(formula = rate ~ temp + species, data = crickets)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Residuals:</span></span>
+<span><span class="co">#&gt;     Min      1Q  Median      3Q     Max </span></span>
+<span><span class="co">#&gt; -3.0128 -1.1296 -0.3912  0.9650  3.7800 </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Coefficients:</span></span>
+<span><span class="co">#&gt;                   Estimate Std. Error t value Pr(&gt;|t|)    </span></span>
+<span><span class="co">#&gt; (Intercept)       -7.21091    2.55094  -2.827  0.00858 ** </span></span>
+<span><span class="co">#&gt; temp               3.60275    0.09729  37.032  &lt; 2e-16 ***</span></span>
+<span><span class="co">#&gt; speciesO. niveus -10.06529    0.73526 -13.689 6.27e-14 ***</span></span>
+<span><span class="co">#&gt; ---</span></span>
+<span><span class="co">#&gt; Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Residual standard error: 1.786 on 28 degrees of freedom</span></span>
+<span><span class="co">#&gt; Multiple R-squared:  0.9896, Adjusted R-squared:  0.9888 </span></span>
+<span><span class="co">#&gt; F-statistic:  1331 on 2 and 28 DF,  p-value: &lt; 2.2e-16</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>每个物种的鸣叫率会随着温度每升高1度而增加3.6次鸣叫。p值表明，这个项具有很强的统计显著性。物种项的值为-10.07。这表明，在所有温度值下，O.niveus的鸣叫率大约比O.exclamationis每分钟少10次。与温度项类似，物种效应也与一个非常小的p值相关。</p>
+<p>本分析中唯一的问题是截距值。它表明在0°C时，两个物种的每分钟鸣叫次数都是负数。但数据中温度最低仅为17.2°C，在0°C时对模型进行解释属于外推法，这不是个好主意，结论应仅限于观测到的温度范围。</p>
+<p>如果我们需要在实验中未观测到的温度下估计鸣叫率，我们可以使用<code><a href="https://rdrr.io/r/stats/predict.html">predict()</a></code>方法。该方法需要模型对象和一个包含用于预测的新值的数据框。例如，模型对15°C至20°C之间温度下的O. exclamationis的鸣叫率估计可以通过以下方式计算：</p>
+<div class="cell">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">new_values</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>species <span class="op">=</span> <span class="st">"O. exclamationis"</span>, temp <span class="op">=</span> <span class="fl">15</span><span class="op">:</span><span class="fl">20</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">main_effect_fit</span>, <span class="va">new_values</span><span class="op">)</span></span>
+<span><span class="co">#&gt;        1        2        3        4        5        6 </span></span>
+<span><span class="co">#&gt; 46.83039 50.43314 54.03589 57.63865 61.24140 64.84415</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>请注意，传递给<code><a href="https://rdrr.io/r/stats/predict.html">predict()</a></code>方法的是<code>species</code>的非数值型值，而非数值型的二元指示变量。</p>
+</section><section id="summary" class="level3"><h3 class="anchored" data-anchor-id="summary">Summary</h3>
+<p>虽然本分析显然并未全面展示R的建模能力，但它确实强调了对本书其余部分而言很重要的一些主要功能：</p>
+<ul>
+<li><p>这种语言具有富有表现力的语法，可用于为简单模型和相当复杂的模型指定模型项。</p></li>
+<li><p>R语言的公式方法在建模方面有许多便利之处，这些便利之处在生成预测时也会应用于新数据。</p></li>
+<li><p>有许多辅助函数（例如<code><a href="https://rdrr.io/r/stats/anova.html">anova()</a></code>、<code><a href="https://rdrr.io/r/base/summary.html">summary()</a></code>和<code><a href="https://rdrr.io/r/stats/predict.html">predict()</a></code>），你可以在创建拟合模型后使用它们来进行特定的计算。</p></li>
+</ul>
+<p>最后，如前所述，该框架于1992年首次发表。其中的大部分理念和方法都是在那个时期发展出来的，但直到今天仍然具有显著的相似性。这凸显出S语言以及由此衍生的R语言从一开始就专为数据分析而设计。</p>
+</section></section><section id="what-does-the-r-formula-do" class="level2"><h2 class="anchored" data-anchor-id="what-does-the-r-formula-do">What Does the R Formula Do?</h2>
+<p>R模型公式被许多建模包所使用。它通常有多种用途：</p>
+<ul>
+<li><p>公式定义了模型所使用的数据框中的列。</p></li>
+<li><p>标准的R机制利用该公式将列编码为适当的格式。</p></li>
+<li><p>数据框中列的角色由该公式定义。</p></li>
+</ul>
+<p>在很大程度上，从业者对公式功能的理解主要受最后一个用途的影响。我们在输入公式时，注意力往往集中在声明应如何使用这些列上。例如，我们之前讨论的规范就以特定方式设置了要使用的预测变量：<code>(temp + species)^2</code>。看到这个公式时，我们的关注点在于，存在两个预测变量，模型应当包含它们的主效应和双向交互项。然而，这个公式还意味着，由于<code>species</code>是一个因子，它还应该为这个预测变量创建指示变量列（参见第8.4.1节），并将这些列与temp列相乘来创建交互项。这种转换体现了我们关于编码的第二点；公式还定义了每一列的编码方式，并且可以创建原始数据中不存在的额外列。</p>
+<p>这一点很重要，在本书中会多次出现，尤其是当我们在第8章及以后章节讨论更复杂的特征工程时。R语言中的公式存在一些局限性，而我们克服这些局限性的方法涉及到所有三个方面。</p>
+</section><section id="why-tidiness-is-important-for-modeling" class="level2"><h2 class="anchored" data-anchor-id="why-tidiness-is-important-for-modeling">Why Tidiness Is Important for Modeling</h2>
+<section id="rs-diversity" class="level3"><h3 class="anchored" data-anchor-id="rs-diversity">R’s diversity</h3>
+<p>R的优势之一在于，它鼓励开发者创建符合自身需求的用户界面。举个例子，以下是在名为plot_data的数据框中创建两个数值变量的散点图的三种常见方法：</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">plot_data</span><span class="op">$</span><span class="va">x</span>, <span class="va">plot_data</span><span class="op">$</span><span class="va">y</span><span class="op">)</span></span>
+<span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://lattice.r-forge.r-project.org/">lattice</a></span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/lattice/man/xyplot.html">xyplot</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="va">x</span>, data <span class="op">=</span> <span class="va">plot_data</span><span class="op">)</span></span>
+<span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">plot_data</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>在这三种情况下，不同的开发人员团队为同一任务设计了三种截然不同的界面。每种界面都各有优缺点。相比之下，《Python开发者指南》在解决问题时信奉这样一种理念：“There should be one – and preferably only one – obvious way to do it.” 在这方面，R与Python有很大不同。R的接口多样性的一个优势在于，它可以随着时间的推移不断发展，满足不同用户的不同需求。不幸的是，部分语法多样性源于对开发代码者需求的关注，而非对使用代码者需求的关注。各软件包之间的不一致性可能会成为R用户的绊脚石。</p>
+<p>假设你的建模项目有一个包含两个类别的结果。你可以从多种统计模型和机器学习模型中进行选择。为了为每个样本生成类别概率估计，模型函数通常会有一个对应的<code><a href="https://rdrr.io/r/stats/predict.html">predict()</a></code>方法。然而，这些方法用于生成类别概率预测的参数值存在显著差异，这种差异即使对于有经验的用户来说也可能难以应对。不同模型的这些参数值示例如表3.1所示。</p>
+<table class="caption-top table">
+<caption>Table 3.1: Heterogeneous argument names for different modeling functions.</caption>
+<colgroup>
+<col style="width: 21%">
+<col style="width: 17%">
+<col style="width: 61%">
+</colgroup>
+<thead><tr class="header">
+<th style="text-align: left;"><strong>Function</strong></th>
+<th style="text-align: left;"><strong>Package</strong></th>
+<th style="text-align: left;"><strong>Code</strong></th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>lda()</code></td>
+<td style="text-align: left;">MASS</td>
+<td style="text-align: left;"><code>predict(object)</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code><a href="https://rdrr.io/r/stats/glm.html">glm()</a></code></td>
+<td style="text-align: left;">stats</td>
+<td style="text-align: left;"><code>predict(object, type = “response”)</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>gbm()</code></td>
+<td style="text-align: left;">gbm</td>
+<td style="text-align: left;"><code>predict(object, type = “response”, n.trees)</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>mda()</code></td>
+<td style="text-align: left;">mda</td>
+<td style="text-align: left;"><code>predict(object, type = “posterior”)</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>rpart()</code></td>
+<td style="text-align: left;">rpart</td>
+<td style="text-align: left;"><code>predict(object, type = “prob”)</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">various</td>
+<td style="text-align: left;">RWeka</td>
+<td style="text-align: left;"><code>predict(object, type = “probability”)</code></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>logitboost()</code></td>
+<td style="text-align: left;">LogitBoost</td>
+<td style="text-align: left;"><code>predict(object, type = “raw”, nIter)</code></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>pamr.train()</code></td>
+<td style="text-align: left;">pamr</td>
+<td style="text-align: left;"><code>pamr.predict(object, type = “posterior”)</code></td>
+</tr>
+</tbody>
+</table>
+<p>请注意，最后一个示例使用了一个自定义函数来进行预测，而不是使用更常见的<code><a href="https://rdrr.io/r/stats/predict.html">predict()</a></code>接口（即<code><a href="https://rdrr.io/r/stats/predict.html">predict()</a></code>的泛函方法）。这种不一致性是日常使用R语言进行建模的一个障碍。</p>
+</section><section id="missing-value" class="level3"><h3 class="anchored" data-anchor-id="missing-value">Missing value</h3>
+<p>作为不可预测性的另一个例子，R语言中有关缺失数据的约定处理方式并不一致。一般规则是缺失数据会产生更多缺失数据；例如，一组包含缺失数据点的值的平均值本身也是缺失的，依此类推。当模型进行预测时，绝大多数模型都要求所有预测变量具有完整的值。在这一点上，R语言内置了几种通过通用函数<code><a href="https://rdrr.io/r/stats/na.action.html">na.action()</a></code>实现的选项。这一函数设定了函数在遇到缺失值时的处理策略。两种最常见的策略是<code><a href="https://rdrr.io/r/stats/na.fail.html">na.fail()</a></code>和<code><a href="https://rdrr.io/r/stats/na.fail.html">na.omit()</a></code>。前者在存在缺失数据时会产生错误，而后者在计算前通过个案删除的方式移除缺失数据。从我们之前的例子来看：</p>
+<div class="cell">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Add a missing value to the prediction set</span></span>
+<span><span class="va">new_values</span><span class="op">$</span><span class="va">temp</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="cn">NA</span></span>
+<span></span>
+<span><span class="co"># The predict method for `lm` defaults to `na.pass`:</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">main_effect_fit</span>, <span class="va">new_values</span><span class="op">)</span></span>
+<span><span class="co">#&gt;        1        2        3        4        5        6 </span></span>
+<span><span class="co">#&gt;       NA 50.43314 54.03589 57.63865 61.24140 64.84415</span></span>
+<span></span>
+<span><span class="co"># Alternatively</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">main_effect_fit</span>, <span class="va">new_values</span>, na.action <span class="op">=</span> <span class="va">na.fail</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Error in na.fail.default(structure(list(temp = c(NA, 16L, 17L, 18L, 19L, : missing values in object</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">main_effect_fit</span>, <span class="va">new_values</span>, na.action <span class="op">=</span> <span class="va">na.omit</span><span class="op">)</span></span>
+<span><span class="co">#&gt;        2        3        4        5        6 </span></span>
+<span><span class="co">#&gt; 50.43314 54.03589 57.63865 61.24140 64.84415</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>从用户的角度来看，<code><a href="https://rdrr.io/r/stats/na.fail.html">na.omit()</a></code>可能会带来问题。在我们的示例中，<code>new_values</code>有6个，但使用<code><a href="https://rdrr.io/r/stats/na.fail.html">na.omit()</a></code>只会返回5个。为了对此进行调整，如果要将预测结果合并到<code>new_values</code>中，用户就必须确定哪一行存在缺失值，并在适当的位置插入一个缺失值。虽然预测函数将<code><a href="https://rdrr.io/r/stats/na.fail.html">na.omit()</a></code>用作其缺失数据处理策略的情况很少见，但这种情况确实会发生。那些确定这是其代码中错误原因的用户会对此印象非常深刻。</p>
+<p>为了解决此处描述的使用问题，tidymodels包设定了一系列设计目标。tidymodels的大多数设计目标都属于tidyverse中已有的“为人类而设计”这一范畴（Wickham et al.&nbsp;2019），但这些目标在建模代码方面有特定的应用。此外，tidymodels还有一些额外的设计目标，作为对tidyverse设计目标的补充。以下是一些例子：</p>
+<ul>
+<li><p>R具有出色的面向对象编程能力，我们利用这一点来替代创建新的函数名称（例如一个假设的新<code>predict_samples()</code>函数）。</p></li>
+<li><p>合理的默认值非常重要。此外，当更适合迫使用户做出选择时，函数的参数不应有默认值（例如，<code><a href="https://readr.tidyverse.org/reference/read_delim.html">read_csv()</a></code>的文件名参数）。</p></li>
+<li><p>同样，那些默认值可以从数据中推导出来的参数值也应该如此。例如，对于<code><a href="https://rdrr.io/r/stats/glm.html">glm()</a></code>函数，<code>family</code>参数可以检查结果中数据的类型，并且如果没有提供<code>family</code>参数，就可以在内部确定一个默认值。</p></li>
+<li><p>函数应该接受用户已有的数据结构，而非开发者想要的数据结构。例如，模型函数的唯一接口不应局限于矩阵。用户往往会有非数值型的预测变量，比如因子。</p></li>
+</ul>
+<p>这些理念中有许多在tidymodels的模型实现指南中都有阐述。在后续章节中，我们将举例说明一些现存的问题及其解决方案。</p>
+</section><section id="broomtidy" class="level3"><h3 class="anchored" data-anchor-id="broomtidy"><code>broom::tidy()</code></h3>
+<p>一些现有的R包提供了统一的接口来协调这些异构的建模API，例如caret和mlr。tidymodels框架与它们类似，采用了统一的函数接口，并确保函数名称和返回值的一致性。但它在其固执己见的设计目标和建模实现方面有所不同，本书将对此进行详细讨论。</p>
+<p>我们在本书中一直使用的broom::tidy()函数是另一个用于标准化R对象结构的工具。它能以更易用的格式返回多种类型的R对象。例如，假设正根据预测变量与结果列的相关性对其进行筛选。使用<code><a href="https://purrr.tidyverse.org/reference/map.html">purrr::map()</a></code>函数，<code><a href="https://rdrr.io/r/stats/cor.test.html">cor.test()</a></code>函数的结果可以以列表形式为每个预测变量返回：</p>
+<div class="cell">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">corr_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html">map</a></span><span class="op">(</span><span class="va">mtcars</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">mpg</span><span class="op">)</span>, <span class="va">cor.test</span>, y <span class="op">=</span> <span class="va">mtcars</span><span class="op">$</span><span class="va">mpg</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># The first of ten results in the vector:</span></span>
+<span><span class="va">corr_res</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;  Pearson's product-moment correlation</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; data:  .x[[i]] and mtcars$mpg</span></span>
+<span><span class="co">#&gt; t = -8.9197, df = 30, p-value = 6.113e-10</span></span>
+<span><span class="co">#&gt; alternative hypothesis: true correlation is not equal to 0</span></span>
+<span><span class="co">#&gt; 95 percent confidence interval:</span></span>
+<span><span class="co">#&gt;  -0.9257694 -0.7163171</span></span>
+<span><span class="co">#&gt; sample estimates:</span></span>
+<span><span class="co">#&gt;       cor </span></span>
+<span><span class="co">#&gt; -0.852162</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>如果我们想在图表中使用这些结果，假设检验结果的标准格式并不是很有用。<code><a href="https://generics.r-lib.org/reference/tidy.html">tidy()</a></code>方法可以将其以tibble的形式返回，并带有标准化的名称：</p>
+<div class="cell">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://broom.tidymodels.org/">broom</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="va">corr_res</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 1 × 8</span></span>
+<span><span class="co">#&gt;   estimate statistic  p.value parameter conf.low conf.high method            </span></span>
+<span><span class="co">#&gt;      &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;     &lt;int&gt;    &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;             </span></span>
+<span><span class="co">#&gt; 1   -0.852     -8.92 6.11e-10        30   -0.926    -0.716 Pearson's product…</span></span>
+<span><span class="co">#&gt; # ℹ 1 more variable: alternative &lt;chr&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>这些结果可以“堆叠”起来并添加到<code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot()</a></code>中，如图3.3所示。</p>
+<div class="cell">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">corr_res</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="co"># Convert each to a tidy format; `map_dfr()` stacks the data frames</span></span>
+<span>  <span class="fu"><a href="https://purrr.tidyverse.org/reference/map_dfr.html">map_dfr</a></span><span class="op">(</span><span class="va">tidy</span>, .id <span class="op">=</span> <span class="st">"predictor"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://forcats.tidyverse.org/reference/fct_reorder.html">fct_reorder</a></span><span class="op">(</span><span class="va">predictor</span>, <span class="va">estimate</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">estimate</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_linerange.html">geom_errorbar</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>ymin <span class="op">=</span> <span class="va">conf.low</span>, ymax <span class="op">=</span> <span class="va">conf.high</span><span class="op">)</span>, width <span class="op">=</span> <span class="fl">.1</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="cn">NULL</span>, y <span class="op">=</span> <span class="st">"Correlation with mpg"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure"><p><img src="3-A-Review-of-R-Modeling-Fundamentals_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="576"></p>
+<figcaption>Correlations (and 95% confidence intervals) between predictors and the outcome in the <code>mtcars</code> data set</figcaption></figure>
+</div>
+</div>
+</div>
+<p>使用base R中的函数也可以创建这样的图表，但自动重新格式化结果能使代码更简洁，且出错的可能性更小。</p>
+</section></section><section id="combining-base-r-models-and-the-tidyverse" class="level2"><h2 class="anchored" data-anchor-id="combining-base-r-models-and-the-tidyverse">Combining Base R Models and the Tidyverse</h2>
+<p>base R或其他R包中的建模函数可以与tidyverse结合使用，尤其是与dplyr、purrr和tidyr包。例如，如果我们想为每个蟋蟀物种拟合单独的模型，我们可以首先使用<code><a href="https://dplyr.tidyverse.org/reference/group_nest.html">dplyr::group_nest()</a></code>按该列拆分蟋蟀数据：</p>
+<div class="cell">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">split_by_species</span> <span class="op">&lt;-</span></span>
+<span>  <span class="va">crickets</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_nest.html">group_nest</a></span><span class="op">(</span><span class="va">species</span><span class="op">)</span></span>
+<span><span class="va">split_by_species</span></span>
+<span><span class="co">#&gt; # A tibble: 2 × 2</span></span>
+<span><span class="co">#&gt;   species                        data</span></span>
+<span><span class="co">#&gt;   &lt;fct&gt;            &lt;list&lt;tibble[,2]&gt;&gt;</span></span>
+<span><span class="co">#&gt; 1 O. exclamationis           [14 × 2]</span></span>
+<span><span class="co">#&gt; 2 O. niveus                  [17 × 2]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><code>data</code>列包含来自<code>crickets</code>的<code>rate</code>列和<code>temp</code>列，并以列表列的形式呈现。基于此，<code><a href="https://purrr.tidyverse.org/reference/map.html">purrr::map()</a></code>函数可以为每个物种创建单独的模型：</p>
+<div class="cell">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">model_by_species</span> <span class="op">&lt;-</span></span>
+<span>  <span class="va">split_by_species</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>model <span class="op">=</span> <span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html">map</a></span><span class="op">(</span><span class="va">data</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">rate</span> <span class="op">~</span> <span class="va">temp</span>, data <span class="op">=</span> <span class="va">.x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">model_by_species</span></span>
+<span><span class="co">#&gt; # A tibble: 2 × 3</span></span>
+<span><span class="co">#&gt;   species                        data model </span></span>
+<span><span class="co">#&gt;   &lt;fct&gt;            &lt;list&lt;tibble[,2]&gt;&gt; &lt;list&gt;</span></span>
+<span><span class="co">#&gt; 1 O. exclamationis           [14 × 2] &lt;lm&gt;  </span></span>
+<span><span class="co">#&gt; 2 O. niveus                  [17 × 2] &lt;lm&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>要收集这些模型中每个模型的系数，请使用<code><a href="https://generics.r-lib.org/reference/tidy.html">broom::tidy()</a></code>将它们转换为一致的数据框格式，以便可以对其进行拆嵌：</p>
+<div class="cell">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">model_by_species</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>coef <span class="op">=</span> <span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html">map</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">tidy</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">species</span>, <span class="va">coef</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/unnest.html">unnest</a></span><span class="op">(</span>cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">coef</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 4 × 6</span></span>
+<span><span class="co">#&gt;   species          term        estimate std.error statistic  p.value</span></span>
+<span><span class="co">#&gt;   &lt;fct&gt;            &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 O. exclamationis (Intercept)   -11.0      4.77      -2.32 3.90e- 2</span></span>
+<span><span class="co">#&gt; 2 O. exclamationis temp            3.75     0.184     20.4  1.10e-10</span></span>
+<span><span class="co">#&gt; 3 O. niveus        (Intercept)   -15.4      2.35      -6.56 9.07e- 6</span></span>
+<span><span class="co">#&gt; 4 O. niveus        temp            3.52     0.105     33.6  1.57e-15</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>列表列(list-column)</strong>在建模项目中可能非常强大。列表列可为任何类型的R对象提供容器，从拟合模型本身到重要的数据框结构均可容纳。</p>
+</section><section id="the-tidymodels-metapackage" class="level2"><h2 class="anchored" data-anchor-id="the-tidymodels-metapackage">The tidymodels Metapackage</h2>
+<p>tidyverse（第2章）是作为一组模块化的R包设计的，每个包的范围都相当狭窄。tidymodels框架采用了类似的设计。例如，rsample包专注于数据拆分和重采样。尽管重采样方法对建模的其他活动（如衡量性能）至关重要，但它们存在于单个包中，而性能指标则包含在另一个独立的包yardstick中。采用这种模块化包的理念有很多好处，从更简洁的模型部署到更顺畅的包维护。</p>
+<p>这种理念的缺点是tidymodels框架中有很多包。为了弥补这一点，tidymodels包（你可以把它看作是一个像tidyverse包一样的元包）会加载一组核心的tidymodels和tidyverse包。加载该包会显示哪些包被附加了：</p>
+<div class="cell">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidymodels.tidymodels.org">tidymodels</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; ── Attaching packages ─────────────────────────────────── tidymodels 1.4.1 ──</span></span>
+<span><span class="co">#&gt; ✔ dials        1.4.2     ✔ tailor       0.1.0</span></span>
+<span><span class="co">#&gt; ✔ infer        1.0.9     ✔ tune         2.0.0</span></span>
+<span><span class="co">#&gt; ✔ modeldata    1.5.1     ✔ workflows    1.3.0</span></span>
+<span><span class="co">#&gt; ✔ parsnip      1.3.3     ✔ workflowsets 1.1.1</span></span>
+<span><span class="co">#&gt; ✔ recipes      1.3.1     ✔ yardstick    1.3.2</span></span>
+<span><span class="co">#&gt; ✔ rsample      1.3.1</span></span>
+<span><span class="co">#&gt; ── Conflicts ────────────────────────────────────── tidymodels_conflicts() ──</span></span>
+<span><span class="co">#&gt; ✖ scales::discard() masks purrr::discard()</span></span>
+<span><span class="co">#&gt; ✖ dplyr::filter()   masks stats::filter()</span></span>
+<span><span class="co">#&gt; ✖ recipes::fixed()  masks stringr::fixed()</span></span>
+<span><span class="co">#&gt; ✖ dplyr::lag()      masks stats::lag()</span></span>
+<span><span class="co">#&gt; ✖ yardstick::spec() masks readr::spec()</span></span>
+<span><span class="co">#&gt; ✖ recipes::step()   masks stats::step()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>如果你用过tidyverse，你会注意到一些熟悉的名字，因为有几个tidyverse包，比如dplyr和ggplot2，会和tidymodels包一起加载。我们已经说过，tidymodels框架将tidyverse的原则应用到建模中，而实际上，tidymodels框架也建立在一些最基础的tidyverse包之上，比如这些包。</p>
+<p>加载这个元包还会显示是否存在与之前加载的包的函数命名冲突。作为命名冲突的一个例子，在加载tidymodels之前，调用<code><a href="https://dplyr.tidyverse.org/reference/filter.html">filter()</a></code>函数会执行stats包中的该函数。加载tidymodels之后，它会执行同名的dplyr函数。</p>
+<p>有几种处理命名冲突的方法。可以使用函数的命名空间来调用该函数（例如，<code><a href="https://rdrr.io/r/stats/filter.html">stats::filter()</a></code>）。这并非不好的做法，但确实会降低代码的可读性。</p>
+<p>另一个选择是使用<code>conflicted</code>包。我们可以设置一条规则，该规则在R会话结束前一直有效，以确保如果代码中没有指定命名空间，某个特定的函数将始终运行。例如，如果我们更倾向于使用前面提到的函数的dplyr版本：</p>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://conflicted.r-lib.org/">conflicted</a></span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://conflicted.r-lib.org/reference/conflict_prefer.html">conflict_prefer</a></span><span class="op">(</span><span class="st">"filter"</span>, winner <span class="op">=</span> <span class="st">"dplyr"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>为方便起见，tidymodels包含一个函数，该函数可捕获我们可能遇到的大多数常见命名冲突：</p>
+<div class="cell">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://tidymodels.tidymodels.org/reference/tidymodels_prefer.html">tidymodels_prefer</a></span><span class="op">(</span>quiet <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [conflicted] Will prefer agua::refit over any other package.</span></span>
+<span><span class="co">#&gt; [conflicted] Will prefer DALEX::explain over any other package.</span></span>
+<span><span class="co">#&gt; [conflicted] Will prefer dials::Laplace over any other package.</span></span>
+<span><span class="co">#&gt; [conflicted] Will prefer dials::max_rules over any other package.</span></span>
+<span><span class="co">#&gt; [conflicted] Will prefer dials::neighbors over any other package.</span></span>
+<span><span class="co">#&gt; [conflicted] Will prefer dials::prune over any other package.</span></span>
+<span><span class="co">#&gt; [conflicted] Will prefer dials::smoothness over any other package.</span></span>
+<span><span class="co">#&gt; [conflicted] Will prefer dplyr::collapse over any other package.</span></span>
+<span><span class="co">#&gt; [conflicted] Will prefer dplyr::combine over any other package.</span></span>
+<span><span class="co">#&gt; [conflicted] Will prefer dplyr::filter over any other package.</span></span>
+<span><span class="co">#&gt; [conflicted] Will prefer dplyr::rename over any other package.</span></span>
+<span><span class="co">#&gt; [conflicted] Will prefer dplyr::select over any other package.</span></span>
+<span><span class="co">#&gt; [conflicted] Will prefer dplyr::slice over any other package.</span></span>
+<span><span class="co">#&gt; [conflicted] Will prefer ggplot2::`%+%` over any other package.</span></span>
+<span><span class="co">#&gt; [conflicted] Will prefer ggplot2::margin over any other package.</span></span>
+<span><span class="co">#&gt; [conflicted] Will prefer parsnip::bart over any other package.</span></span>
+<span><span class="co">#&gt; [conflicted] Will prefer parsnip::fit over any other package.</span></span>
+<span><span class="co">#&gt; [conflicted] Will prefer parsnip::mars over any other package.</span></span>
+<span><span class="co">#&gt; [conflicted] Will prefer parsnip::pls over any other package.</span></span>
+<span><span class="co">#&gt; [conflicted] Will prefer purrr::cross over any other package.</span></span>
+<span><span class="co">#&gt; [conflicted] Will prefer purrr::invoke over any other package.</span></span>
+<span><span class="co">#&gt; [conflicted] Will prefer purrr::map over any other package.</span></span>
+<span><span class="co">#&gt; [conflicted] Will prefer recipes::discretize over any other package.</span></span>
+<span><span class="co">#&gt; [conflicted] Will prefer recipes::step over any other package.</span></span>
+<span><span class="co">#&gt; [conflicted] Will prefer recipes::update over any other package.</span></span>
+<span><span class="co">#&gt; [conflicted] Will prefer rsample::populate over any other package.</span></span>
+<span><span class="co">#&gt; [conflicted] Will prefer scales::rescale over any other package.</span></span>
+<span><span class="co">#&gt; [conflicted] Will prefer themis::step_downsample over any other package.</span></span>
+<span><span class="co">#&gt; [conflicted] Will prefer themis::step_upsample over any other package.</span></span>
+<span><span class="co">#&gt; [conflicted] Will prefer tidyr::expand over any other package.</span></span>
+<span><span class="co">#&gt; [conflicted] Will prefer tidyr::extract over any other package.</span></span>
+<span><span class="co">#&gt; [conflicted] Will prefer tidyr::pack over any other package.</span></span>
+<span><span class="co">#&gt; [conflicted] Will prefer tidyr::unpack over any other package.</span></span>
+<span><span class="co">#&gt; [conflicted] Will prefer tune::parameters over any other package.</span></span>
+<span><span class="co">#&gt; [conflicted] Will prefer tune::tune over any other package.</span></span>
+<span><span class="co">#&gt; [conflicted] Will prefer yardstick::get_weights over any other package.</span></span>
+<span><span class="co">#&gt; [conflicted] Will prefer yardstick::precision over any other package.</span></span>
+<span><span class="co">#&gt; [conflicted] Will prefer yardstick::recall over any other package.</span></span>
+<span><span class="co">#&gt; [conflicted] Will prefer yardstick::spec over any other package.</span></span>
+<span><span class="co">#&gt; [conflicted] Removing existing preference.</span></span>
+<span><span class="co">#&gt; [conflicted] Will prefer recipes::update over Matrix::update.</span></span>
+<span><span class="co">#&gt; ── Conflicts ───────────────────────────────────────── tidymodels_prefer() ──</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>请注意，使用此函数意味着您同意对所有命名空间冲突使用<code><a href="https://conflicted.r-lib.org/reference/conflict_prefer.html">conflicted::conflict_prefer()</a></code>，这会将每个冲突都视为错误，并强制您选择要使用的函数。<code><a href="https://tidymodels.tidymodels.org/reference/tidymodels_prefer.html">tidymodels::tidymodels_prefer()</a></code>函数会处理tidymodels函数中最常见的冲突，但您需要自行处理R会话中的其他冲突。</p>
+</section><section id="chapter-summary" class="level2"><h2 class="anchored" data-anchor-id="chapter-summary">Chapter Summary</h2>
+<p>本章回顾了创建和使用模型的核心R语言约定，这些约定是本书其余部分的重要基础。公式运算符是在R中拟合模型时一个富有表现力且重要的方面，并且在非tidymodels函数中通常有多种用途。传统的R建模方法存在一些局限性，特别是在流畅地处理和可视化模型输出方面。tidymodels元包将tidyverse设计理念应用于建模包。</p>
+
+
+</section><a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script><script src="https://utteranc.es/client.js" repo="hanguojun007/Blog" issue-term="pathname" theme="github-light" crossorigin="anonymous" async="">
+</script><nav class="page-navigation"><div class="nav-page nav-page-previous">
+      <a href="../../Books/Tidy Modeling with R/2 A Tidyverse Primer.html" class="pagination-link" aria-label="2 A Tidyverse Primer">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">2 A Tidyverse Primer</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+</body></html>
