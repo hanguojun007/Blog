@@ -4,6 +4,9 @@ website:
       title: Tidy Modeling with R
       contents:
         - Books/Tidy Modeling with R/index.qmd
+        - Introduction
         - Books/Tidy Modeling with R/1 Software for modeling.qmd
         - Books/Tidy Modeling with R/2 A Tidyverse Primer.qmd
         - Books/Tidy Modeling with R/3 A Review of R Modeling Fundamentals.qmd
+        - Moduling Basics
+        - Books/Tidy Modeling with R/4 The Ames Housing Data.qmd
