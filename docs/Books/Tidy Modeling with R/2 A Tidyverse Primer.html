@@ -147,7 +147,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="dropdown-text">Quarto</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="../../Books/Js4R/00 Preface.html">
+    <a class="dropdown-item" href="../../Books/Js4R/00 Preface.qmd">
  <span class="dropdown-text">Js4R</span></a>
   </li>  
     </ul>
@@ -321,9 +321,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span><span class="co">#&gt; # A tibble: 3 × 2</span></span>
 <span><span class="co">#&gt;   splits          id        </span></span>
 <span><span class="co">#&gt;   &lt;list&gt;          &lt;chr&gt;     </span></span>
-<span><span class="co">#&gt; 1 &lt;split [32/7]&gt;  Bootstrap1</span></span>
-<span><span class="co">#&gt; 2 &lt;split [32/13]&gt; Bootstrap2</span></span>
-<span><span class="co">#&gt; 3 &lt;split [32/15]&gt; Bootstrap3</span></span>
+<span><span class="co">#&gt; 1 &lt;split [32/13]&gt; Bootstrap1</span></span>
+<span><span class="co">#&gt; 2 &lt;split [32/11]&gt; Bootstrap2</span></span>
+<span><span class="co">#&gt; 3 &lt;split [32/13]&gt; Bootstrap3</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/class.html">class</a></span><span class="op">(</span><span class="va">boot_samp</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "bootstraps" "rset"       "tbl_df"     "tbl"        "data.frame"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -356,14 +356,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">)</span></span>
 <span><span class="va">ratios</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="cn">NA_real_</span>, <span class="va">n</span><span class="op">)</span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">car</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="va">n</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">ratios</span><span class="op">[</span><span class="va">car</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">$</span><span class="va">mpg</span><span class="op">[</span><span class="va">car</span><span class="op">]</span><span class="op">/</span><span class="va">mtcars</span><span class="op">$</span><span class="va">wt</span><span class="op">[</span><span class="va">car</span><span class="op">]</span><span class="op">)</span></span>
+<span>  <span class="va">ratios</span><span class="op">[</span><span class="va">car</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">$</span><span class="va">mpg</span><span class="op">[</span><span class="va">car</span><span class="op">]</span> <span class="op">/</span> <span class="va">mtcars</span><span class="op">$</span><span class="va">wt</span><span class="op">[</span><span class="va">car</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">ratios</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 2.081348 1.988470 2.285193 1.895564 1.693052 1.654643</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>那些在R语言方面有更多经验的人可能知道，有一种更简单、更快的向量化版本可以通过以下方式计算：</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">ratios</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">$</span><span class="va">mpg</span><span class="op">/</span><span class="va">mtcars</span><span class="op">$</span><span class="va">wt</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">ratios</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">$</span><span class="va">mpg</span> <span class="op">/</span> <span class="va">mtcars</span><span class="op">$</span><span class="va">wt</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>然而，在许多现实世界的案例中，我们所关注的逐元素运算对于矢量化解决方案来说过于复杂。在这种情况下，一个好的方法是编写一个函数来进行计算。当我们进行函数式编程设计时，重要的是输出应仅取决于输入，且函数没有副作用。以下函数中违背这些原则的地方已用注释标出：</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">compute_log_ratio</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">mpg</span>, <span class="va">wt</span><span class="op">)</span> <span class="op">{</span></span>
@@ -376,7 +376,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>一个更好的版本是：</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">compute_log_ratio</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">mpg</span>, <span class="va">wt</span>, <span class="va">log_base</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">exp</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">mpg</span><span class="op">/</span><span class="va">wt</span>, base <span class="op">=</span> <span class="va">log_base</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">/</span> <span class="va">wt</span>, base <span class="op">=</span> <span class="va">log_base</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>purrr包包含用于函数式编程的工具。让我们重点关注<code><a href="https://purrr.tidyverse.org/reference/map.html">map()</a></code>函数族，它们对向量进行操作，并且总是返回相同类型的输出。最基本的函数<code><a href="https://purrr.tidyverse.org/reference/map.html">map()</a></code>总是返回一个列表，其基本语法为<code>map(vector, function)</code>。例如，要对我们的数据求平方根，我们可以：</p>
@@ -404,7 +404,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p><code><a href="https://purrr.tidyverse.org/reference/map.html">map()</a></code>函数还允许使用波浪号定义临时的匿名函数。对于<code><a href="https://purrr.tidyverse.org/reference/map2.html">map2()</a></code>，参数值为<code>.x</code>和<code>.y</code>：</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map2.html">map2_dbl</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">$</span><span class="va">mpg</span>, <span class="va">mtcars</span><span class="op">$</span><span class="va">wt</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">.x</span><span class="op">/</span><span class="va">.y</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map2.html">map2_dbl</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">$</span><span class="va">mpg</span>, <span class="va">mtcars</span><span class="op">$</span><span class="va">wt</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log</a></span><span class="op">(</span><span class="va">.x</span> <span class="op">/</span> <span class="va">.y</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 2.081348 1.988470 2.285193 1.895564 1.693052 1.654643</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>

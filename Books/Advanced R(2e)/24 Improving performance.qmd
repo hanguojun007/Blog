@@ -373,4 +373,3 @@ stopifnot(all.equal(t1, t3))
 -   学习如何并行地运行代码，如"Parallel R"和"Parallel Computing for Data Science"。
 
 -   阅读通用的有关优化的数据，如"Mature optimisation"，"Pragmatic Programmer"。
-

@@ -134,7 +134,7 @@ R语言拥有出色的工具来创建、修改函数以及对函数进行操作�
 n <- nrow(mtcars)
 ratios <- rep(NA_real_, n)
 for (car in 1:n) {
-  ratios[car] <- log(mtcars$mpg[car]/mtcars$wt[car])
+  ratios[car] <- log(mtcars$mpg[car] / mtcars$wt[car])
 }
 head(ratios)
 ```
@@ -142,7 +142,7 @@ head(ratios)
 那些在R语言方面有更多经验的人可能知道，有一种更简单、更快的向量化版本可以通过以下方式计算：
 
 ```{r}
-ratios <- log(mtcars$mpg/mtcars$wt)
+ratios <- log(mtcars$mpg / mtcars$wt)
 ```
 
 然而，在许多现实世界的案例中，我们所关注的逐元素运算对于矢量化解决方案来说过于复杂。在这种情况下，一个好的方法是编写一个函数来进行计算。当我们进行函数式编程设计时，重要的是输出应仅取决于输入，且函数没有副作用。以下函数中违背这些原则的地方已用注释标出：
@@ -161,7 +161,7 @@ compute_log_ratio <- function(mpg, wt) {
 
 ```{r}
 compute_log_ratio <- function(mpg, wt, log_base = exp(1)) {
-  log(mpg/wt, base = log_base)
+  log(mpg / wt, base = log_base)
 }
 ```
 
@@ -187,7 +187,7 @@ head(log_ratios)
 `map()`函数还允许使用波浪号定义临时的匿名函数。对于`map2()`，参数值为`.x`和`.y`：
 
 ```{r}
-map2_dbl(mtcars$mpg, mtcars$wt, ~ log(.x/.y)) %>%
+map2_dbl(mtcars$mpg, mtcars$wt, ~ log(.x / .y)) %>%
   head()
 ```
 

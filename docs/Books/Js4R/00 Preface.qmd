@@ -1,0 +1,44 @@
+---
+title: "00 Preface"
+date: "2025-05-14"
+date-modified: "2025-05-14"
+format: "html"
+execute:
+  warning: false
+  fig-width: 6
+  fig-asp: 0.618
+  out-width: 70%
+  fig-align: center
+---
+
+```{r}
+#| echo: false
+
+source("_common.R")
+```
+
+本书的主要内容是如何将Javascript与R有机结合，使得能在R中书写网页应用。
+
+## 引言
+
+很多R语言使用者对shiny，rmarkdown等或多或少的熟悉，却不熟悉web核心技术——JavaScript，本书旨在通过揭示 JavaScript 在多大程度上能够极大地增强数据科学流水线的各个阶段，从分析到结果传达，来弥补这一缺陷。
+
+## 目录
+
+1.
+
+
+## 总结
+
+1.  `myWidget()`函数中包含的`htmlwidgets::createWidget`会：
+    -   自动创建element，默认是`div`，可以通过`myWidget_html()`函数进行修改。
+    -   解析`x`对象的属性，如`TOJSON_ARGS`, `TOJSON_FUNC`，配置数据转换方式。
+
+2.  `htmlwidgets::createWidget`创建的`x`对象，可以直接在外部进行赋值。如`gio$x$style <- "juicyCake"`。
+
+3.  `usethis::use_pipe()`可以实现管道符操作。
+
+4.  实现`crosstalk`支持的步骤：
+    -   R脚本改造为能接收共享数据对象，获取数据的data，group，key信息，添加`crosstalk`依赖库。
+    -   根据JS依赖库获取key信息，然后JS脚本使用`sel_handle.set`发送key信息
+    -   JS脚本使用`sel_handle.on`监听事件发送改变后，获取key信息。

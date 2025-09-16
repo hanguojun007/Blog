@@ -45,5 +45,3 @@ str(x)
 trials <- map(1:100, ~ t.test(rpois(10, 10), rpois(10, 7)))
 
 ```
-
-

@@ -50,5 +50,3 @@ tidymodels R包官方网站：[https://www.tidymodels.org](https://www.tidymodel
 -   第4~9章：以一个示例介绍tidymodel系列包：recipes，parsnip，workflows，yardstick等。
 -   第10~15章：模型性能评估与调参。
 -   第16~21章：介绍特征工程，如降维和高基数预测变量编码；模型的可解释性与可信度。
-
-

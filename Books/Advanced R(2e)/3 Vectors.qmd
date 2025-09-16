@@ -661,4 +661,3 @@ length(NULL)
 x <- NULL
 attr(x, "y") <- 1
 ```
-
