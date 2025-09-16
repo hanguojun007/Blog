@@ -47,7 +47,7 @@ website:
     # 工具栏
     tools:
       - icon: github
-        href: https://github.com/hanguojun007
+        href: https://github.com/hanguojun007/Blog
 
     # 菜单栏
     left:
