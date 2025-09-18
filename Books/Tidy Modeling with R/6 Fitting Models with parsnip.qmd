@@ -1,7 +1,7 @@
 ---
 title: "6 Fitting Models with parsnip"
 date: "2025-09-17"
-date-modified: "2025-09-17"
+date-modified: "2025-09-18"
 
 format:
   html:
@@ -50,13 +50,13 @@ $$y_i = \beta_0 + \beta_1 x_{1i} + \ldots + \beta_p x_{pi}$$
 
 -   **正则化线性回归**在最小二乘法中加入惩罚项，通过移除预测变量和/或将其系数缩小至零来追求模型的简洁性。这可以通过贝叶斯或非贝叶斯技术来实现。
 
+### Heterogeneous Interface
+
 在R语言中，stats包可用于第一种情况。使用函数`lm()`进行线性回归的语法为`model <- lm(formula, data, ...)`，其中`...`表示要传递给`lm()`的其他参数。该函数没有单独的`x`或`y`的接口，而是直接假定结果是`y`，预测变量是`x`。
 
 对于第二种情况，即使用正则化进行估计，可以通过**rstanarm**包来拟合贝叶斯模型：`model <- stan_glm(formula, data, family = "gaussian", ...)`。在这种情况下，通过`...`传递的其他选项将包括参数的先验分布的参数以及有关模型数值方面的具体信息。与`lm()`一样，只有公式接口可用。
 
 一种流行的非贝叶斯正则化回归方法是**glmnet**模型（Friedman, Hastie, Tibshirani 2010）。其语法如下：`model <- glmnet(x = matrix, y = vector, family = "gaussian", ...)`。在这种情况下，预测变量数据必须已经格式化为数值矩阵；这里有`x`或`y`的单独接口，没有公式接口。
-
-### Heterogeneous Interface
 
 请注意，这些接口在数据传递给模型函数的方式或其参数方面存在异质性。第一个问题是，为了在不同的包中拟合模型，数据必须以不同的方式格式化。`lm()`和`stan_glm()`只有公式接口，而`glmnet()`没有，对于其他类型的模型，其接口可能差异更大。对于试图进行数据分析的人来说，这些差异要求他们记住每个包的语法，这可能会非常令人沮丧。
 
@@ -80,6 +80,8 @@ linear_reg() %>% set_engine("glmnet")
 
 linear_reg() %>% set_engine("stan")
 ```
+
+### Consistent Interface
 
 一旦模型的细节确定后，就可以使用`fit()`函数（用于公式）或`fit_xy()`函数（当数据已预处理时）来进行模型估计。parsnip包允许用户不必在意底层模型的接口；即使建模包的函数只有`x`/`y`接口，你也始终可以使用公式。
 
@@ -133,6 +135,8 @@ lm_form_fit
 
 lm_xy_fit
 ```
+
+### Consistent Parameters
 
 parsnip不仅为不同的包提供了一致的模型接口，还在模型参数方面保持了一致性。拟合相同模型的不同函数往往具有不同的参数名称，这是很常见的情况。随机森林模型函数就是一个很好的例子。三个常用的参数分别是集成中的树的数量、在树的每次分裂时随机抽样的预测变量数量，以及进行分裂所需的数据点数量。对于实现该算法的三个不同的R包，这些参数如 @tbl-6.1 所示。
 
@@ -303,7 +307,7 @@ ames_test_small %>%
 
 ## parsnip-Extension Packages
 
-parsnip包本身包含了多个模型的接口。不过，为了便于包的安装和维护，还有其他tidymodels包提供了针对其他模型集的parsnip模型定义。discrim包包含了一组称为判别分析方法（如线性或二次判别分析）的分类技术的模型定义。通过这种方式，安装parsnip所需的包依赖得以减少。所有可与parsnip配合使用的模型（涵盖CRAN上的不同包）的列表可在https://www.tidymodels.org/find/找到。
+parsnip包本身包含了多个模型的接口。不过，为了便于包的安装和维护，还有其他tidymodels包提供了针对其他模型集的parsnip模型定义。discrim包包含了一组称为判别分析方法（如线性或二次判别分析）的分类技术的模型定义。通过这种方式，安装parsnip所需的包依赖得以减少。所有可与parsnip配合使用的模型（涵盖CRAN上的不同包）的列表可在 https://www.tidymodels.org/find/ 找到。
 
 ## Creating Model Specifications
 
