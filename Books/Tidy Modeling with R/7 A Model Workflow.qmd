@@ -1,0 +1,156 @@
+---
+title: "7 A Model Workflow"
+date: "2025-09-22"
+date-modified: "2025-09-22"
+
+format:
+  html:
+    code-link: true
+
+fig-width: 6
+fig-asp: 0.618
+out-width: 70%
+fig-align: center
+
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: "#>"
+    R.options:
+      dplyr.print_min: 6
+      dplyr.print_max: 6
+      pillar.max_footer_lines: 2
+      pillar.min_chars: 15
+      stringr.view_n: 6
+      cli.num_colors: 0
+      cli.hyperlink: FALSE
+      pillar.bold: TRUE
+      width: 77
+
+execute:
+  warning: true
+  error: true
+---
+
+在上一章中，我们讨论了parsnip包，该包可用于定义和拟合模型。本章将介绍一个名为**模型工作流**的新概念。这一概念（以及相应的`workflow()`对象）的目的是封装建模过程中的主要部分（在1.5节中讨论）。工作流的重要性体现在两个方面。首先，使用工作流概念有助于形成良好的方法体系，因为它是数据分析中估计部分的单一入口。其次，它能让用户更好地组织项目。这两点将在以下各节中详细讨论。
+
+## Where Does the Model Begin and End?
+
+到目前为止，当我们使用“模型”这一术语时，指的是将一些预测变量与一个或多个结果变量相关联的结构方程。让我们再以线性回归为例来思考。结果数据表示为yᵢ，其中训练集中有i=1…n个样本。假设模型中使用了p个预测变量xᵢ₁，…，xᵢₚ。线性回归会生成一个模型方程：
+
+$$ \hat{y}_i = \hat{\beta}_0 + \hat{\beta}_1x_{i1} + \ldots + \hat{\beta}_px_{ip} $$
+
+虽然这是一个线性模型，但它仅在参数上是线性的。预测变量可以是非线性项（例如log(xi)）。
+
+关于建模过程的传统思路是，它只包含模型拟合。对于一些简单的数据集，拟合模型本身可能就是整个过程。然而，在拟合模型之前，通常会有多种选择和额外的步骤：
+
+-   虽然我们的示例模型有p个预测变量，但通常一开始会有多于p个的候选预测变量。通过探索性数据分析或运用领域知识，一些预测变量可能会被排除在分析之外。在其他情况下，可以使用特征选择算法，以数据驱动的方式为模型选择最小的预测变量集。
+
+-   在某些情况下，重要预测变量的值会缺失。此时，我们不必将该样本从数据集中剔除，而是可以利用数据中的其他值来填补这个缺失值。例如，如果x₁的值缺失，但它与预测变量x₂和x₃相关，那么一种填补方法就可以根据x₂和x₃的值来估计缺失的x₁观测值。
+
+-   转换预测变量的尺度可能是有益的。如果没有关于新尺度应该是什么的先验信息，我们可以使用统计转换技术、现有数据和一些优化准则来估计合适的尺度。其他转换方法，如主成分分析（PCA），会对一组预测变量进行转换，将它们变成新的特征，用作预测变量。
+
+虽然这些例子都与模型拟合前的步骤有关，但在模型创建后也可能会有一些操作。当创建的分类模型其结果为二元时（例如，event和non-event），通常会使用50%的概率阈值来生成离散的类别预测，这也被称为硬预测。例如，某个分类模型可能会估计某一事件发生的概率为62%。按照通常的默认设置，硬预测结果会是event。然而，该模型可能需要更专注于减少假阳性结果（即，将真正的非事件错误地分类为事件的情况）。实现这一点的一种方法是将阈值从50%提高到某个更高的值。这会提高将新样本判定为事件所需的证据级别。虽然这会降低真阳性率（这是不利的），但它在减少假阳性方面可能会产生更显著的效果。阈值的选择应该利用数据进行优化。这是一个后处理步骤的例子，它对模型的运行效果有着重大影响，尽管它并不包含在模型拟合步骤中。
+
+关注更广泛的建模过程很重要，而不仅仅是拟合用于估计参数的特定模型。这个更广泛的过程包括任何预处理步骤、模型拟合本身以及潜在的后处理活动。在本书中，我们将把这个更全面的概念称为模型工作流，并重点介绍如何处理其所有组成部分以生成最终的模型方程。在其他软件中，例如Python或Spark，类似的步骤集合被称为管道。在tidymodels中，“管道（pipeline）”一词已经表示通过管道运算符（例如magrittr包中的`%>%`或更新的原生`|>`）链接在一起的一系列操作。为了避免在此语境中使用模糊的术语，我们将与建模相关的一系列计算操作称为工作流。
+
+将数据分析的分析组件整合在一起还有另一个重要原因。后续章节将展示如何准确衡量性能，以及如何优化结构参数（即模型调优）。为了正确量化模型在训练集上的性能，第10章提倡使用重采样方法。要正确做到这一点，分析中任何数据驱动的部分都不应被排除在验证之外。为此，工作流程必须包含所有重要的估计步骤。
+
+举个例子，考虑主成分分析（PCA）信号提取。我们将在第8.4节和第16章中对此进行更详细的讨论；PCA是一种用新的人工特征替代相关预测变量的方法，这些新特征不相关，并且能捕捉原始集合中的大部分信息。这些新特征可以用作预测变量，而最小二乘回归可以用来估计模型参数。
+
+关于模型工作流有两种思考方式。@fig-7.1 展示了错误的方法：将主成分分析（PCA）预处理步骤视为不属于建模工作流的一部分。
+
+![Incorrect mental model of where model estimation occurs in the data analysis process](images/bad-workflow.svg){#fig-7.1}
+
+这里的谬误在于，尽管主成分分析（PCA）为生成主成分进行了大量计算，但其运算被假定为不存在任何相关的不确定性。主成分分析的主成分被视为已知的，而且如果不将其纳入模型工作流，就无法充分衡量主成分分析的效果。
+
+@fig-7.2 展示了一种恰当的方法。
+
+![Correct mental model of where model estimation occurs in the data analysis process](images/proper-workflow.svg){#fig-7.2}
+
+通过这种方式，主成分分析预处理被视为建模过程的一部分。
+
+## Workflow Basics
+
+workflows包允许用户将建模对象和预处理对象绑定在一起。让我们再次从Ames数据和一个简单的线性模型开始：
+
+```{r}
+library(tidymodels)
+data(ames)
+ames <- mutate(ames, Sale_Price = log10(Sale_Price))
+
+set.seed(502)
+ames_split <- initial_split(ames, prop = 0.80, strata = Sale_Price)
+ames_train <- training(ames_split)
+ames_test <- testing(ames_split)
+
+lm_model <- linear_reg() %>% set_engine("lm")
+```
+
+工作流始终需要一个parsnip模型对象：
+
+```{r}
+lm_wflow <-
+  workflow() %>%
+  add_model(lm_model)
+
+lm_wflow
+```
+
+请注意，我们尚未指定此工作流应如何预处理数据：`Preprocessor: None`。如果我们的模型非常简单，可以使用标准的R公式作为预处理器：
+
+```{r}
+lm_wflow <-
+  lm_wflow %>%
+  add_formula(Sale_Price ~ Longitude + Latitude)
+
+lm_wflow
+```
+
+工作流有一个`fit()`方法，可用于创建模型。使用在第6.6节中创建的对象：
+
+```{r}
+lm_fit <- fit(lm_wflow, ames_train)
+lm_fit
+```
+
+我们还可以在拟合的工作流上使用`predict()`：
+
+```{r}
+predict(lm_fit, ames_test %>% slice(1:3))
+```
+
+`predict()`方法遵循我们在6.3节中为parsnip包描述的所有相同规则和命名约定。模型和预处理器都可以被移除或更新：
+
+```{r}
+lm_fit %>% update_formula(Sale_Price ~ Longitude)
+```
+
+请注意，在这个新对象中，输出显示之前拟合的模型已被移除，因为新公式与之前的模型拟合不一致。
+
+##  Adding Raw Variables to the `workflow()`
+
+还有另一种向模型传递数据的接口，即`add_variables()`函数，它使用类dplyr的语法来选择变量。该函数有两个主要参数：`outcomes`（结果）和`predictors`（预测变量）。它们采用类似于tidyverse包的tidyselect后端的选择方法，通过`c()`来捕获多个选择器。
+
+```{r}
+lm_wflow <-
+  lm_wflow %>%
+  remove_formula() %>%
+  add_variables(outcome = Sale_Price, predictors = c(Longitude, Latitude))
+lm_wflow
+```
+
+也可以使用更通用的选择器来指定预测变量，例如：`predictors = c(ends_with("tude"))`。一个便利之处在于，任何意外地在predictors参数中指定的结果列都会被悄无声息地移除。这为以下用法提供了便利：`predictors = everything()`。
+
+当模型拟合时，该规格会将这些数据原封不动地整合到一个数据框中，并将其传递给底层函数：
+
+```{r}
+fit(lm_wflow, ames_train)
+```
+
+如果你希望底层建模方法按其通常的方式处理数据，`add_variables()`会是一个有用的接口。正如我们将在第7.4.1节中看到的，它还能促进更复杂的建模规范。不过，正如我们在下一节中提到的，像`glmnet`和`xgboost`这样的模型期望用户从因子预测变量中创建指示变量。在这些情况下，配方（recipe）或公式接口通常会是更好的选择。
+
+在下一章中，我们将介绍一种更强大的预处理工具（称为配方），它也可以添加到工作流程中。
+
+## How Does a `workflow()` Use the Formula?
+
