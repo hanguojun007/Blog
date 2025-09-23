@@ -1,7 +1,7 @@
 ---
 title: "7 A Model Workflow"
 date: "2025-09-22"
-date-modified: "2025-09-22"
+date-modified: "2025-09-23"
 
 format:
   html:
@@ -154,3 +154,176 @@ fit(lm_wflow, ames_train)
 
 ## How Does a `workflow()` Use the Formula?
 
+回顾第3.2节可知，R语言中的公式方法有多种用途（我们将在第8章进一步讨论这一点）。其中之一是将原始数据正确编码为便于分析的格式。这可能包括执行内嵌转换（例如`log(x)`）、创建虚拟变量列、创建交互项或其他列扩展等。然而，许多统计方法需要不同类型的编码：
+
+-   大多数基于树的模型的软件包使用公式接口，但不会将分类预测变量编码为虚拟变量。
+
+-   软件包可以使用特殊的内联函数来告知模型函数在分析中如何处理预测变量。例如，在生存分析模型中，像`strata(site)`这样的公式项会表明列`site`是一个分层变量。这意味着它不应被当作常规预测变量来处理，并且在模型中没有相应的位置参数估计。
+
+-   有几个R包以基础R函数无法解析或执行的方式扩展了公式。在多水平模型（例如混合模型或分层贝叶斯模型）中，诸如`(week | subject)`这样的模型项表示列`week`是一个随机效应，其对于`subject`列的每个值都有不同的斜率参数估计。
+
+工作流是一种通用接口。当使用`add_formula()`时，工作流应该如何对数据进行预处理？由于预处理取决于模型，工作流会尽可能模仿底层模型的做法。如果无法做到这一点，公式处理不应对公式中使用的列进行任何操作。让我们更详细地看看这一点。
+
+### Special formulas and inline functions
+
+许多多层模型已经采用了**lme4**包中设计的公式规范。例如，要拟合一个包含受试者随机效应的回归模型，我们会使用以下公式：
+
+```{r}
+library(lme4)
+library(nlme)
+lmer(distance ~ Sex + (age | Subject), data = Orthodont)
+```
+
+其结果是，每个受试者都会有一个针对`age`的估计截距和斜率参数。
+
+问题在于标准的R方法无法正确处理这个公式，导致生成一个0行的数据框：
+
+```{r}
+model.matrix(distance ~ Sex + (age | Subject), data = Orthodont)
+```
+
+问题在于，这个特殊公式必须由底层的包代码来处理，而不是标准的`model.matrix()`方法。
+
+即使这个公式可以与`model.matrix()`一起使用，这仍然会带来问题，因为该公式还指定了模型的统计属性。
+
+workflows中的解决方案是一个可选的补充模型公式，可将其传递给`add_model()`。`add_variables()`规范提供了基本的列名，然后提供给模型的实际公式在`add_model()`中设置：
+
+```{r}
+library(multilevelmod)
+
+multilevel_spec <- linear_reg() %>% set_engine("lmer")
+
+multilevel_workflow <-
+  workflow() %>%
+  # Pass the data along as-is:
+  add_variables(outcome = distance, predictors = c(Sex, age, Subject)) %>%
+  add_model(multilevel_spec,
+    # This formula is given to the model
+    formula = distance ~ Sex + (age | Subject)
+  )
+
+multilevel_fit <- fit(multilevel_workflow, data = Orthodont)
+multilevel_fit
+```
+
+我们甚至可以使用前面提到的生存分析包（**survival**）中的`strata()`函数来进行生存分析：
+
+```{r}
+library(censored)
+
+parametric_spec <- survival_reg()
+
+parametric_workflow <-
+  workflow() %>%
+  add_variables(outcome = c(fustat, futime), predictors = c(age, rx)) %>%
+  add_model(parametric_spec,
+    formula = Surv(futime, fustat) ~ age + strata(rx)
+  )
+
+parametric_fit <- fit(parametric_workflow, data = ovarian)
+parametric_fit
+```
+
+## Creating Multiple Workflows at Once
+
+在某些情况下，数据需要多次尝试才能找到合适的模型。例如：
+
+-   对于预测模型，建议评估多种不同的模型类型。这需要用户创建多个模型规格。
+
+-   模型的序贯检验通常从一组扩展的预测变量开始。这种“全模型”会与一系列相同的模型进行比较，这些模型依次移除了每个预测变量。通过基本的假设检验方法或经验验证，可以分离并评估每个预测变量的影响。
+
+在这些情况下以及其他一些情况中，根据不同的预处理程序集和/或模型规格创建大量工作流可能会变得繁琐或繁重。为了解决这个问题，workflowset包会创建工作流组件的组合。一系列预处理程序（例如公式、dplyr选择器，或下一章将讨论的特征工程配方对象）可以与一系列模型规格相结合，从而生成一套工作流。
+
+举个例子，假设我们想重点关注Ames数据中房屋位置的不同表示方式。我们可以创建一组公式来捕捉这些预测变量：
+
+```{r}
+location <- list(
+  longitude = Sale_Price ~ Longitude,
+  latitude = Sale_Price ~ Latitude,
+  coords = Sale_Price ~ Longitude + Latitude,
+  neighborhood = Sale_Price ~ Neighborhood
+)
+```
+
+可以使用`workflow_set()`函数将这些表示形式与一个或多个模型进行组合。我们将仅使用之前的线性模型规格来进行演示：
+
+```{r}
+library(workflowsets)
+location_models <- workflow_set(preproc = location, models = list(lm = lm_model))
+location_models
+location_models$info[[1]]
+extract_workflow(location_models, id = "coords_lm")
+```
+
+工作流集主要设计用于处理重采样，这在第10章中会进行讨论。`option`列和`result`列必须填充从重采样中得到的特定类型的对象。我们将在第11章和第15章中更详细地演示这一点。
+
+与此同时，让我们为每个公式创建模型拟合，并将它们保存在一个名为`fit`的新列中。我们将使用基本的dplyr和purrr操作：
+
+```{r}
+location_models <-
+  location_models %>%
+  mutate(fit = map(info, ~ fit(.x$workflow[[1]], ames_train)))
+location_models
+location_models$fit[[1]]
+```
+
+我们在这里使用了一个purrr函数来遍历我们的模型，但有一种更简单、更好的方法来拟合工作流集合，这将在第11.1节中介绍。
+
+总的来说，工作流集还有很多内容值得探讨！虽然我们在这里介绍了基础知识，但工作流集的细微差别和优势要到第15章才会详细阐述。
+
+## Evaluating the Test Set
+
+假设我们已经完成了模型开发，并确定了最终模型。有一个便捷函数叫做`last_fit()`，它会用整个训练集对模型进行拟合，并用测试集对其进行评估。
+
+以`lm_wflow`为例，我们可以将模型以及初始的训练/测试集拆分传递给该函数：
+
+```{r}
+final_lm_res <- last_fit(lm_wflow, ames_split)
+final_lm_res
+```
+
+请注意，`last_fit()`接受的数据分割作为输入，而不是数据框。该函数使用此分割来生成用于最终拟合和评估的训练集和测试集。
+
+`.workflow`列包含拟合的工作流，可以使用以下代码从结果中提取出来：
+
+```{r}
+fitted_lm_wflow <- extract_workflow(final_lm_res)
+```
+
+同样地，`collect_metrics()`和`collect_predictions()`分别提供了获取性能指标和预测结果的途径。
+
+```{r}
+collect_metrics(final_lm_res)
+collect_predictions(final_lm_res) %>% slice(1:5)
+```
+
+我们将在16.6节中进一步了解`last_fit()`的实际应用以及如何再次使用它。
+
+在使用验证集时，`last_fit()`有一个名为`add_validation_set`的参数，用于指定最终模型是仅在训练集上训练（默认设置），还是在训练集和验证集的组合上训练。
+
+## Chapter Summary
+
+在本章中，你了解到建模过程不仅仅包括估计将预测变量与结果联系起来的算法参数。这个过程还包括预处理步骤以及模型拟合后的操作。我们引入了一个名为模型工作流的概念，它可以捕捉建模过程中的重要组成部分。多个工作流也可以在一个工作流集合中创建。`last_fit()`函数便于将最终模型拟合到训练集并使用测试集进行评估。
+
+对于艾姆斯数据集，我们将再次看到使用的相关代码如下：
+
+```r
+library(tidymodels)
+data(ames)
+
+ames <- mutate(ames, Sale_Price = log10(Sale_Price))
+
+set.seed(502)
+ames_split <- initial_split(ames, prop = 0.80, strata = Sale_Price)
+ames_train <- training(ames_split)
+ames_test  <-  testing(ames_split)
+
+lm_model <- linear_reg() %>% set_engine("lm")
+
+lm_wflow <-
+  workflow() %>%
+  add_model(lm_model) %>%
+  add_variables(outcome = Sale_Price, predictors = c(Longitude, Latitude))
+
+lm_fit <- fit(lm_wflow, ames_train)
+```
