@@ -12,3 +12,4 @@ website:
         - Books/Tidy Modeling with R/4 The Ames Housing Data.qmd
         - Books/Tidy Modeling with R/5 Spending our Data.qmd
         - Books/Tidy Modeling with R/6 Fitting Models with parsnip.qmd
+        - Books/Tidy Modeling with R/7 A Model Workflow.qmd
