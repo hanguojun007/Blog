@@ -1,0 +1,132 @@
+---
+title: "8 Feature Engineering with recipes"
+date: "2025-09-25"
+date-modified: "2025-09-25"
+
+format:
+  html:
+    code-link: true
+
+fig-width: 6
+fig-asp: 0.618
+out-width: 70%
+fig-align: center
+
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: "#>"
+    R.options:
+      dplyr.print_min: 6
+      dplyr.print_max: 6
+      pillar.max_footer_lines: 2
+      pillar.min_chars: 15
+      stringr.view_n: 6
+      cli.num_colors: 0
+      cli.hyperlink: FALSE
+      pillar.bold: TRUE
+      width: 77
+
+execute:
+  warning: true
+  error: true
+---
+
+**特征工程**(Feature Engineering)需要重新格式化预测变量的值，使其更易于模型有效使用。这包括对数据进行**转换**(transformation)和**编码**(encoding)，以最佳方式呈现其重要特征。想象一下，在一个数据集中有两个预测变量，将它们以比率的形式在模型中呈现会更有效；根据这两个原始变量的比率创建一个新的预测变量，就是特征工程的一个简单例子。
+
+以Ames市一栋房屋的位置为例，有多种方式可以将这种空间信息提供给模型，包括所在社区（一种定性衡量标准）、经度/纬度、到最近学校或Iowa State University的距离等等。在选择如何在建模中对这些数据进行编码时，我们可能会选择一个我们**认为与结果关联性最强**的选项。数据的原始格式，例如数值型（如距离）与分类型（如社区），也是特征工程选择中的一个驱动因素。
+
+用于构建更优建模特征的其他预处理示例包括：
+
+-   可以通过特征提取或移除部分预测变量来降低预测变量之间的相关性。
+
+-   当一些预测变量存在缺失值时，可以使用子模型对其进行插补。
+
+-   使用方差类度量的模型可能会通过估计一种转换方法，将某些偏斜预测变量的分布强制变为对称分布，从而从中受益。
+
+特征工程和数据预处理还可能涉及模型所需的重新格式化操作。有些模型会使用几何距离度量，因此，数值预测变量需要进行中心化和标准化处理，以确保它们都采用相同的单位。否则，距离值会因各列的尺度不同而产生偏差。
+
+不同的模型有不同的预处理要求，有些模型，例如基于树的模型，几乎不需要任何预处理。附录A包含一个小表格，列出了针对不同模型的推荐预处理技术。
+
+在本章中，我们将介绍**recipes**包，你可以使用它将不同的特征工程和预处理任务组合成一个单一对象，然后将这些转换应用于不同的数据集。与用于模型的parsnip类似，recipes包是tidymodels核心包之一。
+
+本章使用了Ames房价数据以及本书到目前为止创建的R对象，如第7.7节所概述的那样。
+
+##  A Simple `recipe()` for the Ames Housing Data
+
+在本节中，我们将重点关注Ames房产数据中可用预测变量的一小部分：
+
+-   社区（定性的，训练集中有29个社区）
+
+-   地上总居住面积（连续变量，命名为`Gr_Liv_Area`）
+
+-   建造年份（`Year_Built`）
+
+-   建筑物类型（`Bldg_Type`，其中`OneFam`(n = 1,936)，`TwoFmCon`(n = 50)，`Duplex`(n = 88)，`Twnhs`(n = 77)，`TwnhsE`(n = 191)）
+
+假设最初的普通线性回归模型是根据这些数据拟合的。回想一下，在第4章中，销售价格已经预先进行了对数转换，一个标准的`lm()`调用可能如下所示：
+
+```r
+lm(Sale_Price ~ Neighborhood + log10(Gr_Liv_Area) + Year_Built + Bldg_Type, data = ames)
+```
+
+当执行此函数时，数据会从数据框转换为数值型的设计矩阵（也称为模型矩阵），然后使用最小二乘法来估计参数。在3.2节中，我们列出了R模型公式的多种用途；现在我们仅关注数据处理方面。该公式的作用可以分解为一系列步骤：
+
+-   销售价格被定义为结果，而社区、总居住面积、建造年份和建筑类型变量都被定义为预测因子。
+
+-   对总居住面积这一预测变量进行了对数转换。
+
+-   社区和建筑类型列从非数字格式转换为数字格式（因为最小二乘法需要数字预测变量）。
+
+如第3章所述，公式法会将这些数据处理操作应用于任何传入`predict()`函数的数据，包括新数据。
+
+recipe会定义一个包含一系列数据处理步骤的对象。与建模函数中的公式方法不同，recipe通过`step_*()`函数来定义步骤，而不会立即执行这些步骤；它仅仅是对应该做什么的一种规范说明。以下是一个与前面的公式等效的recipe对象，其基于第5.5节中的代码摘要构建而成：
+
+```{r}
+library(tidymodels) # Includes the recipes package
+tidymodels_prefer()
+data(ames)
+
+ames <- mutate(ames, Sale_Price = log10(Sale_Price))
+
+set.seed(502)
+ames_split <- initial_split(ames, prop = 0.80, strata = Sale_Price)
+ames_train <- training(ames_split)
+ames_test <- testing(ames_split)
+
+simple_ames <-
+  recipe(Sale_Price ~ Neighborhood + Gr_Liv_Area + Year_Built + Bldg_Type,
+    data = ames_train
+  ) %>%
+  step_log(Gr_Liv_Area, base = 10) %>%
+  step_dummy(all_nominal_predictors())
+simple_ames
+```
+
+让我们来详细分析一下：
+
+1.  带有公式的`recipe()`调用会告知配方“原料”或变量（例如，预测变量、结果变量）的角色。它仅使用`ames_train`数据来确定各列的数据类型。
+
+2.  `step_log()`声明应对`Gr_Liv_Area`进行对数转换。
+
+3.  `step_dummy()`指定了哪些变量应该从定性格式转换为定量格式，在这种情况下，会使用虚拟变量或指示变量。指示变量或虚拟变量是一种二元数值变量（由1和0组成的列），用于编码定性信息；我们将在第8.4.1节更深入地探讨这类变量。
+
+函数`all_nominal_predictors()`会捕获当前为因子型或字符型（即名义型）的任何预测变量列的名称。这是一个类似dplyr的选择器函数，与`starts_with()`或`matches()`类似，但只能在配方内部使用。
+
+recipes包特有的其他选择器包括：`all_numeric_predictors()`、`all_numeric()`、`all_predictors()`和`all_outcomes()`。与dplyr类似，可以使用一个或多个未加引号的表达式（用逗号分隔）来选择每个步骤所作用的列。
+
+与公式或原始预测变量相比，使用配方有什么优势？有几个优势，包括：
+
+-   由于这些计算与建模函数并非紧密耦合，因此它们可以在不同模型之间重复使用。
+
+-   与公式相比，配方能提供更广泛的数据处理选择。
+
+-   语法可以非常简洁。例如，`all_nominal_predictors()`可用于捕获许多变量以进行特定类型的处理，而公式则需要明确列出每个变量。
+
+-   所有数据处理都可以被捕获在一个单独的R对象中，而不是在重复的脚本中，甚至不会分散在不同的文件里。
+
+## Using Recipes
+
+
+
+
