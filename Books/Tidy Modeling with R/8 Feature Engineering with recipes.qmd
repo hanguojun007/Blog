@@ -105,17 +105,15 @@ simple_ames
 
 让我们来详细分析一下：
 
-1.  带有公式的`recipe()`调用会告知配方“原料”或变量（例如，预测变量、结果变量）的角色。它仅使用`ames_train`数据来确定各列的数据类型。
+1.  带有公式的`recipe()`调用会告知“配方”的“原料”（例如，预测变量、结果变量）。它仅使用`ames_train`数据来确定各列的数据类型。
 
 2.  `step_log()`声明应对`Gr_Liv_Area`进行对数转换。
 
 3.  `step_dummy()`指定了哪些变量应该从定性格式转换为定量格式，在这种情况下，会使用虚拟变量或指示变量。指示变量或虚拟变量是一种二元数值变量（由1和0组成的列），用于编码定性信息；我们将在第8.4.1节更深入地探讨这类变量。
 
-函数`all_nominal_predictors()`会捕获当前为因子型或字符型（即名义型）的任何预测变量列的名称。这是一个类似dplyr的选择器函数，与`starts_with()`或`matches()`类似，但只能在配方内部使用。
+函数`all_nominal_predictors()`会捕获当前为因子型或字符型（即名义型）的任何预测变量列的名称。这是一个类似dplyr的选择器函数，与`starts_with()`或`matches()`类似，但只能在配方内部使用。recipe包特有的其他选择器包括：`all_numeric_predictors()`、`all_numeric()`、`all_predictors()`和`all_outcomes()`。与dplyr类似，可以使用一个或多个未加引号的表达式（用逗号分隔）来选择每个步骤所作用的列。
 
-recipes包特有的其他选择器包括：`all_numeric_predictors()`、`all_numeric()`、`all_predictors()`和`all_outcomes()`。与dplyr类似，可以使用一个或多个未加引号的表达式（用逗号分隔）来选择每个步骤所作用的列。
-
-与公式或原始预测变量相比，使用配方有什么优势？有几个优势，包括：
+与公式或原始预测变量相比，使用recipe有几个优势，包括：
 
 -   由于这些计算与建模函数并非紧密耦合，因此它们可以在不同模型之间重复使用。
 
@@ -127,6 +125,73 @@ recipes包特有的其他选择器包括：`all_numeric_predictors()`、`all_num
 
 ## Using Recipes
 
+正如我们在第7章中讨论的那样，预处理选项和特征工程通常应被视为建模工作流的一部分，而非一项独立任务。workflows包包含用于处理不同类型预处理器的高级函数。我们之前的工作流（`lm_wflow`）使用了一组简单的dplyr选择器：
 
+```{r}
+lm_model <- linear_reg() %>% set_engine("lm")
 
+lm_wflow <-
+  workflow() %>%
+  add_model(lm_model) %>%
+  add_variables(outcome = Sale_Price, predictors = c(Longitude, Latitude))
+```
+
+为了通过更复杂的特征工程改进这种方法，让我们使用`simple_ames`对象对建模数据进行预处理。此对象可附加到工作流中：
+
+```{r}
+lm_wflow %>%
+  add_recipe(simple_ames)
+```
+
+直接添加行不通，因为工作流只能有一种预处理方法，所以在添加recipe对象之前，需要先移除现有的预处理器。
+
+```{r}
+lm_wflow <-
+  lm_wflow %>%
+  remove_variables() %>%
+  add_recipe(simple_ames)
+lm_wflow
+```
+
+让我们通过一个简单的`fit()`调用同时估计recipe对象和模型：
+
+```{r}
+lm_fit <- fit(lm_wflow, ames_train)
+```
+
+`predict()`方法会先对新数据应用与训练集相同的预处理，然后再将其传递给模型的`predict()`方法：
+
+```{r}
+predict(lm_fit, ames_test %>% slice(1:3))
+```
+
+如果我们只需要模型对象或recipe对象，可以使用`extract_*`函数来获取它们：
+
+```{r}
+# Get the recipe after it has been estimated:
+lm_fit %>%
+  extract_recipe(estimated = TRUE)
+
+# To tidy the model fit:
+lm_fit %>%
+  # This returns the parsnip object:
+  extract_fit_parsnip() %>%
+  # Now tidy the linear model object:
+  tidy() %>%
+  slice(1:5)
+```
+
+在工作流对象之外使用（和调试）recipe对象的工具在第16.4节中有描述。
+
+## How Data Are Used by the `recipe()`
+
+数据在不同阶段被传递给recipe对象。
+
+首先，在调用`recipe(..., data)`时，数据集用于确定每列的数据类型，以便可以使用诸如`all_numeric()`或`all_numeric_predictors()`之类的选择器。
+
+其次，在使用`fit(workflow, data)`准备数据时，训练集会用于所有估计操作，包括可能作为workflow一部分的recipe对象，从确定因子水平到计算主成分分析（PCA）组件，以及介于两者之间的所有操作。所有预处理和特征工程步骤都仅使用训练数据。否则，信息泄露可能会在模型处理新数据时对其性能产生负面影响。
+
+最后，在使用`predict(workflow, new_data)`时，不会利用`new_data`中的值重新估计任何模型或预处理器参数（如来自recipe对象的那些参数）。以使用`step_normalize()`进行中心化和标准化为例，在调用`predict()`时，预测时的新样本会使用从训练集中确定的相应列的均值和标准差进行标准化。
+
+## Examples of Recipe Steps
 
