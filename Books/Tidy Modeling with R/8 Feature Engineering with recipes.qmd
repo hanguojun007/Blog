@@ -52,7 +52,7 @@ execute:
 
 本章使用了Ames房价数据以及本书到目前为止创建的R对象，如第7.7节所概述的那样。
 
-##  A Simple `recipe()` for the Ames Housing Data
+## A Simple `recipe()` for the Ames Housing Data
 
 在本节中，我们将重点关注Ames房产数据中可用预测变量的一小部分：
 
@@ -66,7 +66,7 @@ execute:
 
 假设最初的普通线性回归模型是根据这些数据拟合的。回想一下，在第4章中，销售价格已经预先进行了对数转换，一个标准的`lm()`调用可能如下所示：
 
-```r
+``` r
 lm(Sale_Price ~ Neighborhood + log10(Gr_Liv_Area) + Year_Built + Bldg_Type, data = ames)
 ```
 
@@ -195,3 +195,339 @@ lm_fit %>%
 
 ## Examples of Recipe Steps
 
+在继续之前，让我们深入了解一些recipe包中的函数，并探讨一些最重要的`step_*()`函数。这些**步骤函数**各自指定了特征工程过程中一个特定的可能步骤，并且不同的步骤函数会对数据列产生不同的影响。
+
+### Encoding qualitative data in a numeric format
+
+特征工程中最常见的任务之一是对名义数据或定性数据（因子或字符）进行转换，以便对其进行编码或以数值形式表示。有时，在进行此类转换之前，我们可以以有用的方式修改定性列的因子水平。例如，`step_unknown()`可用于将缺失值更改为一个专用的因子水平。同样，如果我们预计在未来的数据中可能会遇到新的因子水平，`step_novel()`可以为此分配一个新的水平。
+
+此外，`step_other()`可用于分析训练集中因子水平的频率，并将不常出现的值转换为一个通用的“other”水平，其阈值可以指定。我们数据中的`Neighborhood`预测变量就是一个很好的例子，如 @fig-8.1 所示。
+
+```{r}
+#| label: fig-8.1
+#| fig-cap: Frequencies of neighborhoods in the Ames training set.
+#| fig-alt: A bar chart of the frequencies of neighborhoods in the Ames training set. The most homes are in North Ames while the Greens, Green Hills, and Landmark neighborhood have very few instances.
+ggplot(ames_train, aes(y = Neighborhood)) +
+  geom_bar() +
+  labs(y = NULL)
+```
+
+在这里我们可以看到，有两个社区在训练集中的房产数量少于5处（Landmark和Green Hills）；在这种情况下，测试集中完全没有包含Landmark社区的房屋。对于某些模型而言，列中存在只有一个非零项的虚拟变量可能会产生问题。至少，这些特征不太可能对模型起到重要作用。如果我们在配方中添加`step_other(Neighborhood, threshold = 0.01)`，那么占比最低的1%的社区将会被归为一个名为“other”的新类别。在这个训练集中，这将涵盖7个社区。
+
+对于Ames数据，我们可以修改recipe对象以使用：
+
+```{r}
+simple_ames <-
+  recipe(Sale_Price ~ Neighborhood + Gr_Liv_Area + Year_Built + Bldg_Type,
+    data = ames_train
+  ) %>%
+  step_log(Gr_Liv_Area, base = 10) %>%
+  step_other(Neighborhood, threshold = 0.01) %>%
+  step_dummy(all_nominal_predictors())
+```
+
+许多（但并非所有）基础模型计算都要求将预测变量值编码为数字。值得注意的例外包括基于树的模型、基于规则的模型和朴素贝叶斯模型。
+
+将因子预测变量转换为数值格式最常用的方法是创建虚拟变量或指示变量。让我们以Ames数据中关于建筑类型的预测变量为例，这是一个具有五个水平的因子变量（见 @tbl-8.1 ）。对于虚拟变量，单个`Bldg_Type`列将被四个数值列取代，这些列的值要么是0要么是1。这些二元变量代表特定的因子水平值。在R语言中，惯例是排除第一个因子水平所对应的列（在这种情况下是`OneFam`）。`Bldg_Type`列将被一个名为`TwoFmCon`的列取代，当行中是该值时，该列的值为1，否则为0。其他三个列也以类似的方式创建：
+
+| **Raw Data** | **TwoFmCon** | **Duplex** | **Twnhs** | **TwnhsE** |
+|:-------------|-------------:|-----------:|----------:|-----------:|
+| OneFam       |            0 |          0 |         0 |          0 |
+| TwoFmCon     |            1 |          0 |         0 |          0 |
+| Duplex       |            0 |          1 |         0 |          0 |
+| Twnhs        |            0 |          0 |         1 |          0 |
+| TwnhsE       |            0 |          0 |         0 |          1 |
+
+: Illustration of binary encodings (i.e., dummy variables) for a qualitative predictor.
+
+为什么不是五个都用呢？最基本的原因是简洁性：如果你知道这四个列的值，你就能确定最后一个的值，因为这些类别是互斥的。从更专业的角度来说，经典的理由是，包括普通线性回归在内的许多模型，当列之间存在线性相关性时，会出现数值问题。如果将所有五个建筑类型指示列都包含进来，它们加起来就会等于截距列（如果有的话）。这会在底层的矩阵代数中导致问题，甚至可能是直接的错误。
+
+完整的编码集可用于某些模型。这传统上被称为独热编码，可通过`step_dummy()`的`one_hot`参数来实现。
+
+`step_dummy()`的一个实用功能是，能更好地控制生成的虚拟变量的命名方式。在基础R中，虚拟变量的名称会将变量名和水平值合并，形成类似`NeighborhoodVeenker`这样的名称。而recipes默认使用下划线作为名称和水平值之间的分隔符（例如，`Neighborhood_Veenker`），并且还提供了自定义名称格式的选项。Recipes中的默认命名规则，使得在后续步骤中更容易使用选择器捕获这些新列，比如`starts_with("Neighborhood_")`。
+
+传统的虚拟变量要求必须已知所有可能的类别，才能创建一整套数值特征。还有其他方法可以将其转换为数值格式。特征哈希方法仅根据类别的值将其分配到预定义的虚拟变量池中。效应编码或似然编码用一个单一的数值列替换原始数据，该数值列用于衡量这些数据的效应。特征哈希和效应编码都能无缝处理数据中出现新因子水平的情况。第17章探讨了这些以及其他用于编码分类数据的方法，这些方法超越了简单的虚拟变量或指示变量。
+
+不同的配方步骤应用于数据中的变量时，表现会有所不同。例如，`step_log()`会在不更改名称的情况下就地修改列。其他步骤，如`step_dummy()`，会删除原始数据列，并替换为一个或多个名称不同的列。配方步骤的效果取决于所进行的特征工程转换类型。
+
+### Interaction terms
+
+交互效应涉及两个或多个预测变量。当一个预测变量对结果的影响取决于一个或多个其他预测变量时，就会产生这种效应。例如，如果你试图预测通勤期间的交通流量，两个潜在的预测变量可能是你通勤的具体时间和天气。然而，交通流量与恶劣天气之间的关系在一天中的不同时间是不同的。在这种情况下，你可以在模型中添加这两个预测变量之间的交互项，以及原来的两个预测变量（称为主效应）。从数值上讲，预测变量之间的交互项被编码为它们的乘积。交互是根据它们对结果的影响来定义的，并且可以是不同类型数据（如数值型、分类型等）的组合。第7章更详细地讨论了交互效应以及如何检测它们。
+
+在探究Ames训练集后，我们可能会发现，不同建筑类型的总居住面积的回归斜率存在差异，如 @fig-8.2 所示。
+
+```{r}
+#| label: fig-8.2
+#| fig-cap: Gross living area (in log-10 units) versus sale price (also in log-10 units) for five different building types
+ggplot(ames_train, aes(x = Gr_Liv_Area, y = 10^Sale_Price)) +
+  geom_point(alpha = .2) +
+  facet_wrap(~Bldg_Type) +
+  geom_smooth(method = lm, formula = y ~ x, se = FALSE, color = "lightblue") +
+  scale_x_log10() +
+  scale_y_log10() +
+  labs(x = "Gross Living Area", y = "Sale Price (USD)")
+```
+
+在recipe对象中如何指定交互项？基础R公式会使用:来表示交互项，所以我们会这样使用：
+
+```r
+Sale_Price ~ Neighborhood + log10(Gr_Liv_Area) + Bldg_Type +
+  log10(Gr_Liv_Area):Bldg_Type
+# or
+Sale_Price ~ Neighborhood + log10(Gr_Liv_Area) * Bldg_Type
+```
+
+其中，`*`会将这些列扩展为主效应项和交互项。同样，公式方法会同时处理多项任务，它知道因子变量（例如`Bldg_Type`）应首先扩展为虚拟变量，并且交互项应涉及所有生成的二进制列。
+
+recipe更为明确且具有顺序性，能让你获得更多控制权。在当前recipe对象中，`step_dummy()`已经创建了虚拟变量。我们该如何将这些变量组合起来进行交互呢？额外的步骤会像`step_interact(~ interaction terms)`这样，其中波浪号右侧的项就是交互项。这些项可以包含选择器，因此使用以下方式是合适的：
+
+```{r}
+simple_ames <-
+  recipe(Sale_Price ~ Neighborhood + Gr_Liv_Area + Year_Built + Bldg_Type,
+    data = ames_train
+  ) %>%
+  step_log(Gr_Liv_Area, base = 10) %>%
+  step_other(Neighborhood, threshold = 0.01) %>%
+  step_dummy(all_nominal_predictors()) %>%
+  # Gr_Liv_Area is on the log scale from a previous step
+  step_interact(~ Gr_Liv_Area:starts_with("Bldg_Type_"))
+```
+
+可以在该公式中通过用`+`分隔来指定额外的交互项。另请注意，此规则仅使用不同变量之间的交互项；如果公式中使用了`var_1:var_1`，则该术语将被忽略。
+
+假设在一个recipe对象中，我们尚未为建筑类型创建虚拟变量。在这一步骤中包含一个因子列是不合适的，例如：` step_interact( ~ Gr_Liv_Area:Bldg_Type )`
+
+这说明了`step_interact()`所使用的底层（基础R）代码是如何创建虚拟变量并进而形成交互项的。实际上，如果出现这种情况，会有一个警告提示这可能会产生意外结果。
+
+这种行为让你拥有更多控制权，但它与R的标准模型公式不同。
+
+与命名虚拟变量一样，配方为交互项提供了更连贯的名称。在这种情况下，交互项被命名为`Gr_Liv_Area_x_Bldg_Type_Duplex`，而不是`Gr_Liv_Area:Bldg_TypeDuplex`（这不是数据框的有效列名）。
+
+记住顺序很重要。总居住面积在形成交互项之前会进行对数转换。此后与该变量的交互也将使用对数尺度。
+
+### Spline functions
+
+当预测变量与结果之间存在非线性关系时，某些类型的预测模型能够在训练过程中自适应地逼近这种关系。然而，通常来说，越简单越好，尝试使用简单模型（如线性拟合）并为可能需要的预测变量添加特定的非线性特征（例如Ames房价数据中的经度和纬度）的情况并不少见。实现这一点的一种常用方法是使用样条函数来表示数据。样条函数会用一组列替换现有的数值预测变量，使模型能够模拟灵活的非线性关系。随着向数据中添加的样条项增多，非线性表示这种关系的能力也会增强。但遗憾的是，这也可能增加捕捉到偶然出现的数据趋势的可能性（即过拟合）。
+
+如果你曾经在`ggplot`中使用过`geom_smooth()`，那么你很可能使用过数据的样条表示。例如， @fig-8.3 中的每个面板都对纬度预测变量使用了不同数量的平滑样条：
+
+```{r}
+#| label: fig-8.3
+#| fig-cap: Sale price versus latitude, with trend lines using natural splines with different degrees of freedom
+library(patchwork)
+library(splines)
+
+plot_smoother <- function(deg_free) {
+  ggplot(ames_train, aes(x = Latitude, y = 10^Sale_Price)) +
+    geom_point(alpha = .2) +
+    scale_y_log10() +
+    geom_smooth(
+      method = lm,
+      formula = y ~ ns(x, df = deg_free),
+      color = "lightblue",
+      se = FALSE
+    ) +
+    labs(
+      title = paste(deg_free, "Spline Terms"),
+      y = "Sale Price (USD)"
+    )
+}
+
+(plot_smoother(2) + plot_smoother(5)) / (plot_smoother(20) + plot_smoother(100))
+```
+
+"splines"包中的`ns()`函数使用名为自然样条的函数生成特征列。
+
+@fig-8.3 中的一些面板明显拟合效果不佳；两个项对数据存在欠拟合，而100个项则存在过拟合。有5个项和20个项的面板看起来拟合得相当平滑，捕捉到了数据的主要模式。这表明适当程度的“非线性”很重要。样条项的数量可以被视为该模型的一个调优参数。这类参数将在第12章中探讨。
+
+在recipe中，多个步骤可以创建这类术语。要为该预测变量添加自然样条表示：
+
+```{r}
+recipe(Sale_Price ~ Neighborhood + Gr_Liv_Area + Year_Built + Bldg_Type + Latitude,
+  data = ames_train
+) %>%
+  step_log(Gr_Liv_Area, base = 10) %>%
+  step_other(Neighborhood, threshold = 0.01) %>%
+  step_dummy(all_nominal_predictors()) %>%
+  step_interact(~ Gr_Liv_Area:starts_with("Bldg_Type_")) %>%
+  step_ns(Latitude, deg_free = 20)
+```
+
+用户需要确定“社区”和“纬度”是否都应该包含在模型中，因为它们以不同的方式代表着相同的基础数据。
+
+### Feature extraction
+
+另一种同时表示多个特征的常用方法称为特征提取。这些技术大多会从预测变量中创建新的特征，以整体捕捉更广泛集合中的信息。例如，主成分分析（PCA）试图使用更少数量的特征，尽可能多地提取预测变量集合中的原始信息。PCA是一种线性提取方法，这意味着每个新特征都是原始预测变量的线性组合。PCA的一个优点是，每个新特征（称为主成分或PCA得分）彼此不相关。正因为如此，PCA在降低预测变量之间的相关性方面非常有效。需要注意的是，PCA只关注预测变量；新的PCA特征可能与结果无关。
+
+在Ames数据中，有几个预测变量用于衡量房产的面积，例如总地下室面积（`Total_Bsmt_SF`）、一楼面积（`First_Flr_SF`）、总居住面积（`Gr_Liv_Area`）等等。主成分分析（PCA）可能是将这些潜在冗余变量表示为更小特征集的一种选择。除了总居住面积外，这些预测变量的名称中都带有后缀SF（代表平方英尺），因此用于主成分分析的一个配方步骤可能如下：
+
+```r
+# Use a regular expression to capture house size predictors:
+step_pca(matches("(SF$)|(Gr_Liv)"))
+```
+
+请注意，所有这些列的测量单位都是平方英尺。主成分分析（PCA）假设所有预测变量都在同一尺度上。在这种情况下确实如此，但通常在此步骤之前可以使用`step_normalize()`，它会对每一列进行中心化和标准化处理。
+
+对于其他提取方法，已有现成的配方步骤，例如：独立成分分析（ICA）、非负矩阵分解（NNMF）、多维尺度分析（MDS）、均匀流形逼近与投影（UMAP）等。
+
+### Row sampling steps
+
+recipe中的步骤也会影响数据集的行。例如，用于类别不平衡的子采样技术会改变提供给模型的数据中的类别比例；这些技术通常不会提高整体性能，但可以生成表现更好的预测类别概率分布。以下是在处理类别不平衡数据时尝试子采样的一些方法：
+
+-   **下采样**数据会保留少数类，并对多数类进行随机抽样，以使类频率达到平衡。
+
+-   **过采样**通过复制少数类的样本来平衡类别。一些技术通过合成与少数类数据相似的新样本来实现这一点，而另一些方法则只是简单地重复添加相同的少数类样本。
+
+-   **混合方法**则是将两者结合起来。
+
+"themis"包包含一些recipe步骤，可通过子采样来解决类别不平衡问题。对于简单的下采样，我们会使用：`step_downsample(outcome_column_name)`
+
+只有训练集才应该受到这些技术的影响。在使用该流程处理时，测试集或其他保留样本应保持原样。因此，所有子采样步骤都将`skip`参数的默认值设为`TRUE`（第8.5节）。
+
+其他步骤函数也是基于行的：`step_filter()`、`step_sample()`、`step_slice()`以及`step_arrange()`。在这些步骤的几乎所有使用场景中，`skip`参数都应设置为`TRUE`。
+
+### General transformations
+
+与原始的dplyr操作类似，`step_mutate()`可用于对数据执行各种基本操作。它最适合用于简单的转换，例如计算两个变量的比率，比如`Bedroom_AbvGr / Full_Bath`，即Ames住房数据中卧室与浴室的比率。
+
+使用这个灵活的步骤时，要格外小心，避免在预处理过程中出现数据泄露。例如，考虑这样一种转换：`x = w > mean(w)`。当将其应用于新数据或测试数据时，这种转换会使用`w`在新数据中的均值，而不是`w`在训练数据中的均值。
+
+### Natural language processing
+
+recipe也能处理那些并非传统结构（即列代表特征）的数据。例如，"textrecipes"包可以对数据应用自然语言处理方法。输入列通常是一个文本字符串，我们可以通过不同的步骤对数据进行分词（例如，将文本拆分成单独的词语）、过滤掉某些词，并创建适合建模的新特征。
+
+## Skipping Steps for New Data
+
+Ames数据框中的销售价格数据已经过对数转换。为什么不使用：`step_log(Sale_Price, base = 10)`
+
+当该recipe步骤应用于售价未知的新房产时，这会导致失败。由于价格是我们要预测的内容，数据中可能不会有这个变量的列。事实上，为了避免信息泄露，许多tidymodels包在进行任何预测时都会隔离所使用的数据。这意味着在预测时，训练集和任何结果列都无法使用。
+
+对于结果列的简单转换，我们强烈建议这些操作在配方之外进行。
+
+然而，在其他情况下，这并非一个恰当的解决方案。例如，在存在严重类别不平衡的分类模型中，对提供给建模函数的数据进行子抽样是很常见的做法。举例来说，假设有两个类别，事件发生率为10%。一种简单但存在争议的方法是对数据进行下采样，即向模型提供所有的事件样本以及10%随机选取的非事件样本。
+
+问题在于，不应将相同的子采样过程应用于待预测的数据。因此，在使用recipe时，我们需要一种机制来确保某些操作仅应用于提供给模型的数据。每个步骤函数都有一个名为`skip`的选项，当该选项设置为`TRUE`时，`predict()`函数会忽略该步骤。通过这种方式，你可以隔离那些影响建模数据的步骤，而不会在应用于新样本时产生错误。不过，在使用`fit()`时，所有步骤都会被应用。
+
+在撰写本文时，recipes和themis包中仅应用于训练数据的步骤函数有：`step_adasyn()`、`step_bsmote()`、`step_downsample()`、`step_filter()`、`step_naomit()`、`step_nearmiss`()`、`step_rose()`、`step_sample()`、`step_slice()`。
+
+##  Tidy a `recipe()`
+
+在第3.3节中，我们介绍了用于统计对象的`tidy()`动词。对于recipe对象以及各个recipe步骤，也有一种`tidy()`方法。在继续之前，让我们使用本章讨论过的一些新步骤，为Ames数据创建一个扩展配方：
+
+```{r}
+ames_rec <-
+  recipe(Sale_Price ~ Neighborhood + Gr_Liv_Area + Year_Built + Bldg_Type +
+    Latitude + Longitude, data = ames_train) %>%
+  step_log(Gr_Liv_Area, base = 10) %>%
+  step_other(Neighborhood, threshold = 0.01) %>%
+  step_dummy(all_nominal_predictors()) %>%
+  step_interact(~ Gr_Liv_Area:starts_with("Bldg_Type_")) %>%
+  step_ns(Latitude, Longitude, deg_free = 20)
+```
+
+当用recipe对象调用`tidy()`方法时，会给出配方步骤的摘要：
+
+```{r}
+tidy(ames_rec)
+```
+
+这一结果有助于识别各个步骤，或许之后就能对某一特定步骤执行`tidy()`方法。
+
+我们可以在任何步骤函数调用中指定id参数；否则，它会使用随机后缀生成。如果同一类型的步骤被多次添加到配方中，设置这个值会很有帮助。让我们提前为`step_other()`指定`id`，因为我们想要对其执行`tidy()`：
+
+```{r}
+ames_rec <-
+  recipe(Sale_Price ~ Neighborhood + Gr_Liv_Area + Year_Built + Bldg_Type +
+    Latitude + Longitude, data = ames_train) %>%
+  step_log(Gr_Liv_Area, base = 10) %>%
+  step_other(Neighborhood, threshold = 0.01, id = "my_id") %>%
+  step_dummy(all_nominal_predictors()) %>%
+  step_interact(~ Gr_Liv_Area:starts_with("Bldg_Type_")) %>%
+  step_ns(Latitude, Longitude, deg_free = 20)
+```
+
+我们将用这个新配方重新调整工作流程：
+
+```{r}
+lm_wflow <-
+  workflow() %>%
+  add_model(lm_model) %>%
+  add_recipe(ames_rec)
+
+lm_fit <- fit(lm_wflow, ames_train)
+```
+
+可以再次调用`tidy()`方法，并结合我们指定的id标识符，以获取应用`step_other()`后的结果：
+
+```{r}
+estimated_recipe <-
+  lm_fit %>%
+  extract_recipe(estimated = TRUE)
+
+tidy(estimated_recipe, id = "my_id")
+```
+
+我们在这里看到的使用`tidy()`得到的`tidy()`结果显示了哪些因子水平被保留了下来，也就是说，没有被添加到新的“其他”类别中。
+
+如果我们知道配方中需要哪一步，`tidy()`方法也可以与number标识符一起调用：
+
+```{r}
+tidy(estimated_recipe, number = 2)
+```
+
+每个`tidy()`方法都会返回关于该步骤的相关信息。例如，`tidy()`方法用于`step_dummy()`时，会返回一列包含被转换为哑变量的变量，以及另一列包含每列所有已知水平的信息。
+
+## Column Roles
+
+当在初次调用`recipe()`时使用公式，它会根据各列位于波浪号的哪一侧，为每一列分配角色。这些角色要么是`"predictor"`，要么是`"outcome"`。不过，也可以根据需要分配其他角色。
+
+例如，在我们的艾姆斯数据集（Ames data set）中，原始数据包含一个地址列。17 保留该列可能是有用的，这样在做出预测后，就可以对有问题的结果进行详细调查。换句话说，即使该列既不是预测变量也不是结果变量，它也可能很重要。
+
+为了解决这个问题，`add_role()`、`remove_role()`和`update_role()`函数会很有帮助。例如，对于房价数据，可以使用以下方式修改街道地址列的角色：
+
+```{r}
+ames_rec %>% update_role(address, new_role = "street address")
+```
+
+在这一更改之后，数据框中的`address`列将不再是预测变量，而是根据处理流程，成为一个`"street address"`。任何字符串都可以用作角色。此外，列可以有多个角色（额外的角色通过`add_role()`添加），这样它们就可以在不止一个情境下被选中。
+
+当数据被重采样时，这会很有帮助。它有助于将与模型拟合无关的列保留在同一个数据框中（而不是放在外部向量中）。第10章中描述的重采样主要通过行子采样来创建数据的替代版本。如果街道地址在另一个列中，就需要进行额外的子采样，这可能会导致代码更复杂，出错的可能性也更高。
+
+最后，所有步骤函数都有一个role字段，该字段可以为步骤的结果分配角色。在很多情况下，受步骤影响的列会保留其现有的角色。例如，对我们的`ames_rec`对象调用`step_log()`会影响`Gr_Liv_Area`列。对于该步骤，默认行为是保留该列现有的角色，因为没有创建新列。作为反例，生成样条曲线的步骤会将新列的默认角色设置为`"predictor"`，因为这通常是样条曲线列在模型中的使用方式。大多数步骤都有合理的默认设置，但由于默认设置可能不同，务必查看文档页面以了解将分配哪些角色。
+
+## Chapter Summary
+
+在本章中，你学习了如何使用配方进行灵活的特征工程和数据预处理，包括创建虚拟变量、处理类别不平衡等。特征工程是建模过程中的重要组成部分，在此过程中很容易发生信息泄露，因此必须采用良好的实践方法。在recipes包以及其他扩展recipes的包中，有超过100个可用的步骤。所有可能的配方步骤都列在tidymodels.org/find上。recipes框架为建模前的数据预处理和转换提供了丰富的数据操作环境。此外，tidymodels.org/learn/develop/recipes/</
+
+我们在这里的工作仅在工作流对象内部使用了配方。对于建模而言，这是推荐的用法，因为特征工程应该与模型一起进行评估。然而，对于可视化和其他活动，工作流可能并不合适，可能需要更多特定于配方的函数。第16章讨论了用于拟合、使用配方以及解决配方问题的低级API。
+
+我们将在后续章节中使用的代码如下：
+
+```r
+library(tidymodels)
+data(ames)
+ames <- mutate(ames, Sale_Price = log10(Sale_Price))
+
+set.seed(502)
+ames_split <- initial_split(ames, prop = 0.80, strata = Sale_Price)
+ames_train <- training(ames_split)
+ames_test  <-  testing(ames_split)
+
+ames_rec <-
+  recipe(Sale_Price ~ Neighborhood + Gr_Liv_Area + Year_Built + Bldg_Type +
+           Latitude + Longitude, data = ames_train) %>%
+  step_log(Gr_Liv_Area, base = 10) %>%
+  step_other(Neighborhood, threshold = 0.01) %>%
+  step_dummy(all_nominal_predictors()) %>%
+  step_interact( ~ Gr_Liv_Area:starts_with("Bldg_Type_") ) %>%
+  step_ns(Latitude, Longitude, deg_free = 20)
+
+lm_model <- linear_reg() %>% set_engine("lm")
+
+lm_wflow <-
+  workflow() %>%
+  add_model(lm_model) %>%
+  add_recipe(ames_rec)
+
+lm_fit <- fit(lm_wflow, ames_train)
+```
