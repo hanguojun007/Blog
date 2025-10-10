@@ -71,4 +71,140 @@ ggplot(reg_ex, aes(x = observed, y = predicted)) +
 
 ## Performance Metrics and Inference
 
+任何模型的有效性取决于该模型的使用方式。推断模型主要用于理解关系，通常会着重强调概率分布的选择（及有效性）以及其他定义该模型的生成特性。相比之下，对于主要用于预测的模型，预测能力至关重要，而对潜在统计特性的其他考量可能没那么重要。预测能力通常由我们的预测与观测数据的接近程度决定，即模型预测与实际结果的一致性。本章将聚焦于可用于衡量预测能力的函数。不过，我们对那些开发推断模型的人的建议是，即便模型的主要目标不是预测，也应使用这些技术。
+
+推断统计学实践中一个长期存在的问题是，由于纯粹聚焦于推断，很难评估模型的可信度。例如，Craig–Schapiro等人（2011）的阿尔茨海默病数据对333名患者进行了分析，以确定影响认知障碍的因素。一项分析可能会利用已知的风险因素，构建一个逻辑回归模型，其中结果是二元的（有障碍/无障碍）。我们来考虑年龄、性别和载脂蛋白E基因型（分类变量，该基因有三个主要变体的六种可能组合）这些预测因子。已知载脂蛋白E与阿尔茨海默病存在关联（Jungsu、Basak和Holtzman，2009）。
+
+一种肤浅但并不少见的分析方法是拟合一个包含主效应和交互作用的大型模型，然后使用统计检验来找到在某个预先定义的水平上具有统计显著性的最小模型项集。如果使用包含三个因素及其双向和三向交互作用的完整模型，那么初始阶段将使用序贯似然比检验来检验交互作用（Hosmer and Lemeshow，2000）。让我们针对阿尔茨海默病的数据示例逐步介绍这种方法：
+
+-   当将包含所有双向交互项的模型与额外包含三向交互项的模型进行比较时，似然比检验得出的p值为0.888。这意味着，没有证据表明与三向交互项相关的四个额外模型项能够解释数据中足够多的变异，因此不应将它们保留在模型中。
+
+-   接下来，双向交互作用同样会与无交互作用的模型进行比较评估。此处的p值为0.0382。这一数值有些接近临界值，但考虑到样本量较小，谨慎的结论应该是：有证据表明，在10种可能的双向交互作用中，有一些对模型而言是重要的。
+
+-   从这里开始，我们将对结果进行一些解释。交互作用的讨论尤为重要，因为它们可能会引发有趣的生理学或神经学假设，供进一步探索。
+
+尽管这种分析策略比较浅显，但在实际应用和文献中都很常见。如果从业者在数据分析方面接受的正规培训有限，情况尤其如此。
+
+这种方法中缺失的一项信息是该模型与实际数据的拟合程度。利用第10章讨论的重采样方法，我们可以估计该模型的准确率约为73.4%。准确率通常不是衡量模型性能的理想指标，我们在这里使用它是因为它易于理解。如果该模型与数据的契合度为73.4%，我们应该相信它得出的结论吗？或许我们会这么认为，直到我们意识到数据中无障碍患者的基准率为72.7%（无障碍患者的比例）。这意味着，尽管我们进行了统计分析，但这个双因素模型似乎只比一种简单的启发式方法（无论观察到的数据如何，总是预测患者为无障碍）好0.8%。也就是说，对模型统计特征的优化并不意味着该模型能很好地拟合数据。即使对于纯粹的推断模型，推断结果也应附带某种程度的数据保真度衡量指标。借助这一点，分析结果的使用者可以校准他们对结果的预期。
+
+在本章的剩余部分，我们将讨论通过经验验证来评估模型的一般方法。这些方法按结果数据的性质分组：纯数值型、二元类别型以及三个或更多类别水平型。
+
+## Regression Metrics
+
+回想第6.3节，tidymodels的预测函数会生成包含预测值列的`tibble`（一种数据框）。这些列有着统一的名称，而yardstick包中用于生成性能指标的函数也具有统一的接口。这些函数基于数据框，而非基于向量，其通用语法如为：`function(data, truth, ...)`，其中，`data`是一个数据框或`tibble`，`truth`是包含观测结果值的列。省略号或其他参数用于指定包含预测值的列。
+
+为了说明这一点，让我们以第8.8节中的模型为例。这个名为`lm_fit`的模型结合了线性回归模型与一个预测因子集，该预测因子集补充了经度和纬度的交互项及样条函数。它是根据一个训练集（名为`ames_train`）创建的。尽管我们不建议在建模过程的这个阶段使用测试集，但在这里会用它来演示功能和语法。数据框`ames_test`包含588处房产的数据。首先，让我们生成预测结果：
+
+```{r}
+library(tidymodels)
+data(ames)
+ames <- mutate(ames, Sale_Price = log10(Sale_Price))
+
+set.seed(502)
+ames_split <- initial_split(ames, prop = 0.80, strata = Sale_Price)
+ames_train <- training(ames_split)
+ames_test <- testing(ames_split)
+
+ames_rec <-
+  recipe(Sale_Price ~ Neighborhood + Gr_Liv_Area + Year_Built + Bldg_Type +
+    Latitude + Longitude, data = ames_train) %>%
+  step_log(Gr_Liv_Area, base = 10) %>%
+  step_other(Neighborhood, threshold = 0.01) %>%
+  step_dummy(all_nominal_predictors()) %>%
+  step_interact(~ Gr_Liv_Area:starts_with("Bldg_Type_")) %>%
+  step_ns(Latitude, Longitude, deg_free = 20)
+
+lm_model <- linear_reg() %>% set_engine("lm")
+
+lm_wflow <-
+  workflow() %>%
+  add_model(lm_model) %>%
+  add_recipe(ames_rec)
+
+lm_fit <- fit(lm_wflow, ames_train)
+ames_test_res <- predict(lm_fit, new_data = ames_test %>% select(-Sale_Price))
+ames_test_res
+```
+
+回归模型的预测数值结果被命名为`.pred`。让我们将预测值与其对应的观测结果值进行匹配：
+
+```{r}
+ames_test_res <- bind_cols(ames_test_res, ames_test %>% select(Sale_Price))
+ames_test_res
+```
+
+我们可以看到这些数值大多看起来比较接近，但我们尚未对模型的表现有一个定量的了解，因为我们还没有计算任何性能指标。需要注意的是，预测结果和观测结果的单位都是以10为底的对数。即使预测结果是以原始单位报告的，最好还是在转换后的尺度上（如果使用了转换的话）分析这些预测结果。
+
+在计算指标之前，让我们绘制图 @fig-9.2 中的数据：
+
+```{r}
+#| label: fig-9.2
+#| fig-cap: Observed versus predicted values for an Ames regression model, with log-10 units on both axes
+ggplot(ames_test_res, aes(x = Sale_Price, y = .pred)) +
+  # Create a diagonal line:
+  geom_abline(lty = 2) +
+  geom_point(alpha = 0.5) +
+  labs(y = "Predicted Sale Price (log10)", x = "Sale Price (log10)") +
+  # Scale and size the x- and y-axis uniformly:
+  coord_obs_pred()
+```
+
+有一处低价房产的预测值严重偏高，也就是说，它的位置远在那条虚线上方。
+
+让我们使用`rmse()`函数计算该模型的均方根误差：
+
+```{r}
+rmse(ames_test_res, truth = Sale_Price, estimate = .pred)
+```
+
+这向我们展示了yardstick函数输出的标准格式。对于数值型结果的指标，`.estimator`列的值通常为“standard”。下一节将展示该列具有不同值的示例。
+
+为了同时计算多个指标，我们可以创建一个指标集。让我们添加$R^2$和平均绝对误差：
+
+```{r}
+ames_metrics <- metric_set(rmse, rsq, mae)
+ames_metrics(ames_test_res, truth = Sale_Price, estimate = .pred)
+```
+
+这种整洁的数据格式将指标垂直堆叠。均方根误差和平均绝对误差这两个指标都与结果处于同一量级（在我们的示例中是`log10(Sale_Price)`），它们用于衡量预测值与观测值之间的差异。$R^2$的值衡量的是预测值与观测值之间的平方相关性，因此该值越接近1越好。
+
+yardstick包中没有用于计算调整后$R^2$的函数。这种决定系数的修正形式通常用于使用拟合模型的数据来评估模型的情况。tidymodels中没有完全支持这一指标，因为使用与拟合模型不同的独立数据集来计算性能总是更好的方法。
+
+## Binary Classification Metrics
+
+为了说明衡量模型性能的其他方法，我们将换一个不同的例子。modeldata包（tidymodels包中的另一个包）包含来自一个测试数据集的示例预测结果，该数据集有两个类别（“Class1”和“Class2”）：
+
+```{r}
+data(two_class_example)
+tibble(two_class_example)
+```
+
+第二列和第三列是测试集的预测类别概率，而`predicted`是离散预测值。
+
+对于硬类别预测，多种yardstick函数很有帮助：
+
+```{r}
+# A confusion matrix:
+conf_mat(two_class_example, truth = truth, estimate = predicted)
+
+# Accuracy:
+accuracy(two_class_example, truth, predicted)
+
+# Matthews correlation coefficient:
+mcc(two_class_example, truth, predicted)
+
+# F1 metric:
+f_meas(two_class_example, truth, predicted)
+
+# Combining these three classification metrics together
+classification_metrics <- metric_set(accuracy, mcc, f_meas)
+classification_metrics(two_class_example, truth = truth, estimate = predicted)
+```
+
+马修斯相关系数（Matthews correlation coefficient）和F1分数（F1 score）都能对混淆矩阵进行总结，但与衡量正负例质量的`mcc()`相比，`f_meas()`指标更侧重于正类，即我们所关注的事件。对于像本示例这样的二分类数据集，yardstick函数有一个名为`event_level`的标准参数，用于区分正负水平。默认情况下（我们在本代码中使用的就是默认设置），结果因子的第一个水平是我们关注的事件。
+
+在这一点上，R函数存在一些不一致性：有些函数使用第一层级，而另一些则使用第二层级来表示关注的事件。我们认为第一层级最为重要，这更符合直觉。将结果编码为0/1（在这种情况下，第二个值代表事件）催生了第二层级的逻辑，遗憾的是，这种逻辑在一些包中仍然存在。然而，tidymodels（以及许多其他R包）要求将分类结果编码为因子，因此，将第二层级作为事件的传统理由就变得无关紧要了。
+
+
+
 
