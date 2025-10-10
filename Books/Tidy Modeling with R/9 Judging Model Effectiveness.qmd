@@ -1,0 +1,74 @@
+---
+title: "9 Judging Model Effectiveness"
+date: "2025-10-10"
+date-modified: "2025-10-10"
+
+format:
+  html:
+    code-link: true
+
+fig-width: 6
+fig-asp: 0.618
+out-width: 70%
+fig-align: center
+
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: "#>"
+    R.options:
+      dplyr.print_min: 6
+      dplyr.print_max: 6
+      pillar.max_footer_lines: 2
+      pillar.min_chars: 15
+      stringr.view_n: 6
+      cli.num_colors: 0
+      cli.hyperlink: FALSE
+      pillar.bold: TRUE
+      width: 77
+
+execute:
+  warning: true
+  error: true
+---
+
+一旦我们构建好了模型，我们需要知道它的效果如何。一种用于评估有效性的定量方法能让我们理解该模型、比较不同的模型，或者调整模型以提升性能。在tidymodels中，我们的重点是经验验证；这通常意味着使用未被用于创建模型的数据作为衡量有效性的基础。第10章会介绍另外一种经验验证方法——**重抽样方法**。在本章中，我们将通过使用测试集来说明经验验证的必要性。请记住，正如第5.1节中所解释的，测试集只能使用一次。
+
+在判断模型效果时，指标的选择可能至关重要。在后面的章节中，某些模型参数将通过经验验证进行优化，并且会使用一个主要的性能指标来选择最佳的子模型。选择错误的指标很容易导致意想不到的后果。例如，回归模型的两个常见指标是均方根误差（RMSE）和决定系数（R²），前者衡量的是准确性，而后者衡量的是相关性，这两者并不一定是一回事。@fig-9.1 展示了两者之间的区别。
+
+```{r performance-reg-metrics, echo = FALSE}
+#| label: fig-9.1
+#| fig-cap: Observed versus predicted values for models that are optimized using the RMSE compared to the coefficient of determination
+#| fig-alt: Scatter plots of numeric observed versus predicted values for models that are optimized using the RMSE and the coefficient of determination. The former results in results that are close to the 45 degree line of identity while the latter shows results with a tight linear correlation but falls well off of the line of identity.
+library(tidyverse)
+library(tune)
+set.seed(234)
+n <- 200
+obs <- runif(n, min = 2, max = 20)
+
+reg_ex <-
+  tibble(
+    observed = c(obs, obs),
+    predicted = c(obs + rnorm(n, sd = 1.5), 5 + .5 * obs + rnorm(n, sd = .5)),
+    approach = rep(c("RMSE optimized", "R^2 optimized"), each = n)
+  ) %>%
+  mutate(approach = factor(
+    approach,
+    levels = c("RMSE optimized", "R^2 optimized"),
+    labels = c(expression(RMSE ~ optimized), expression(italic(R^2) ~ optimized))
+  ))
+
+ggplot(reg_ex, aes(x = observed, y = predicted)) +
+  geom_abline(lty = 2) +
+  geom_point(alpha = 0.5) +
+  coord_obs_pred() +
+  facet_wrap(~approach, labeller = "label_parsed")
+```
+
+针对均方根误差（RMSE）优化的模型变异性更大，但在结果的整个范围内具有相对一致的准确性。针对决定系数（R²）优化的模型，其观测值和预测值之间的相关性更强，但在尾部表现不佳。
+
+本章将介绍**yardstick**包，这是tidymodels核心包之一，主要用于衡量模型性能。在说明语法之前，让我们探讨一下，当模型侧重于推断而非预测时，使用性能指标进行实证验证是否有价值。
+
+## Performance Metrics and Inference
+
+
