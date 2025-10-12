@@ -61,6 +61,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
+<link href="../../Books/Tidy Modeling with R/9 Judging Model Effectiveness.html" rel="next">
 <link href="../../Books/Tidy Modeling with R/7 A Model Workflow.html" rel="prev">
 <script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
@@ -246,6 +247,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">8 Feature Engineering with recipes</span></a>
   </div>
 </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/9 Judging Model Effectiveness.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">9 Judging Model Effectiveness</span></a>
+  </div>
+</li>
     </ul>
 </div>
 </nav><div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
@@ -269,7 +276,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#natural-language-processing" id="toc-natural-language-processing" class="nav-link" data-scroll-target="#natural-language-processing">Natural language processing</a></li>
   </ul>
 </li>
-  <li><a href="#skipping-steps-for-new-data" id="toc-skipping-steps-for-new-data" class="nav-link" data-scroll-target="#skipping-steps-for-new-data">Skipping Steps for New Data</a></li>
+  <li>
+<a href="#skipping-steps-for-new-data" id="toc-skipping-steps-for-new-data" class="nav-link" data-scroll-target="#skipping-steps-for-new-data">Skipping Steps for New Data</a>
+  <ul class="collapse">
+<li><a href="#%E7%AC%AC%E4%B8%80%E7%B1%BBlog%E8%BD%AC%E6%8D%A2" id="toc-第一类log转换" class="nav-link" data-scroll-target="#%E7%AC%AC%E4%B8%80%E7%B1%BBlog%E8%BD%AC%E6%8D%A2">第一类：log转换</a></li>
+  <li><a href="#%E7%AC%AC%E4%BA%8C%E7%B1%BB%E8%A1%8C%E5%A4%84%E7%90%86" id="toc-第二类行处理" class="nav-link" data-scroll-target="#%E7%AC%AC%E4%BA%8C%E7%B1%BB%E8%A1%8C%E5%A4%84%E7%90%86">第二类：行处理</a></li>
+  </ul>
+</li>
   <li><a href="#tidy-a-recipe" id="toc-tidy-a-recipe" class="nav-link" data-scroll-target="#tidy-a-recipe">Tidy a <code>recipe()</code></a></li>
   <li><a href="#column-roles" id="toc-column-roles" class="nav-link" data-scroll-target="#column-roles">Column Roles</a></li>
   <li><a href="#chapter-summary" id="toc-chapter-summary" class="nav-link" data-scroll-target="#chapter-summary">Chapter Summary</a></li>
@@ -297,7 +310,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">October 9, 2025</p>
+      <p class="date-modified">October 12, 2025</p>
     </div>
   </div>
     
@@ -309,10 +322,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>以Ames市一栋房屋的位置为例，有多种方式可以将这种空间信息提供给模型，包括所在社区（一种定性衡量标准）、经度/纬度、到最近学校或Iowa State University的距离等等。在选择如何在建模中对这些数据进行编码时，我们可能会选择一个我们<strong>认为与结果关联性最强</strong>的选项。数据的原始格式，例如数值型（如距离）与分类型（如社区），也是特征工程选择中的一个驱动因素。</p>
 <p>特征工程的其他预处理示例包括：</p>
 <ul>
-<li><p>可以通过特征提取或移除部分预测变量来降低预测变量之间的相关性。</p></li>
-<li><p>当一些预测变量存在缺失值时，可以使用子模型对其进行插补。</p></li>
-<li><p>使用方差类度量的模型可能会通过估计一种转换方法，将某些偏斜预测变量的分布强制变为对称分布，进而从中受益。</p></li>
-<li><p>重新格式化操作。有些模型会使用几何距离度量，因此，数值预测变量需要进行中心化和标准化处理，以确保它们都采用相同的单位。否则，距离值会因各列的尺度不同而产生偏差。</p></li>
+<li><p>可以通过特征提取或移除部分预测变量来降低预测变量之间的<strong>相关性</strong>。</p></li>
+<li><p>当一些预测变量存在<strong>缺失值</strong>时，可以使用子模型对其进行插补。</p></li>
+<li><p>使用方差类度量的模型可能会通过估计一种转换方法，将某些偏斜预测变量的分布强制变为<strong>对称分布</strong>，进而从中受益。</p></li>
+<li><p>有些模型会使用几何距离度量，因此，数值预测变量需要进行中心化和标准化处理等<strong>重新格式化操作</strong>，以确保它们都采用相同的单位。否则，距离值会因各列的尺度不同而产生偏差。</p></li>
 </ul>
 <p>不同的模型有不同的预处理要求，有些模型，例如基于树的模型，几乎不需要任何预处理。附录A包含一个小表格，列出了针对不同模型的推荐预处理技术。在本章中，我们将介绍<strong>recipes</strong>包，你可以使用它将不同的特征工程和预处理任务组合成一个单一对象，然后将这些转换应用于不同的数据集。与用于模型的parsnip类似，recipes包是tidymodels核心包之一。</p>
 <p>本章使用了Ames房价数据以及本书到目前为止创建的R对象，如第7.7节所概述的那样。</p>
@@ -328,12 +341,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">Sale_Price</span> <span class="op">~</span> <span class="va">Neighborhood</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log10</a></span><span class="op">(</span><span class="va">Gr_Liv_Area</span><span class="op">)</span> <span class="op">+</span> <span class="va">Year_Built</span> <span class="op">+</span> <span class="va">Bldg_Type</span>, data <span class="op">=</span> <span class="va">ames</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>当执行此函数时，数据会从数据框转换为数值型的设计矩阵（也称为模型矩阵），然后使用最小二乘法来估计参数。在3.2节中，我们列出了R模型公式的多种用途；现在我们仅关注数据处理方面。该公式的作用可以分解为一系列步骤：</p>
 <ul>
-<li><p>销售价格被定义为结果，而社区、总居住面积、建造年份和建筑类型变量都被定义为预测因子。</p></li>
+<li><p>销售价格被定义为结果，而社区、总居住面积、建造年份和建筑类型等变量都被定义为预测因子。</p></li>
 <li><p>对总居住面积这一预测变量进行了对数转换。</p></li>
-<li><p>社区和建筑类型列从非数字格式转换为数字格式（因为最小二乘法需要数字预测变量）。</p></li>
+<li><p>社区和建筑类型列从非数字型转换为数字型（因为最小二乘法需要数字型预测变量）。</p></li>
 </ul>
-<p>如第3章所述，公式法会将这些数据处理操作应用于任何传入<code><a href="https://rdrr.io/r/stats/predict.html">predict()</a></code>函数的数据，包括新数据。</p>
-<p>recipe会定义一个包含一系列数据处理步骤的对象。与建模函数中的公式方法不同，recipe通过<code>step_*()</code>函数来定义步骤，而不会立即执行这些步骤；它仅仅是对应该做什么的一种规范说明。以下是一个与前面的公式等效的recipe对象，其基于第5.5节中的代码摘要构建而成：</p>
+<p>如第3章所述，<code>~</code>公式会将这些数据处理操作应用于任何传入<code><a href="https://rdrr.io/r/stats/predict.html">predict()</a></code>函数的数据，包括新数据。</p>
+<p>与建模函数中的<code>~</code>公式不同，recipe通过<code>step_*()</code>函数来定义步骤，但不会立即执行这些步骤，而是定义一个包含一系列数据处理步骤的对象；它仅仅是一种对应该做什么的规范说明。以下是一个与前面的<code>~</code>公式等效的recipe对象，其基于第5.5节中的代码摘要构建而成：</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidymodels.tidymodels.org">tidymodels</a></span><span class="op">)</span> <span class="co"># Includes the recipes package</span></span>
 <span><span class="co">#&gt; ── Attaching packages ─────────────────────────────────── tidymodels 1.4.1 ──</span></span>
@@ -383,13 +396,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <ol type="1">
 <li><p>带有公式的<code>recipe()</code>调用会告知“配方”的“原料”（例如，预测变量、结果变量）。它仅使用<code>ames_train</code>数据来确定各列的数据类型。</p></li>
 <li><p><code>step_log()</code>声明应对<code>Gr_Liv_Area</code>进行对数转换。</p></li>
-<li><p><code>step_dummy()</code>指定了哪些变量应该从定性格式转换为定量格式，在这种情况下，会使用虚拟变量或指示变量。指示变量或虚拟变量是一种二元数值变量（由1和0组成的列），用于编码定性信息；我们将在第8.4.1节更深入地探讨这类变量。</p></li>
+<li><p><code>step_dummy()</code>指定了哪些变量应该从定性型转换为定量型，在这种情况下，会使用虚拟变量或指示变量。指示变量或虚拟变量是一种二元数值变量（由1和0组成的列），用于编码定性信息；我们将在第8.4.1节更深入地探讨这类变量。</p></li>
 </ol>
 <p>函数<code>all_nominal_predictors()</code>会捕获当前为因子型或字符型（即名义型）的任何预测变量列的名称。这是一个类似dplyr的选择器函数，与<code>starts_with()</code>或<code>matches()</code>类似，但只能在recipe对象内部使用。recipe包特有的其他选择器包括：<code>all_numeric_predictors()</code>、<code>all_numeric()</code>、<code>all_predictors()</code>和<code>all_outcomes()</code>。与dplyr类似，可以使用一个或多个未加引号的表达式（用逗号分隔）来选择每个步骤所作用的列。</p>
 <p>与公式或原始预测变量相比，使用recipe有几个优势，包括：</p>
 <ul>
 <li><p>由于这些计算与建模函数并非紧密耦合，因此它们可以在不同模型之间重复使用。</p></li>
-<li><p>与公式相比，recipe能提供更广泛的数据处理选择。</p></li>
+<li><p>与<code>~</code>公式相比，recipe能提供更广泛的数据处理选择。</p></li>
 <li><p>语法可以非常简洁。例如，<code>all_nominal_predictors()</code>可用于捕获许多变量以进行特定类型的处理，而公式则需要明确列出每个变量。</p></li>
 <li><p>所有数据处理都可以被捕获在一个单独的R对象中，而不是在重复的脚本中，甚至不会分散在不同的文件里。</p></li>
 </ul></section><section id="using-recipes" class="level2"><h2 class="anchored" data-anchor-id="using-recipes">Using Recipes</h2>
@@ -512,7 +525,7 @@ Figure&nbsp;1: Frequencies of neighborhoods in the Ames training set.
 </div>
 </div>
 </div>
-<p>在这里我们可以看到，有两个社区在训练集中的房产数量少于5处（Landmark和Green Hills）；在这种情况下，测试集中完全没有包含Landmark社区的房屋。对于某些模型而言，列中存在只有一个非零项的虚拟变量可能会产生问题。至少，这些特征不太可能对模型起到重要作用。如果我们在recipe中添加<code>step_other(Neighborhood, threshold = 0.01)</code>，那么占比最低的1%的社区将会被归为一个名为“other”的新类别。在这个训练集中，这将涵盖7个社区。</p>
+<p>在这里我们可以看到，有两个社区在训练集中的房产数量少于5处（Landmark和Green Hills）；在这种情况下，测试集中完全没有包含Landmark社区的房屋。对于某些模型而言，列中存在只有一个非零项的虚拟变量可能会产生问题。至少，这些特征不太可能对模型起到重要作用。如果我们在recipe对象中添加<code>step_other(Neighborhood, threshold = 0.01)</code>，那么占比低于1%的社区将会被归为一个名为“other”的新类别。在这个训练集中，这将涵盖7个社区。</p>
 <p>对于Ames数据，我们可以修改recipe对象以使用：</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">simple_ames</span> <span class="op">&lt;-</span></span>
@@ -523,8 +536,8 @@ Figure&nbsp;1: Frequencies of neighborhoods in the Ames training set.
 <span>  <span class="fu">step_other</span><span class="op">(</span><span class="va">Neighborhood</span>, threshold <span class="op">=</span> <span class="fl">0.01</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
 <span>  <span class="fu">step_dummy</span><span class="op">(</span><span class="fu">all_nominal_predictors</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>许多（但并非所有）基础模型计算都要求将预测变量值编码为数字。值得注意的例外包括基于树的模型、基于规则的模型和朴素贝叶斯模型。</p>
-<p>将因子预测变量转换为数值格式最常用的方法是创建虚拟变量或指示变量。让我们以Ames数据中关于建筑类型的预测变量为例，这是一个具有五个水平的因子变量（见 <a href="#tbl-8.1" class="quarto-xref">Table&nbsp;1</a> ）。对于虚拟变量，单个<code>Bldg_Type</code>列将被四个数值列取代，这些列的值要么是0要么是1。这些二元变量代表特定的因子水平值。在R语言中，惯例是排除第一个因子水平所对应的列（在这种情况下是<code>OneFam</code>）。<code>Bldg_Type</code>列将被一个名为<code>TwoFmCon</code>的列取代，当行中是该值时，该列的值为1，否则为0。其他三个列也以类似的方式创建：</p>
+<p>许多（但并非所有）基础模型计算都要求将预测变量值编码为数字，但基于树的模型、基于规则的模型和朴素贝叶斯模型除外。</p>
+<p>将因子预测变量转换为数值格式最常用的方法是创建虚拟变量或指示变量。让我们以Ames数据中关于建筑类型的预测变量为例，这是一个具有五个水平的因子变量（见 <a href="#tbl-8.1" class="quarto-xref">Table&nbsp;1</a> ）。对于虚拟变量，单个<code>Bldg_Type</code>列将被四个数值列取代，这些列的值要么是0要么是1，这些二元变量代表特定的因子水平值。在R语言中，惯例是排除第一个因子水平所对应的列（在这种情况下是<code>OneFam</code>）。<code>Bldg_Type</code>列将被一个名为<code>TwoFmCon</code>的列取代，当行中是该值时，该列的值为1，否则为0。其他三个列也以类似的方式创建：</p>
 <div id="tbl-8.1" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-8.1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Table&nbsp;1: Illustration of binary encodings (i.e., dummy variables) for a qualitative predictor.
@@ -578,10 +591,10 @@ Table&nbsp;1: Illustration of binary encodings (i.e., dummy variables) for a qua
 </div>
 </figure>
 </div>
-<p>为什么不是五个都用呢？最基本的原因是简洁性：如果你知道这四个列的值，你就能确定最后一个的值，因为这些类别是互斥的。从更专业的角度来说，经典的理由是，包括普通线性回归在内的许多模型，当列之间存在线性相关性时，会出现数值问题。如果将所有五个建筑类型指示列都包含进来，它们加起来就会等于截距列（如果有的话）。这会在底层的矩阵代数中导致问题，甚至可能是直接的错误。</p>
+<p>为什么不是五个都用呢？最基本的原因是简洁性：如果你知道这四个列的值，你就能确定最后一个的值，因为这些类别是互斥的。从更专业的角度来说，经典的理由是，包括普通线性回归在内的许多模型，当列之间存在线性相关性时，会出现数值问题。如果将所有五个建筑类型指示列都包含进来，它们加起来就会等于截距列（如果有的话）。这会在底层的矩阵代数中会导致问题，甚至可能是直接的错误。</p>
 <p>完整的编码集可用于某些模型。这传统上被称为独热编码，可通过<code>step_dummy()</code>的<code>one_hot</code>参数来实现。</p>
 <p><code>step_dummy()</code>的一个实用功能是，能更好地控制生成的虚拟变量的命名方式。在基础R中，虚拟变量的名称会将变量名和水平值合并，形成类似<code>NeighborhoodVeenker</code>这样的名称。而recipes默认使用下划线作为名称和水平值之间的分隔符（例如，<code>Neighborhood_Veenker</code>），并且还提供了自定义名称格式的选项。Recipes中的默认命名规则，使得在后续步骤中更容易使用选择器捕获这些新列，比如<code>starts_with("Neighborhood_")</code>。</p>
-<p>传统的虚拟变量要求必须已知所有可能的类别，才能创建一整套数值特征。还有其他方法可以将其转换为数值格式。特征哈希方法仅根据类别的值将其分配到预定义的虚拟变量池中。效应编码或似然编码用一个单一的数值列替换原始数据，该数值列用于衡量这些数据的效应。特征哈希和效应编码都能无缝处理数据中出现新因子水平的情况。第17章探讨了这些以及其他用于编码分类数据的方法，这些方法超越了简单的虚拟变量或指示变量。</p>
+<p>传统的虚拟变量要求必须已知所有可能的类别，才能创建一整套数值特征，有些方法不需要，可以直接将其转换为数值格式。如：<strong>特征哈希方法</strong>仅根据类别的值将其分配到预定义的虚拟变量池中；<strong>效应编码或似然编码</strong>用一个单一的数值列替换原始数据，该数值列用于衡量这些数据的效应。特征哈希和效应编码都能无缝处理数据中出现新因子水平的情况。第17章探讨了这些以及其他用于编码分类数据的方法，这些方法超越了简单的虚拟变量或指示变量。</p>
 <p>不同的recipe步骤函数应用于数据中的变量时，表现会有所不同。例如，<code>step_log()</code>会在不更改名称的情况下就地修改列。其他步骤，如<code>step_dummy()</code>，会删除原始数据列，并替换为一个或多个名称不同的列。recipe步骤函数的效果取决于所进行的特征工程转换类型。</p>
 </section><section id="interaction-terms" class="level3"><h3 class="anchored" data-anchor-id="interaction-terms">Interaction terms</h3>
 <p>交互效应涉及两个或多个预测变量。当一个预测变量对结果的影响取决于一个或多个其他预测变量时，就会产生这种效应。例如，如果你试图预测通勤期间的交通流量，两个潜在的预测变量可能是你通勤的具体时间和天气。然而，交通流量与恶劣天气之间的关系在一天中的不同时间是不同的。在这种情况下，你可以在模型中添加这两个预测变量之间的交互项，以及原来的两个预测变量（称为主效应）。从数值上讲，预测变量之间的交互项被编码为它们的乘积。交互是根据它们对结果的影响来定义的，并且可以是不同类型数据（如数值型、分类型等）的组合。第7章更详细地讨论了交互效应以及如何检测它们。</p>
@@ -609,7 +622,7 @@ Figure&nbsp;2: Gross living area (in log-10 units) versus sale price (also in lo
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">Sale_Price</span> <span class="op">~</span> <span class="va">Neighborhood</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log10</a></span><span class="op">(</span><span class="va">Gr_Liv_Area</span><span class="op">)</span> <span class="op">+</span> <span class="va">Bldg_Type</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log10</a></span><span class="op">(</span><span class="va">Gr_Liv_Area</span><span class="op">)</span><span class="op">:</span><span class="va">Bldg_Type</span></span>
 <span><span class="co"># or</span></span>
 <span><span class="va">Sale_Price</span> <span class="op">~</span> <span class="va">Neighborhood</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log10</a></span><span class="op">(</span><span class="va">Gr_Liv_Area</span><span class="op">)</span> <span class="op">*</span> <span class="va">Bldg_Type</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>其中，<code>*</code>会将这些列扩展为主效应项和交互项。同样，公式方法会同时处理多项任务，它知道因子变量（例如<code>Bldg_Type</code>）应首先扩展为虚拟变量，并且交互项应涉及所有生成的二进制列。</p>
+<p>其中，<code>*</code>会将这些列扩展为主效应项和交互项。同样，<code>~</code>公式方法会同时处理多项任务，它知道因子变量（例如<code>Bldg_Type</code>）应首先扩展为虚拟变量，并且交互项应涉及所有生成的二进制列。</p>
 <p>recipe更为明确且具有顺序性，能让你获得更多控制权。在当前recipe对象中，<code>step_dummy()</code>已经创建了虚拟变量。我们该如何将这些变量组合起来进行交互呢？额外的步骤会像<code>step_interact(~ interaction terms)</code>这样，其中波浪号右侧的项就是交互项。这些项可以包含选择器，因此使用以下方式是合适的：</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">simple_ames</span> <span class="op">&lt;-</span></span>
@@ -622,14 +635,12 @@ Figure&nbsp;2: Gross living area (in log-10 units) versus sale price (also in lo
 <span>  <span class="co"># Gr_Liv_Area is on the log scale from a previous step</span></span>
 <span>  <span class="fu">step_interact</span><span class="op">(</span><span class="op">~</span> <span class="va">Gr_Liv_Area</span><span class="op">:</span><span class="fu">starts_with</span><span class="op">(</span><span class="st">"Bldg_Type_"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>可以在该公式中通过用<code>+</code>分隔来指定额外的交互项。另请注意，此规则仅使用不同变量之间的交互项；如果公式中使用了<code>var_1:var_1</code>，则该术语将被忽略。</p>
-<p>假设在一个recipe对象中，我们尚未为建筑类型创建虚拟变量。在这一步骤中包含一个因子列是不合适的，例如：<code>step_interact( ~ Gr_Liv_Area:Bldg_Type )</code></p>
-<p>这说明了<code>step_interact()</code>所使用的底层（基础R）代码是如何创建虚拟变量并进而形成交互项的。实际上，如果出现这种情况，会有一个警告提示这可能会产生意外结果。</p>
-<p>这种行为让你拥有更多控制权，但它与R的标准模型公式不同。</p>
+<p>可以在该公式中通过用<code>+</code>分隔来指定额外的交互项。另请注意，此规则仅适用不同变量之间的交互项；如果公式中使用了<code>var_1:var_1</code>，则该术语将被忽略。</p>
+<p>假设在一个recipe对象中，我们尚未对建筑类型创建虚拟变量。在构建交互项时包含一个因子列是不合适的，例如：<code>step_interact(~ Gr_Liv_Area:Bldg_Type)</code>，此时<code>step_interact()</code>所使用的底层（基础R）代码会自动创建虚拟变量然后形成交互项。实际上，如果出现这种情况，会有一个警告提示这可能会产生意外结果。</p>
 <p>与命名虚拟变量一样，recipe为交互项提供了更连贯的名称。在这种情况下，交互项被命名为<code>Gr_Liv_Area_x_Bldg_Type_Duplex</code>，而不是<code>Gr_Liv_Area:Bldg_TypeDuplex</code>（这不是数据框的有效列名）。</p>
-<p>记住顺序很重要。总居住面积在形成交互项之前会进行对数转换。此后与该变量的交互也将使用对数尺度。</p>
+<p>总之，recipe为你提供了更多的控制权，但它与R的标准模型公式不同，且步骤的<strong>顺序很重要</strong>。例如，总居住面积在形成交互项之前会进行对数转换，此后与该变量的交互也将使用对数尺度。</p>
 </section><section id="spline-functions" class="level3"><h3 class="anchored" data-anchor-id="spline-functions">Spline functions</h3>
-<p>当预测变量与结果之间存在非线性关系时，某些类型的预测模型能够在训练过程中自适应地逼近这种关系。然而，通常来说，越简单越好，尝试使用简单模型（如线性拟合）并为可能需要的预测变量添加特定的非线性特征（例如Ames房价数据中的经度和纬度）的情况并不少见。实现这一点的一种常用方法是使用样条函数来表示数据。样条函数会用一组列替换现有的数值预测变量，使模型能够模拟灵活的非线性关系。随着向数据中添加的样条项增多，非线性表示这种关系的能力也会增强。但遗憾的是，这也可能增加捕捉到偶然出现的数据趋势的可能性（即过拟合）。</p>
+<p>当预测变量与结果之间存在非线性关系时，某些类型的预测模型能够在训练过程中自适应地逼近这种关系。然而，通常来说，<strong>越简单越好</strong>，尝试使用简单模型（如线性拟合）并为可能需要的预测变量（例如Ames房价数据中的经度和纬度）添加特定的非线性特征的情况并不少见。实现这一点的一种常用方法是使用<strong>样条函数</strong>来表示数据。样条函数会用一组列替换现有的数值预测变量，使模型能够模拟灵活的非线性关系。随着向数据中添加的样条项增多，非线性表示这种关系的能力也会增强。但遗憾的是，这也可能增加捕捉到偶然出现的数据趋势的可能性（即过拟合）。</p>
 <p>如果你曾经在<code>ggplot</code>中使用过<code>geom_smooth()</code>，那么你很可能使用过数据的样条表示。例如， <a href="#fig-8.3" class="quarto-xref">Figure&nbsp;3</a> 中的每个面板都对纬度预测变量使用了不同数量的平滑样条：</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://patchwork.data-imaginist.com">patchwork</a></span><span class="op">)</span></span>
@@ -663,9 +674,9 @@ Figure&nbsp;3: Sale price versus latitude, with trend lines using natural spline
 </div>
 </div>
 </div>
-<p>“splines”包中的<code><a href="https://rdrr.io/r/splines/ns.html">ns()</a></code>函数使用名为自然样条的函数生成特征列。</p>
-<p><a href="#fig-8.3" class="quarto-xref">Figure&nbsp;3</a> 中的一些面板明显拟合效果不佳；两个项对数据存在欠拟合，而100个项则存在过拟合。有5个项和20个项的面板看起来拟合得相当平滑，捕捉到了数据的主要模式。这表明适当程度的“非线性”很重要。样条项的数量可以被视为该模型的一个调优参数。这类参数将在第12章中探讨。</p>
-<p>在recipe中，多个步骤可以创建这类术语。要为该预测变量添加自然样条表示：</p>
+<p>“splines”包中的<code><a href="https://rdrr.io/r/splines/ns.html">ns()</a></code>函数(“natural splines”)可以生成特征列。</p>
+<p><a href="#fig-8.3" class="quarto-xref">Figure&nbsp;3</a> 中的一些面板明显拟合效果不佳；<code>n=2</code>时对数据存在欠拟合，而<code>n=100</code>时则存在过拟合。<code>n=5</code>和<code>n=20</code>的面板看起来拟合得相当平滑，捕捉到了数据的主要模式。这表明适当程度的“非线性”很重要。样条项的数量可以被视为该模型的一个<strong>调优参数</strong>。这类参数将在第12章中探讨。</p>
+<p>在recipe中，多个步骤函数可以创建“样条”，要添加自然样条可以：</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">recipe</span><span class="op">(</span><span class="va">Sale_Price</span> <span class="op">~</span> <span class="va">Neighborhood</span> <span class="op">+</span> <span class="va">Gr_Liv_Area</span> <span class="op">+</span> <span class="va">Year_Built</span> <span class="op">+</span> <span class="va">Bldg_Type</span> <span class="op">+</span> <span class="va">Latitude</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">ames_train</span></span>
@@ -692,35 +703,38 @@ Figure&nbsp;3: Sale price versus latitude, with trend lines using natural spline
 </div>
 <p>用户需要确定“社区”和“纬度”是否都应该包含在模型中，因为它们以不同的方式代表着相同的基础数据。</p>
 </section><section id="feature-extraction" class="level3"><h3 class="anchored" data-anchor-id="feature-extraction">Feature extraction</h3>
-<p>另一种同时表示多个特征的常用方法称为特征提取。这些技术大多会从预测变量中创建新的特征，以整体捕捉更广泛集合中的信息。例如，主成分分析（PCA）试图使用更少数量的特征，尽可能多地提取预测变量集合中的原始信息。PCA是一种线性提取方法，这意味着每个新特征都是原始预测变量的线性组合。PCA的一个优点是，每个新特征（称为主成分或PCA得分）彼此不相关。正因为如此，PCA在降低预测变量之间的相关性方面非常有效。需要注意的是，PCA只关注预测变量；新的PCA特征可能与结果无关。</p>
+<p>另一种同时表示多个特征的常用方法是<strong>特征提取</strong>。这些技术大多会从预测变量中创建新的特征，以整体捕捉更广泛集合中的信息。例如，主成分分析（PCA）试图使用更少数量的特征，尽可能多地提取预测变量集合中的原始信息。PCA是一种线性提取方法，这意味着每个新特征都是原始预测变量的线性组合。PCA的一个优点是，每个新特征（称为主成分或PCA得分）彼此不相关。正因为如此，PCA在降低预测变量之间的相关性方面非常有效。需要注意的是，PCA只关注预测变量新的PCA特征可能与结果无关。</p>
 <p>在Ames数据中，有几个预测变量用于衡量房产的面积，例如总地下室面积（<code>Total_Bsmt_SF</code>）、一楼面积（<code>First_Flr_SF</code>）、总居住面积（<code>Gr_Liv_Area</code>）等等。主成分分析（PCA）可能是将这些潜在冗余变量表示为更小特征集的一种选择。除了总居住面积外，这些预测变量的名称中都带有后缀SF（代表平方英尺），因此用于主成分分析的一个recipe步骤可能如下：</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Use a regular expression to capture house size predictors:</span></span>
 <span><span class="fu">step_pca</span><span class="op">(</span><span class="fu">matches</span><span class="op">(</span><span class="st">"(SF$)|(Gr_Liv)"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>请注意，所有这些列的测量单位都是平方英尺。主成分分析（PCA）假设所有预测变量都在同一尺度上。在这种情况下确实如此，但通常在此步骤之前可以使用<code>step_normalize()</code>，它会对每一列进行中心化和标准化处理。</p>
+<p>请注意，所有这些列的测量单位都是平方英尺。主成分分析（PCA）假设所有预测变量都在同一尺度上。在这种情况下确实如此，但通常在此步骤之前会使用<code>step_normalize()</code>对每一列进行中心化和标准化处理。</p>
 <p>对于其他提取方法，已有现成的recipe步骤，例如：独立成分分析（ICA）、非负矩阵分解（NNMF）、多维尺度分析（MDS）、均匀流形逼近与投影（UMAP）等。</p>
 </section><section id="row-sampling-steps" class="level3"><h3 class="anchored" data-anchor-id="row-sampling-steps">Row sampling steps</h3>
-<p>recipe中的步骤也会影响数据集的行。例如，用于类别不平衡的子采样技术会改变提供给模型的数据中的类别比例；这些技术通常不会提高整体性能，但可以生成表现更好的预测类别概率分布。以下是在处理类别不平衡数据时尝试子采样的一些方法：</p>
+<p>recipe中也有影响数据集行的步骤函数。例如，用于类别不平衡的<strong>子采样技术</strong>会改变提供给模型的数据中的类别比例；这些技术通常不会提高整体性能，但可以生成表现更好的预测类别概率分布。以下是在处理类别不平衡数据时尝试子采样的一些方法：</p>
 <ul>
 <li><p><strong>下采样</strong>数据会保留少数类，并对多数类进行随机抽样，以使类频率达到平衡。</p></li>
 <li><p><strong>过采样</strong>通过复制少数类的样本来平衡类别。一些技术通过合成与少数类数据相似的新样本来实现这一点，而另一些方法则只是简单地重复添加相同的少数类样本。</p></li>
 <li><p><strong>混合方法</strong>则是将两者结合起来。</p></li>
 </ul>
-<p>“themis”包包含一些recipe步骤，可通过子采样来解决类别不平衡问题。对于简单的下采样，我们会使用：<code>step_downsample(outcome_column_name)</code></p>
+<p>“themis”包提供一些recipe类步骤函数，可通过子采样来解决类别不平衡问题。对于简单的下采样，我们会使用：<code>step_downsample(outcome_column_name)</code></p>
 <p>只有训练集才应该受到这些技术的影响。在使用该流程处理时，测试集或其他保留样本应保持原样。因此，所有子采样步骤都将<code>skip</code>参数的默认值设为<code>TRUE</code>（第8.5节）。</p>
-<p>其他步骤函数也是基于行的：<code>step_filter()</code>、<code>step_sample()</code>、<code>step_slice()</code>以及<code>step_arrange()</code>。在这些步骤的几乎所有使用场景中，<code>skip</code>参数都应设置为<code>TRUE</code>。</p>
+<p>其他基于行的步骤函数：<code>step_filter()</code>、<code>step_sample()</code>、<code>step_slice()</code>以及<code>step_arrange()</code>。在这些步骤函数的几乎所有使用场景中，<code>skip</code>参数都应设置为<code>TRUE</code>。</p>
 </section><section id="general-transformations" class="level3"><h3 class="anchored" data-anchor-id="general-transformations">General transformations</h3>
 <p>与原始的dplyr操作类似，<code>step_mutate()</code>可用于对数据执行各种基本操作。它最适合用于简单的转换，例如计算两个变量的比率，比如<code>Bedroom_AbvGr / Full_Bath</code>，即Ames住房数据中卧室与浴室的比率。</p>
 <p>使用这个灵活的步骤时，要格外小心，避免在预处理过程中出现数据泄露。例如，考虑这样一种转换：<code>x = w &gt; mean(w)</code>。当将其应用于新数据或测试数据时，这种转换会使用<code>w</code>在新数据中的均值，而不是<code>w</code>在训练数据中的均值。</p>
 </section><section id="natural-language-processing" class="level3"><h3 class="anchored" data-anchor-id="natural-language-processing">Natural language processing</h3>
 <p>recipe也能处理那些并非传统结构（即列代表特征）的数据。例如，“textrecipes”包可以对数据应用自然语言处理方法。输入列通常是一个文本字符串，我们可以通过不同的步骤对数据进行分词（例如，将文本拆分成单独的词语）、过滤掉某些词，并创建适合建模的新特征。</p>
 </section></section><section id="skipping-steps-for-new-data" class="level2"><h2 class="anchored" data-anchor-id="skipping-steps-for-new-data">Skipping Steps for New Data</h2>
+<p>有些对训练集的预处理步骤，需要在测试集中避免使用。</p>
+<section id="第一类log转换" class="level3"><h3 class="anchored" data-anchor-id="第一类log转换">第一类：log转换</h3>
 <p>Ames数据框中的销售价格数据已经过对数转换。为什么不使用：<code>step_log(Sale_Price, base = 10)</code></p>
 <p>当该recipe步骤应用于售价未知的新房产时，这会导致失败。由于价格是我们要预测的内容，数据中可能不会有这个变量的列。事实上，为了避免信息泄露，许多tidymodels包在进行任何预测时都会隔离所使用的数据。这意味着在预测时，训练集和任何结果列都无法使用。</p>
 <p>对于结果列的简单转换，我们强烈建议这些操作在recipe之外进行。</p>
+</section><section id="第二类行处理" class="level3"><h3 class="anchored" data-anchor-id="第二类行处理">第二类：行处理</h3>
 <p>然而，在其他情况下，这并非一个恰当的解决方案。例如，在存在严重类别不平衡的分类模型中，对提供给建模函数的数据进行子抽样是很常见的做法。举例来说，假设有两个类别，事件发生率为10%。一种简单但存在争议的方法是对数据进行下采样，即向模型提供所有的事件样本以及10%随机选取的非事件样本。</p>
 <p>问题在于，不应将相同的子采样过程应用于待预测的数据。因此，在使用recipe时，我们需要一种机制来确保某些操作仅应用于提供给模型的数据。每个步骤函数都有一个名为<code>skip</code>的选项，当该选项设置为<code>TRUE</code>时，<code><a href="https://rdrr.io/r/stats/predict.html">predict()</a></code>函数会忽略该步骤。通过这种方式，你可以隔离那些影响建模数据的步骤，而不会在应用于新样本时产生错误。不过，在使用<code>fit()</code>时，所有步骤都会被应用。</p>
-<p>在撰写本文时，recipes和themis包中仅应用于训练数据的步骤函数有：<code>step_adasyn()</code>、<code>step_bsmote()</code>、<code>step_downsample()</code>、<code>step_filter()</code>、<code>step_naomit()</code>、<code>step_nearmiss</code>()<code>、</code>step_rose()<code>、</code>step_sample()<code>、</code>step_slice()`。</p>
-</section><section id="tidy-a-recipe" class="level2"><h2 class="anchored" data-anchor-id="tidy-a-recipe">Tidy a <code>recipe()</code>
+<p>在撰写本文时，recipes和themis包中应仅用于训练数据的步骤函数有：<code>step_adasyn()</code>、<code>step_bsmote()</code>、<code>step_downsample()</code>、<code>step_filter()</code>、<code>step_naomit()</code>、<code>step_nearmiss</code>()<code>、</code>step_rose()<code>、</code>step_sample()<code>、</code>step_slice()`。</p>
+</section></section><section id="tidy-a-recipe" class="level2"><h2 class="anchored" data-anchor-id="tidy-a-recipe">Tidy a <code>recipe()</code>
 </h2>
 <p>在第3.3节中，我们介绍了用于统计对象的<code>tidy()</code>动词。对于recipe对象以及各个recipe步骤，也有一种<code>tidy()</code>方法。在继续之前，让我们使用本章讨论过的一些新步骤，为Ames数据创建一个扩展recipe：</p>
 <div class="cell">
@@ -784,8 +798,8 @@ Figure&nbsp;3: Sale price versus latitude, with trend lines using natural spline
 <span><span class="co">#&gt; 6 Neighborhood Northridge_Heights my_id</span></span>
 <span><span class="co">#&gt; # ℹ 16 more rows</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>我们在这里看到的使用<code>tidy()</code>得到的<code>tidy()</code>结果显示了哪些因子水平被保留了下来，也就是说，没有被添加到新的“其他”类别中。</p>
-<p>如果我们知道recipe中需要哪一步，<code>tidy()</code>方法也可以与number标识符一起调用：</p>
+<p>我们在这里看到的使用<code>tidy()</code>得到的结果显示了哪些因子水平被保留了下来，也就是说，没有被添加到新的“其他”类别中。</p>
+<p>如果我们需要知道recipe中的哪一步，<code>tidy()</code>方法也可以与number标识符一起调用：</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb22"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">tidy</span><span class="op">(</span><span class="va">estimated_recipe</span>, number <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 22 × 3</span></span>
@@ -801,8 +815,8 @@ Figure&nbsp;3: Sale price versus latitude, with trend lines using natural spline
 </div>
 <p>每个<code>tidy()</code>方法都会返回关于该步骤的相关信息。例如，<code>tidy()</code>方法用于<code>step_dummy()</code>时，会返回一列包含被转换为哑变量的变量，以及另一列包含每列所有已知水平的信息。</p>
 </section><section id="column-roles" class="level2"><h2 class="anchored" data-anchor-id="column-roles">Column Roles</h2>
-<p>当在初次调用<code>recipe()</code>时使用公式，它会根据各列位于波浪号的哪一侧，为每一列分配角色。这些角色要么是<code>"predictor"</code>，要么是<code>"outcome"</code>。不过，也可以根据需要分配其他角色。</p>
-<p>例如，在我们的艾姆斯数据集（Ames data set）中，原始数据包含一个地址列。保留该列可能是有用的，这样在做出预测后，就可以对有问题的结果进行详细调查。换句话说，即使该列既不是预测变量也不是结果变量，它也可能很重要。</p>
+<p>当在初次调用<code>recipe()</code>使用公式时，它会根据各列位于波浪号的哪一侧，为每一列分配角色。这些角色要么是<code>"predictor"</code>，要么是<code>"outcome"</code>。不过，也可以根据需要分配其他角色。</p>
+<p>例如，在我们的Ames数据集中，原始数据包含一个地址列。保留该列可能是有用的，这样在做出预测后，就可以对有问题的结果进行详细调查。换句话说，即使该列既不是预测变量也不是结果变量，它也可能很重要。</p>
 <p>为了解决这个问题，<code>add_role()</code>、<code>remove_role()</code>和<code>update_role()</code>函数会很有帮助。例如，对于房价数据，可以使用以下方式修改街道地址列的角色：</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb23"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">ames_rec</span> <span class="op">%&gt;%</span> <span class="fu">update_role</span><span class="op">(</span><span class="va">address</span>, new_role <span class="op">=</span> <span class="st">"street address"</span><span class="op">)</span></span>
@@ -814,7 +828,7 @@ Figure&nbsp;3: Sale price versus latitude, with trend lines using natural spline
 <p>当数据被重采样时，这会很有帮助。它有助于将与模型拟合无关的列保留在同一个数据框中（而不是放在外部向量中）。第10章中描述的重采样主要通过行子采样来创建数据的替代版本。如果街道地址在另一个列中，就需要进行额外的子采样，这可能会导致代码更复杂，出错的可能性也更高。</p>
 <p>最后，所有步骤函数都有一个role字段，该字段可以为步骤的结果分配角色。在很多情况下，受步骤影响的列会保留其现有的角色。例如，对我们的<code>ames_rec</code>对象调用<code>step_log()</code>会影响<code>Gr_Liv_Area</code>列。对于该步骤，默认行为是保留该列现有的角色，因为没有创建新列。作为反例，生成样条曲线的步骤会将新列的默认角色设置为<code>"predictor"</code>，因为这通常是样条曲线列在模型中的使用方式。大多数步骤都有合理的默认设置，但由于默认设置可能不同，务必查看文档页面以了解将分配哪些角色。</p>
 </section><section id="chapter-summary" class="level2"><h2 class="anchored" data-anchor-id="chapter-summary">Chapter Summary</h2>
-<p>在本章中，你学习了如何使用recipe进行灵活的特征工程和数据预处理，包括创建虚拟变量、处理类别不平衡等。特征工程是建模过程中的重要组成部分，在此过程中很容易发生信息泄露，因此必须采用良好的实践方法。在recipes包以及其他扩展recipes的包中，有超过100个可用的步骤。所有可能的recipe步骤都列在tidymodels.org/find上。recipes框架为建模前的数据预处理和转换提供了丰富的数据操作环境。此外，tidymodels.org/learn/develop/recipes/&lt;/</p>
+<p>在本章中，你学习了如何使用recipe进行灵活的特征工程和数据预处理，包括创建虚拟变量、处理类别不平衡等。特征工程是建模过程中的重要组成部分，在此过程中很容易发生信息泄露，因此必须采用良好的实践方法。在recipes包以及其他扩展recipes的包中，有超过100个可用的步骤。所有可能的recipe步骤都列在<code>tidymodels.org/find</code>上。recipes框架为建模前的数据预处理和转换提供了丰富的数据操作环境，此外，<code>tidymodels.org/learn/develop/recipes/</code>展示了如何创建自定义步骤。</p>
 <p>我们在这里的工作仅在工作流对象内部使用了recipe。对于建模而言，这是推荐的用法，因为特征工程应该与模型一起进行评估。然而，对于可视化和其他活动，工作流可能并不合适，可能需要更多特定于recipe的函数。第16章讨论了用于拟合、使用recipe以及解决recipe问题的低级API。</p>
 <p>我们将在后续章节中使用的代码如下：</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb24"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidymodels.tidymodels.org">tidymodels</a></span><span class="op">)</span></span>
@@ -1251,6 +1265,9 @@ Figure&nbsp;3: Sale price versus latitude, with trend lines using natural spline
       </a>          
   </div>
   <div class="nav-page nav-page-next">
+      <a href="../../Books/Tidy Modeling with R/9 Judging Model Effectiveness.html" class="pagination-link" aria-label="9 Judging Model Effectiveness">
+        <span class="nav-page-text">9 Judging Model Effectiveness</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
   </div>
 </nav>
 </div> <!-- /content -->
