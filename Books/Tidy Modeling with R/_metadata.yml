@@ -15,3 +15,4 @@ website:
         - Books/Tidy Modeling with R/7 A Model Workflow.qmd
         - Books/Tidy Modeling with R/8 Feature Engineering with recipes.qmd
         - Books/Tidy Modeling with R/9 Judging Model Effectiveness.qmd
+        - Tools For Creating Effective Models
