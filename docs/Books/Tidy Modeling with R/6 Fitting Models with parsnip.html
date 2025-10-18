@@ -272,6 +272,15 @@ window.Quarto = {
  <span class="menu-text">8 Feature Engineering with recipes</span></a>
   </div>
 </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/9 Judging Model Effectiveness.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">9 Judging Model Effectiveness</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+ <span class="menu-text">Tools For Creating Effective Models</span>
+  </li>
     </ul>
 </div>
 </nav><div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
@@ -567,7 +576,7 @@ Table&nbsp;2: Random forest argument names used by parsnip.
 <li><p>主要参数更为常用，且往往在不同引擎中都可使用。</p></li>
 <li><p>引擎参数要么是特定于某个引擎的，要么使用频率较低。</p></li>
 </ul>
-<p>例如，在之前随机森林代码的转换中，参数<code>num.threads</code>、<code>verbose</code>和<code>seed</code>是默认添加的。这些参数是随机森林模型range实现所特有的，作为主要参数是不合理的。特定于引擎的参数可以在 <code>set_engine()</code>中指定。例如，要让<code>ranger::ranger()</code>函数打印出更多关于拟合的信息：</p>
+<p>例如，在之前随机森林代码的转换中，参数<code>num.threads</code>、<code>verbose</code>和<code>seed</code>是默认添加的。这些参数是随机森林模型range实现所特有的，作为主要参数是不合理的。特定于引擎的参数可以在 <code>set_engine()</code>中指定。例如，要让<code><a href="https://rdrr.io/pkg/ranger/man/ranger.html">ranger::ranger()</a></code>函数打印出更多关于拟合的信息：</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">rand_forest</span><span class="op">(</span>trees <span class="op">=</span> <span class="fl">1000</span>, min_n <span class="op">=</span> <span class="fl">5</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
 <span>  <span class="fu">set_engine</span><span class="op">(</span><span class="st">"ranger"</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">%&gt;%</span></span>

@@ -253,6 +253,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">9 Judging Model Effectiveness</span></a>
   </div>
 </li>
+        <li class="sidebar-item">
+ <span class="menu-text">Tools For Creating Effective Models</span>
+  </li>
     </ul>
 </div>
 </nav><div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
@@ -401,7 +404,7 @@ Figure&nbsp;2: Correct mental model of where model estimation occurs in the data
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Computational engine: lm</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>工作流有一个<code><a href="https://generics.r-lib.org/reference/fit.html">fit()</a></code>方法，可用于创建模型。使用在第6.6节中创建的对象：</p>
+<p>工作流有一个<code><a href="https://rdrr.io/pkg/generics/man/fit.html">fit()</a></code>方法，可用于创建模型。使用在第6.6节中创建的对象：</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">lm_fit</span> <span class="op">&lt;-</span> <span class="fu">fit</span><span class="op">(</span><span class="va">lm_wflow</span>, <span class="va">ames_train</span><span class="op">)</span></span>
 <span><span class="va">lm_fit</span></span>
@@ -552,18 +555,18 @@ Figure&nbsp;2: Correct mental model of where model estimation occurs in the data
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/tidymodels/multilevelmod">multilevelmod</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">multilevel_spec</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://parsnip.tidymodels.org/reference/linear_reg.html">linear_reg</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html">set_engine</a></span><span class="op">(</span><span class="st">"lmer"</span><span class="op">)</span></span>
+<span><span class="va">multilevel_spec</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/parsnip/man/linear_reg.html">linear_reg</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/parsnip/man/set_engine.html">set_engine</a></span><span class="op">(</span><span class="st">"lmer"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">multilevel_workflow</span> <span class="op">&lt;-</span></span>
-<span>  <span class="fu">workflow</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">workflow</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="co"># Pass the data along as-is:</span></span>
-<span>  <span class="fu">add_variables</span><span class="op">(</span>outcome <span class="op">=</span> <span class="va">distance</span>, predictors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">Sex</span>, <span class="va">age</span>, <span class="va">Subject</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">add_variables</span><span class="op">(</span>outcome <span class="op">=</span> <span class="va">distance</span>, predictors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">Sex</span>, <span class="va">age</span>, <span class="va">Subject</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu">add_model</span><span class="op">(</span><span class="va">multilevel_spec</span>,</span>
 <span>    <span class="co"># This formula is given to the model</span></span>
 <span>    formula <span class="op">=</span> <span class="va">distance</span> <span class="op">~</span> <span class="va">Sex</span> <span class="op">+</span> <span class="op">(</span><span class="va">age</span> <span class="op">|</span> <span class="va">Subject</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span></span>
-<span><span class="va">multilevel_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html">fit</a></span><span class="op">(</span><span class="va">multilevel_workflow</span>, data <span class="op">=</span> <span class="va">Orthodont</span><span class="op">)</span></span>
+<span><span class="va">multilevel_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/generics/man/fit.html">fit</a></span><span class="op">(</span><span class="va">multilevel_workflow</span>, data <span class="op">=</span> <span class="va">Orthodont</span><span class="op">)</span></span>
 <span><span class="va">multilevel_fit</span></span>
 <span><span class="co">#&gt; ══ Workflow [trained] ═══════════════════════════════════════════════════════</span></span>
 <span><span class="co">#&gt; Preprocessor: Variables</span></span>
@@ -593,16 +596,16 @@ Figure&nbsp;2: Correct mental model of where model estimation occurs in the data
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/tidymodels/censored">censored</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; Loading required package: survival</span></span>
 <span></span>
-<span><span class="va">parametric_spec</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://parsnip.tidymodels.org/reference/survival_reg.html">survival_reg</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">parametric_spec</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/parsnip/man/survival_reg.html">survival_reg</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">parametric_workflow</span> <span class="op">&lt;-</span></span>
-<span>  <span class="fu">workflow</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu">add_variables</span><span class="op">(</span>outcome <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">fustat</span>, <span class="va">futime</span><span class="op">)</span>, predictors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">rx</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">workflow</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">add_variables</span><span class="op">(</span>outcome <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">fustat</span>, <span class="va">futime</span><span class="op">)</span>, predictors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">age</span>, <span class="va">rx</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu">add_model</span><span class="op">(</span><span class="va">parametric_spec</span>,</span>
 <span>    formula <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html">Surv</a></span><span class="op">(</span><span class="va">futime</span>, <span class="va">fustat</span><span class="op">)</span> <span class="op">~</span> <span class="va">age</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/survival/man/strata.html">strata</a></span><span class="op">(</span><span class="va">rx</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span></span>
-<span><span class="va">parametric_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html">fit</a></span><span class="op">(</span><span class="va">parametric_workflow</span>, data <span class="op">=</span> <span class="va">ovarian</span><span class="op">)</span></span>
+<span><span class="va">parametric_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/generics/man/fit.html">fit</a></span><span class="op">(</span><span class="va">parametric_workflow</span>, data <span class="op">=</span> <span class="va">ovarian</span><span class="op">)</span></span>
 <span><span class="va">parametric_fit</span></span>
 <span><span class="co">#&gt; ══ Workflow [trained] ═══════════════════════════════════════════════════════</span></span>
 <span><span class="co">#&gt; Preprocessor: Variables</span></span>
@@ -645,10 +648,10 @@ Figure&nbsp;2: Correct mental model of where model estimation occurs in the data
 <span>  neighborhood <span class="op">=</span> <span class="va">Sale_Price</span> <span class="op">~</span> <span class="va">Neighborhood</span></span>
 <span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>可以使用<code><a href="https://workflowsets.tidymodels.org/reference/workflow_set.html">workflow_set()</a></code>函数将这些表示形式与一个或多个模型进行组合。我们将仅使用之前的线性模型规格来进行演示：</p>
+<p>可以使用<code><a href="https://rdrr.io/pkg/workflowsets/man/workflow_set.html">workflow_set()</a></code>函数将这些表示形式与一个或多个模型进行组合。我们将仅使用之前的线性模型规格来进行演示：</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/tidymodels/workflowsets">workflowsets</a></span><span class="op">)</span></span>
-<span><span class="va">location_models</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://workflowsets.tidymodels.org/reference/workflow_set.html">workflow_set</a></span><span class="op">(</span>preproc <span class="op">=</span> <span class="va">location</span>, models <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>lm <span class="op">=</span> <span class="va">lm_model</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">location_models</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/workflowsets/man/workflow_set.html">workflow_set</a></span><span class="op">(</span>preproc <span class="op">=</span> <span class="va">location</span>, models <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>lm <span class="op">=</span> <span class="va">lm_model</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">location_models</span></span>
 <span><span class="co">#&gt; # A workflow set/tibble: 4 × 4</span></span>
 <span><span class="co">#&gt;   wflow_id        info             option    result    </span></span>
@@ -662,7 +665,7 @@ Figure&nbsp;2: Correct mental model of where model estimation occurs in the data
 <span><span class="co">#&gt;   workflow   preproc model      comment</span></span>
 <span><span class="co">#&gt;   &lt;list&gt;     &lt;chr&gt;   &lt;chr&gt;      &lt;chr&gt;  </span></span>
 <span><span class="co">#&gt; 1 &lt;workflow&gt; formula linear_reg ""</span></span>
-<span><span class="fu"><a href="https://hardhat.tidymodels.org/reference/hardhat-extract.html">extract_workflow</a></span><span class="op">(</span><span class="va">location_models</span>, id <span class="op">=</span> <span class="st">"coords_lm"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/hardhat/man/hardhat-extract.html">extract_workflow</a></span><span class="op">(</span><span class="va">location_models</span>, id <span class="op">=</span> <span class="st">"coords_lm"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; ══ Workflow ═════════════════════════════════════════════════════════════════</span></span>
 <span><span class="co">#&gt; Preprocessor: Formula</span></span>
 <span><span class="co">#&gt; Model: linear_reg()</span></span>
@@ -679,8 +682,8 @@ Figure&nbsp;2: Correct mental model of where model estimation occurs in the data
 <p>与此同时，让我们为每个公式创建模型拟合，并将它们保存在一个名为<code>fit</code>的新列中。我们将使用基本的dplyr和purrr操作：</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">location_models</span> <span class="op">&lt;-</span></span>
-<span>  <span class="va">location_models</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu">mutate</span><span class="op">(</span>fit <span class="op">=</span> <span class="fu">map</span><span class="op">(</span><span class="va">info</span>, <span class="op">~</span> <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html">fit</a></span><span class="op">(</span><span class="va">.x</span><span class="op">$</span><span class="va">workflow</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="va">ames_train</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="va">location_models</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>fit <span class="op">=</span> <span class="fu">map</span><span class="op">(</span><span class="va">info</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/pkg/generics/man/fit.html">fit</a></span><span class="op">(</span><span class="va">.x</span><span class="op">$</span><span class="va">workflow</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="va">ames_train</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">location_models</span></span>
 <span><span class="co">#&gt; # A workflow set/tibble: 4 × 5</span></span>
 <span><span class="co">#&gt;   wflow_id        info             option    result     fit       </span></span>
@@ -725,17 +728,17 @@ Figure&nbsp;2: Correct mental model of where model estimation occurs in the data
 <p>请注意，<code>last_fit()</code>接受的数据是已分割的，而不是原始数据框。该函数使用此分割好的数据集来生成用于最终拟合和评估的训练集和测试集。</p>
 <p><code>.workflow</code>列包含拟合的工作流，可以使用以下代码从结果中提取出来：</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">fitted_lm_wflow</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://hardhat.tidymodels.org/reference/hardhat-extract.html">extract_workflow</a></span><span class="op">(</span><span class="va">final_lm_res</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">fitted_lm_wflow</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/hardhat/man/hardhat-extract.html">extract_workflow</a></span><span class="op">(</span><span class="va">final_lm_res</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>同样地，<code><a href="https://tune.tidymodels.org/reference/collect_predictions.html">collect_metrics()</a></code>和<code><a href="https://tune.tidymodels.org/reference/collect_predictions.html">collect_predictions()</a></code>分别提供了获取性能指标和预测结果的途径。</p>
+<p>同样地，<code><a href="https://rdrr.io/pkg/tune/man/collect_predictions.html">collect_metrics()</a></code>和<code><a href="https://rdrr.io/pkg/tune/man/collect_predictions.html">collect_predictions()</a></code>分别提供了获取性能指标和预测结果的途径。</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://tune.tidymodels.org/reference/collect_predictions.html">collect_metrics</a></span><span class="op">(</span><span class="va">final_lm_res</span><span class="op">)</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/tune/man/collect_predictions.html">collect_metrics</a></span><span class="op">(</span><span class="va">final_lm_res</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 2 × 4</span></span>
 <span><span class="co">#&gt;   .metric .estimator .estimate .config        </span></span>
 <span><span class="co">#&gt;   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;          </span></span>
 <span><span class="co">#&gt; 1 rmse    standard       0.164 pre0_mod0_post0</span></span>
 <span><span class="co">#&gt; 2 rsq     standard       0.189 pre0_mod0_post0</span></span>
-<span><span class="fu"><a href="https://tune.tidymodels.org/reference/collect_predictions.html">collect_predictions</a></span><span class="op">(</span><span class="va">final_lm_res</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu">slice</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/tune/man/collect_predictions.html">collect_predictions</a></span><span class="op">(</span><span class="va">final_lm_res</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu">slice</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 5 × 5</span></span>
 <span><span class="co">#&gt;   .pred id               Sale_Price  .row .config        </span></span>
 <span><span class="co">#&gt;   &lt;dbl&gt; &lt;chr&gt;                 &lt;dbl&gt; &lt;int&gt; &lt;chr&gt;          </span></span>
@@ -760,14 +763,14 @@ Figure&nbsp;2: Correct mental model of where model estimation occurs in the data
 <span><span class="va">ames_train</span> <span class="op">&lt;-</span> <span class="fu">training</span><span class="op">(</span><span class="va">ames_split</span><span class="op">)</span></span>
 <span><span class="va">ames_test</span>  <span class="op">&lt;-</span>  <span class="fu">testing</span><span class="op">(</span><span class="va">ames_split</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">lm_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://parsnip.tidymodels.org/reference/linear_reg.html">linear_reg</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html">set_engine</a></span><span class="op">(</span><span class="st">"lm"</span><span class="op">)</span></span>
+<span><span class="va">lm_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/parsnip/man/linear_reg.html">linear_reg</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/parsnip/man/set_engine.html">set_engine</a></span><span class="op">(</span><span class="st">"lm"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">lm_wflow</span> <span class="op">&lt;-</span></span>
-<span>  <span class="fu">workflow</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu">add_model</span><span class="op">(</span><span class="va">lm_model</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">workflow</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">add_model</span><span class="op">(</span><span class="va">lm_model</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu">add_variables</span><span class="op">(</span>outcome <span class="op">=</span> <span class="va">Sale_Price</span>, predictors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">Longitude</span>, <span class="va">Latitude</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">lm_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html">fit</a></span><span class="op">(</span><span class="va">lm_wflow</span>, <span class="va">ames_train</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span><span class="va">lm_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/generics/man/fit.html">fit</a></span><span class="op">(</span><span class="va">lm_wflow</span>, <span class="va">ames_train</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 
 
 </section><a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">

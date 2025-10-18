@@ -229,6 +229,33 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">5 Spending our Data</span></a>
   </div>
 </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/6 Fitting Models with parsnip.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">6 Fitting Models with parsnip</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/7 A Model Workflow.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">7 A Model Workflow</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/8 Feature Engineering with recipes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">8 Feature Engineering with recipes</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/9 Judging Model Effectiveness.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">9 Judging Model Effectiveness</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+ <span class="menu-text">Tools For Creating Effective Models</span>
+  </li>
     </ul>
 </div>
 </nav><div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
@@ -312,16 +339,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span></span>
 <span><span class="co"># Plot the temperature on the x-axis, the chirp rate on the y-axis. The plot</span></span>
 <span><span class="co"># elements will be colored differently for each species:</span></span>
-<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span><span class="op">(</span></span>
 <span>  <span class="va">crickets</span>,</span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">temp</span>, y <span class="op">=</span> <span class="va">rate</span>, color <span class="op">=</span> <span class="va">species</span>, pch <span class="op">=</span> <span class="va">species</span>, lty <span class="op">=</span> <span class="va">species</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">temp</span>, y <span class="op">=</span> <span class="va">rate</span>, color <span class="op">=</span> <span class="va">species</span>, pch <span class="op">=</span> <span class="va">species</span>, lty <span class="op">=</span> <span class="va">species</span><span class="op">)</span></span>
 <span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="co"># Plot points for each data point and color by species</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="co"># Show a simple linear model fit created separately for each species:</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_smooth.html">geom_smooth</a></span><span class="op">(</span>method <span class="op">=</span> <span class="va">lm</span>, se <span class="op">=</span> <span class="cn">FALSE</span>, alpha <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_brewer.html">scale_color_brewer</a></span><span class="op">(</span>palette <span class="op">=</span> <span class="st">"Paired"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Temperature (C)"</span>, y <span class="op">=</span> <span class="st">"Chirp Rate (per minute)"</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_smooth.html">geom_smooth</a></span><span class="op">(</span>method <span class="op">=</span> <span class="va">lm</span>, se <span class="op">=</span> <span class="cn">FALSE</span>, alpha <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/scale_brewer.html">scale_color_brewer</a></span><span class="op">(</span>palette <span class="op">=</span> <span class="st">"Paired"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/labs.html">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Temperature (C)"</span>, y <span class="op">=</span> <span class="st">"Chirp Rate (per minute)"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; `geom_smooth()` using formula = 'y ~ x'</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
@@ -494,7 +521,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span><span class="fu"><a href="https://rdrr.io/pkg/lattice/man/xyplot.html">xyplot</a></span><span class="op">(</span><span class="va">y</span> <span class="op">~</span> <span class="va">x</span>, data <span class="op">=</span> <span class="va">plot_data</span><span class="op">)</span></span>
 <span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">plot_data</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">plot_data</span>, <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>在这三种情况下，不同的开发人员团队为同一任务设计了三种截然不同的界面。每种界面都各有优缺点。相比之下，《Python开发者指南》在解决问题时信奉这样一种理念：“There should be one – and preferably only one – obvious way to do it.” 在这方面，R与Python有很大不同。R的接口多样性的一个优势在于，它可以随着时间的推移不断发展，满足不同用户的不同需求。不幸的是，部分语法多样性源于对开发代码者需求的关注，而非对使用代码者需求的关注。各软件包之间的不一致性可能会成为R用户的绊脚石。</p>
 <p>假设你的建模项目有一个包含两个类别的结果。你可以从多种统计模型和机器学习模型中进行选择。为了为每个样本生成类别概率估计，模型函数通常会有一个对应的<code><a href="https://rdrr.io/r/stats/predict.html">predict()</a></code>方法。然而，这些方法用于生成类别概率预测的参数值存在显著差异，这种差异即使对于有经验的用户来说也可能难以应对。不同模型的这些参数值示例如表3.1所示。</p>
 <table class="caption-top table">
@@ -576,16 +603,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>为了解决此处描述的使用问题，tidymodels包设定了一系列设计目标。tidymodels的大多数设计目标都属于tidyverse中已有的“为人类而设计”这一范畴（Wickham et al.&nbsp;2019），但这些目标在建模代码方面有特定的应用。此外，tidymodels还有一些额外的设计目标，作为对tidyverse设计目标的补充。以下是一些例子：</p>
 <ul>
 <li><p>R具有出色的面向对象编程能力，我们利用这一点来替代创建新的函数名称（例如一个假设的新<code>predict_samples()</code>函数）。</p></li>
-<li><p>合理的默认值非常重要。此外，当更适合迫使用户做出选择时，函数的参数不应有默认值（例如，<code><a href="https://readr.tidyverse.org/reference/read_delim.html">read_csv()</a></code>的文件名参数）。</p></li>
+<li><p>合理的默认值非常重要。此外，当更适合迫使用户做出选择时，函数的参数不应有默认值（例如，<code><a href="https://rdrr.io/pkg/readr/man/read_delim.html">read_csv()</a></code>的文件名参数）。</p></li>
 <li><p>同样，那些默认值可以从数据中推导出来的参数值也应该如此。例如，对于<code><a href="https://rdrr.io/r/stats/glm.html">glm()</a></code>函数，<code>family</code>参数可以检查结果中数据的类型，并且如果没有提供<code>family</code>参数，就可以在内部确定一个默认值。</p></li>
 <li><p>函数应该接受用户已有的数据结构，而非开发者想要的数据结构。例如，模型函数的唯一接口不应局限于矩阵。用户往往会有非数值型的预测变量，比如因子。</p></li>
 </ul>
 <p>这些理念中有许多在tidymodels的模型实现指南中都有阐述。在后续章节中，我们将举例说明一些现存的问题及其解决方案。</p>
 </section><section id="broomtidy" class="level3"><h3 class="anchored" data-anchor-id="broomtidy"><code>broom::tidy()</code></h3>
 <p>一些现有的R包提供了统一的接口来协调这些异构的建模API，例如caret和mlr。tidymodels框架与它们类似，采用了统一的函数接口，并确保函数名称和返回值的一致性。但它在其固执己见的设计目标和建模实现方面有所不同，本书将对此进行详细讨论。</p>
-<p>我们在本书中一直使用的broom::tidy()函数是另一个用于标准化R对象结构的工具。它能以更易用的格式返回多种类型的R对象。例如，假设正根据预测变量与结果列的相关性对其进行筛选。使用<code><a href="https://purrr.tidyverse.org/reference/map.html">purrr::map()</a></code>函数，<code><a href="https://rdrr.io/r/stats/cor.test.html">cor.test()</a></code>函数的结果可以以列表形式为每个预测变量返回：</p>
+<p>我们在本书中一直使用的broom::tidy()函数是另一个用于标准化R对象结构的工具。它能以更易用的格式返回多种类型的R对象。例如，假设正根据预测变量与结果列的相关性对其进行筛选。使用<code><a href="https://rdrr.io/pkg/purrr/man/map.html">purrr::map()</a></code>函数，<code><a href="https://rdrr.io/r/stats/cor.test.html">cor.test()</a></code>函数的结果可以以列表形式为每个预测变量返回：</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">corr_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html">map</a></span><span class="op">(</span><span class="va">mtcars</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">mpg</span><span class="op">)</span>, <span class="va">cor.test</span>, y <span class="op">=</span> <span class="va">mtcars</span><span class="op">$</span><span class="va">mpg</span><span class="op">)</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">corr_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/purrr/man/map.html">map</a></span><span class="op">(</span><span class="va">mtcars</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/select.html">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">mpg</span><span class="op">)</span>, <span class="va">cor.test</span>, y <span class="op">=</span> <span class="va">mtcars</span><span class="op">$</span><span class="va">mpg</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># The first of ten results in the vector:</span></span>
 <span><span class="va">corr_res</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
@@ -601,26 +628,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span><span class="co">#&gt;       cor </span></span>
 <span><span class="co">#&gt; -0.852162</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>如果我们想在图表中使用这些结果，假设检验结果的标准格式并不是很有用。<code><a href="https://generics.r-lib.org/reference/tidy.html">tidy()</a></code>方法可以将其以tibble的形式返回，并带有标准化的名称：</p>
+<p>如果我们想在图表中使用这些结果，假设检验结果的标准格式并不是很有用。<code><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy()</a></code>方法可以将其以tibble的形式返回，并带有标准化的名称：</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://broom.tidymodels.org/">broom</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="va">corr_res</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span><span class="op">(</span><span class="va">corr_res</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 1 × 8</span></span>
 <span><span class="co">#&gt;   estimate statistic  p.value parameter conf.low conf.high method            </span></span>
 <span><span class="co">#&gt;      &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;     &lt;int&gt;    &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;             </span></span>
 <span><span class="co">#&gt; 1   -0.852     -8.92 6.11e-10        30   -0.926    -0.716 Pearson's product…</span></span>
 <span><span class="co">#&gt; # ℹ 1 more variable: alternative &lt;chr&gt;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>这些结果可以“堆叠”起来并添加到<code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot()</a></code>中，如图3.3所示。</p>
+<p>这些结果可以“堆叠”起来并添加到<code><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot()</a></code>中，如图3.3所示。</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">corr_res</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">corr_res</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="co"># Convert each to a tidy format; `map_dfr()` stacks the data frames</span></span>
-<span>  <span class="fu"><a href="https://purrr.tidyverse.org/reference/map_dfr.html">map_dfr</a></span><span class="op">(</span><span class="va">tidy</span>, .id <span class="op">=</span> <span class="st">"predictor"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://forcats.tidyverse.org/reference/fct_reorder.html">fct_reorder</a></span><span class="op">(</span><span class="va">predictor</span>, <span class="va">estimate</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">estimate</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_linerange.html">geom_errorbar</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>ymin <span class="op">=</span> <span class="va">conf.low</span>, ymax <span class="op">=</span> <span class="va">conf.high</span><span class="op">)</span>, width <span class="op">=</span> <span class="fl">.1</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="cn">NULL</span>, y <span class="op">=</span> <span class="st">"Correlation with mpg"</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/purrr/man/map_dfr.html">map_dfr</a></span><span class="op">(</span><span class="va">tidy</span>, .id <span class="op">=</span> <span class="st">"predictor"</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/ggplot.html">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/forcats/man/fct_reorder.html">fct_reorder</a></span><span class="op">(</span><span class="va">predictor</span>, <span class="va">estimate</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_point.html">geom_point</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">estimate</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/geom_linerange.html">geom_errorbar</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/aes.html">aes</a></span><span class="op">(</span>ymin <span class="op">=</span> <span class="va">conf.low</span>, ymax <span class="op">=</span> <span class="va">conf.high</span><span class="op">)</span>, width <span class="op">=</span> <span class="fl">.1</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/ggplot2/man/labs.html">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="cn">NULL</span>, y <span class="op">=</span> <span class="st">"Correlation with mpg"</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure"><p><img src="3-A-Review-of-R-Modeling-Fundamentals_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="576"></p>
@@ -630,11 +657,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <p>使用base R中的函数也可以创建这样的图表，但自动重新格式化结果能使代码更简洁，且出错的可能性更小。</p>
 </section></section><section id="combining-base-r-models-and-the-tidyverse" class="level2"><h2 class="anchored" data-anchor-id="combining-base-r-models-and-the-tidyverse">Combining Base R Models and the Tidyverse</h2>
-<p>base R或其他R包中的建模函数可以与tidyverse结合使用，尤其是与dplyr、purrr和tidyr包。例如，如果我们想为每个蟋蟀物种拟合单独的模型，我们可以首先使用<code><a href="https://dplyr.tidyverse.org/reference/group_nest.html">dplyr::group_nest()</a></code>按该列拆分蟋蟀数据：</p>
+<p>base R或其他R包中的建模函数可以与tidyverse结合使用，尤其是与dplyr、purrr和tidyr包。例如，如果我们想为每个蟋蟀物种拟合单独的模型，我们可以首先使用<code><a href="https://rdrr.io/pkg/dplyr/man/group_nest.html">dplyr::group_nest()</a></code>按该列拆分蟋蟀数据：</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">split_by_species</span> <span class="op">&lt;-</span></span>
-<span>  <span class="va">crickets</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_nest.html">group_nest</a></span><span class="op">(</span><span class="va">species</span><span class="op">)</span></span>
+<span>  <span class="va">crickets</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/group_nest.html">group_nest</a></span><span class="op">(</span><span class="va">species</span><span class="op">)</span></span>
 <span><span class="va">split_by_species</span></span>
 <span><span class="co">#&gt; # A tibble: 2 × 2</span></span>
 <span><span class="co">#&gt;   species                        data</span></span>
@@ -642,11 +669,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span><span class="co">#&gt; 1 O. exclamationis           [14 × 2]</span></span>
 <span><span class="co">#&gt; 2 O. niveus                  [17 × 2]</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p><code>data</code>列包含来自<code>crickets</code>的<code>rate</code>列和<code>temp</code>列，并以列表列的形式呈现。基于此，<code><a href="https://purrr.tidyverse.org/reference/map.html">purrr::map()</a></code>函数可以为每个物种创建单独的模型：</p>
+<p><code>data</code>列包含来自<code>crickets</code>的<code>rate</code>列和<code>temp</code>列，并以列表列的形式呈现。基于此，<code><a href="https://rdrr.io/pkg/purrr/man/map.html">purrr::map()</a></code>函数可以为每个物种创建单独的模型：</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">model_by_species</span> <span class="op">&lt;-</span></span>
-<span>  <span class="va">split_by_species</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>model <span class="op">=</span> <span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html">map</a></span><span class="op">(</span><span class="va">data</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">rate</span> <span class="op">~</span> <span class="va">temp</span>, data <span class="op">=</span> <span class="va">.x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="va">split_by_species</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/mutate.html">mutate</a></span><span class="op">(</span>model <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/purrr/man/map.html">map</a></span><span class="op">(</span><span class="va">data</span>, <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">rate</span> <span class="op">~</span> <span class="va">temp</span>, data <span class="op">=</span> <span class="va">.x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">model_by_species</span></span>
 <span><span class="co">#&gt; # A tibble: 2 × 3</span></span>
 <span><span class="co">#&gt;   species                        data model </span></span>
@@ -654,11 +681,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span><span class="co">#&gt; 1 O. exclamationis           [14 × 2] &lt;lm&gt;  </span></span>
 <span><span class="co">#&gt; 2 O. niveus                  [17 × 2] &lt;lm&gt;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>要收集这些模型中每个模型的系数，请使用<code><a href="https://generics.r-lib.org/reference/tidy.html">broom::tidy()</a></code>将它们转换为一致的数据框格式，以便可以对其进行拆嵌：</p>
+<p>要收集这些模型中每个模型的系数，请使用<code><a href="https://rdrr.io/pkg/generics/man/tidy.html">broom::tidy()</a></code>将它们转换为一致的数据框格式，以便可以对其进行拆嵌：</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">model_by_species</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>coef <span class="op">=</span> <span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html">map</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">tidy</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">species</span>, <span class="va">coef</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">model_by_species</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/mutate.html">mutate</a></span><span class="op">(</span>coef <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/purrr/man/map.html">map</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">tidy</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/pkg/dplyr/man/select.html">select</a></span><span class="op">(</span><span class="va">species</span>, <span class="va">coef</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/pkg/magrittr/man/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/unnest.html">unnest</a></span><span class="op">(</span>cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">coef</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 4 × 6</span></span>
 <span><span class="co">#&gt;   species          term        estimate std.error statistic  p.value</span></span>
@@ -690,14 +717,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span><span class="co">#&gt; ✖ recipes::step()   masks stats::step()</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>如果你用过tidyverse，你会注意到一些熟悉的名字，因为有几个tidyverse包，比如dplyr和ggplot2，会和tidymodels包一起加载。我们已经说过，tidymodels框架将tidyverse的原则应用到建模中，而实际上，tidymodels框架也建立在一些最基础的tidyverse包之上，比如这些包。</p>
-<p>加载这个元包还会显示是否存在与之前加载的包的函数命名冲突。作为命名冲突的一个例子，在加载tidymodels之前，调用<code><a href="https://dplyr.tidyverse.org/reference/filter.html">filter()</a></code>函数会执行stats包中的该函数。加载tidymodels之后，它会执行同名的dplyr函数。</p>
+<p>加载这个元包还会显示是否存在与之前加载的包的函数命名冲突。作为命名冲突的一个例子，在加载tidymodels之前，调用<code><a href="https://rdrr.io/pkg/dplyr/man/filter.html">filter()</a></code>函数会执行stats包中的该函数。加载tidymodels之后，它会执行同名的dplyr函数。</p>
 <p>有几种处理命名冲突的方法。可以使用函数的命名空间来调用该函数（例如，<code><a href="https://rdrr.io/r/stats/filter.html">stats::filter()</a></code>）。这并非不好的做法，但确实会降低代码的可读性。</p>
 <p>另一个选择是使用<code>conflicted</code>包。我们可以设置一条规则，该规则在R会话结束前一直有效，以确保如果代码中没有指定命名空间，某个特定的函数将始终运行。例如，如果我们更倾向于使用前面提到的函数的dplyr版本：</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://conflicted.r-lib.org/">conflicted</a></span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://conflicted.r-lib.org/reference/conflict_prefer.html">conflict_prefer</a></span><span class="op">(</span><span class="st">"filter"</span>, winner <span class="op">=</span> <span class="st">"dplyr"</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span><span class="fu"><a href="https://rdrr.io/pkg/conflicted/man/conflict_prefer.html">conflict_prefer</a></span><span class="op">(</span><span class="st">"filter"</span>, winner <span class="op">=</span> <span class="st">"dplyr"</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>为方便起见，tidymodels包含一个函数，该函数可捕获我们可能遇到的大多数常见命名冲突：</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://tidymodels.tidymodels.org/reference/tidymodels_prefer.html">tidymodels_prefer</a></span><span class="op">(</span>quiet <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/tidymodels/man/tidymodels_prefer.html">tidymodels_prefer</a></span><span class="op">(</span>quiet <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [conflicted] Will prefer agua::refit over any other package.</span></span>
 <span><span class="co">#&gt; [conflicted] Will prefer DALEX::explain over any other package.</span></span>
 <span><span class="co">#&gt; [conflicted] Will prefer dials::Laplace over any other package.</span></span>
@@ -741,7 +768,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span><span class="co">#&gt; [conflicted] Will prefer recipes::update over Matrix::update.</span></span>
 <span><span class="co">#&gt; ── Conflicts ───────────────────────────────────────── tidymodels_prefer() ──</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>请注意，使用此函数意味着您同意对所有命名空间冲突使用<code><a href="https://conflicted.r-lib.org/reference/conflict_prefer.html">conflicted::conflict_prefer()</a></code>，这会将每个冲突都视为错误，并强制您选择要使用的函数。<code><a href="https://tidymodels.tidymodels.org/reference/tidymodels_prefer.html">tidymodels::tidymodels_prefer()</a></code>函数会处理tidymodels函数中最常见的冲突，但您需要自行处理R会话中的其他冲突。</p>
+<p>请注意，使用此函数意味着您同意对所有命名空间冲突使用<code><a href="https://rdrr.io/pkg/conflicted/man/conflict_prefer.html">conflicted::conflict_prefer()</a></code>，这会将每个冲突都视为错误，并强制您选择要使用的函数。<code><a href="https://rdrr.io/pkg/tidymodels/man/tidymodels_prefer.html">tidymodels::tidymodels_prefer()</a></code>函数会处理tidymodels函数中最常见的冲突，但您需要自行处理R会话中的其他冲突。</p>
 </section><section id="chapter-summary" class="level2"><h2 class="anchored" data-anchor-id="chapter-summary">Chapter Summary</h2>
 <p>本章回顾了创建和使用模型的核心R语言约定，这些约定是本书其余部分的重要基础。公式运算符是在R中拟合模型时一个富有表现力且重要的方面，并且在非tidymodels函数中通常有多种用途。传统的R建模方法存在一些局限性，特别是在流畅地处理和可视化模型输出方面。tidymodels元包将tidyverse设计理念应用于建模包。</p>
 

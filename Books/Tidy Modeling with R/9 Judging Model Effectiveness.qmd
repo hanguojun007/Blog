@@ -36,7 +36,8 @@ execute:
 
 在判断模型效果时，指标的选择可能至关重要。在后面的章节中，某些模型参数将通过经验验证进行优化，并且会使用一个主要的性能指标来选择最佳的子模型。选择错误的指标很容易导致意想不到的后果。例如，回归模型的两个常见指标是均方根误差（RMSE）和决定系数（$R^2$），前者衡量的是准确性，而后者衡量的是相关性，这两者并不一定是一回事。@fig-9.1 展示了两者之间的区别。
 
-```{r performance-reg-metrics, echo = FALSE}
+```{r}
+#| echo: false
 #| label: fig-9.1
 #| fig-cap: Observed versus predicted values for models that are optimized using the RMSE compared to the coefficient of determination
 #| fig-alt: Scatter plots of numeric observed versus predicted values for models that are optimized using the RMSE and the coefficient of determination. The former results in results that are close to the 45 degree line of identity while the latter shows results with a tight linear correlation but falls well off of the line of identity.
