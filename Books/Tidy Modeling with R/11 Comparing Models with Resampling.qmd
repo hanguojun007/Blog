@@ -1,0 +1,423 @@
+---
+title: "11 Comparing Models with Resampling"
+date: "2025-10-20"
+date-modified: "2025-10-20"
+
+format:
+  html:
+    code-link: true
+
+fig-width: 6
+fig-asp: 0.618
+out-width: 70%
+fig-align: center
+
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: "#>"
+    R.options:
+      dplyr.print_min: 6
+      dplyr.print_max: 6
+      pillar.max_footer_lines: 2
+      pillar.min_chars: 15
+      stringr.view_n: 6
+      cli.num_colors: 0
+      cli.hyperlink: FALSE
+      pillar.bold: TRUE
+      width: 77
+
+execute:
+  warning: true
+  error: true
+---
+
+一旦我们创建了两个或更多模型，下一步就是对它们进行比较，以了解哪个模型最好。在某些情况下，比较可能是模型内的，即使用不同的特征或预处理方法对同一个模型进行评估。另外，模型间的比较更为常见，比如我们在第10章中对线性回归模型和随机森林模型进行的比较。
+
+无论是哪种情况，结果都是每个模型的一组重采样汇总统计量（例如，均方根误差、准确率等）。在本章中，我们首先将演示如何使用工作流集来拟合多个模型。然后，我们将讨论重采样统计量的重要方面。最后，我们将探讨如何正式比较模型（使用假设检验或贝叶斯方法）。
+
+## Creating Multiple Models with Workflow Sets
+
+在第7.5节中，我们介绍了工作流集合的概念，即可以组合生成不同的预处理器和/或模型。而在第10章，我们使用了针对Ames数据的recipe对象，其中包含了一个交互项，以及用于经度和纬度的样条函数。为了更深入地展示工作流集合的应用，让我们依次逐步添加这些预处理步骤，创建三个不同的线性模型；随后，我们可以检验这些新增项是否能提升模型的表现。首先，我们将分别创建三个recipe对象，再将它们整合进一个工作流集合中：
+
+```{r}
+library(tidymodels)
+tidymodels_prefer()
+
+basic_rec <-
+  recipe(Sale_Price ~ Neighborhood + Gr_Liv_Area + Year_Built + Bldg_Type +
+    Latitude + Longitude, data = ames_train) %>%
+  step_log(Gr_Liv_Area, base = 10) %>%
+  step_other(Neighborhood, threshold = 0.01) %>%
+  step_dummy(all_nominal_predictors())
+
+interaction_rec <-
+  basic_rec %>%
+  step_interact(~ Gr_Liv_Area:starts_with("Bldg_Type_"))
+
+spline_rec <-
+  interaction_rec %>%
+  step_ns(Latitude, Longitude, deg_free = 50)
+
+preproc <-
+  list(
+    basic = basic_rec,
+    interact = interaction_rec,
+    splines = spline_rec
+  )
+
+lm_models <- workflow_set(preproc, list(lm = linear_reg()), cross = FALSE)
+lm_models
+```
+
+我们希望依次对这些模型进行重新采样。为此，我们将使用一个类似`purrr`的函数，名为`workflow_map()`。该函数首先接受一个要应用于工作流的函数作为初始参数，随后是该函数的相关选项。此外，我们还设置了`verbose`参数，用于打印进度信息；以及`seed`参数，确保每种模型都使用与其他模型相同的随机数流。
+
+```{r}
+lm_models <-
+  lm_models %>%
+  workflow_map("fit_resamples",
+    # Options to `workflow_map()`:
+    seed = 1101, verbose = TRUE,
+    # Options to `fit_resamples()`:
+    resamples = ames_folds, control = keep_pred
+  )
+lm_models
+```
+
+请注意，选项列和结果列现已填满内容。前者包含了之前提供的 `fit_resamples()` 函数的选项（以确保可重复性），而后者则列出了由 `fit_resamples()` 生成的结果。
+
+有一些适用于工作流集合的便捷函数，包括用于汇总性能统计信息的`collect_metrics()`。我们还可以使用`filter()`来筛选出感兴趣的特定指标：
+
+```{r}
+collect_metrics(lm_models) %>%
+  filter(.metric == "rmse")
+```
+
+上一章中的随机森林模型呢？我们可以先将其转换为独立的工作流集，然后再绑定行，从而将其加入到集合中。需要注意的是，当对该模型进行重采样时，必须在控制函数中设置 `save_workflow = TRUE` 选项。
+
+```{r}
+four_models <-
+  as_workflow_set(random_forest = rf_res) %>%
+  bind_rows(lm_models)
+four_models
+```
+
+autoplot() 方法的输出如 @fig-11.1 所示，它按模型从优到劣的顺序展示了各模型的置信区间。在本章中，我们将重点关注决定系数（又称$R^2$），并在调用时使用参数 `metric = "rsq"` 来设置我们的图表：
+
+```{r}
+#| label: fig-11.1
+#| fig-cap: Confidence intervals for the coefficient of determination using four different models
+library(ggrepel)
+autoplot(four_models, metric = "rsq") +
+  geom_text_repel(aes(label = wflow_id), nudge_x = 1 / 8, nudge_y = 1 / 100) +
+  theme(legend.position = "none")
+```
+
+从这一组$R^2$置信区间图中，我们可以看出随机森林方法表现最佳，而随着我们逐步增加配方步骤，线性模型也呈现出微小的改进。
+
+现在，我们已为四个模型中的每一个模型获得了10个重新采样的性能估计值，这些汇总统计量可用于进行模型间的比较。
+
+## Comparing Resampled Performance Statistics
+
+考虑到三种线性模型的上述结果，似乎新增的项并未显著改善线性模型的平均RMSE或R²统计量。尽管差异较小，但可能已超出系统中的实验噪声范围，即在统计上具有显著性意义。我们可以正式检验以下假设：新增项确实提高了R²值。
+
+在进行模型间比较之前，我们有必要先讨论一下重采样统计量的样本内相关性。每个模型都使用相同的交叉验证折数进行评估，而同一重采样的结果往往较为接近。
+
+换句话说，有些重采样情况下，各模型的表现往往较低；而在另一些重采样情况下，则倾向于较高。在统计学中，这被称为重采样间的变异成分。
+
+举例来说，让我们汇总线性模型和随机森林的各个重采样统计量。我们将重点关注每个模型的R²统计量，该统计量用于衡量每栋房屋的实际销售价格与预测销售价格之间的相关性。接下来，我们通过 `filter()` 函数仅保留这些R²指标，然后重塑结果，并计算这些指标彼此之间的相关性。
+
+```{r}
+rsq_indiv_estimates <-
+  collect_metrics(four_models, summarize = FALSE) %>%
+  filter(.metric == "rsq")
+
+rsq_wider <-
+  rsq_indiv_estimates %>%
+  select(wflow_id, .estimate, id) %>%
+  pivot_wider(id_cols = "id", names_from = "wflow_id", values_from = ".estimate")
+
+corrr::correlate(rsq_wider %>% select(-id), quiet = TRUE)
+```
+
+这些相关性很高，表明在不同模型之间，每次重采样内的相关性也很大。如 @fig-11.2 所示，为了更直观地体现这一点，每个模型的R²统计量都以连线的方式标注了各次重采样的结果：
+
+```{r}
+#| label: fig-11.2
+#| fig-cap: Resample statistics across models
+rsq_indiv_estimates %>%
+  mutate(wflow_id = reorder(wflow_id, .estimate)) %>%
+  ggplot(aes(x = wflow_id, y = .estimate, group = id, color = id)) +
+  geom_line(alpha = .5, linewidth = 1.25) +
+  theme(legend.position = "none")
+```
+
+如果重采样到重采样的效应并非真实存在，就不会出现任何平行线。一种用于检验相关性的统计方法，旨在评估这些相关性的大小是否仅仅是随机噪声。对于线性模型而言：
+
+```{r}
+rsq_wider %>%
+  with(cor.test(basic_lm, splines_lm)) %>%
+  tidy() %>%
+  select(estimate, starts_with("conf"))
+```
+
+相关性检验的结果`estimate`列（相关性估计值及置信区间）表明，样本内相关性似乎确实存在。
+
+额外的相关性对我们的分析有何影响？请考虑两个变量之差的方差：
+
+$$
+\operatorname{Var}[X - Y] = \operatorname{Var}[X] + \operatorname{Var}[Y]  - 2 \operatorname{Cov}[X, Y]
+$$
+
+最后的项是两个变量之间的协方差。如果存在显著的正协方差，那么在比较两个模型差异时，任何针对这一差异的统计检验都将严重缺乏检验力。换句话说，忽略样本间的重采样效应，可能会导致我们的模型比较倾向于得出“模型间无明显差异”的结论。
+
+在进行模型比较或查看重采样结果之前，明确一个相关的实际效应大小可能会有所帮助。由于这些分析聚焦于R²统计量，因此实际效应大小即为我们认为具有实际意义且值得关注的R²值变化幅度。例如，我们可能认为，如果两个模型的R²值相差不超过$\pm 2$%，则它们在实际意义上并无差异。换言之，即使差异在统计上显著，若小于2%，我们也视其为不具重要性。
+
+实践意义是主观的；两个人对重要性的阈值可能有着截然不同的看法。不过，我们稍后会说明，在模型选择过程中，这一考量实际上非常有帮助。
+
+## Simple Hypothesis Testing Methods
+
+我们可以使用简单的假设检验来对模型进行正式比较。考虑熟悉的线性统计模型：
+
+$$
+y_{ij} = \beta_0 + \beta_1x_{i1} + \ldots + \beta_px_{ip} + \epsilon_{ij}
+$$
+
+这种多功能模型既可用于构建回归模型，也是广泛应用的方差分析（ANOVA）技术中比较各组差异的基础。在ANOVA模型中，预测变量（$x_{ij}$）是用于区分不同组别的二元虚拟变量。通过这些变量，$\beta$参数能够借助假设检验方法，判断两个或多个组之间是否存在显著差异。
+
+在我们具体的情境中，ANOVA同样可以用于模型比较。假设每个重新抽样的R²统计量作为因变量数据（即$y_{ij}$），而各模型则作为ANOVA模型中的预测变量。这种数据结构的示例见 @tbl-11.1 。
+
+```{r, echo = FALSE, results = "asis"}
+rsq_indiv_estimates %>%
+  select(id, rsq = .estimate, model = wflow_id) %>%
+  # pivot_longer(cols = c(-id), names_to = "model", values_to = "rsq") %>%
+  arrange(id, model) %>%
+  mutate(
+    X1 = ifelse(model == "interact_lm", 1, 0),
+    X2 = ifelse(model == "random_forest", 1, 0),
+    X3 = ifelse(model == "splines_lm", 1, 0)
+  ) %>%
+  select(`Y = rsq` = rsq, model, X1, X2, X3, id) %>%
+  slice(1:6) %>%
+  kable(
+    caption = "Model performance statistics as a data set for analysis.",
+    label = "tbl-11.1",
+    escape = FALSE
+  ) %>%
+  kable_styling(full_width = FALSE)
+```
+
+表格中的`X1`、`X2`和`X3`列是`model`列中数值的指示器。它们的排列顺序与R语言定义这些列的方式相同，即按`model`列中名称的字母顺序排列。
+
+在我们的模型比较中，具体的方差分析模型是：
+
+$$
+y_{ij} = \beta_0 + \beta_1x_{i1} + \beta_2x_{i2} + \beta_3x_{i3} + \epsilon_{ij}
+$$
+
+其中，
+β₀ 是基本线性模型（即不含样条或交互作用项）的均值估计值；
+R² 统计量衡量了加入交互作用后基本线性模型的均值变化情况；
+β₁ 表示当向基本线性模型中引入交互作用时，均值及其 R² 统计量的变化量；
+β₂ 则是基本线性模型与随机森林模型之间均值及其 R² 统计量的变化量；
+而 β₃ 描述的是基本线性模型与同时包含交互作用和样条函数的模型相比，均值及其 R² 统计量的进一步变化。
+
+根据这些模型参数，我们生成假设检验和p值，以对模型进行统计比较；但同时，我们必须解决如何处理样本间相互影响的问题。过去，研究者通常将这些重复抽样的组别视为区块效应，并在模型中加入相应的项。另一种方法是将样本效应视为随机效应，即认为这些特定的样本是从更大的潜在样本总体中随机抽取的。然而，实际上我们并不真正关注这些效应——我们只是希望在模型中加以调整，从而确保能够准确估计出那些真正感兴趣的差异的方差。
+
+将重抽样视为随机效应在理论上颇具吸引力。用于拟合具有此类随机效应的方差分析模型的方法，可包括线性混合模型（Faraway, 2016）或贝叶斯层次模型（如下一节所示）。
+
+一种简单快捷的两模型比较方法，是将两个模型的R²值之差作为ANOVA模型中的响应数据。由于这些响应数据通过重采样进行匹配，因此差异中不包含重采样间的效应，正因如此，标准的ANOVA模型完全适用。例如，以下对`lm()`函数的调用正是用于检验两个线性回归模型之间的差异：
+
+```{r}
+compare_lm <-
+  rsq_wider %>%
+  mutate(difference = splines_lm - basic_lm)
+
+lm(difference ~ 1, data = compare_lm) %>%
+  tidy(conf.int = TRUE) %>%
+  select(estimate, p.value, starts_with("conf"))
+
+# Alternatively, a paired t-test could also be used:
+rsq_wider %>%
+  with(t.test(splines_lm, basic_lm, paired = TRUE)) %>%
+  tidy() %>%
+  select(estimate, p.value, starts_with("conf"))
+```
+
+我们可以用这种方式评估每一对的差异。需要注意的是，p值表明存在统计学上显著的信号；经由样条函数构建的经度和纬度项确实似乎产生了影响。然而，R²的差异仅估计为0.91%。如果我们的实际效应大小为2%，那么可能就不会认为这些项值得纳入模型中了。
+
+我们之前已简要提及过p值，但究竟什么是p值呢？根据瓦瑟斯坦和拉扎尔（2016年）的解释：“非正式地说，p值是在特定统计模型下，数据的统计量（例如，两组比较时样本均值的差异）等于或超过其观测值的概率。”
+
+换句话说，如果在“无差异”的零假设下重复进行这种分析多次，p值将反映我们所观察到的结果究竟有多极端。
+
+## Bayesian Methods
+
+我们刚刚通过假设检验来正式比较模型，但也可以采用更通用的方法，利用随机效应和贝叶斯统计来进行这些正式比较（McElreath 2020）。尽管这种模型比方差分析法更为复杂，但其解释却比p值法更加简单明了。此前的方差分析模型形式为：
+
+$$
+y_{ij} = \beta_0 + \beta_1x_{i1} + \beta_2x_{i2} + \beta_3x_{i3} + \epsilon_{ij}
+$$
+
+其中，残差 $\epsilon_{ij}$ 被假定为相互独立，并服从均值为零、标准差恒定为 $\sigma$ 的正态分布。基于这一假设，统计理论表明，所估计的回归参数也遵循多变量正态分布，进而可据此计算出p值和置信区间。
+
+贝叶斯线性模型做出了额外的假设。除了为残差指定分布外，我们还需要为模型参数（$\beta_j$ 和 $\sigma$）设定先验分布。这些分布是模型在接触观测数据之前所假定的参数分布。例如，我们模型的一组简单先验分布可能是：
+
+$$
+\begin{align}
+\epsilon_{ij} &\sim N(0, \sigma) \notag \\
+\beta_j &\sim N(0, 10) \notag \\
+\sigma &\sim \text{exponential}(1) \notag
+\end{align}
+$$
+
+这些先验设定了模型参数的可能范围或合理范围，且不包含任何未知参数。例如，关于 $\sigma$ 的先验表明，其取值必须大于零，呈现明显的右偏分布，并且通常小于3或4。
+
+请注意，回归参数的先验分布相当宽泛，标准差为10。在许多情况下，我们对这一先验可能并没有强烈的看法，只需确保其呈对称且钟形即可。较大的标准差意味着这是一个信息量较少的先验——它并未对参数可能取值范围施加过于严格的限制，从而让数据在参数估计过程中发挥更大的影响力。
+
+根据观测数据和先验分布的设定，模型参数便可被估计出来。这些参数的最终分布是先验分布与似然估计的组合。而这些参数的后验分布正是我们所关注的关键分布，它们完整地体现了模型对参数的 probabilistic 描述。
+
+### A random intercept model
+
+为了使我们的贝叶斯方差分析模型能够充分模拟重采样过程，我们考虑采用随机截距模型。在此模型中，我们假设重采样仅通过改变截距来影响模型。需要注意的是，这一假设限制了重采样对回归参数$\beta_j$的影响存在差异——即假定这些参数在不同重采样之间保持相同的关系。该模型的方程如下：
+
+$$
+y_{ij} = (\beta_0 + b_{i}) + \beta_1x_{i1} + \beta_2x_{i2} + \beta_3x_{i3} + \epsilon_{ij}
+$$
+
+这对于重新抽样的统计方法来说并非不合理的模型，当这些方法如 @fig-11.2 所示在不同模型间绘制时，往往表现出较为平行的效果（即各条线几乎不会交叉）。
+
+对于这种模型配置，我们对随机效应的先验分布做出了一个额外假设。合理的假设是采用另一种对称分布，例如另一条钟形曲线。鉴于我们的汇总统计数据显示有效样本量仅为10，我们将选择一个比标准正态分布更宽的先验分布。具体来说，我们将使用自由度为1的t分布（即 $b_i \sim t(1)$），其尾部比相应的高斯分布更为厚重。
+
+**tidyposterior**包提供了用于拟合此类贝叶斯模型的函数，以便比较重新采样的模型。其中，主函数名为`perf_mod()`，它被设计为能“无缝兼容”不同类型的对象：
+
+-   对于工作流集合，它会创建一个ANOVA模型，其中各组对应于不同的工作流。我们现有的模型并未优化任何调参参数（详见接下来的三章）。如果集合中的某个工作流包含调参数据，则在贝叶斯分析中将采用该工作流的最佳调参设置。换句话说，尽管存在调参参数，`perf_mod()`的重点仍在于进行工作流间的比较。
+
+-   对于包含单个经重采样调优的模型的对象，`perf_mod()` 会进行模型内部的比较。在这种情况下，贝叶斯 ANOVA 模型中所检验的分组变量正是由调参参数定义的子模型。
+
+-   `perf_mod()` 函数还可以接受由 `rsample` 生成的数据框，该数据框包含与两个或多个模型/工作流结果相关的性能指标列。这些指标可能是通过非标准方式生成的。
+
+从这些类型的对象中，`perf_mod()` 函数会确定一个合适的贝叶斯模型，并利用重采样统计量对其进行拟合。在我们的示例中，它将对与工作流相关的四组 R² 统计量进行建模。
+
+**tidyposterior** 包使用 Stan 软件来通过 rstanarm 包指定并拟合模型。该包中的函数具有默认先验分布（详细信息请参阅 `?priors`）。以下模型对所有参数均采用默认先验，但随机截距除外——后者遵循 t-分布。由于估计过程涉及随机数生成，因此在函数调用中设置了随机种子。估计过程采用迭代方式，并在称为“链”的多个集合中重复进行多次。`iter`参数用于指定每个链中估计过程的运行时长。当使用多条链时，其结果将被合并（前提是已通过诊断评估验证）。
+
+```{r}
+library(tidyposterior)
+library(rstanarm)
+
+# The rstanarm package creates copious amounts of output; those results
+# are not shown here but are worth inspecting for potential issues. The
+# option `refresh = 0` can be used to eliminate the logging.
+rsq_anova <-
+  perf_mod(
+    four_models,
+    metric = "rsq",
+    prior_intercept = rstanarm::student_t(df = 1),
+    chains = 4,
+    iter = 5000,
+    seed = 1102
+  )
+```
+
+生成的对象包含重采样过程的信息，同时还嵌入了Stan对象（存储在一个名为stan的元素中）。我们最感兴趣的是回归参数的后验分布。tidyposterior包提供了一个`tidy()`方法，可将这些后验分布提取到一个tibble中：
+
+```{r}
+model_post <-
+  rsq_anova %>%
+  # Take a random sample from the posterior distribution
+  # so set the seed again to be reproducible.
+  tidy(seed = 1103)
+
+glimpse(model_post)
+```
+
+四个后验分布如 @fig-11.3 所示。
+
+```{r}
+#| fig-11.3:
+#| fig-cap: Posterior distributions for the coefficient of determination using four different models
+model_post %>%
+  mutate(model = forcats::fct_inorder(model)) %>%
+  ggplot(aes(x = posterior)) +
+  geom_histogram(bins = 50, color = "white", fill = "blue", alpha = 0.4) +
+  facet_wrap(~model, ncol = 1)
+```
+
+这些直方图描述了每个模型中均值R²值的估计概率分布。其中存在一定重叠，尤其是在三个线性模型之间。
+
+此外，模型结果还提供了一个基本的`autoplot()`方法，如 @fig-11.4 所示，以及经过整理后的对象，其中叠加展示了密度图。
+
+```{r}
+#| label: fig-11.4
+#| fig-cap: Credible intervals derived from the model posterior distributions
+autoplot(rsq_anova) +
+  geom_text_repel(aes(label = workflow), nudge_x = 1 / 8, nudge_y = 1 / 100) +
+  theme(legend.position = "none")
+```
+
+使用贝叶斯模型进行重采样的一大优势在于，一旦我们获得了参数的后验分布，便能轻松得到这些参数组合的后验分布。例如，若要比较两个线性回归模型，我们关注的是两者的均值差异。计算这一差异的后验分布时，只需分别从每个模型的后验中独立采样，并取其差值即可。`contrast_models()` 函数便可完成这一任务。要指定需要进行的比较，`list_1` 和 `list_2` 参数需接收字符型向量，并计算这两个列表中模型之间的差异（具体表达为 `list_1 - list_2`）。
+
+我们可以比较两个线性模型，并将结果可视化于 @fig-11.5 中。
+
+```{r}
+#| label: fig-11.5
+#| fig-cap: Posterior distribution for the difference in the coefficient of determination
+rqs_diff <-
+  contrast_models(rsq_anova,
+    list_1 = "splines_lm",
+    list_2 = "basic_lm",
+    seed = 1104
+  )
+
+rqs_diff %>%
+  as_tibble() %>%
+  ggplot(aes(x = difference)) +
+  geom_vline(xintercept = 0, lty = 2) +
+  geom_histogram(bins = 50, color = "white", fill = "red", alpha = 0.4)
+```
+
+后验结果显示，分布的中心大于零（表明使用样条函数的模型通常具有较大值），但同时也与零存在一定程度的重叠。该对象的summary()方法不仅计算了分布的均值，还生成了可信区间——这是贝叶斯方法中对应于传统置信区间的概念。
+
+```{r}
+summary(rqs_diff, size = 0.02) %>%
+  select(contrast, starts_with("pract"))
+```
+
+`probability`列反映了后验分布中大于零的比例。这正是正差异真实存在的概率。该数值并不接近零，有力地表明了统计显著性——即从统计学角度来看，实际差异确实不为零。
+
+然而，均值差的估计值非常接近零。回想一下，我们之前建议的实际效应大小为2%。借助后验分布，我们还可以计算出达到实际显著性的概率。在贝叶斯分析中，这被称为ROPE估计（即“实际等效区域”，Kruschke和Liddell，2018年）。要估算这一概率，可使用`summary`函数中的`size`选项：
+
+`pract_equiv` 列表示后验分布中位于 `[-size, size]` 区间内的比例（而 `pract_neg` 和 `pract_pos` 列则分别表示低于和高于该区间的比例）。这一较大数值表明，对于我们的效应大小而言，两个模型在实际意义上几乎完全相同的可能性极高。尽管之前的图表显示，我们观察到的差异很可能不为零，但等效性检验却提示，这种差异小到不足以在实际应用中产生意义。
+
+同样的流程也可用于将随机森林模型与经过重采样的一个或两个线性回归模型进行比较。实际上，当`perf_mod()`函数与工作流集合一起使用时，`autoplot()`方法能够展示实际等效性结果，直观地对比每个工作流与当前最佳模型（在本例中即随机森林模型）。
+
+```{r}
+#| label: fig-11.6
+#| fig-cap: Probability of practical equivalence for an effect size of 2%
+autoplot(rsq_anova, type = "ROPE", size = 0.02) +
+  geom_text_repel(aes(label = workflow)) +
+  theme(legend.position = "none")
+```
+
+@fig-11.6 表明，在采用2%的实际效应大小时，没有任何一个线性模型能与随机森林模型相媲美。
+
+### The effect of the amount of resampling
+
+这些类型的正式贝叶斯比较中，重抽样的次数有何影响？更多的重抽样会提高整体重抽样估计的精度；而这种精度又会进一步传递到此类分析中。为了说明这一点，我们采用了重复交叉验证的方法增加了重抽样的次数。那么，后验分布发生了怎样的变化呢？ @fig-11.7 展示了在最多进行100次重抽样（由10次10折交叉验证的重复生成）情况下的90%可信区间。
+
+```{r}
+#| label: fig-11.7
+#| fig-cap: Probability of practical equivalence to the random forest model
+ggplot(
+  intervals,
+  aes(x = resamples, y = mean)
+) +
+  geom_path() +
+  geom_ribbon(aes(ymin = lower, ymax = upper), fill = "red", alpha = .1) +
+  labs(x = "Number of Resamples (repeated 10-fold cross-validation)")
+```
+
+随着重抽样的次数增加，区间宽度逐渐缩小。显然，从10次重抽样增至30次的效果，比从80次增加到100次更为显著。然而，使用“大量”重抽样所带来的收益正在递减——当然，“大量”的定义会因具体数据集而有所不同。
+
+## Chapter Summary
+
+本章介绍了用于检验模型间性能差异的正式统计方法。我们展示了重采样内部效应——即同一重采样的结果往往较为相似；这一重采样汇总统计量的特点，需要进行恰当的分析，才能确保模型比较的有效性。此外，尽管统计显著性和实际意义都是模型比较中至关重要的概念，但二者并不相同。
