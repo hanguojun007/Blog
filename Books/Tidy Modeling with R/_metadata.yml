@@ -17,3 +17,4 @@ website:
         - Books/Tidy Modeling with R/9 Judging Model Effectiveness.qmd
         - Tools For Creating Effective Models
         - Books/Tidy Modeling with R/10 Resampling for Evaluating Performance.qmd
+        - Books/Tidy Modeling with R/11 Comparing Models with Resampling.qmd
