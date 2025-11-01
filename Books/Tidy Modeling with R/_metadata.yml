@@ -18,3 +18,4 @@ website:
         - Tools For Creating Effective Models
         - Books/Tidy Modeling with R/10 Resampling for Evaluating Performance.qmd
         - Books/Tidy Modeling with R/11 Comparing Models with Resampling.qmd
+        - Books/Tidy Modeling with R/12 Model Tuning and the Dangers of Overfitting.qmd

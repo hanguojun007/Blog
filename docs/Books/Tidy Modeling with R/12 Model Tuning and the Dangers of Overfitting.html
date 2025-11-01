@@ -1,0 +1,1427 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.24">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<meta name="dcterms.date" content="2025-10-23">
+<title>12 Model Tuning and the Dangers of Overfitting</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../Books/Tidy Modeling with R/11 Comparing Models with Resampling.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dc55a5b9e770e841cd82e46aadbfb9b0.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-2bc269ba33bfe0c9779ec90686b7c52e.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light"><script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": true,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "Search",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script><script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script><script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script><script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script><link rel="stylesheet" href="../../styles.css">
+</head>
+<body class="nav-sidebar floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top"><nav class="navbar navbar-expand-lg " data-bs-theme="dark"><div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">RSSPtho</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+<li class="nav-item">
+    <a class="nav-link active" href="../../index.html" aria-current="page"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-books" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Books</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-books">
+<li>
+    <a class="dropdown-item" href="../../Books/ggplot2/index.html">
+ <span class="dropdown-text">ggplot2</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Books/R4DS2/index.html">
+ <span class="dropdown-text">R for Data Science(2e)</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Books/Tidy Modeling with R/index.html">
+ <span class="dropdown-text">Tidy Modeling with R</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Books/Advanced R(2e)/index.html">
+ <span class="dropdown-text">Advanced R(2e)</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Books/quarto/Project Basics.html">
+ <span class="dropdown-text">Quarto</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Books/Js4R/00 Preface.qmd">
+ <span class="dropdown-text">Js4R</span></a>
+  </li>  
+    </ul>
+</li>
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About me</span></a>
+  </li>  
+</ul>
+<div class="quarto-navbar-tools">
+    <a href="https://github.com/hanguojun007/Blog" title="" class="quarto-navigation-tool px-1" aria-label=""><i class="bi bi-github"></i></a>
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav><nav class="quarto-secondary-nav"><div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../Books/Tidy Modeling with R/12 Model Tuning and the Dangers of Overfitting.html">12 Model Tuning and the Dangers of Overfitting</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav></header><!-- content --><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto"><div class="pt-lg-2 mt-2 text-left sidebar-header sidebar-header-stacked">
+      <a href="../../index.html" class="sidebar-logo-link">
+      </a>
+      </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Hello World</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+ <span class="menu-text">Introduction</span>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/1 Software for modeling.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1 Software for modeling</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/2 A Tidyverse Primer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2 A Tidyverse Primer</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/3 A Review of R Modeling Fundamentals.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">3 A Review of R Modeling Fundamentals</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+ <span class="menu-text">Moduling Basics</span>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/4 The Ames Housing Data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">4 The Ames Housing Data</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/5 Spending our Data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">5 Spending our Data</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/6 Fitting Models with parsnip.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">6 Fitting Models with parsnip</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/7 A Model Workflow.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">7 A Model Workflow</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/8 Feature Engineering with recipes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">8 Feature Engineering with recipes</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/9 Judging Model Effectiveness.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">9 Judging Model Effectiveness</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+ <span class="menu-text">Tools For Creating Effective Models</span>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/10 Resampling for Evaluating Performance.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">10 Resampling for Evaluating Performance</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/11 Comparing Models with Resampling.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">11 Comparing Models with Resampling</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/12 Model Tuning and the Dangers of Overfitting.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">12 Model Tuning and the Dangers of Overfitting</span></a>
+  </div>
+</li>
+    </ul>
+</div>
+</nav><div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active"><h2 id="toc-title">On this page</h2>
+   
+  <ul>
+<li><a href="#model-parameters" id="toc-model-parameters" class="nav-link active" data-scroll-target="#model-parameters">Model Parameters</a></li>
+  <li><a href="#tuning-parameters-for-different-types-of-models" id="toc-tuning-parameters-for-different-types-of-models" class="nav-link" data-scroll-target="#tuning-parameters-for-different-types-of-models">Tuning Parameters for Different Types of Models</a></li>
+  <li><a href="#what-do-we-optimize" id="toc-what-do-we-optimize" class="nav-link" data-scroll-target="#what-do-we-optimize">What do we Optimize?</a></li>
+  <li><a href="#the-consequences-of-poor-parameter-estimates" id="toc-the-consequences-of-poor-parameter-estimates" class="nav-link" data-scroll-target="#the-consequences-of-poor-parameter-estimates">The consequences of poor parameter estimates</a></li>
+  <li><a href="#two-general-strategies-for-optimization" id="toc-two-general-strategies-for-optimization" class="nav-link" data-scroll-target="#two-general-strategies-for-optimization">Two general strategies for optimization</a></li>
+  <li><a href="#tuning-parameters-in-tidymodels" id="toc-tuning-parameters-in-tidymodels" class="nav-link" data-scroll-target="#tuning-parameters-in-tidymodels">Tuning Parameters in tidymodels</a></li>
+  <li><a href="#chapter-summary" id="toc-chapter-summary" class="nav-link" data-scroll-target="#chapter-summary">Chapter Summary</a></li>
+  </ul></nav>
+    <div class="quarto-margin-footer"><div class="margin-footer-item">
+<p><img src="../..\logo.jpg" class="conditional-footer img-fluid" width="200"></p>
+</div></div></div>
+<!-- main -->
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
+<h1 class="title">12 Model Tuning and the Dangers of Overfitting</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">October 23, 2025</p>
+    </div>
+  </div>
+  
+    <div>
+    <div class="quarto-title-meta-heading">Modified</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date-modified">November 1, 2025</p>
+    </div>
+  </div>
+    
+  </div>
+  
+
+
+</header><p>为了使用模型进行预测，必须先估计出该模型的参数。其中一些参数可以直接从训练数据中估算出来，而另一些被称为<strong>调优参数</strong>（tuning parameters）或<strong>超参数</strong>（hyperparameters）的参数，则无法直接从训练数据中获得，需事先指定。这些未知的结构化或其他类型数值对模型有重要影响，但无法通过数据直接推算。本章将提供调优参数的示例，并展示如何利用tidymodels系函数来创建和处理调优参数。此外，我们还将说明错误地选择这些值会导致<strong>过拟合</strong>（overfitting）现象，并介绍几种寻找最优调优参数值的策略。第13章和第14章将更深入地探讨用于调优的具体优化方法。</p>
+<section id="model-parameters" class="level2"><h2 class="anchored" data-anchor-id="model-parameters">Model Parameters</h2>
+<p>在普通的线性回归中，模型有两个参数 <span class="math inline">\(\beta_0\)</span> 和 <span class="math inline">\(\beta_1\)</span> :</p>
+<p><span class="math display">\[
+y_i = \beta_0 + \beta_1 x_i + \epsilon_i
+\]</span></p>
+<p>当我们有结果 <span class="math inline">\(y\)</span> 和 预测变量 <span class="math inline">\(x\)</span> 的数据时，我们可以估计出 <span class="math inline">\(\beta_0\)</span> 和 <span class="math inline">\(\beta_1\)</span> ：</p>
+<p><span class="math display">\[
+\hat \beta_1 = \frac{\sum_i (y_i-\bar{y})(x_i-\bar{x})}{\sum_i(x_i-\bar{x})^2}
+\]</span></p>
+<p><span class="math display">\[
+\hat \beta_0 = \bar{y}-\hat \beta_1 \bar{x}
+\]</span></p>
+<p>对于这个示例模型，我们可以直接从数据中估计这些值，因为它们在解析上是可处理的；但在许多情况下，模型的参数无法直接从数据中估计出来。例如，对于KNN模型，给定某个输入 <span class="math inline">\(x_0\)</span> ，它的预测值方程为：</p>
+<p><span class="math display">\[
+\hat y = \frac{1}{K}\sum_{\ell = 1}^K x_\ell^*
+\]</span></p>
+<p>其中 <span class="math inline">\(K\)</span> 是邻居的数量，而 <span class="math inline">\(x_\ell^*\)</span> 是训练集中与 <span class="math inline">\(x_0\)</span> 最接近的K个值。KNN模型由<strong>预测方程</strong>来定义，而不是<strong>模型方程</strong>。这一特性，再加上距离度量可能难以处理，使得无法创建一组可求解 <span class="math inline">\(K\)</span> 的方程（无论是迭代求解还是通过其他方式）。邻居的数量对模型有着深远的影响，它决定了类别边界的灵活性。当 <span class="math inline">\(K\)</span> 值较小时，边界会非常复杂；而当 <span class="math inline">\(K\)</span> 值较大时，边界可能会相当平滑。</p>
+<p>最近邻的数量 <span class="math inline">\(K\)</span> 是一个很好的调优参数或超参数的例子，它无法直接从数据中估计出来。</p>
+</section><section id="tuning-parameters-for-different-types-of-models" class="level2"><h2 class="anchored" data-anchor-id="tuning-parameters-for-different-types-of-models">Tuning Parameters for Different Types of Models</h2>
+<p>在不同的统计模型和机器学习模型中，存在许多调优参数或超参数的例子：</p>
+<ul>
+<li><p>boosting是一种集成方法，它结合了一系列基础模型，每个基础模型都是依次创建的，并且依赖于之前的模型。boosting迭代次数是一个重要的调优参数，通常需要进行优化。</p></li>
+<li><p>在经典的单层人工神经网络（又名多层感知器）中，预测变量通过两个或多个隐藏单元进行组合。隐藏单元是预测变量的线性组合，这些组合被包含在一个激活函数（通常是一种非线性函数，如“sigmoid”函数）中。然后，隐藏单元与输出单元相连；回归模型使用一个输出单元，而分类则需要多个输出单元。隐藏单元的数量和激活函数的类型是重要的结构调优参数。</p></li>
+<li><p>现代梯度下降方法通过找到合适的优化参数得到了改进。这类超参数的例子包括学习率、动量以及优化迭代次数/轮数（Goodfellow，Bengio 和 Courville，2016）。神经网络和一些集成模型利用梯度下降来估计模型参数。虽然与梯度下降相关的调优参数并非结构参数，但它们通常需要进行调优。</p></li>
+</ul>
+<p>在某些情况下，预处理步骤也需要调优：</p>
+<ul>
+<li><p>在主成分分析（principal component analysis）或者其有监督的“近亲”——偏最小二乘（partial least squares）中，预测变量会被替换为新的、人工构建的特征，这些特征在共线性方面具有更优的性质。提取的成分数量是可以调整的。</p></li>
+<li><p>插补方法利用一个或多个预测变量的完整值来估计缺失的预测变量值。一种有效的插补工具是使用完整列的 <span class="math inline">\(K\)</span>-近邻 来预测缺失值。邻居的数量可以进行调整。</p></li>
+</ul>
+<p>一些经典的统计模型也具有结构参数：</p>
+<ul>
+<li><p>在二元回归中，通常使用“logit”链接函数（即逻辑回归）。也可以使用其他链接函数，如“probit”和“complementary log-log”（Dobson，1999）。第12.3节对该示例进行了更详细的描述。</p></li>
+<li><p>非贝叶斯纵向和重复测量模型需要明确数据的协方差或相关结构。可选的结构包括复合对称（compound symmetric）（也称为可交换）、自回归（autoregressive）、托普利茨（Toeplitz）等（Littell，Pendergast 和 Natarajan，2000）。</p></li>
+</ul>
+<p>一个不适合调整参数的例子是贝叶斯分析所需的先验分布。先验分布概括了分析师在考虑证据或数据之前对某个量的分布的信念。例如，在11.4节中，我们使用了贝叶斯方差分析模型，并且不确定回归参数的先验分布应该是什么（除了是对称分布之外）。我们选择了自由度为1的t分布作为先验分布，因为它具有更厚的尾部；这反映了我们额外的不确定性。我们的先验信念不应受到优化的影响。调优参数通常是为了优化性能而进行调整的，而先验分布不应为了得到“正确的结果”而被修改。另一个（或许更有争议的）不需要调整参数的例子是随机森林或<strong>装袋模型</strong>（bagging model）中树的数量。这个值应该选得足够大，以确保结果的数值稳定性；并且只要该值足够大，就能够产生可靠的结果，无需调整它来提升性能。随机森林通常需要数千棵树，而装袋模型所需的数量大约在50到100棵之间。</p>
+</section><section id="what-do-we-optimize" class="level2"><h2 class="anchored" data-anchor-id="what-do-we-optimize">What do we Optimize?</h2>
+<p>在优化调优参数时，我们应该如何评估模型呢？这取决于模型本身以及模型的用途。</p>
+<p>对于调优参数的统计特性易于处理的情况，可以将常见的统计特性用作目标函数。例如，在二元逻辑回归中，可以通过最大化似然函数或信息准则来选择链接函数。然而，这些统计特性可能与使用面向准确性的特性所得到的结果不一致。例如，Friedman（2001）对提升树集成中的树的数量进行了优化，发现在最大化似然函数和最大化准确性时得到了不同的结果：通过过拟合降低似然性实际上会提高错误分类率，尽管这可能违反直觉，但并不矛盾；似然性和错误率是拟合质量在不同方面的描述。</p>
+<p>为了说明这一点，考虑 <a href="#fig-12.1" class="quarto-xref">Figure&nbsp;1</a> 中所示的分类数据，其中包含两个预测变量、两个类别，共593个数据点的训练集。</p>
+<div class="cell">
+<pre><code>#&gt; ── Attaching packages ─────────────────────────────────── tidymodels 1.4.1 ──
+#&gt; ✔ broom        1.0.9     ✔ recipes      1.3.1
+#&gt; ✔ dials        1.4.2     ✔ rsample      1.3.1
+#&gt; ✔ dplyr        1.1.4     ✔ tailor       0.1.0
+#&gt; ✔ ggplot2      3.5.2     ✔ tidyr        1.3.1
+#&gt; ✔ infer        1.0.9     ✔ tune         2.0.0
+#&gt; ✔ modeldata    1.5.1     ✔ workflows    1.3.0
+#&gt; ✔ parsnip      1.3.3     ✔ workflowsets 1.1.1
+#&gt; ✔ purrr        1.1.0     ✔ yardstick    1.3.2
+#&gt; ── Conflicts ────────────────────────────────────── tidymodels_conflicts() ──
+#&gt; ✖ purrr::discard() masks scales::discard()
+#&gt; ✖ dplyr::filter()  masks stats::filter()
+#&gt; ✖ dplyr::lag()     masks stats::lag()
+#&gt; ✖ recipes::step()  masks stats::step()</code></pre>
+<div class="cell-output-display">
+<div id="fig-12.1" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-12.1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="12-Model-Tuning-and-the-Dangers-of-Overfitting_files/figure-html/fig-12.1-1.png" class="img-fluid figure-img" width="576">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-12.1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: An example two-class classification data set with two predictors
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>我们可以先为这些数据拟合一个线性分类边界。最常用的方法是使用广义线性模型，其形式为逻辑回归。该模型通过“logit”函数将样本属于类别1的对数几率联系起来：</p>
+<p><span class="math display">\[
+\log\left(\frac{\pi}{1 - \pi}\right) = \beta_0 + \beta_1x_1 + \ldots + \beta_px_p
+\]</span></p>
+<p>在广义线性模型的背景下，“logit”函数是结果（<span class="math inline">\(\pi\)</span>）和预测变量之间的连接函数。还有其他连接函数，包括“probit”函数，其中 <span class="math inline">\(\Phi\)</span> 是累积标准正态函数，：</p>
+<p><span class="math display">\[
+\Phi^{-1}(\pi) = \beta_0 + \beta_1x_1 + \ldots + \beta_px_p
+\]</span></p>
+<p>还有“complementary log-log”函数：</p>
+<p><span class="math display">\[
+\log(-\log(1-\pi)) = \beta_0 + \beta_1x_1 + \ldots + \beta_px_p
+\]</span></p>
+<p>上述模型都会产生线性分类边界，我们应该使用哪一个呢？因为上述模型参数的数量是不变的，我们可以计算每个模型在统计学上的（对数）似然值，并确定具有最大似然值的模型。传统上，似然值的计算需要使用与估计参数相同的数据，而不是使用像第5章和第10章中的数据拆分或重抽样之类的方法获得的数据。</p>
+<p>对于数据框<code>training_set</code>，我们来创建一个函数，用于计算不同的模型并提取训练集的似然统计量（使用<code><a href="https://generics.r-lib.org/reference/glance.html">broom::glance()</a></code>）：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">llhood</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu">logistic_reg</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>    <span class="fu">set_engine</span><span class="op">(</span><span class="st">"glm"</span>, <span class="va">...</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>    <span class="fu">fit</span><span class="op">(</span><span class="va">Class</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">training_set</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>    <span class="fu">glance</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>    <span class="fu">select</span><span class="op">(</span><span class="va">logLik</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="fu">bind_rows</span><span class="op">(</span></span>
+<span>  <span class="fu">llhood</span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  <span class="fu">llhood</span><span class="op">(</span>family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html">binomial</a></span><span class="op">(</span>link <span class="op">=</span> <span class="st">"probit"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  <span class="fu">llhood</span><span class="op">(</span>family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html">binomial</a></span><span class="op">(</span>link <span class="op">=</span> <span class="st">"cloglog"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>link <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"logit"</span>, <span class="st">"probit"</span>, <span class="st">"c-log-log"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">arrange</span><span class="op">(</span><span class="fu">desc</span><span class="op">(</span><span class="va">logLik</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 3 × 2</span></span>
+<span><span class="co">#&gt;   logLik link     </span></span>
+<span><span class="co">#&gt;    &lt;dbl&gt; &lt;chr&gt;    </span></span>
+<span><span class="co">#&gt; 1  -258. logit    </span></span>
+<span><span class="co">#&gt; 2  -262. probit   </span></span>
+<span><span class="co">#&gt; 3  -270. c-log-log</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>根据这些结果，逻辑回归模型具有最佳的统计特性。但从对数似然值的量级来看，很难判断这些差异是重要的还是可以忽略的。改进这种分析的一种方法是对统计数据进行重采样，并将建模数据与用于性能评估的数据分开。对于这个小数据集，重复10折交叉验证是重采样的一个不错选择。在yardstick包中，<code>mn_log_loss()</code>函数用于估计负对数似然，我们的结果如 <a href="#fig-12.2" class="quarto-xref">Figure&nbsp;2</a> 所示。</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">1201</span><span class="op">)</span></span>
+<span><span class="va">rs</span> <span class="op">&lt;-</span> <span class="fu">vfold_cv</span><span class="op">(</span><span class="va">training_set</span>, repeats <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Return the individual resampled performance estimates:</span></span>
+<span><span class="va">lloss</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">perf_meas</span> <span class="op">&lt;-</span> <span class="fu">metric_set</span><span class="op">(</span><span class="va">roc_auc</span>, <span class="va">mn_log_loss</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="fu">logistic_reg</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>    <span class="fu">set_engine</span><span class="op">(</span><span class="st">"glm"</span>, <span class="va">...</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>    <span class="fu">fit_resamples</span><span class="op">(</span><span class="va">Class</span> <span class="op">~</span> <span class="va">A</span> <span class="op">+</span> <span class="va">B</span>, <span class="va">rs</span>, metrics <span class="op">=</span> <span class="va">perf_meas</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>    <span class="fu">collect_metrics</span><span class="op">(</span>summarize <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>    <span class="fu">select</span><span class="op">(</span><span class="va">id</span>, <span class="va">id2</span>, <span class="va">.metric</span>, <span class="va">.estimate</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="va">resampled_res</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu">bind_rows</span><span class="op">(</span></span>
+<span>    <span class="fu">lloss</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu">mutate</span><span class="op">(</span>model <span class="op">=</span> <span class="st">"logistic"</span><span class="op">)</span>,</span>
+<span>    <span class="fu">lloss</span><span class="op">(</span>family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html">binomial</a></span><span class="op">(</span>link <span class="op">=</span> <span class="st">"probit"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu">mutate</span><span class="op">(</span>model <span class="op">=</span> <span class="st">"probit"</span><span class="op">)</span>,</span>
+<span>    <span class="fu">lloss</span><span class="op">(</span>family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html">binomial</a></span><span class="op">(</span>link <span class="op">=</span> <span class="st">"cloglog"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu">mutate</span><span class="op">(</span>model <span class="op">=</span> <span class="st">"c-log-log"</span><span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="co"># Convert log-loss to log-likelihood:</span></span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>.estimate <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html">ifelse</a></span><span class="op">(</span><span class="va">.metric</span> <span class="op">==</span> <span class="st">"mn_log_loss"</span>, <span class="op">-</span><span class="va">.estimate</span>, <span class="va">.estimate</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">group_by</span><span class="op">(</span><span class="va">model</span>, <span class="va">.metric</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">summarize</span><span class="op">(</span></span>
+<span>    mean <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">.estimate</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>    std_err <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/sd.html">sd</a></span><span class="op">(</span><span class="va">.estimate</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">sqrt</a></span><span class="op">(</span><span class="fu">n</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    .groups <span class="op">=</span> <span class="st">"drop"</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="co">#&gt; → A | warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</span></span>
+<span><span class="co">#&gt; There were issues with some computations   A: x1</span></span>
+<span><span class="co">#&gt; There were issues with some computations   A: x1</span></span>
+<span><span class="co">#&gt; </span></span>
+<span></span>
+<span><span class="va">resampled_res</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">.metric</span> <span class="op">==</span> <span class="st">"mn_log_loss"</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">mean</span>, y <span class="op">=</span> <span class="va">model</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_point</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_errorbar</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>xmin <span class="op">=</span> <span class="va">mean</span> <span class="op">-</span> <span class="fl">1.64</span> <span class="op">*</span> <span class="va">std_err</span>, xmax <span class="op">=</span> <span class="va">mean</span> <span class="op">+</span> <span class="fl">1.64</span> <span class="op">*</span> <span class="va">std_err</span><span class="op">)</span>,</span>
+<span>    width <span class="op">=</span> <span class="fl">.1</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">labs</span><span class="op">(</span>y <span class="op">=</span> <span class="cn">NULL</span>, x <span class="op">=</span> <span class="st">"log-likelihood"</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div id="fig-12.2" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-12.2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="12-Model-Tuning-and-the-Dangers-of-Overfitting_files/figure-html/fig-12.2-1.png" class="img-fluid figure-img" width="576">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-12.2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Means and approximate 90% confidence intervals for the resampled binomial log-likelihood with three different link functions
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>这些值的规模与之前的值不同，因为它们是在更小的数据集上计算得出的；<code><a href="https://generics.r-lib.org/reference/glance.html">broom::glance()</a></code>产生的值是总和，而<code><a href="https://yardstick.tidymodels.org/reference/mn_log_loss.html">yardstick::mn_log_loss()</a></code>产生的值是平均值。</p>
+<p>换一个不同的指标怎么样？我们还计算了每个重采样的ROC曲线下面积。这些结果反映了模型在众多概率阈值下的判别能力，在 <a href="#fig-12.3" class="quarto-xref">Figure&nbsp;3</a> 中显示出没有差异。</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">resampled_res</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">.metric</span> <span class="op">==</span> <span class="st">"roc_auc"</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">mean</span>, y <span class="op">=</span> <span class="va">model</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_point</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_errorbar</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>xmin <span class="op">=</span> <span class="va">mean</span> <span class="op">-</span> <span class="fl">1.64</span> <span class="op">*</span> <span class="va">std_err</span>, xmax <span class="op">=</span> <span class="va">mean</span> <span class="op">+</span> <span class="fl">1.64</span> <span class="op">*</span> <span class="va">std_err</span><span class="op">)</span>,</span>
+<span>    width <span class="op">=</span> <span class="fl">.1</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">labs</span><span class="op">(</span>y <span class="op">=</span> <span class="cn">NULL</span>, x <span class="op">=</span> <span class="st">"area under the ROC curve"</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div id="fig-12.3" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-12.3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="12-Model-Tuning-and-the-Dangers-of-Overfitting_files/figure-html/fig-12.3-1.png" class="img-fluid figure-img" width="576">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-12.3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: Means and approximate 90% confidence intervals for the resampled area under the ROC curve with three different link functions
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>考虑到区间的重叠以及x轴的刻度，这些选项中的任何一个都可以使用。当三个模型的类别边界叠加在 <a href="#fig-12.4" class="quarto-xref">Figure&nbsp;4</a> 中的198个数据点的测试集上时，我们再次看到了这一点。</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">data_grid</span> <span class="op">&lt;-</span> <span class="fu">crossing</span><span class="op">(</span>A <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">0.4</span>, <span class="fl">4</span>, length <span class="op">=</span> <span class="fl">200</span><span class="op">)</span>, B <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">.14</span>, <span class="fl">3.9</span>, length <span class="op">=</span> <span class="fl">200</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">logit_pred</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu">logistic_reg</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">set_engine</span><span class="op">(</span><span class="st">"glm"</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">fit</span><span class="op">(</span><span class="va">Class</span> <span class="op">~</span> <span class="va">A</span> <span class="op">+</span> <span class="va">B</span>, data <span class="op">=</span> <span class="va">training_set</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">data_grid</span>, type <span class="op">=</span> <span class="st">"prob"</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">bind_cols</span><span class="op">(</span><span class="va">data_grid</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>link <span class="op">=</span> <span class="st">"logit"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">probit_pred</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu">logistic_reg</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">set_engine</span><span class="op">(</span><span class="st">"glm"</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html">binomial</a></span><span class="op">(</span>link <span class="op">=</span> <span class="st">"probit"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">fit</span><span class="op">(</span><span class="va">Class</span> <span class="op">~</span> <span class="va">A</span> <span class="op">+</span> <span class="va">B</span>, data <span class="op">=</span> <span class="va">training_set</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">data_grid</span>, type <span class="op">=</span> <span class="st">"prob"</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">bind_cols</span><span class="op">(</span><span class="va">data_grid</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>link <span class="op">=</span> <span class="st">"probit"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">cloglog_pred</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu">logistic_reg</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">set_engine</span><span class="op">(</span><span class="st">"glm"</span>, family <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html">binomial</a></span><span class="op">(</span>link <span class="op">=</span> <span class="st">"cloglog"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">fit</span><span class="op">(</span><span class="va">Class</span> <span class="op">~</span> <span class="va">A</span> <span class="op">+</span> <span class="va">B</span>, data <span class="op">=</span> <span class="va">training_set</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">data_grid</span>, type <span class="op">=</span> <span class="st">"prob"</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">bind_cols</span><span class="op">(</span><span class="va">data_grid</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>link <span class="op">=</span> <span class="st">"c-log-log"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">link_grids</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu">bind_rows</span><span class="op">(</span><span class="va">logit_pred</span>, <span class="va">probit_pred</span>, <span class="va">cloglog_pred</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>link <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span><span class="op">(</span><span class="va">link</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"logit"</span>, <span class="st">"probit"</span>, <span class="st">"c-log-log"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">link_grids</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">A</span>, y <span class="op">=</span> <span class="va">B</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_point</span><span class="op">(</span></span>
+<span>    data <span class="op">=</span> <span class="va">testing_set</span>, <span class="fu">aes</span><span class="op">(</span>color <span class="op">=</span> <span class="va">Class</span>, pch <span class="op">=</span> <span class="va">Class</span><span class="op">)</span>,</span>
+<span>    alpha <span class="op">=</span> <span class="fl">0.7</span>, show.legend <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_contour</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>z <span class="op">=</span> <span class="va">.pred_Class1</span>, lty <span class="op">=</span> <span class="va">link</span><span class="op">)</span>, breaks <span class="op">=</span> <span class="fl">0.5</span>, color <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">scale_color_manual</span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"#CC6677"</span>, <span class="st">"#88CCEE"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">coord_equal</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">labs</span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Predictor A"</span>, y <span class="op">=</span> <span class="st">"Predictor B"</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div id="fig-12.4" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-12.4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="12-Model-Tuning-and-the-Dangers-of-Overfitting_files/figure-html/fig-12.4-1.png" class="img-fluid figure-img" width="576">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-12.4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: The linear class boundary fits for three link functions
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>本练习强调，不同的指标可能会导致在选择调优参数值时做出不同的决策。在这种情况下，一个指标表明这些模型存在一定差异，而另一个指标则显示它们完全没有差异。Thomas 和 Uminsky（2020）对指标优化进行了深入探讨，他们研究了几个问题，包括指标的博弈。他们警告说：当前人工智能方法中，指标优化的不合理有效性是该领域面临的一项根本性挑战，并且由此产生了一个内在矛盾：仅仅优化指标会导致结果远非最优。</p>
+</section><section id="the-consequences-of-poor-parameter-estimates" class="level2"><h2 class="anchored" data-anchor-id="the-consequences-of-poor-parameter-estimates">The consequences of poor parameter estimates</h2>
+<p>许多调优参数会调节模型复杂度的大小，更高的复杂度通常意味着模型在模拟模式时具有更强的<strong>可塑性</strong>（malleability）。例如，如第8.4.3节所示，在样条函数中增加自由度会提高预测方程的复杂性。虽然当数据中有潜在的复杂模式时，这是一个优势，但它也可能导致对偶然模式的过度解读，而这些偶然模式在新数据中不会重现。过拟合指的是模型过度适应训练数据的情况：它在用于构建模型的数据上表现良好，但在新数据上表现不佳。由于调优模型参数会增加模型的复杂度，不当的选择可能会导致过拟合。</p>
+<p>回顾12.2节中描述的单层神经网络模型。对于分类任务的神经网络，当它只有一个隐藏单元且采用“sigmoidal”激活函数时，实际上就等同于逻辑回归。然而，随着隐藏单元数量的增加，模型的复杂度也会随之提高。事实上，当网络模型使用“sigmoidal”激活单元时，Cybenko（1989）证明，只要有足够多的隐藏单元，该模型就是一个通用函数逼近器。</p>
+<p>我们将神经网络分类模型应用于上一节中的数据，并改变隐藏单元的数量。以ROC曲线下面积作为性能指标，随着添加的隐藏单元数量增多，模型在训练集上的效果会提升。该网络模型会彻底且细致地学习训练集。如果模型根据训练集的ROC值来评判自身，它会倾向于选择大量隐藏单元，以便几乎消除误差。</p>
+<p>第5章和第10章表明，仅对训练集进行重新预测是一种糟糕的模型评估方法。在这里，神经网络会很快开始过度解读它在训练集中看到的模式。请比较 <a href="#fig-12.5" class="quarto-xref">Figure&nbsp;5</a> 中这三个示例分类边界（基于训练集开发）在训练集和测试集上的叠加情况。</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">two_class_rec</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu">recipe</span><span class="op">(</span><span class="va">Class</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">two_class_dat</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">step_normalize</span><span class="op">(</span><span class="fu">all_numeric_predictors</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">mlp_mod</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu">mlp</span><span class="op">(</span>hidden_units <span class="op">=</span> <span class="fu">tune</span><span class="op">(</span><span class="op">)</span>, epochs <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">set_engine</span><span class="op">(</span><span class="st">"nnet"</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">set_mode</span><span class="op">(</span><span class="st">"classification"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">mlp_wflow</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu">workflow</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">add_recipe</span><span class="op">(</span><span class="va">two_class_rec</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">add_model</span><span class="op">(</span><span class="va">mlp_mod</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">mlp_res</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu">tibble</span><span class="op">(</span></span>
+<span>    hidden_units <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">20</span>,</span>
+<span>    train <span class="op">=</span> <span class="cn">NA_real_</span>,</span>
+<span>    test <span class="op">=</span> <span class="cn">NA_real_</span>,</span>
+<span>    model <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/vector.html">vector</a></span><span class="op">(</span>mode <span class="op">=</span> <span class="st">"list"</span>, length <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">mlp_res</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">27</span><span class="op">)</span></span>
+<span>  <span class="va">tmp_mod</span> <span class="op">&lt;-</span></span>
+<span>    <span class="va">mlp_wflow</span> <span class="op">%&gt;%</span></span>
+<span>    <span class="fu">finalize_workflow</span><span class="op">(</span><span class="va">mlp_res</span> <span class="op">%&gt;%</span> <span class="fu">slice</span><span class="op">(</span><span class="va">i</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu">select</span><span class="op">(</span><span class="va">hidden_units</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>    <span class="fu">fit</span><span class="op">(</span><span class="va">training_set</span><span class="op">)</span></span>
+<span>  <span class="va">mlp_res</span><span class="op">$</span><span class="va">train</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span></span>
+<span>    <span class="fu">roc_auc_vec</span><span class="op">(</span><span class="va">training_set</span><span class="op">$</span><span class="va">Class</span>, <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">tmp_mod</span>, <span class="va">training_set</span>, type <span class="op">=</span> <span class="st">"prob"</span><span class="op">)</span><span class="op">$</span><span class="va">.pred_Class1</span><span class="op">)</span></span>
+<span>  <span class="va">mlp_res</span><span class="op">$</span><span class="va">test</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span></span>
+<span>    <span class="fu">roc_auc_vec</span><span class="op">(</span><span class="va">testing_set</span><span class="op">$</span><span class="va">Class</span>, <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">tmp_mod</span>, <span class="va">testing_set</span>, type <span class="op">=</span> <span class="st">"prob"</span><span class="op">)</span><span class="op">$</span><span class="va">.pred_Class1</span><span class="op">)</span></span>
+<span>  <span class="va">mlp_res</span><span class="op">$</span><span class="va">model</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">tmp_mod</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="va">te_plot</span> <span class="op">&lt;-</span></span>
+<span>  <span class="va">mlp_res</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">slice</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">4</span>, <span class="fl">20</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">mutate</span><span class="op">(</span></span>
+<span>    probs <span class="op">=</span> <span class="fu">map</span><span class="op">(</span><span class="va">model</span>, <span class="op">~</span> <span class="fu">bind_cols</span><span class="op">(</span><span class="va">data_grid</span>, <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">.x</span>, <span class="va">data_grid</span>, type <span class="op">=</span> <span class="st">"prob"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">hidden_units</span>, <span class="va">probs</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">unnest</span><span class="op">(</span>cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">probs</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">mutate</span><span class="op">(</span></span>
+<span>    label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/format.html">format</a></span><span class="op">(</span><span class="va">hidden_units</span><span class="op">)</span>, <span class="st">"units"</span><span class="op">)</span>,</span>
+<span>    label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html">ifelse</a></span><span class="op">(</span><span class="va">label</span> <span class="op">==</span> <span class="st">" 1 units"</span>, <span class="st">" 1 unit"</span>, <span class="va">label</span><span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">A</span>, y <span class="op">=</span> <span class="va">B</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_point</span><span class="op">(</span></span>
+<span>    data <span class="op">=</span> <span class="va">testing_set</span>, <span class="fu">aes</span><span class="op">(</span>color <span class="op">=</span> <span class="va">Class</span>, pch <span class="op">=</span> <span class="va">Class</span><span class="op">)</span>,</span>
+<span>    alpha <span class="op">=</span> <span class="fl">0.5</span>, show.legend <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_contour</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>z <span class="op">=</span> <span class="va">.pred_Class1</span><span class="op">)</span>, breaks <span class="op">=</span> <span class="fl">0.5</span>, color <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">scale_color_manual</span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"#CC6677"</span>, <span class="st">"#88CCEE"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">facet_wrap</span><span class="op">(</span><span class="op">~</span><span class="va">label</span>, nrow <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">coord_equal</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">ggtitle</span><span class="op">(</span><span class="st">"Test Set"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">labs</span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Predictor A"</span>, y <span class="op">=</span> <span class="st">"Predictor B"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">tr_plot</span> <span class="op">&lt;-</span></span>
+<span>  <span class="va">mlp_res</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">slice</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">4</span>, <span class="fl">20</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">mutate</span><span class="op">(</span></span>
+<span>    probs <span class="op">=</span> <span class="fu">map</span><span class="op">(</span><span class="va">model</span>, <span class="op">~</span> <span class="fu">bind_cols</span><span class="op">(</span><span class="va">data_grid</span>, <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">.x</span>, <span class="va">data_grid</span>, type <span class="op">=</span> <span class="st">"prob"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">hidden_units</span>, <span class="va">probs</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">unnest</span><span class="op">(</span>cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">probs</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">mutate</span><span class="op">(</span></span>
+<span>    label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/format.html">format</a></span><span class="op">(</span><span class="va">hidden_units</span><span class="op">)</span>, <span class="st">"units"</span><span class="op">)</span>,</span>
+<span>    label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html">ifelse</a></span><span class="op">(</span><span class="va">label</span> <span class="op">==</span> <span class="st">" 1 units"</span>, <span class="st">" 1 unit"</span>, <span class="va">label</span><span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">A</span>, y <span class="op">=</span> <span class="va">B</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_point</span><span class="op">(</span></span>
+<span>    data <span class="op">=</span> <span class="va">training_set</span>, <span class="fu">aes</span><span class="op">(</span>color <span class="op">=</span> <span class="va">Class</span>, pch <span class="op">=</span> <span class="va">Class</span><span class="op">)</span>,</span>
+<span>    alpha <span class="op">=</span> <span class="fl">0.5</span>, show.legend <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_contour</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>z <span class="op">=</span> <span class="va">.pred_Class1</span><span class="op">)</span>, breaks <span class="op">=</span> <span class="fl">0.5</span>, color <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">scale_color_manual</span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"#CC6677"</span>, <span class="st">"#88CCEE"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">facet_wrap</span><span class="op">(</span><span class="op">~</span><span class="va">label</span>, nrow <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">coord_equal</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">ggtitle</span><span class="op">(</span><span class="st">"Training Set"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">labs</span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Predictor A"</span>, y <span class="op">=</span> <span class="st">"Predictor B"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">tr_plot</span></span>
+<span><span class="va">te_plot</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="fig-12.5" class="quarto-layout-panel">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-12.5-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-layout-row">
+<div class="cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-12.5" style="flex-basis: 100.0%;justify-content: flex-start;">
+<div id="fig-12.5-1" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig figure"><div aria-describedby="fig-12.5-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="12-Model-Tuning-and-the-Dangers-of-Overfitting_files/figure-html/fig-12.5-1.png" class="img-fluid figure-img" data-ref-parent="fig-12.5" width="576">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-12.5-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(a) Training set
+</figcaption></figure>
+</div>
+</div>
+</div>
+<div class="quarto-layout-row">
+<div class="cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-12.5" style="flex-basis: 100.0%;justify-content: flex-start;">
+<div id="fig-12.5-2" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig figure"><div aria-describedby="fig-12.5-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="12-Model-Tuning-and-the-Dangers-of-Overfitting_files/figure-html/fig-12.5-2.png" class="img-fluid figure-img" data-ref-parent="fig-12.5" width="576">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-12.5-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(b) Test set
+</figcaption></figure>
+</div>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-12.5-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5: Class boundaries for three models with increasing numbers of hidden units. The boundaries are fit on the training set and shown for the training and test sets.
+</figcaption></figure>
+</div>
+<p>一个隐藏单元的模型因为受限于线性，不能灵活地适应数据。具有四个隐藏单元的模型开始出现过拟合迹象，对于偏离数据主流的值，其边界不切实际。这是由数据右上角第一类中的单个数据点引起的。到20个隐藏单元时，模型开始记住训练集，在这些数据周围创建小的“孤岛”，以最小化重代入错误率。这些模式在测试集中不会重现。最后一个面板最能说明，必须控制调节复杂度的调优参数，才能使模型有效。对于20单元模型，训练集的AUC为0.944，但测试集的值为0.855。</p>
+<p>当我们有两个可以绘图的预测变量时，这种过拟合现象是很明显的。然而，一般来说，我们必须使用定量方法来检测过拟合。可以使用样本外数据来检测模型是否在训练集上过拟合。同样，我们不能使用测试集，而是需要某种形式的重采样，这可能意味着一种迭代方法（例如，10折交叉验证）或单一数据源（例如，验证集）。</p>
+</section><section id="two-general-strategies-for-optimization" class="level2"><h2 class="anchored" data-anchor-id="two-general-strategies-for-optimization">Two general strategies for optimization</h2>
+<p>调优参数优化通常分为两类：<strong>网格搜索</strong>（grid search）和<strong>迭代搜索</strong>（iterative search）。</p>
+<p>网格搜索是指我们预先定义一组要评估的参数值。网格搜索涉及的主要选择是如何构建网格以及要评估多少种参数组合。网格搜索通常被认为效率低下，因为随着“维度灾难”的出现，覆盖参数空间所需的网格点数量可能会变得难以处理。这种担忧有一定道理，在流程未优化时尤为明显。第13章对此有更详细的讨论。</p>
+<p>迭代搜索或顺序搜索是指我们基于先前的结果依次发现新的参数组合。几乎任何非线性优化方法都是适用的，在某些情况下，需要一组初始的一个或多个参数组合的结果来启动优化过程。第14章将对迭代搜索进行更详细的讨论。</p>
+<p><a href="#fig-12.6" class="quarto-xref">Figure&nbsp;6</a> 展示了两个面板，这两个面板针对具有两个在0到1之间取值的调优参数的情况，演示了这两种方法。在每个面板中，一组等高线显示了参数与结果之间真实的（模拟的）关系。最优结果位于右上角。</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># load("E:/Blog/Books/Tidy Modeling with R/Rdata/search_examples.RData")</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/load.html">load</a></span><span class="op">(</span><span class="st">"./Rdata/search_examples.RData"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">grid_plot</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu">ggplot</span><span class="op">(</span><span class="va">sfd_grid</span>, <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_point</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">lims</span><span class="op">(</span>x <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">1</span>, y <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">1</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">labs</span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Parameter 1"</span>, y <span class="op">=</span> <span class="st">"Parameter 2"</span>, title <span class="op">=</span> <span class="st">"Space-Filling Grid"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_contour</span><span class="op">(</span></span>
+<span>    data <span class="op">=</span> <span class="va">grid_contours</span>,</span>
+<span>    <span class="fu">aes</span><span class="op">(</span>z <span class="op">=</span> <span class="va">obj</span><span class="op">)</span>,</span>
+<span>    alpha <span class="op">=</span> <span class="fl">.3</span>,</span>
+<span>    bins <span class="op">=</span> <span class="fl">12</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">coord_equal</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">theme_bw</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">theme</span><span class="op">(</span></span>
+<span>    panel.grid.major <span class="op">=</span> <span class="fu">element_blank</span><span class="op">(</span><span class="op">)</span>,</span>
+<span>    panel.grid.minor <span class="op">=</span> <span class="fu">element_blank</span><span class="op">(</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span><span class="va">search_plot</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu">ggplot</span><span class="op">(</span><span class="va">nm_res</span>, <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_point</span><span class="op">(</span>size <span class="op">=</span> <span class="fl">.7</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">lims</span><span class="op">(</span>x <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">1</span>, y <span class="op">=</span> <span class="fl">0</span><span class="op">:</span><span class="fl">1</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">labs</span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Parameter 1"</span>, y <span class="op">=</span> <span class="st">"Parameter 2"</span>, title <span class="op">=</span> <span class="st">"Global Search"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">coord_equal</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_contour</span><span class="op">(</span></span>
+<span>    data <span class="op">=</span> <span class="va">grid_contours</span>,</span>
+<span>    <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, z <span class="op">=</span> <span class="va">obj</span><span class="op">)</span>,</span>
+<span>    alpha <span class="op">=</span> <span class="fl">.3</span>,</span>
+<span>    bins <span class="op">=</span> <span class="fl">12</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">theme_bw</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">theme</span><span class="op">(</span></span>
+<span>    panel.grid.major <span class="op">=</span> <span class="fu">element_blank</span><span class="op">(</span><span class="op">)</span>,</span>
+<span>    panel.grid.minor <span class="op">=</span> <span class="fu">element_blank</span><span class="op">(</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span><span class="va">grid_plot</span></span>
+<span><span class="va">search_plot</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="fig-12.6" class="quarto-layout-panel">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-12.6-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-layout-row">
+<div class="cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-12.6" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-12.6-1" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig figure"><div aria-describedby="fig-12.6-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="12-Model-Tuning-and-the-Dangers-of-Overfitting_files/figure-html/fig-12.6-1.png" class="img-fluid figure-img" data-ref-parent="fig-12.6" width="576">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-12.6-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(a) Space-Filling Grid
+</figcaption></figure>
+</div>
+</div>
+<div class="cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-12.6" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-12.6-2" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-subfloat-fig figure"><div aria-describedby="fig-12.6-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="12-Model-Tuning-and-the-Dangers-of-Overfitting_files/figure-html/fig-12.6-2.png" class="img-fluid figure-img" data-ref-parent="fig-12.6" width="576">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-12.6-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(b) Global Search
+</figcaption></figure>
+</div>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-12.6-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;6: Examples of pre-defined grid tuning and an iterative search method. The lines represent contours of a performance metric; it is best in the upper-right-hand side of the plot.
+</figcaption></figure>
+</div>
+<p><a href="#fig-12.6" class="quarto-xref">Figure&nbsp;6</a> 的左面板展示了一种名为<strong>空间填充设计</strong>（space-filling design）的网格类型。这是一种为覆盖参数空间的设计，其目的是使调优参数组合彼此之间不会过于接近。这种设计的结果中，没有任何点恰好位于真正的最优位置。不过，有一个点处于大致的附近区域，其性能指标结果很可能在最优值的误差范围内。</p>
+<p><a href="#fig-12.6" class="quarto-xref">Figure&nbsp;6</a> 的右侧面板展示了一种<strong>全局搜索方法</strong>（global search method）的结果——Nelder-Mead单纯形法（奥尔森和纳尔逊，1975）。起始点位于参数空间的左下部分。搜索在空间中蜿蜒前行，直到到达最优位置，在那里它会努力尽可能接近数值上的最佳值。这种特定的搜索方法虽然有效，但并不以效率著称；它需要进行大量的函数评估，尤其是在接近最优值的地方。第14章将讨论更高效的搜索算法。</p>
+<p>混合策略也是一种选择，并且效果很好。在初始网格搜索之后，序贯优化可以从最佳网格组合开始。这些策略的示例将在接下来的两章中详细讨论。在继续之前，让我们学习如何使用<strong>dials</strong>包在tidymodels中处理调优参数对象。</p>
+</section><section id="tuning-parameters-in-tidymodels" class="level2"><h2 class="anchored" data-anchor-id="tuning-parameters-in-tidymodels">Tuning Parameters in tidymodels</h2>
+<p>在前面的章节中，我们已经讨论了相当多与recipe对象和模型的调优参数相对应的参数。以下这些参数是可以进行调优的：</p>
+<ul>
+<li><p>将社区合并为“其他”类别的阈值（参数名称为<code>threshold</code>），在第8.4.1节中进行了讨论</p></li>
+<li><p>自然样条中的自由度数量（<code>deg_free</code>，第8.4.3节）</p></li>
+<li><p>在基于树的模型中执行分割所需的数据点数量（<code>min_n</code>，第6.1节）</p></li>
+<li><p>惩罚模型中的正则化量（<code>penalty</code>，第6.1节）</p></li>
+</ul>
+<p>由parsnip包构建的模型函数，有两种参数：</p>
+<ul>
+<li><p><strong>主要参数</strong>（main arguments）：为了性能而进行优化且在多个引擎中可用的常见参数，它们是模型函数的顶级参数，例如，<code>rand_forest()</code>函数有主要参数<code>trees</code>、<code>min_n</code>和<code>mtry</code>，因为这些参数是最常被指定或优化的。</p></li>
+<li><p><strong>特定于引擎</strong>（调优参数）的调优参数：这些参数要么很少被优化，要么只针对某些特定引擎。例如，随机森林ranger包有一些其他包不会使用的参数，比如“增益惩罚”——它在树的归纳过程中对预测因子的选择进行正则化，这个参数有助于调节集成中使用的预测因子数量与性能之间的权衡（Wundervald、Parnell和Domijan，2020）。在<code>ranger()</code>中，这个参数的名称是<code>regularization.factor</code>。要通过parsnip模型规格指定一个值，需将其作为补充参数添加到<code>set_engine()</code>中：</p></li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">rand_forest</span><span class="op">(</span>trees <span class="op">=</span> <span class="fl">2000</span>, min_n <span class="op">=</span> <span class="fl">10</span><span class="op">)</span> <span class="op">%&gt;%</span>                   <span class="co"># &lt;- main arguments</span></span>
+<span>  <span class="fu">set_engine</span><span class="op">(</span><span class="st">"ranger"</span>, regularization.factor <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span>         <span class="co"># &lt;- engine-specific</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>主要参数使用统一的命名系统，以消除不同引擎之间的不一致性，而特定于引擎的参数则不这样做。</p>
+<p>我们如何向tidymodels函数表明哪些参数需要优化？通过为参数赋值<code>tune()</code>来标记需要调整的参数。对于第12.4节中使用的单层神经网络，隐藏单元的数量通过以下方式指定为需要调整的参数：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">neural_net_spec</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu">mlp</span><span class="op">(</span>hidden_units <span class="op">=</span> <span class="fu">tune</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">set_mode</span><span class="op">(</span><span class="st">"regression"</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">set_engine</span><span class="op">(</span><span class="st">"keras"</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><code>tune()</code>函数不会执行任何特定的参数值；它只返回一个表达式：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">tune</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; tune()</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>将这个<code>tune()</code>值嵌入到参数中，会为待优化的参数添加标签。接下来两章中展示的模型调优函数会解析模型和recipe对象，以发现带有标签的参数。这些函数能够自动配置和处理这些参数，因为它们了解这些参数的特性（例如，值的范围等）。</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">extract_parameter_set_dials</span><span class="op">(</span><span class="va">neural_net_spec</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Collection of 1 parameters for tuning</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;    identifier         type    object</span></span>
+<span><span class="co">#&gt;  hidden_units hidden_units nparam[+]</span></span>
+<span><span class="co">#&gt; </span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>结果显示值为<code>nparam[+]</code>，这表明隐藏单元的数量是一个数值参数。</p>
+<p>有一个可选的标识参数，用于将名称与参数相关联。当同一种参数在不同地方进行调优时，这会很有用。例如，对于10.6节中的Ames房产数据，recipe对象使用样条函数对经度和纬度都进行了编码。如果我们想调优这两个样条函数，使其可能具有不同的平滑度，我们会调用两次<code>step_ns()</code>，每个预测变量调用一次。为了使这些参数可识别，标识参数可以采用任何字符串：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="va">ames</span><span class="op">)</span></span>
+<span><span class="va">ames</span> <span class="op">&lt;-</span> <span class="fu">mutate</span><span class="op">(</span><span class="va">ames</span>, Sale_Price <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html">log10</a></span><span class="op">(</span><span class="va">Sale_Price</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">502</span><span class="op">)</span></span>
+<span><span class="va">ames_split</span> <span class="op">&lt;-</span> <span class="fu">initial_split</span><span class="op">(</span><span class="va">ames</span>, prop <span class="op">=</span> <span class="fl">0.80</span>, strata <span class="op">=</span> <span class="va">Sale_Price</span><span class="op">)</span></span>
+<span><span class="va">ames_train</span> <span class="op">&lt;-</span> <span class="fu">training</span><span class="op">(</span><span class="va">ames_split</span><span class="op">)</span></span>
+<span><span class="va">ames_test</span> <span class="op">&lt;-</span> <span class="fu">testing</span><span class="op">(</span><span class="va">ames_split</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">ames_rec</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu">recipe</span><span class="op">(</span><span class="va">Sale_Price</span> <span class="op">~</span> <span class="va">Neighborhood</span> <span class="op">+</span> <span class="va">Gr_Liv_Area</span> <span class="op">+</span> <span class="va">Year_Built</span> <span class="op">+</span> <span class="va">Bldg_Type</span> <span class="op">+</span></span>
+<span>    <span class="va">Latitude</span> <span class="op">+</span> <span class="va">Longitude</span>, data <span class="op">=</span> <span class="va">ames_train</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">step_log</span><span class="op">(</span><span class="va">Gr_Liv_Area</span>, base <span class="op">=</span> <span class="fl">10</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">step_other</span><span class="op">(</span><span class="va">Neighborhood</span>, threshold <span class="op">=</span> <span class="fu">tune</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">step_dummy</span><span class="op">(</span><span class="fu">all_nominal_predictors</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">step_interact</span><span class="op">(</span><span class="op">~</span> <span class="va">Gr_Liv_Area</span><span class="op">:</span><span class="fu">starts_with</span><span class="op">(</span><span class="st">"Bldg_Type_"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">step_ns</span><span class="op">(</span><span class="va">Longitude</span>, deg_free <span class="op">=</span> <span class="fu">tune</span><span class="op">(</span><span class="st">"longitude df"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">step_ns</span><span class="op">(</span><span class="va">Latitude</span>, deg_free <span class="op">=</span> <span class="fu">tune</span><span class="op">(</span><span class="st">"latitude df"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">recipes_param</span> <span class="op">&lt;-</span> <span class="fu">extract_parameter_set_dials</span><span class="op">(</span><span class="va">ames_rec</span><span class="op">)</span></span>
+<span><span class="va">recipes_param</span></span>
+<span><span class="co">#&gt; Collection of 3 parameters for tuning</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;    identifier      type    object</span></span>
+<span><span class="co">#&gt;     threshold threshold nparam[+]</span></span>
+<span><span class="co">#&gt;  longitude df  deg_free nparam[+]</span></span>
+<span><span class="co">#&gt;   latitude df  deg_free nparam[+]</span></span>
+<span><span class="co">#&gt; </span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>请注意，<code>identifier</code>列和<code>type</code>列对于这两个样条参数来说并不相同。</p>
+<p>当使用工作流将recipe对象和模型结合起来时，两组参数都会显示：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">wflow_param</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu">workflow</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">add_recipe</span><span class="op">(</span><span class="va">ames_rec</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">add_model</span><span class="op">(</span><span class="va">neural_net_spec</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">extract_parameter_set_dials</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">wflow_param</span></span>
+<span><span class="co">#&gt; Collection of 4 parameters for tuning</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;    identifier         type    object</span></span>
+<span><span class="co">#&gt;  hidden_units hidden_units nparam[+]</span></span>
+<span><span class="co">#&gt;     threshold    threshold nparam[+]</span></span>
+<span><span class="co">#&gt;  longitude df     deg_free nparam[+]</span></span>
+<span><span class="co">#&gt;   latitude df     deg_free nparam[+]</span></span>
+<span><span class="co">#&gt; </span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>神经网络极其擅长模拟非线性模式。向这类模型中添加样条项是没有必要的；我们将此模型与recipe对象结合起来只是为了举例说明。</p>
+<p>每个调优参数在dials包中都有一个对应的函数。在绝大多数情况下，该函数与参数参数同名：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">hidden_units</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # Hidden Units (quantitative)</span></span>
+<span><span class="co">#&gt; Range: [1, 10]</span></span>
+<span><span class="fu">threshold</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Threshold (quantitative)</span></span>
+<span><span class="co">#&gt; Range: [0, 1]</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><code>deg_free</code>参数是一个反例；自由度的概念会出现在各种各样不同的语境中。当用于样条函数时，有一个专门的dials函数叫做<code>spline_degree()</code>，默认情况下，它会被用于样条函数：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">spline_degree</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Spline Degrees of Freedom (quantitative)</span></span>
+<span><span class="co">#&gt; Range: [1, 10]</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>dials包还提供了一个便捷函数，用于提取特定的参数对象：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># identify the parameter using the id value:</span></span>
+<span><span class="va">wflow_param</span> <span class="op">%&gt;%</span> <span class="fu">extract_parameter_dials</span><span class="op">(</span><span class="st">"threshold"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Threshold (quantitative)</span></span>
+<span><span class="co">#&gt; Range: [0, 0.1]</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>在参数集中，参数的范围也可以就地更新：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">extract_parameter_set_dials</span><span class="op">(</span><span class="va">ames_rec</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/update.html">update</a></span><span class="op">(</span>threshold <span class="op">=</span> <span class="fu">threshold</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.8</span>, <span class="fl">1.0</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Collection of 3 parameters for tuning</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;    identifier      type    object</span></span>
+<span><span class="co">#&gt;     threshold threshold nparam[+]</span></span>
+<span><span class="co">#&gt;  longitude df  deg_free nparam[+]</span></span>
+<span><span class="co">#&gt;   latitude df  deg_free nparam[+]</span></span>
+<span><span class="co">#&gt; </span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>由<code>extract_parameter_set_dials()</code>创建的参数集会被tidymodels调优函数使用（在需要时）。如果需要修改调优参数对象的默认值，则将修改后的参数集传递给相应的调优函数。</p>
+<p>一些调优参数取决于数据的维度。例如，最近邻的数量必须在1和数据的行数之间。在某些情况下，很容易为可能的取值范围设定合理的默认值。而在其他情况下，参数范围至关重要，不能随意假设。随机森林模型的主要调优参数是每个树节点分裂时随机抽样的预测变量列的数量，通常记为<code>mtry()</code>。在不知道预测变量数量的情况下，该参数范围无法预先配置，需要进行最终确定。</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">rf_spec</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu">rand_forest</span><span class="op">(</span>mtry <span class="op">=</span> <span class="fu">tune</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">set_engine</span><span class="op">(</span><span class="st">"ranger"</span>, regularization.factor <span class="op">=</span> <span class="fu">tune</span><span class="op">(</span><span class="st">"regularization"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">set_mode</span><span class="op">(</span><span class="st">"regression"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">rf_param</span> <span class="op">&lt;-</span> <span class="fu">extract_parameter_set_dials</span><span class="op">(</span><span class="va">rf_spec</span><span class="op">)</span></span>
+<span><span class="va">rf_param</span></span>
+<span><span class="co">#&gt; Collection of 2 parameters for tuning</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;      identifier                  type    object</span></span>
+<span><span class="co">#&gt;            mtry                  mtry nparam[?]</span></span>
+<span><span class="co">#&gt;  regularization regularization.factor nparam[+]</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Model parameters needing finalization:</span></span>
+<span><span class="co">#&gt; # Randomly Selected Predictors ('mtry')</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; See `?dials::finalize()` or `?dials::update.parameters()` for more</span></span>
+<span><span class="co">#&gt; information.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>完整的参数对象在其摘要中带有<code>[+]</code>；<code>[?]</code>值表示可能范围中至少有一端缺失。有两种处理方法。第一种是使用<code><a href="https://rdrr.io/r/stats/update.html">update()</a></code>，根据你对数据维度的了解添加范围：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb19"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">rf_param</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/update.html">update</a></span><span class="op">(</span>mtry <span class="op">=</span> <span class="fu">mtry</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">70</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Collection of 2 parameters for tuning</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;      identifier                  type    object</span></span>
+<span><span class="co">#&gt;            mtry                  mtry nparam[+]</span></span>
+<span><span class="co">#&gt;  regularization regularization.factor nparam[+]</span></span>
+<span><span class="co">#&gt; </span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>然而，如果一个recipe对象附加到使用了添加或删除列的步骤的工作流中，这种方法可能就不奏效了。如果这些步骤不计划进行调整，那么<code>finalize()</code>函数可以执行一次该recipe对象以获取维度：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb20"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">pca_rec</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu">recipe</span><span class="op">(</span><span class="va">Sale_Price</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">ames_train</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="co"># Select the square-footage predictors and extract their PCA components:</span></span>
+<span>  <span class="fu">step_normalize</span><span class="op">(</span><span class="fu">contains</span><span class="op">(</span><span class="st">"SF"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="co"># Select the number of components needed to capture 95% of</span></span>
+<span>  <span class="co"># the variance in the predictors.</span></span>
+<span>  <span class="fu">step_pca</span><span class="op">(</span><span class="fu">contains</span><span class="op">(</span><span class="st">"SF"</span><span class="op">)</span>, threshold <span class="op">=</span> <span class="fl">.95</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">updated_param</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu">workflow</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">add_model</span><span class="op">(</span><span class="va">rf_spec</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">add_recipe</span><span class="op">(</span><span class="va">pca_rec</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">extract_parameter_set_dials</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">finalize</span><span class="op">(</span><span class="va">ames_train</span><span class="op">)</span></span>
+<span><span class="va">updated_param</span></span>
+<span><span class="co">#&gt; Collection of 2 parameters for tuning</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;      identifier                  type    object</span></span>
+<span><span class="co">#&gt;            mtry                  mtry nparam[+]</span></span>
+<span><span class="co">#&gt;  regularization regularization.factor nparam[+]</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="va">updated_param</span> <span class="op">%&gt;%</span> <span class="fu">extract_parameter_dials</span><span class="op">(</span><span class="st">"mtry"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # Randomly Selected Predictors (quantitative)</span></span>
+<span><span class="co">#&gt; Range: [1, 74]</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>当recipe对象准备好后，<code>finalize()</code>函数会学习将<code>mtry</code>的上限设置为74个预测变量。</p>
+<p>此外，<code>extract_parameter_set_dials()</code>的结果将包含特定于引擎的参数（如果有的话）。这些参数的发现方式与主要参数相同，并被包含在参数集中。dials包包含所有可能可调节的特定于引擎的参数的参数函数：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb21"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">rf_param</span></span>
+<span><span class="co">#&gt; Collection of 2 parameters for tuning</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;      identifier                  type    object</span></span>
+<span><span class="co">#&gt;            mtry                  mtry nparam[?]</span></span>
+<span><span class="co">#&gt;  regularization regularization.factor nparam[+]</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Model parameters needing finalization:</span></span>
+<span><span class="co">#&gt; # Randomly Selected Predictors ('mtry')</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; See `?dials::finalize()` or `?dials::update.parameters()` for more</span></span>
+<span><span class="co">#&gt; information.</span></span>
+<span><span class="fu">regularization_factor</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Gain Penalization (quantitative)</span></span>
+<span><span class="co">#&gt; Range: (0, 1]</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>最后，有些调优参数最好与转换相关联。一个很好的例子是与许多正则化回归模型相关的惩罚参数。该参数是非负的，通常以对数单位改变其值。主要的dials参数对象表明默认使用转换：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb22"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">penalty</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Amount of Regularization (quantitative)</span></span>
+<span><span class="co">#&gt; Transformer: log-10 [1e-100, Inf]</span></span>
+<span><span class="co">#&gt; Range (transformed scale): [-10, 0]</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>了解这一点很重要，尤其是在更改范围时。新的范围值必须采用转换后的单位：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb23"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># correct method to have penalty values between 0.1 and 1.0</span></span>
+<span><span class="fu">penalty</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">value_sample</span><span class="op">(</span><span class="fl">1000</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
+<span><span class="co">#&gt;  0.1002  0.1796  0.3284  0.4007  0.5914  0.9957</span></span>
+<span></span>
+<span><span class="co"># incorrect:</span></span>
+<span><span class="fu">penalty</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">1.0</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">value_sample</span><span class="op">(</span><span class="fl">1000</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt;    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
+<span><span class="co">#&gt;   1.261   2.081   3.437   4.151   5.781   9.996</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>如果需要，可以通过trans参数更改尺度。你可以使用自然单位，但要保持相同的范围：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb24"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">penalty</span><span class="op">(</span>trans <span class="op">=</span> <span class="cn">NULL</span>, range <span class="op">=</span> <span class="fl">10</span><span class="op">^</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">10</span>, <span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Amount of Regularization (quantitative)</span></span>
+<span><span class="co">#&gt; Range: [1e-10, 1]</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section><section id="chapter-summary" class="level2"><h2 class="anchored" data-anchor-id="chapter-summary">Chapter Summary</h2>
+<p>本章介绍了模型超参数的调优过程，这些超参数无法直接从数据中估计出来。调整这类参数可能会导致过拟合，这通常是因为模型变得过于复杂，所以使用重采样数据集以及适当的评估指标非常重要。确定合适值有两种通用策略，即网格搜索和迭代搜索，我们将在接下来的两章中深入探讨。在tidymodels中，<code>tune()</code>函数用于确定待优化的参数，而dials包中的函数可以提取调优参数对象并与之交互。</p>
+
+
+</section><a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script><script src="https://utteranc.es/client.js" repo="hanguojun007/Blog" issue-term="pathname" theme="github-light" crossorigin="anonymous" async="">
+</script><nav class="page-navigation"><div class="nav-page nav-page-previous">
+      <a href="../../Books/Tidy Modeling with R/11 Comparing Models with Resampling.html" class="pagination-link" aria-label="11 Comparing Models with Resampling">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">11 Comparing Models with Resampling</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+</body></html>
