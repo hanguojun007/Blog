@@ -1,7 +1,7 @@
 ---
 title: "13 Grid Search"
 date: "2025-11-04"
-date-modified: "2025-11-04"
+date-modified: "2025-11-06"
 
 format:
   html:
@@ -28,7 +28,7 @@ knitr:
       width: 77
 
 execute:
-  warning: true
+  warning: false
   error: true
 ---
 
@@ -115,7 +115,7 @@ mlp_param %>%
 
 对于`penalty`，随机数在对数（以10为底）尺度上是均匀分布的，但网格中的值是以自然单位表示的。
 
-随机网格的问题在于，对于中小规模的网格，随机值可能会导致参数组合重叠。此外，随机网格需要覆盖整个参数空间，但良好覆盖的可能性会随着网格值数量的增加而提高。即使对于15个候选点的样本，@fig-13.1 也显示了我们示例中的多层感知器的点之间存在一些重叠。
+随机网格的问题在于，对于中小规模的网格，随机值可能会导致参数组合重叠。此外，随机网格需要覆盖整个参数空间，但良好覆盖的可能性是会随着网格值数量的增加而提高。即使对于15个候选点的样本，@fig-13.1 也显示了我们示例中的多层感知器的点之间存在一些重叠。
 
 ```{r}
 #| label: fig-13.1
@@ -132,7 +132,13 @@ mlp_param %>%
   labs(title = "Random design with 20 candidates")
 ```
 
-一种好得多的方法是使用一组称为**空间填充设计**（space-filling designs）的实验设计。虽然不同的设计方法目标略有不同，但它们通常会找到一种能够覆盖参数空间，且点重叠或值冗余的可能性最小的点配置。这类设计的例子包括“Latin hypercubes”（McKay, Beckman, and Conover 1979），“maximum entropy designs”（Shewry and Wynn 1987），“maximum projection designs”（Joseph, Gul, and Ba 2015），更多见 Santner等人（2003）的综述。
+一种好得多的方法是使用一组称为**空间填充设计**（space-filling designs）的实验设计。虽然不同的设计方法目标略有不同，但它们通常会找到一种能够覆盖参数空间，且点重叠或值冗余的可能性最小的点配置。这类设计的例子包括：
+
+-   “Latin hypercubes”（McKay, Beckman, and Conover 1979），
+-   “maximum entropy designs”（Shewry and Wynn 1987），
+-   “maximum projection designs”（Joseph, Gul, and Ba 2015），
+
+更多见 Santner等人（2003）的综述。
 
 dials包包含用于Latin hypercubes和maximum entropy designs的函数。与`grid_random()`一样，主要输入是参数组合的数量和一个参数对象。让我们在 @fig-13.2 中比较20个候选参数值的随机设计和Latin hypercubes设计。
 
@@ -157,7 +163,7 @@ mlp_param %>%
 
 为了选择最佳的调优参数组合，每个候选参数集都使用未用于训练该模型的数据进行评估。重抽样方法或单个验证集很适合用于此目的。这一过程（以及语法）与10.3节中使用tune包的`fit_resamples()`函数的方法非常相似。
 
-重抽样后，用户会选择最合适的候选参数集。选择经验上最佳的参数组合，或者在选择时偏向模型拟合的其他方面（如简洁性），可能都是合理的。
+重抽样后，用户会选择最合适的候选参数集。选择经验上最佳的参数组合，或者偏向模型拟合的其他方面（如简洁性），可能都是合理的。
 
 在本章和下一章中，我们将使用一个分类数据集来演示模型调优。这些数据来自Hill等人（2007），他们开发了一种用于癌症研究的自动化显微镜实验室工具。该数据集包含对2019个人类乳腺癌细胞的56项成像测量结果。这些预测变量代表了细胞不同部分（例如细胞核、细胞边界等）的形状和强度特征。预测变量之间存在高度的相关性。例如，有几个不同的预测变量用于测量细胞核和细胞边界的大小与形状。此外，许多预测变量各自具有偏斜分布。
 
@@ -166,7 +172,6 @@ mlp_param %>%
 这些数据包含在**modeldata**包中。让我们删除一个分析不需要的列（`case`）：
 
 ```{r}
-library(tidymodels)
 data(cells)
 cells <- cells %>% select(-case)
 ```
@@ -178,9 +183,9 @@ set.seed(1304)
 cell_folds <- vfold_cv(cells)
 ```
 
-由于预测变量之间具有高度的相关性，使用主成分分析（PCA）进行特征提取来消除预测变量的相关性是合理的。下面的流程包含以下步骤：对预测变量进行变换以提高对称性，将它们标准化到同一尺度，然后进行特征提取。需要保留的主成分分析成分数量会与模型参数一起进行调优。虽然得到的主成分分析（PCA）成分在技术上处于相同的尺度，但低阶成分的范围往往比高阶成分更宽。出于这个原因，我们再次进行标准化，以使预测变量具有相同的均值和方差。
+由于预测变量之间具有高度的相关性，使用主成分分析（PCA）进行特征提取来消除预测变量的相关性是合理的。下面的流程包含以下步骤：**对预测变量进行变换以提高对称性，将它们标准化到同一尺度，然后进行特征提取。需要保留的主成分分析成分数量会与模型参数一起进行调优。虽然得到的主成分分析（PCA）成分在技术上处于相同的尺度，但低阶成分的范围往往比高阶成分更宽。出于这个原因，我们再次进行标准化，以使预测变量具有相同的均值和方差**。
 
-许多预测变量具有偏态分布。由于主成分分析（PCA）是基于方差的，极端值可能会对这些计算产生不利影响。为了解决这个问题，让我们添加一个recipe步骤，为每个预测变量估计“Yeo-Johnson”变换（Yeo和Johnson，2000年）。虽然它最初旨在对结果进行变换，但也可用于估计有助于获得更对称分布的变换。这个`step_YeoJohnson()`步骤在recipe对象中出现在通过`step_normalize()`进行初始标准化之前。然后，让我们将这个特征工程recipe对象与我们的神经网络模型`mlp_spec`结合起来。
+许多预测变量具有偏态分布。由于**主成分分析（PCA）是基于方差的，极端值可能会对这些计算产生不利影响。为了解决这个问题，让我们添加一个recipe步骤，为每个预测变量估计“Yeo-Johnson”变换**（Yeo和Johnson，2000年）。虽然它最初旨在对结果进行变换，但也可用于估计有助于获得更对称分布的变换。这个`step_YeoJohnson()`步骤在recipe对象中出现在通过`step_normalize()`进行初始标准化之前。然后，让我们将这个特征工程recipe对象与我们的神经网络模型`mlp_spec`结合起来。
 
 ```{r}
 mlp_rec <-
@@ -208,7 +213,9 @@ mlp_param <-
   )
 ```
 
+:::: {.callout-tip}
 在`step_pca()`中，使用零个主成分分析（PCA）组件是跳过特征提取的快捷方式。通过这种方式，原始预测变量可以直接与包含主成分分析组件的结果进行比较。
+:::
 
 `tune_grid()`函数是进行网格搜索的主要函数。其功能与第10.3节中的`fit_resamples()`非常相似，但它有一些与网格相关的额外参数：
 
@@ -216,7 +223,7 @@ mlp_param <-
 
 -   `param_info`：一个用于定义参数范围的可选参数。当`grid`为整数时，该参数最为有用。
 
-否则，`tune_grid()`的参数接口与`fit_resamples()`相同。第一个参数要么是模型，要么是工作流。当提供模型时，第二个参数可以是配方或公式。另一个必需的参数是rsample重抽样对象（例如`cell_folds`）。下面的调用还传递了一个指标集，以便在重抽样过程中测量ROC曲线下面积。
+`tune_grid()`的其他参数接口与`fit_resamples()`相同。第一个参数要么是模型，要么是工作流。当提供模型时，第二个参数可以是recipe对象或公式。另一个必需的参数是rsample重抽样对象（例如`cell_folds`）。下面的调用还传递了一个指标集，以便在重抽样过程中测量ROC曲线下面积。
 
 首先，让我们评估一个在重采样中包含三个级别的常规网格：
 
@@ -237,6 +244,8 @@ mlp_reg_tune
 
 ```{r}
 #| label: fig-13.3
+#| fig-width: 10
+#| fig-asp: 1
 #| fig-cap: The regular grid results
 autoplot(mlp_reg_tune) +
   scale_color_viridis_d(direction = -1) +
@@ -287,7 +296,7 @@ show_best(mlp_sfd_tune) %>% select(-.estimator)
 
 一般来说，通过多个指标对模型进行评估是个不错的主意，这样可以考虑到模型拟合的不同方面。此外，选择一个与更简单模型相关联的略次优的参数组合往往是合理的。对于这个模型而言，简单性对应的是更大的惩罚值和/或更少的隐藏单元。
 
-与`fit_resamples()`的结果一样，通常没有必要保留不同重抽样和调优参数下的中间模型拟合结果。不过，和之前一样，`control_grid()`的`extract`选项允许保留拟合好的模型和/或配方。此外，将`save_pred`选项设置为`TRUE`会保留评估集的预测结果，这些结果可以通过`collect_predictions()`进行访问。
+与`fit_resamples()`的结果一样，通常没有必要保留不同重抽样和调优参数下的中间模型拟合结果。不过，和之前一样，`control_grid()`的`extract`选项允许保留拟合好的模型和/或recipe对象。此外，将`save_pred`选项设置为`TRUE`会保留评估集的预测结果，这些结果可以通过`collect_predictions()`进行访问。
 
 ## Finalizing the Model
 
@@ -331,11 +340,11 @@ final_mlp_fit <-
 
 现在可以使用这个对象对新数据进行未来预测。
 
-如果您没有使用工作流，则模型和/或配方的最终确定是通过`finalize_model()`和`finalize_recipe()`来完成的。
+如果您没有使用工作流，则模型和/或recipe对象的最终确定是通过`finalize_model()`和`finalize_recipe()`来完成的。
 
 ## Tools for Creating Tuning Specifications
 
-**usemodels**包可以接收一个数据框和模型公式，然后生成用于模型调优的R代码。该代码还会创建一个合适的配方，其步骤取决于所请求的模型以及预测变量数据。
+**usemodels**包可以接收一个数据框和模型公式，然后生成用于模型调优的R代码。该代码还会创建一个合适的recipe对象，其步骤取决于所请求的模型以及预测变量数据。
 
 例如，对于Ames房价数据，可以使用以下代码创建xgboost建模代码：
 
@@ -459,6 +468,7 @@ for (rs in resamples) {
 为了说明并行处理是如何工作的，我们将使用一个包含7个模型调优参数值且采用5折交叉验证的案例。@fig-13.5 展示了任务是如何分配给工作进程的。
 
 ```{r}
+#| echo: false
 #| label: fig-13.5
 #| fig-cap: Worker processes when parallel processing matches resamples to a specific worker process
 
@@ -491,13 +501,12 @@ for (iter in all_tasks) {
 }
 ```
 
-在这种情况下，并行化现在在单个循环上进行。例如，如果我们使用带有 $M$ 个调优参数值的5折交叉验证，那么这个循环将执行 $5×M$ 次迭代。这增加了可使用的潜在工作进程数量。然而，与数据预处理相关的工作会被重复多次。如果这些步骤的成本很高，这种方法就会效率低下。
+在这种情况下，并行化现在在单个循环上进行。例如，如果我们使用带有 $M$ 个调优参数值的5折交叉验证，那么这个循环将执行 $5×M$ 次迭代。这增加了可使用的潜在工作进程数量。然而，与数据预处理相关的工作会被重复多次。如果这些步骤的成本很高，这种方法就会效率低下。在tidymodels中，验证集被视为单个重采样，这种情况下，这种并行化方案将是最佳的。
 
-在tidymodels中，验证集被视为单个重采样。在这些情况下，这种并行化方案将是最佳的。
-
-@fig-13.6 展示了在此方案中向工作人员分配任务的情况；使用了相同的示例，但有10名工作人员。
+@fig-13.6 展示了此方案向工作进程分配任务的情况；使用了相同的示例，但有10个工作进程。
 
 ```{r}
+#| echo: false
 #| label: fig-13.6
 #| fig-cap: Worker processes when preprocessing and modeling tasks are distributed to many workers
 
@@ -597,17 +606,18 @@ start_stop_dat %>%
 
 为了比较不同可能的并行化方案，我们使用xgboost引擎，在包含4000个样本的数据集上对一个提升树进行了调优，采用了5折交叉验证和10个候选模型。这些数据需要一些不需要任何估计的基线预处理。预处理通过三种不同的方式进行：
 
-1.  在建模前使用dplyr管道对数据进行预处理（在后续图表中标记为“none”）。
-2.  通过一个流程执行相同的预处理（显示为“轻度”预处理）。
-3.  使用配方时，添加一个计算成本高的额外步骤（标记为“昂贵”）。
+1.  在建模前使用dplyr管道对数据进行预处理（标记为“none”）。
+2.  通过一个流程执行相同的预处理（标记为“light”）。
+3.  使用recipe对象时，添加一个计算成本高的额外步骤（标记为“expensive”）。
 
-第一种和第二种预处理选项旨在进行比较，以衡量第二种选项中配方的计算成本。第三种选项衡量在`parallel_over = "everything"`的情况下执行冗余计算的成本。
+第一种和第二种预处理选项旨在进行比较，以衡量第二种选项中recipe对象的计算成本。第三种选项衡量在`parallel_over = "everything"`的情况下执行冗余计算的成本。
 
-我们在一台拥有10个物理核心和20个虚拟核心（通过超线程实现）的计算机上，使用不同数量的工作进程以及两个`parallel_over`选项对这一过程进行了评估。
+我们在一台拥有10个物理核心和20个虚拟核心（通过超线程实现）的计算机上，使用不同数量的工作进程以及两种`parallel_over`选项对这一过程进行了评估。由于只有五次重采样，所以当`parallel_over = "resamples"`时，使用的核心数量被限制为五个。
 
-首先，让我们看看 @fig-13.7 中的原始执行时间。
+结果如 @fig-13.7 所示：
 
 ```{r}
+#| echo: false
 #| label: fig-13.7
 #| fig-cap: Execution times for model tuning versus the number of workers using different delegation schemes
 
@@ -624,11 +634,9 @@ ggplot(times, aes(x = num_cores, y = elapsed, color = parallel_over, shape = par
   theme(legend.position = "top")
 ```
 
-由于只有五次重采样，所以当`parallel_over = "resamples"`时，使用的核心数量被限制为五个。
+比较前两个面板中“none”和“light”的曲线：
 
-比较前两个面板中“无”和“轻度”的曲线：
-
--   这些面板之间的执行时间几乎没有差异。这表明，对于这些数据而言，在配方中执行预处理步骤并不会带来实际的计算代价。
+-   这些面板之间的执行时间几乎没有差异。这表明，对于这些数据而言，在recipe对象中执行预处理步骤并不会带来实际的计算代价。
 
 -   使用`parallel_over = "everything"`搭配多个核心会有一些好处。然而，如图所示，并行处理的大部分好处出现在前五个工作进程中。
 
@@ -637,6 +645,7 @@ ggplot(times, aes(x = num_cores, y = elapsed, color = parallel_over, shape = par
 我们也可以在 @fig-13.8 中从加速比的角度查看这些数据。
 
 ```{r}
+#| echo: false
 #| label: fig-13.8
 #| fig-cap: Speed-ups for model tuning versus the number of workers using different delegation schemes. The diagonal black line indicates a linear speedup where the addition of a new worker process has maximal effect.
 
@@ -659,7 +668,7 @@ ggplot(times, aes(x = num_cores, y = speed_up, color = parallel_over, shape = pa
 
 ### Access to global variables
 
-使用tidymodels时，可以在模型对象中使用本地环境（通常是全局环境）中的值。这里所说的“环境”是什么意思呢？可以把R语言中的环境看作是一个存储你可以操作的变量的地方。想要了解更多信息，请参阅 Advanced R 中 “Environment”章节。
+使用tidymodels时，可以在模型对象中使用本地环境（通常是全局环境）中的值。这里所说的“环境”是什么意思呢？可以把R语言中的环境看作是一个存储你可以操作的变量的地方。想要了解更多信息，请参阅 Advanced R 中“Environment”章节。
 
 如果我们定义一个变量用作模型参数，然后将其传递给像`linear_reg()`这样的函数，该变量通常是在全局环境中定义的。
 
@@ -675,7 +684,7 @@ spec
 spec$args$penalty
 ```
 
-注意，我们有`env: global`，因为这个变量是在全局环境中创建的。由`spec`定义的模型规范在用户的常规会话中运行时能正常工作，因为该会话也在使用全局环境；R可以轻松找到`coef_penalty`对象。当使用并行工作进程评估此类模型时，它可能会失败。这取决于用于并行处理的特定技术，工作进程可能无法访问全局环境。
+注意，结果有`env: global`，因为这个变量是在全局环境中创建的。由`spec`定义的模型规范在用户的常规会话中运行时能正常工作，因为该会话也在使用全局环境；R可以轻松找到`coef_penalty`对象。当使用并行工作进程评估此类模型时，它可能会失败。这取决于用于并行处理的特定技术，工作进程可能无法访问全局环境。
 
 在编写将并行运行的代码时，将实际数据插入到对象中而非对象的引用，是个不错的主意。rlang和dplyr包在这方面会很有帮助。例如，`!!`运算符可以将单个值拼接进一个对象：
 
@@ -692,7 +701,7 @@ mcmc_args <- list(chains = 3, iter = 1000, cores = 3)
 linear_reg() %>% set_engine("stan", !!!mcmc_args)
 ```
 
-配方选择器是另一个你可能希望访问全局变量的地方。假设你有一个配方步骤，该步骤应该使用细胞数据中所有通过第二个光学通道测量的预测变量。我们可以创建这些列名的向量：
+recipe对象选择器是另一个你可能希望访问全局变量的地方。假设你有一个recipe对象步骤，该步骤应该使用细胞数据中所有通过第二个光学通道测量的预测变量。我们可以创建这些列名的向量：
 
 ```{r}
 library(stringr)
@@ -700,7 +709,7 @@ ch_2_vars <- str_subset(names(cells), "ch_2")
 ch_2_vars
 ```
 
-我们可以将这些硬编码到一个配方步骤中，但更好的做法是通过编程方式引用它们，以防数据发生变化。有两种实现方法：
+我们可以将这些硬编码到一个recipe对象步骤中，但更好的做法是通过编程方式引用它们，以防数据发生变化。有两种实现方法：
 
 ```{r}
 # Still uses a reference to global data (~_~;)
@@ -712,24 +721,25 @@ recipe(class ~ ., data = cells) %>%
   step_spatialsign(!!!ch_2_vars)
 ```
 
-后者更适合并行处理，因为所有所需信息都嵌入在配方对象中。
+后者更适合并行处理，因为所有所需信息都嵌入在recipe对象对象中。
 
 ### Racing methods
 
 网格搜索的一个问题是，所有模型都需要在所有重采样上进行拟合，之后才能评估任何调优参数。相反，如果能在调优过程中的某个时刻进行中期分析，以排除任何确实糟糕的参数候选者，那将会很有帮助。这类似于临床试验中的无效性分析。如果一种新药的表现极差（或极好），等到试验结束再做决定可能是不道德的。
 
-在机器学习中，被称为竞赛方法的一系列技术具有类似的功能（Maron and Moore，1994）。在这里，调优过程会在重抽样的初始子集上评估所有模型。根据它们当前的性能指标，某些参数集不会在后续的重抽样中被考虑。
+在机器学习中，被称为**竞赛方法**（racing methods）的一系列技术具有类似的功能（Maron and Moore，1994）。在这里，调优过程会在重抽样的初始子集上评估所有模型。根据它们当前的性能指标，某些参数集不会在后续的重抽样中被考虑。
 
 例如，在本章探讨的使用规则网格的多层感知器调优过程中，仅经过前三个折后的结果会是什么样子？使用与第11章所示类似的技术，我们可以拟合一个模型，其中结果是重采样的ROC曲线下面积，而预测变量是参数组合的指示器。该模型考虑了重采样之间的效应，并为每个参数设置生成点估计和区间估计。模型的结果是单侧95%置信区间，用于衡量相对于当前表现最佳参数的ROC值损失，如 @fig-13.9 所示。
 
 ```{r}
+#| echo: false
 #| label: fig-13.9
 #| fig-cap: The racing process for 20 tuning parameters and 10 resamples
 
 set.seed(1308)
 mlp_sfd_race <-
   mlp_wflow %>%
-  tune_race_anova(
+  finetune::tune_race_anova(
     cell_folds,
     grid = 20,
     # Pass in the parameter object to use the appropriate range:
@@ -790,7 +800,10 @@ iter_three %>%
 
 任何置信区间包含零的参数组，都缺乏证据表明其性能与最佳结果存在统计学上的差异。我们保留了6种设置，对这些设置进行更多的重抽样。其余14个子模型不再被考虑。
 
-```{r grid-mlp-racing-anim, include = FALSE, dev = 'png'}
+```{r}
+#| eval: false
+#| echo: false
+
 race_ci_plots <- function(x, iters = max(x$iter)) {
   x_rng <- extendrange(c(-x$estimate, -x$upper))
 
@@ -834,7 +847,7 @@ av::av_capture_graphics(
 )
 ```
 
-<video width="720" height="720" controls>
+<video width="100%" controls>
   <source src="images/race_results.mp4" type="video/mp4">
 </video>
 
@@ -842,12 +855,12 @@ av::av_capture_graphics(
 
 只要中期分析速度快且某些参数设置性能较差，竞赛方法就可能比基本的网格搜索更高效。当模型不具备利用子模型预测的能力时，这种方法也最有帮助。
 
-finetune包包含用于竞赛的函数。`tune_race_anova()`函数通过ANOVA模型来检验不同模型配置的统计显著性。重现前面所示筛选过程的语法如下：
+**finetune**包包含用于竞赛的函数。`tune_race_anova()`函数通过ANOVA模型来检验不同模型配置的统计显著性。重现前面所示筛选过程的语法如下：
 
 ```{r}
 library(finetune)
 
-set.seed(1308)
+set.seed(1309)
 mlp_sfd_race <-
   mlp_wflow %>%
   tune_race_anova(
@@ -871,7 +884,7 @@ show_best(mlp_sfd_race, n = 10)
 
 ## Chapter Summary
 
-本章讨论了可用于模型调优的网格搜索的两个主要类别（常规和非常规），并演示了如何构建这些网格，既可以手动构建，也可以使用`grid_*()`函数族。`tune_grid()`函数可以通过重抽样来评估这些候选模型参数集。本章还展示了如何确定模型、配方或工作流的最终版本，以更新最终拟合的参数值。网格搜索可能计算成本很高，但在这类搜索的实验设计中做出深思熟虑的选择可以使其变得易于处理。
+本章讨论了可用于模型调优的网格搜索的两个主要类别（常规和非常规），并演示了如何构建这些网格，既可以手动构建，也可以使用`grid_*()`函数族。`tune_grid()`函数可以通过重抽样来评估这些候选模型参数集。本章还展示了如何确定模型、recipe对象或工作流的最终版本，以更新最终拟合的参数值。网格搜索可能计算成本很高，但在这类搜索的实验设计中做出深思熟虑的选择可以使其变得易于处理。
 
 下一章将重用的数据分析代码如下：
 
