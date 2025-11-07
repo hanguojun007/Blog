@@ -1,0 +1,888 @@
+---
+title: "14 Iterative Search"
+date: "2025-11-07"
+date-modified: "2025-11-07"
+
+format:
+  html:
+    code-link: true
+
+fig-width: 6
+fig-asp: 0.618
+out-width: 70%
+fig-align: center
+
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: "#>"
+    R.options:
+      dplyr.print_min: 6
+      dplyr.print_max: 6
+      pillar.max_footer_lines: 2
+      pillar.min_chars: 15
+      stringr.view_n: 6
+      cli.num_colors: 0
+      cli.hyperlink: FALSE
+      pillar.bold: TRUE
+      width: 77
+
+execute:
+  warning: true
+  error: true
+---
+
+第13章展示了网格搜索如何采用一组预定义的候选值，对它们进行评估，然后选择最佳设置。迭代搜索方法则采用不同的策略。在搜索过程中，它们会预测接下来要测试哪些值。当网格搜索不可行或效率低下时，迭代方法是优化调优参数的合理选择。
+
+本章概述了两种搜索方法：
+
+-   **贝叶斯优化**（Bayesian optimization），它使用统计模型来预测更好的参数设置。
+-   **模拟退火**（simulated annealing），它采用全局搜索方法。
+
+为了便于说明，我们使用与前一章相同的细胞特征数据，但更换了模型。本章采用支持向量机模型，因为它能对搜索过程提供清晰的二维可视化效果。
+
+## A Support Vector Machine Model
+
+我们再次使用第13.2节中描述的细胞分割数据进行建模，并使用**支持向量机**（SVM）模型来演示迭代搜索方法。有关SVM模型的更多信息，请参见 M. Kuhn和Johnson（2013）。需要优化的两个调优参数是SVM的成本值和径向基函数核参数 $\sigma$。这两个参数都会对模型的复杂性和性能产生深远影响。
+
+支持向量机（SVM）模型会用到点积，因此有必要对预测变量进行中心化和缩放处理。与多层感知器模型类似，该模型也能从主成分分析（PCA）特征提取中获益。不过，本章不会使用这第三个调优参数，以便我们能在二维空间中可视化搜索过程。
+
+除了之前使用的对象（见第13.6节），还需要svm_rec、svm_spec和svm_wflow等tidymodels对象：
+
+```{r}
+library(tidymodels)
+tidymodels_prefer()
+
+data(cells)
+cells <- cells %>% select(-case)
+
+set.seed(1304)
+cell_folds <- vfold_cv(cells)
+
+roc_res <- metric_set(roc_auc)
+
+svm_rec <-
+  recipe(class ~ ., data = cells) %>%
+  step_YeoJohnson(all_numeric_predictors()) %>%
+  step_normalize(all_numeric_predictors())
+
+svm_spec <-
+  svm_rbf(cost = tune(), rbf_sigma = tune()) %>%
+  set_engine("kernlab") %>%
+  set_mode("classification")
+
+svm_wflow <-
+  workflow() %>%
+  add_model(svm_spec) %>%
+  add_recipe(svm_rec)
+```
+
+两个调优参数`cost`和`rbf_sigma`的默认参数范围是
+
+```{r}
+cost()
+rbf_sigma()
+```
+
+为了说明，让我们稍微改变核参数的范围，以改进搜索的可视化效果：
+
+```{r}
+svm_param <-
+  svm_wflow %>%
+  extract_parameter_set_dials() %>%
+  update(rbf_sigma = rbf_sigma(c(-7, -1)))
+```
+
+在讨论迭代搜索的具体细节及其工作原理之前，让我们探究这个特定数据集的两个支持向量机（SVM）调优参数与ROC曲线下面积之间的关系。我们构建了一个非常大的规则网格，由2500个候选值组成，并通过重采样对该网格进行了评估。显然，这在常规数据分析中是不切实际的，而且效率极低。然而，它阐明了搜索过程应遵循的路径以及数值最优值出现的位置。
+
+@fig-14.1 展示了对该网格的评估结果，其中颜色越浅表示模型性能越高（越好）。参数空间的左下对角线区域有一大片相对平缓的区域，性能较差。性能最佳的脊线出现在该空间的右上部分。黑点表示最佳设置。从性能不佳的平台区域到性能最佳的脊线区域的过渡非常陡峭。在脊线右侧紧邻的位置，ROC曲线下面积也出现了急剧下降。
+
+![Heatmap of the mean area under the ROC curve for a high density grid of tuning parameter values. The best point is a solid dot in the upper-right corner.](images/roc_surface.png){#fig-14.1}
+
+以下搜索过程在继续之前至少需要一些重采样的性能统计数据。为此，下面的代码创建了一个位于参数空间平坦部分的小型规则网格。`tune_grid()`函数对该网格进行重采样：
+
+```{r}
+set.seed(1401)
+start_grid <-
+  svm_param %>%
+  update(
+    cost = cost(c(-6, 1)),
+    rbf_sigma = rbf_sigma(c(-6, -4))
+  ) %>%
+  grid_regular(levels = 2)
+
+set.seed(1402)
+svm_initial <-
+  svm_wflow %>%
+  tune_grid(resamples = cell_folds, grid = start_grid, metrics = roc_res)
+
+collect_metrics(svm_initial)
+```
+
+这个初始网格显示出相当相近的结果，没有任何单个点比其他点好很多。这些结果可以被下一节讨论的迭代调优函数接收，用作初始值。
+
+## Bayesian Optimization
+
+贝叶斯优化技术会分析当前的重采样结果，并创建一个预测模型，以推荐尚未评估的调参参数值。然后对推荐的参数组合进行重采样。这些结果随后会被用于另一个预测模型，该模型会推荐更多供测试的候选值，依此类推。这个过程会进行设定好的迭代次数，或者直到不再有进一步的改进为止。Shahriari等人（2016）和Frazier（2018）对贝叶斯优化做了很好的介绍。
+
+在使用贝叶斯优化时，主要关注点是如何创建模型以及如何选择该模型推荐的参数。首先，让我们考虑贝叶斯优化中最常用的技术——高斯过程模型。
+
+### A Gaussian process model
+
+高斯过程（GP）（Schulz，Speekenbrink，and Krause，2018）模型是著名的统计技术，在空间统计学中有着悠久的历史（以“kriging methods”最为出名）。它可以通过多种方式推导得出，包括作为贝叶斯模型；详见 Rasmussen 和 Williams（2006）的参考文献。
+
+从数学角度来讲，高斯过程（GP）是一组随机变量的集合，其联合概率分布为多元高斯分布。在我们的应用场景中，这组随机变量是调优参数候选值对应的性能指标集合。对于之前的四个样本初始网格，这四个随机变量的观测值分别为0.8639、0.8625、0.8627和0.8659。这些值被假设服从多元高斯分布。定义高斯过程模型中自变量/预测变量的输入是相应的调优参数值（如 @tbl-14.1 所示）。
+
+```{r echo = FALSE, results = "asis"}
+collect_metrics(svm_initial) %>%
+  select(ROC = mean, cost, rbf_sigma) %>%
+  as.data.frame() %>%
+  format(digits = 4, scientific = FALSE) %>%
+  kable(
+    caption = "Resampling statistics used as the initial substrate to the Gaussian process model.",
+    label = "tbl-14.1"
+  ) %>%
+  kableExtra::kable_styling(full_width = FALSE) %>%
+  kableExtra::add_header_above(c("outcome" = 1, "predictors" = 2))
+```
+
+高斯过程模型由其均值函数和协方差函数来定义，不过后者对高斯过程模型的性质影响更大。协方差函数通常根据输入值（记为 $x$ ）进行参数化。例如，一种常用的协方差函数是平方指数函数：
+
+$$
+cov(x_i, x_j) = \exp\left(-\frac{1}{2}|x_i - x_j|^2\right) + \sigma^2_{ij}
+$$
+
+其中 $\sigma^2_{ij}$ 是一个恒定的误差方差项，当 $i = j$ 时，该误差方差项为零。这个方程可转化为：随着两个调优参数组合之间距离的增加，性能指标之间的协方差呈指数增长。
+
+该方程的性质还意味着，结果指标的变异在已观测到的点处达到最小（即当 $|x_i−x_j|^2$ 为零时）。
+
+这种协方差函数的特性使得高斯过程即便在只有少量数据的情况下，也能够表征模型性能与调优参数之间高度非线性的关系。
+
+然而，在某些情况下，拟合这些模型可能会很困难，而且随着调优参数组合数量的增加，模型的计算成本会变得更高。
+
+该模型的一个重要优点是，由于指定了完整的概率模型，对新输入的预测能够反映结果的整个分布。换句话说，新的性能统计数据可以从均值和方差两方面进行预测。
+
+假设正在考虑两个新的调优参数。在 @tbl-14.2 中，候选参数A的平均ROC值略高于候选参数B（当前最佳值为0.8659）。然而，其方差是B的四倍。这是好还是坏呢？选择选项A风险更高，但潜在回报也可能更高。方差的增加还反映出，这个新值与现有数据的距离比B更远。下一节将更详细地探讨高斯过程（GP）预测在贝叶斯优化中的这些方面。
+
+```{r echo = FALSE, result = "asis"}
+best_val <- max(collect_metrics(svm_initial)$mean)
+tmp <- tibble(candidate = LETTERS[1:2], .mean = c(.90, .89), .sd = c(0.02, 0.005))
+tmp %>%
+  select(candidate, mean = .mean, variance = .sd) %>%
+  mutate(variance = variance^2) %>%
+  as.data.frame() %>%
+  format(digits = 4, scientific = FALSE) %>%
+  kable(
+    caption = "Two example tuning parameters considered for further sampling.",
+    label = "tbl-14.2"
+  ) %>%
+  kableExtra::kable_styling(full_width = FALSE) %>%
+  kableExtra::add_header_above(c(" " = 1, "GP Prediction of ROC AUC" = 2))
+```
+
+贝叶斯优化是一个迭代过程。基于四个结果的初始网格，拟合GP模型，预测候选参数，并选择第五个调优参数组合。我们计算新配置的性能估计值，然后利用这五个现有结果重新拟合GP模型（以此类推）。
+
+### Acquisition functions
+
+一旦高斯过程拟合了当前数据，它将如何被使用呢？我们的目标是选择下一个最有可能比当前最佳结果“更好”的调优参数组合。实现这一目标的一种方法是创建一个大型候选集（或许可以采用空间填充设计），然后对每个候选参数组合进行均值和方差预测。利用这些信息，我们就能选出最有利的调优参数值。
+
+一类被称为 Acquisition 函数的目标函数有助于平衡均值和方差。回想一下，高斯过程模型的预测方差主要由它们与现有数据的距离决定。新候选点的预测均值和方差之间的权衡通常从探索和利用的角度来看待：
+
+-   探索会使选择偏向于观测到的候选模型较少（如果有的话）的区域。这往往会给方差较高的候选模型赋予更大的权重，并侧重于发现新的结果。
+
+-   利用主要依靠均值预测来找到最佳（均值）值。它侧重于已有的结果。
+
+```{r}
+#| include: false
+
+nonlin_function <- function(x, error = TRUE) {
+  # use the ames spline curve for Longitude just because I think that it's
+  # cool
+  data(ames, package = "modeldata")
+  rec <-
+    recipe(Sale_Price ~ Longitude, data = ames) %>%
+    step_log(Sale_Price, skip = TRUE) %>%
+    step_range(Longitude) %>%
+    prep()
+
+
+  # use the ames longitude pattern since I like it
+  f <- lm(log10(Sale_Price) ~ splines::ns(Longitude, df = 12), data = juice(rec))
+  p <- predict(f, newdata = data.frame(Longitude = x), se.fit = TRUE)
+  err <- p$se.fit
+  if (!error) {
+    err <- 0
+  }
+  res <- rnorm(1, mean = p$fit, sd = err)
+  # convert to a R^2-like value
+  res <- (8 * res) / 10
+  res <- max(res, 0)
+  res <- min(res, 1)
+  res
+}
+
+grid <-
+  tibble(x = seq(0, 1, length.out = 200)) %>%
+  mutate(y = purrr::map_dbl(x, nonlin_function, error = FALSE))
+
+set.seed(121)
+current_iter <- tibble(x = c(.09, .41, .55, .7, .8)) %>%
+  mutate(y = purrr::map_dbl(x, nonlin_function))
+
+gp <- GPfit::GP_fit(matrix(current_iter$x, ncol = 1), current_iter$y)
+
+gp_pred <-
+  predict(gp, matrix(grid$x, ncol = 1))$complete_data %>%
+  as_tibble() %>%
+  setNames(c("x", ".mean", ".sd")) %>%
+  mutate(.sd = sqrt(.sd))
+
+gp_pred <-
+  gp_pred %>%
+  bind_cols(
+    exp_improve() %>%
+      predict(gp_pred, maximize = TRUE, iter = 1, best = max(current_iter$y)) %>%
+      setNames("exp_imp")
+  ) %>%
+  bind_cols(
+    conf_bound(kappa = .1) %>%
+      predict(gp_pred, maximize = TRUE, iter = 1, best = max(current_iter$y)) %>%
+      setNames("conf_int_01")
+  ) %>%
+  bind_cols(
+    conf_bound(kappa = 1) %>%
+      predict(gp_pred, maximize = TRUE, iter = 1, best = max(current_iter$y)) %>%
+      setNames("conf_int_1")
+  )
+```
+
+为了说明这一点，让我们来看一个简单的例子，其中有一个参数，其值在[0, 1]之间，性能指标是 $R^2$。真实函数如 @fig-14.2 所示，同时还有五个具有现有结果的候选值（以点表示）。
+
+```{r}
+#| label: fig-14.2
+#| echo: false
+#| fig-cap: Hypothetical true performance profile over an arbitrary tuning parameter, with five estimated points
+y_lab <- expression(Estimated ~ italic(R^2))
+
+ggplot(grid, aes(x = x, y = y)) +
+  geom_line(color = "red", alpha = .5, linewidth = 1.25) +
+  labs(y = y_lab, x = "Tuning Parameter") +
+  geom_point(data = current_iter)
+```
+
+对于这些数据，@fig-14.3 展示了高斯过程（GP）模型的拟合情况。阴影区域表示均值±1标准误差。两条竖线标示了两个候选点，后续会对其进行更详细的研究。
+
+阴影置信区域展示了平方指数方差函数；该区域在数据点之间会变得非常大，而在现有数据点处则收敛到零。
+
+```{r}
+#| label: fig-14.3
+#| echo: false
+#| fig-cap: Estimated performance profile generated by the Gaussian process model. The shaded region shows one-standard-error bounds.
+
+y_lab <- expression(Estimated ~ italic(R^2))
+
+gp_pred %>%
+  ggplot(aes(x = x)) +
+  geom_point(data = current_iter, aes(y = y)) +
+  geom_line(aes(y = .mean)) +
+  geom_vline(xintercept = c(0.1, 0.25), lty = 2, alpha = .5) +
+  geom_ribbon(aes(ymin = .mean - 1 * .sd, ymax = .mean + 1 * .sd), alpha = .1) +
+  labs(y = y_lab, x = "Tuning Parameter")
+```
+
+这种非线性趋势穿过每个观测点，但该模型并非完美无缺。在真实最优设置附近没有观测点，而在这个区域，拟合效果本可以好得多。尽管如此，高斯过程（GP）模型仍能有效地为我们指明正确方向。
+
+从纯粹的利用角度来看，最佳选择应该是选取具有最佳平均预测值的参数值。在这里，这个值是0.106，刚好在现有最佳观测点0.09的右侧。
+
+作为一种鼓励探索的方式，一种简单（但不常使用）的方法是找到与最大置信区间相关的调优参数。例如，通过为R²置信界限使用单一标准差，下一个要采样的点将是0.236。这稍微更深入到没有观测结果的区域。增加上界中使用的标准差数量会将选择进一步推向空白区域。
+
+最常用的 Acquisition 函数之一是**期望改进**（expected improvement）。改进的概念需要当前最佳结果的数值（这与置信区间方法不同）。由于高斯过程（GP）可以用一个分布来描述新的候选点，我们可以利用改进发生的概率，对分布中显示出改进的部分进行加权。
+
+例如，考虑两个候选参数值0.10和0.25（如 @fig-14.3 中的竖线所示）。利用拟合的GP模型，它们的预测 $R^2$ 分布如 @fig-14.4 所示，同时还有一条当前最佳结果的参考线。
+
+```{r}
+#| label: fig-14.4
+#| echo: false
+#| fig-cap: Predicted performance distributions for two sampled tuning parameter values
+
+small_pred <-
+  predict(gp, c(0.1, 0.25))$complete_data %>%
+  as_tibble() %>%
+  setNames(c("x", ".mean", ".sd")) %>%
+  mutate(
+    value = c(0.1, 0.25),
+    .sd = sqrt(.sd),
+    max = .mean + 3 * .sd,
+    min = .mean - 3 * .sd
+  )
+
+small_pred <-
+  small_pred %>%
+  bind_cols(
+    exp_improve() %>%
+      predict(small_pred, maximize = TRUE, iter = 1, best = max(current_iter$y)) %>%
+      setNames("exp_imp")
+  )
+
+get_density <- function(dat) {
+  res <- tibble(x = seq(dat$min, dat$max, length.out = 200)) %>%
+    mutate(
+      density = dnorm(x, dat$.mean, dat$.sd),
+      `Parameter Value` = format(dat$value)
+    )
+  res
+}
+
+x_lab <- expression(Predicted ~ italic(R^2) ~ Distribution)
+
+small_pred %>%
+  group_by(value) %>%
+  do(get_density(.)) %>%
+  ungroup() %>%
+  ggplot(aes(x = x, y = density, color = `Parameter Value`, lty = `Parameter Value`)) +
+  geom_line() +
+  geom_vline(xintercept = max(current_iter$y), lty = 3) +
+  labs(x = x_lab) +
+  scale_color_brewer(palette = "Set1")
+```
+
+仅考虑R²预测均值时，0.10的参数值是更好的选择（参见 @tbl-14.3 ）。平均而言，0.25这个调优参数建议被预测为比当前最佳值更差。然而，由于它具有更高的方差，其整体概率分布中高于当前最佳值的区域更大。因此，它具有更大的期望改进：
+
+```{r echo = FALSE, results = "asis"}
+small_pred %>%
+  select(`Parameter Value` = x, Mean = .mean, `Std Dev` = .sd, `Expected Improvement` = exp_imp) %>%
+  as.data.frame() %>%
+  format(digits = 4, scientific = FALSE) %>%
+  kable(
+    caption = "Expected improvement for the two candidate tuning parameters.",
+    label = "tbl-14.3"
+  ) %>%
+  kableExtra::kable_styling(full_width = FALSE) %>%
+  kableExtra::add_header_above(c(" " = 1, "Predictions" = 3))
+```
+
+当在整个调优参数范围内计算预期改进时，如 @fig-14.5 所示，建议的采样点更接近0.25而非0.10。
+
+```{r}
+#| label: fig-14.5
+#| echo: false
+#| fig-width: 8
+#| fig-asp: 1
+#| fig-cap: The estimated performance profile generated by the Gaussian process model (top panel) and the expected improvement (bottom panel). The vertical line indicates the point of maximum improvement
+
+library(patchwork)
+y_lab <- expression(Estimated ~ italic(R^2))
+
+p1 <-
+  gp_pred %>%
+  ggplot(aes(x = x)) +
+  geom_point(data = current_iter, aes(y = y)) +
+  geom_line(aes(y = .mean)) +
+  geom_ribbon(aes(ymin = .mean - 1 * .sd, ymax = .mean + 1 * .sd), alpha = .1) +
+  labs(y = y_lab, x = NULL) +
+  theme(
+    axis.title.x = element_blank(),
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    plot.margin = unit(c(0, 0, 0, 0), "null")
+  )
+
+p2 <-
+  gp_pred %>%
+  ggplot(aes(x = x, y = exp_imp)) +
+  geom_line() +
+  labs(y = "Expected Improvement", x = "Tuning Parameter") +
+  theme(plot.margin = unit(c(0, 0, 0, 0), "null")) +
+  geom_vline(xintercept = gp_pred$x[which.max(gp_pred$exp_imp)], lty = 2)
+
+p1 / p2
+```
+
+已经提出并讨论了许多获取函数；在tidymodels中，期望改进是默认的。
+
+```{r iterative-cells-bo-calcs, echo = FALSE}
+# We will do the calculations here but use some nonstandard options. First,
+# purrr is used to capture the output in a vector so that we can show the
+# results piecemeal. Also, a hidden option is used to save the grid of candidate
+# values for each iteration of the search. These will be used to make an
+# animation in a later chunk.
+#
+# This means that any changes to this chunk have to be made to the next chunk
+# (where the code is shown and not executed).
+
+ctrl <- control_bayes(verbose = TRUE)
+ctrl$save_gp_scoring <- TRUE
+
+tune_bayes_sssshhh <- purrr::quietly(tune_bayes)
+
+set.seed(1403)
+svm_bo_sshh <-
+  svm_wflow %>%
+  tune_bayes_sssshhh(
+    resamples = cell_folds,
+    metrics = roc_res,
+    initial = svm_initial,
+    param_info = svm_param,
+    iter = 25,
+    control = ctrl
+  )
+
+
+# Make sure that the results have not changed since 2022-02-20. Save the results with:
+#   svm_bo_metrics <- collect_metrics(svm_bo_sshh$result)
+#   save(svm_bo_metrics, file = "RData/svm_bo_metrics.RData")
+# Check with:
+verify_consistent_bo(collect_metrics(svm_bo_sshh$result))
+
+svm_bo <- svm_bo_sshh$result
+svm_bo_output <- svm_bo_sshh$messages
+
+gp_candidates <- collect_gp_results(svm_bo)
+```
+
+###  The `tune_bayes()` function
+
+要通过贝叶斯优化实现迭代搜索，请使用`tune_bayes()`函数。其语法与`tune_grid()`非常相似，但有几个额外的参数：
+
+-   `iter`是最大搜索迭代次数。
+
+-   `initial`可以是整数、使用`tune_grid()`生成的对象，或者是某个竞赛函数。使用整数时，它指定了在第一个高斯过程模型之前采样的空间填充设计的大小。
+
+-   `objective`是一个用于确定应使用哪种获取函数的参数。tune包中包含可在此处传递的函数，例如`exp_improve()`或`conf_bound()`。
+
+-   在这种情况下，`param_info`参数指定了参数的范围以及所使用的任何转换。这些用于定义搜索空间。当默认参数对象不够用时，`param_info`会被用来覆盖默认值。
+
+现在，`control`参数使用`control_bayes()`的结果。其中一些有用的参数包括：
+
+-   `no_improve`是一个整数，如果在`no_improve`次迭代内没有发现更优的参数，它将停止搜索。
+
+-   `uncertain`也是一个整数（或`Inf`），如果在`uncertain`次迭代内没有改进，它将进行一次不确定性抽样。这会选择具有较大变异性的下一个候选对象。由于它不考虑均值预测，因此具有纯粹探索的效果。
+
+-   `verbose`是一个逻辑值，它会在搜索过程中打印日志信息。
+
+让我们使用第14.1节中的首个支持向量机（SVM）结果作为高斯过程模型的初始基础。回想一下，对于这个应用，我们希望最大化ROC曲线下的面积。我们的代码如下：
+
+```r
+ctrl <- control_bayes(verbose = TRUE)
+
+set.seed(1403)
+svm_bo <-
+  svm_wflow %>%
+  tune_bayes(
+    resamples = cell_folds,
+    metrics = roc_res,
+    initial = svm_initial,
+    param_info = svm_param,
+    iter = 25,
+    control = ctrl
+  )
+```
+
+```{r iterative-cells-info, include = FALSE}
+bo_res <- collect_metrics(svm_bo) %>% mutate(current_best = FALSE)
+for (i in 1:nrow(bo_res)) {
+  bo_res$current_best[i] <- bo_res$mean[i] > max(bo_res$mean[1:(i - 1)])
+}
+init_vals <- bo_res %>% dplyr::filter(.iter == 0)
+best_init <- max(bo_res$mean[bo_res$.iter == 0])
+best_bo <- max(bo_res$mean)
+best_bo_iter <- bo_res$.iter[which.max(bo_res$mean)]
+new_best_iter <- bo_res$.iter[which(bo_res$current_best)]
+new_best_iter <- new_best_iter[new_best_iter > 0]
+num_improve <- length(new_best_iter)
+last_iter <- max(collect_metrics(svm_bo)$.iter)
+
+iter_1_roc <- bo_res$mean[bo_res$.iter == 1]
+iter_1_imp <- iter_1_roc > best_init
+iter_1_text <-
+  paste0(
+    ifelse(iter_1_imp, "showed an improvement, resulting in an ROC value of ",
+      "failed to improve the outcome with an ROC value of "
+    ),
+    round(iter_1_roc, 5), "."
+  )
+
+iter_2_roc <- bo_res$mean[bo_res$.iter == 2]
+iter_2_imp <- iter_2_roc > max(bo_res$mean[bo_res$.iter < 2])
+iter_2_text <-
+  dplyr::case_when(
+    !iter_1_imp & !iter_2_imp ~
+      paste0("the second iteration also failed to yield an improvement."),
+    !iter_1_imp & iter_2_imp ~
+      paste0(
+        "the second iteration did yield a better result with an area under the ROC curve of ",
+        round(iter_2_roc, 5), "."
+      ),
+    iter_1_imp & !iter_2_imp ~
+      paste0(
+        "the second iteration did not continue the trend with a suboptimal ROC value of ",
+        round(iter_2_roc, 5), "."
+      ),
+    iter_1_imp & !iter_2_imp ~
+      paste0(
+        "the second iteration further increased the outcome value (ROC = ",
+        round(iter_2_roc, 5), ")."
+      )
+  )
+
+if (num_improve > 1) {
+  improve_text <-
+    paste0(
+      "There were a total of ",
+      num_improve,
+      " improvements in the outcome along the way at iterations ",
+      knitr::combine_words(new_best_iter),
+      "."
+    )
+} else {
+  improve_text <-
+    paste0(
+      "There was only a single improvement in the outcome at iteration ",
+      new_best_iter,
+      "."
+    )
+}
+
+if (last_iter < 25) {
+  last_bo_text <-
+    paste0(
+      "There were no more improvements and the default option is to stop if no progress is made after `no_improve = ",
+      ctrl$no_improve,
+      "` more steps. The last step was:"
+    )
+} else {
+  last_bo_text <- "The last step was:"
+}
+```
+
+搜索过程从ROC曲线下面积的初始最佳值 `r round(best_init, 5)` 开始。高斯过程模型利用这四个统计量来构建模型。大型候选集通过期望改进获取函数自动生成并评分。第一次迭代未能改善结果，其ROC值为 `r xfun::numbers_to_words(nrow(init_vals))` 。使用新的结果值拟合另一个高斯过程模型后，第二次迭代也未能产生改进。
+
+由`verbose`选项生成的前两次迭代的日志如下：
+
+```{r iterative-cells-bo-print-first, echo = FALSE}
+so_stop_index <- grep("Iteration 3", svm_bo_output)
+if (length(so_stop_index) > 0) {
+  cat(svm_bo_output[1:(so_stop_index - 2)], sep = "")
+}
+```
+
+搜索仍在继续。在此过程中，第3、4、5、6、8、13、22、23和24次迭代的结果共得到9次改进。最佳结果出现在第24次迭代，此时ROC曲线下面积为0.8986。
+
+最后一步是：
+
+用于查询结果的函数与网格搜索中使用的函数相同（例如，`collect_metrics()`等）。例如：
+
+```{r}
+show_best(svm_bo)
+```
+
+`autoplot()`函数有几种用于迭代搜索方法的选项。@fig-14.6 展示了通过使用`autoplot(svm_bo, type = "performance")`，结果在搜索过程中是如何变化的。
+
+```{r}
+#| label: fig-14.6
+#| echo: FALSE
+#| fig-cap: The progress of the Bayesian optimization produced when the `autoplot()` method is used with `type = "performance"`
+autoplot(svm_bo, type = "performance")
+```
+
+另一种类型的图表使用`type = "parameters"`，它展示了参数值在迭代过程中的变化。
+
+下方的动画可视化了搜索结果。黑色的××值表示包含在`svm_initial`中的初始值。左上角的蓝色面板显示了ROC曲线下面积的预测均值。右上角的红色面板展示了ROC值的预测变异性，而底部的图表则可视化了预期改进。在每个面板中，颜色越深表示数值的吸引力越低（例如，均值小、变异性大以及改进小）。
+
+```{r iterative-bo-progress, include = FALSE}
+av_capture_graphics(
+  make_bo_animation(gp_candidates, svm_bo),
+  output = "bo_search.mp4",
+  width = 760,
+  height = 760,
+  res = 100,
+  vfilter = "framerate=fps=10",
+  framerate = 1 / 3
+)
+```
+
+<video width="720" height="720" controls>
+<source src="bo_search.mp4" type="video/mp4">
+</video>
+
+在搜索的最初几次迭代中，预测的平均表面的表面非常不准确。尽管如此，它确实有助于将过程引导至性能良好的区域。换句话说，高斯过程模型虽然存在错误，但事实证明它非常有用。在最初的十次迭代内，搜索就在最优位置附近进行采样。
+
+虽然最佳的调优参数组合位于参数空间的边界上，但贝叶斯优化往往会选择边界另一侧的新点。尽管我们可以调整探索与利用的比例，但搜索在早期往往会对边界点进行采样。
+
+如果搜索以初始网格为种子，那么填充空间设计可能会是比常规设计更好的选择。它会对参数空间中更多独特的值进行采样，并能在早期迭代中改进对标准差的预测。
+
+最后，如果用户中断了`tune_bayes()`的计算，该函数会返回当前结果（而不是产生错误）。
+
+## Simulated Annealing
+
+模拟退火（Simulated annealing，SA）（Kirkpatrick，Gelatt 和 Vecchi，1983；Van Laarhoven 和 Aarts，1987）是一种受金属冷却过程启发的通用非线性搜索程序。它是一种全局搜索方法，能够有效遍历多种不同类型的搜索空间，包括不连续函数。与大多数基于梯度的优化程序不同，模拟退火可以重新评估之前的解决方案。
+
+### Simulated annealing search process
+
+使用模拟退火的过程始于一个初始值，并在参数空间中进行受控的随机游走。每个新的候选参数值都是前一个值的微小扰动，这使得新点保持在局部邻域内。
+
+对候选点进行重采样以获取其相应的性能值。如果该性能值比之前参数的结果更好，则将其作为新的最优解并继续该过程。如果结果比之前的值更差，搜索程序仍可能使用该参数来确定后续步骤。这取决于两个因素。首先，随着性能变差，接受不良结果的可能性会降低。换句话说，与性能大幅下降的结果相比，略有变差的结果被接受的概率更高。另一个因素是搜索迭代的次数。随着搜索的进行，模拟退火希望接受更少的次优值。基于这两个因素，不良结果的接受概率可以形式化表示为：
+
+$$
+\operatorname{Pr}[\text{accept suboptimal parameters at iteration } i] = \exp(c\times D_i \times i)
+$$
+
+其中i是迭代次数，c是用户指定的常数，Di是新旧值之间的百分比差异（负值意味着结果更差）。对于较差的结果，我们会计算接受概率，并将其与一个随机均匀数进行比较。如果随机数大于该概率值，搜索会舍弃当前参数，下一次迭代会在之前值的邻域内生成候选值。否则，下一次迭代会基于当前（次优）值形成下一组参数。
+
+模拟退火的接受概率允许搜索朝着错误的方向进行，至少在短期内是这样，但从长远来看，有可能找到参数空间中一个好得多的区域。
+
+接受概率会受到怎样的影响？@fig-14.7 中的热图展示了接受概率如何随着迭代次数、性能以及用户指定的系数而变化。
+
+```{r}
+#| label: fig-14.7
+#| echo: false
+#| fig-cap: Heatmap of the simulated annealing acceptance probabilities for different coefficient values
+
+get_accept_probs <- function(coef, pct_diff) {
+  # pct loss to abs value
+  candidate <- .8 - (pct_diff * .8 / 100)
+
+  x <- finetune:::acceptance_prob(0.8, candidate, 1:50, coef = coef, maximize = TRUE)
+  tibble(
+    `Acceptance Probability` = x,
+    iteration = 1:50,
+    pct_diff = pct_diff,
+    coefficient = coef
+  )
+}
+
+prob_settings <- crossing(pct_diff = 1:10, coefficient = c(10, 20, 30) / 1000)
+prob_res <- purrr::map2_dfr(prob_settings$coefficient, prob_settings$pct_diff, get_accept_probs)
+
+ggplot(prob_res, aes(x = iteration, y = pct_diff, fill = `Acceptance Probability`)) +
+  geom_raster() +
+  facet_wrap(~coefficient, labeller = label_both) +
+  scale_fill_gradientn(
+    colours = scales::brewer_pal(palette = "Greens")(8),
+    limits = 0:1
+  ) +
+  labs(y = "Percent Loss", x = "Iteration")
+```
+
+用户可以调整系数，以找到适合自己需求的概率分布。在`finetune::control_sim_anneal()`中，这个`cooling_coef`参数的默认值为0.02。减小该系数会使搜索过程对不佳结果更加宽容。
+
+这一过程会持续设定好的迭代次数，但如果在预先确定的迭代次数内没有出现全局最优结果，就会停止。不过，设置一个重启阈值会非常有帮助。如果出现一连串的失败，该功能会重新采用上一次的全局最优参数设置并重新开始。
+
+主要的重要细节是定义如何在迭代之间扰动调优参数。文献中对此有多种方法。我们采用了博哈切夫斯基、约翰逊和斯坦（1986）提出的一种名为广义模拟退火的方法。对于连续的调优参数，我们定义一个小半径来指定局部“邻域”。例如，假设有两个调优参数，每个参数的取值范围都在0到1之间。模拟退火过程会在周围的半径范围内生成随机值，并随机选择一个作为当前的候选值。
+
+在我们的实现中，邻域是通过根据参数对象的范围将当前候选值缩放到0到1之间来确定的，因此0.05到0.15之间的半径值似乎是合理的。对于这些值，搜索从参数空间的一侧到另一侧最快大约需要10次迭代。半径的大小控制着搜索探索参数空间的速度。在我们的实现中，会指定一个半径范围，因此不同大小的“局部”定义了新的候选值。
+
+为了说明这一点，我们将使用glmnet的两个主要调优参数：
+
+-   总正则化量（`penalty`）。该参数的默认范围是 $10^{-10}$ 到 $10^{0}$ 。通常对该参数进行以10为底的对数转换。
+
+-   套索惩罚的比例（`mixture`）。它在0到1之间有界，无需转换。
+
+该过程从初始值`penalty = 0.025`和`mixture = 0.050`开始。使用一个在0.050到0.015之间随机波动的半径，对数据进行适当缩放，在初始点周围的半径范围内生成随机值，然后随机选择一个作为候选值。为便于说明，我们假设所有候选值都是更优的。利用这个新值，生成一组新的随机邻近值，从中选择一个，依此类推。@fig-14.8 展示了搜索过程向左上角推进的六个迭代步骤。
+
+```{r iterative-neighborhood-calcs, echo = FALSE}
+#| echo = FALSE,
+#| message = FALSE,
+#| warning = FALSE,
+#| out.width = "80%",
+#| fig.cap = "How simulated annealing determines the local neighborhood for two numeric tuning parameters. The clouds of points show possible next values where one would be selected at random. ",
+#| fig.alt = "An illustration of how simulated annealing determines what is the local neighborhood for two numeric tuning parameters. The clouds of points show possible next values where one would be selected at random. The candidate points are small circular clouds surrounding the current best point."
+
+glmn_param <- parameters(penalty(), mixture())
+pen_rng <- unlist(range_get(penalty(), original = TRUE))
+mix_rng <- 0:1
+
+iter_1 <- tibble(penalty = 0.025, mixture = .05)
+next_neighbors <-
+  finetune:::random_real_neighbor(iter_1, iter_1, glmn_param, retain = 300) %>%
+  mutate(Iteration = 1)
+
+set.seed(1)
+neighbors_values <- next_neighbors
+best_values <- iter_1 %>% mutate(Iteration = 1)
+
+scoring <- function(x) {
+  -log10(x$penalty) * .1 + x$mixture * 2 + rnorm(nrow(x), sd = .5)
+}
+
+path <- best_values
+
+for (i in 2:6) {
+  set.seed(i + 5)
+  next_scores <- scoring(next_neighbors)
+  next_ind <- which.max(next_scores)
+  next_value <- next_neighbors %>%
+    slice(next_ind) %>%
+    mutate(Iteration = i)
+
+  best_values <-
+    bind_rows(
+      best_values,
+      next_value
+    )
+  path <- bind_rows(path, best_values %>% mutate(Iteration = i))
+
+  next_neighbors <-
+    finetune:::random_real_neighbor(next_value %>% select(-Iteration),
+      path %>% select(-Iteration),
+      glmn_param,
+      retain = 300
+    ) %>%
+    mutate(Iteration = i)
+  neighbors_values <-
+    bind_rows(
+      neighbors_values,
+      next_neighbors
+    )
+}
+```
+
+```{r iterative-neighborhood}
+#| echo = FALSE,
+#| message = FALSE,
+#| warning = FALSE,
+#| out.width = "80%",
+#| fig.cap = "An illustration of how simulated annealing determines what is the local neighborhood for two numeric tuning parameters. The clouds of points show possible next values where one would be selected at random. ",
+#| fig.alt = "An illustration of how simulated annealing determines what is the local neighborhood for two numeric tuning parameters. The clouds of points show possible next values where one would be selected at random. The candidate points are small circular clouds surrounding the current best point."
+
+ggplot(neighbors_values, aes(x = penalty, y = mixture)) +
+  geom_point(alpha = .3, size = 3 / 4, aes(color = factor(Iteration)), show.legend = FALSE) +
+  scale_x_continuous(trans = "log10", limits = pen_rng) +
+  scale_y_continuous(limits = mix_rng) +
+  geom_point(data = best_values) +
+  geom_path(data = path) +
+  geom_point(data = path) +
+  facet_wrap(vars(Iteration), labeller = label_both) +
+  labs(
+    x = paste(penalty()$label, "(penalty)"),
+    y = paste(mixture()$label, "(mixture)")
+  )
+```
+
+请注意，在某些迭代过程中，沿半径生成的候选集不包括参数边界之外的点。此外，我们的实现会使下一个调优参数配置的选择倾向于远离与先前配置非常相似的新值。
+
+对于非数值参数，我们会为参数值的变化频率分配一个概率。
+
+### The `tune_sim_anneal()` function
+
+要通过模拟退火实现迭代搜索，请使用`tune_sim_anneal()`函数。该函数的语法与`tune_bayes()`几乎相同。它没有关于采集函数或不确定性抽样的选项。`control_sim_anneal()`函数包含一些用于定义局部邻域和冷却调度的细节：
+
+-   `no_improve`，对于模拟退火算法而言，是一个整数，若在`no_improve`次迭代内未发现全局最优结果或改进结果，该整数将使搜索停止。被接受的次优参数或被丢弃的参数均算作“无改进”。
+
+-   `restart`是指在从之前的最佳结果重新开始之前，没有新的最佳结果出现的迭代次数。
+
+-   `radius`是一个取值在(0, 1)上的数值向量，它定义了初始点周围局部邻域的最小和最大半径。
+
+-   `flip`是一个概率值，它定义了改变分类参数或整数参数值的可能性。
+
+-   `cooling_coef`是 $\exp(c\times D_i \times i)$ 中的 $c$ 系数，它调节接受概率在迭代过程中的下降速度。`cooling_coef`的值越大，接受次优参数设置的概率就越低。
+
+对于细胞分割数据，其语法与之前使用的函数非常一致：
+
+```{r}
+ctrl_sa <- control_sim_anneal(verbose = TRUE, no_improve = 10L)
+
+set.seed(1404)
+svm_sa <-
+  svm_wflow %>%
+  tune_sim_anneal(
+    resamples = cell_folds,
+    metrics = roc_res,
+    initial = svm_initial,
+    param_info = svm_param,
+    iter = 50,
+    control = ctrl_sa
+  )
+```
+
+模拟退火过程在4个不同的迭代中发现了新的全局最优解。最早的改进出现在第5次迭代，最终的最优解出现在第27次迭代。总体最佳结果出现在第27次迭代，此时ROC曲线下的平均面积为0.8985（初始最佳值为0.8659）。在迭代过程中，分别在第13、21、35和43次迭代时进行了4次重启，同时还有12个候选解被舍弃。
+
+`verbose`选项会打印搜索过程的细节。前五次迭代的输出如下：
+
+```{r}
+#> 40 ◯ accept suboptimal  roc_auc=0.89606 (+/-0.008203)
+#>
+#> 41 ─ discard suboptimal roc_auc=0.87556 (+/-0.009272)
+#>
+#> 42 ─ discard suboptimal roc_auc=0.87198 (+/-0.009301)
+#>
+#> 43 ✖ restart from best  roc_auc=0.89801 (+/-0.008224)
+#>
+#> 44 ◯ accept suboptimal  roc_auc=0.89006 (+/-0.008789)
+#>
+#> 45 + better suboptimal  roc_auc=0.89781 (+/-0.008104)
+#>
+#> 46 ◯ accept suboptimal  roc_auc=0.89563 (+/-0.008601)
+#>
+#> 47 ─ discard suboptimal roc_auc=0.88527 (+/-0.008766)
+#>
+#> 48 ◯ accept suboptimal  roc_auc=0.8922 (+/-0.008891)
+#>
+#> 49 ─ discard suboptimal roc_auc=0.87691 (+/-0.008352)
+#>
+#> 50 ◯ accept suboptimal  roc_auc=0.88803 (+/-0.008728)
+```
+
+与其他`tune_*()`函数一样，相应的`autoplot()`函数会对结果进行可视化评估。使用`autoplot(svm_sa, type = "performance")`可以显示迭代过程中的性能（ @fig-14.9 ），而autoplot(svm_sa, type = "parameters")则会绘制性能与特定调优参数值的对比图（ @fig-14.10 ）。
+
+```{r iterative-sa-history, include = FALSE}
+load("RData/sa_history.RData")
+
+## -----------------------------------------------------------------------------
+
+restart_iter <- result_history$.iter[result_history$results == "restart from best"]
+restart_num <- length(restart_iter)
+sa_iter_list <- knitr::combine_words(restart_iter)
+restart_txt <-
+  dplyr::case_when(
+    restart_num == 0 ~ paste0("There were no restarts during the search."),
+    restart_num == 1 ~ paste0("There was a single restart at iteration ", restart_iter)[1],
+    TRUE ~ paste0("There were ", restart_num, " restarts at iterations ", sa_iter_list)[1]
+  )
+discard_num <- length(result_history$.iter[result_history$results == "discard suboptimal"])
+if (discard_num > 0) {
+  restart_txt <-
+    paste0(
+      restart_txt,
+      " as well as ",
+      discard_num,
+      " discarded ",
+      ifelse(discard_num > 1, "candidates ", "candidate "),
+      "during the process."
+    )
+} else {
+  restart_txt <- paste0(restart_txt, ".")
+}
+
+## -----------------------------------------------------------------------------
+
+best_iters <- result_history$.iter[result_history$results == "new best"]
+best_init <- max(result_history$mean[result_history$.iter == 0])
+best_sa_res <- max(result_history$mean[result_history$.iter > 0])
+best_sa_inds <- result_history$.iter[which.max(result_history$mean)]
+best_txt <-
+  dplyr::case_when(
+    restart_num == 1 ~ paste0("a new global optimum once at iteration ", best_iters, "."),
+    TRUE ~ paste0("new global optimums at ", length(best_iters), " different iterations.")[1]
+  )
+best_txt <- best_txt[1]
+if (length(best_iters) > 1) {
+  best_txt <-
+    paste0(
+      best_txt,
+      " The earliest improvement was at iteration ",
+      min(best_iters),
+      " and the final optimum occured at iteration ",
+      max(best_iters),
+      ". The best overall results occured at iteration ",
+      best_sa_inds, " with a mean area under the ROC curve of ",
+      round(best_sa_res, 4), " (compared to an initial best of ",
+      round(best_init, 4), ")."
+    )
+}
+```
+
+
+## Chapter Summary
+
+本章介绍了两种用于优化调优参数的迭代搜索方法。贝叶斯优化利用在现有重采样结果上训练的预测模型来推荐调优参数值，而模拟退火则在超参数空间中遍历以寻找合适的值。这两种方法无论是单独使用，还是作为初始网格搜索之后的后续方法来进一步微调性能，都能有效地找到合适的参数值。

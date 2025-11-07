@@ -1,0 +1,6 @@
+website:
+  sidebar:
+    - id: ESL2
+      title: The Elements of Statistical Learning
+      contents:
+        - Books/The Elements of Statistical Learning/1 Introduction.qmd
