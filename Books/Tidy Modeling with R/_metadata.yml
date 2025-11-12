@@ -20,3 +20,4 @@ website:
         - Books/Tidy Modeling with R/11 Comparing Models with Resampling.qmd
         - Books/Tidy Modeling with R/12 Model Tuning and the Dangers of Overfitting.qmd
         - Books/Tidy Modeling with R/13 Grid Search.qmd
+        - Books/Tidy Modeling with R/14 Iterative Search.qmd

@@ -1,0 +1,1313 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.24">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<meta name="dcterms.date" content="2025-11-07">
+<title>14 Iterative Search</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../Books/Tidy Modeling with R/13 Grid Search.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dc55a5b9e770e841cd82e46aadbfb9b0.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-2bc269ba33bfe0c9779ec90686b7c52e.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light"><script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": true,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "Search",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script><script src="../../site_libs/kePrint-0.0.1/kePrint.js"></script><link href="../../site_libs/lightable-0.0.1/lightable.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script><script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script><script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script><link rel="stylesheet" href="../../styles.css">
+</head>
+<body class="nav-sidebar floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top"><nav class="navbar navbar-expand-lg " data-bs-theme="dark"><div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">RSSPtho</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+<li class="nav-item">
+    <a class="nav-link active" href="../../index.html" aria-current="page"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-books" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Books</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-books">
+<li>
+    <a class="dropdown-item" href="../../Books/ggplot2/index.html">
+ <span class="dropdown-text">ggplot2</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Books/R4DS2/index.html">
+ <span class="dropdown-text">R for Data Science(2e)</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Books/Tidy Modeling with R/index.html">
+ <span class="dropdown-text">Tidy Modeling with R</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Books/Advanced R(2e)/index.html">
+ <span class="dropdown-text">Advanced R(2e)</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Books/quarto/Project Basics.html">
+ <span class="dropdown-text">Quarto</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Books/Js4R/00 Preface.qmd">
+ <span class="dropdown-text">Js4R</span></a>
+  </li>  
+    </ul>
+</li>
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About me</span></a>
+  </li>  
+</ul>
+<div class="quarto-navbar-tools">
+    <a href="https://github.com/hanguojun007/Blog" title="" class="quarto-navigation-tool px-1" aria-label=""><i class="bi bi-github"></i></a>
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav><nav class="quarto-secondary-nav"><div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../Books/Tidy Modeling with R/14 Iterative Search.html">14 Iterative Search</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav></header><!-- content --><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto"><div class="pt-lg-2 mt-2 text-left sidebar-header sidebar-header-stacked">
+      <a href="../../index.html" class="sidebar-logo-link">
+      </a>
+      </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Hello World</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+ <span class="menu-text">Introduction</span>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/1 Software for modeling.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1 Software for modeling</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/2 A Tidyverse Primer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2 A Tidyverse Primer</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/3 A Review of R Modeling Fundamentals.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">3 A Review of R Modeling Fundamentals</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+ <span class="menu-text">Moduling Basics</span>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/4 The Ames Housing Data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">4 The Ames Housing Data</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/5 Spending our Data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">5 Spending our Data</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/6 Fitting Models with parsnip.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">6 Fitting Models with parsnip</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/7 A Model Workflow.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">7 A Model Workflow</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/8 Feature Engineering with recipes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">8 Feature Engineering with recipes</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/9 Judging Model Effectiveness.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">9 Judging Model Effectiveness</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+ <span class="menu-text">Tools For Creating Effective Models</span>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/10 Resampling for Evaluating Performance.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">10 Resampling for Evaluating Performance</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/11 Comparing Models with Resampling.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">11 Comparing Models with Resampling</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/12 Model Tuning and the Dangers of Overfitting.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">12 Model Tuning and the Dangers of Overfitting</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/13 Grid Search.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">13 Grid Search</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/14 Iterative Search.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">14 Iterative Search</span></a>
+  </div>
+</li>
+    </ul>
+</div>
+</nav><div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active"><h2 id="toc-title">On this page</h2>
+   
+  <ul>
+<li><a href="#a-support-vector-machine-model" id="toc-a-support-vector-machine-model" class="nav-link active" data-scroll-target="#a-support-vector-machine-model">A Support Vector Machine Model</a></li>
+  <li>
+<a href="#bayesian-optimization" id="toc-bayesian-optimization" class="nav-link" data-scroll-target="#bayesian-optimization">Bayesian Optimization</a>
+  <ul class="collapse">
+<li><a href="#a-gaussian-process-model" id="toc-a-gaussian-process-model" class="nav-link" data-scroll-target="#a-gaussian-process-model">A Gaussian process model</a></li>
+  <li><a href="#acquisition-functions" id="toc-acquisition-functions" class="nav-link" data-scroll-target="#acquisition-functions">Acquisition functions</a></li>
+  <li><a href="#the-tune_bayes-function" id="toc-the-tune_bayes-function" class="nav-link" data-scroll-target="#the-tune_bayes-function">The <code>tune_bayes()</code> function</a></li>
+  </ul>
+</li>
+  <li>
+<a href="#simulated-annealing" id="toc-simulated-annealing" class="nav-link" data-scroll-target="#simulated-annealing">Simulated Annealing</a>
+  <ul class="collapse">
+<li><a href="#simulated-annealing-search-process" id="toc-simulated-annealing-search-process" class="nav-link" data-scroll-target="#simulated-annealing-search-process">Simulated annealing search process</a></li>
+  <li><a href="#the-tune_sim_anneal-function" id="toc-the-tune_sim_anneal-function" class="nav-link" data-scroll-target="#the-tune_sim_anneal-function">The <code>tune_sim_anneal()</code> function</a></li>
+  </ul>
+</li>
+  <li><a href="#chapter-summary" id="toc-chapter-summary" class="nav-link" data-scroll-target="#chapter-summary">Chapter Summary</a></li>
+  </ul></nav>
+    <div class="quarto-margin-footer"><div class="margin-footer-item">
+<p><img src="../..\logo.jpg" class="conditional-footer img-fluid" width="200"></p>
+</div></div></div>
+<!-- main -->
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
+<h1 class="title">14 Iterative Search</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">November 7, 2025</p>
+    </div>
+  </div>
+  
+    <div>
+    <div class="quarto-title-meta-heading">Modified</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date-modified">November 12, 2025</p>
+    </div>
+  </div>
+    
+  </div>
+  
+
+
+</header><p>第13章展示了网格搜索如何采用一组预定义的候选值，对它们进行评估，然后选择最佳设置。迭代搜索方法则采用不同的策略。在搜索过程中，它们会预测接下来要测试哪些值。当网格搜索不可行或效率低下时，迭代方法是优化调优参数的合理选择。</p>
+<p>本章概述了两种搜索方法：</p>
+<ul>
+<li>
+<strong>贝叶斯优化</strong>（Bayesian optimization），它使用统计模型来预测更好的参数设置。</li>
+<li>
+<strong>模拟退火</strong>（simulated annealing），它采用全局搜索方法。</li>
+</ul>
+<p>为了便于说明，我们使用与前一章相同的细胞特征数据，但更换了模型。本章采用支持向量机模型，因为它能对搜索过程提供清晰的二维可视化效果。</p>
+<section id="a-support-vector-machine-model" class="level2"><h2 class="anchored" data-anchor-id="a-support-vector-machine-model">A Support Vector Machine Model</h2>
+<p>我们再次使用第13.2节中描述的细胞分割数据进行建模，并使用<strong>支持向量机</strong>（SVM）模型来演示迭代搜索方法。有关SVM模型的更多信息，请参见 M. Kuhn和Johnson（2013）。需要优化的两个调优参数是SVM的成本值和径向基函数核参数 <span class="math inline">\(\sigma\)</span>。这两个参数都会对模型的复杂性和性能产生深远影响。</p>
+<p>支持向量机（SVM）模型会用到点积，因此有必要对预测变量进行中心化和缩放处理。与多层感知器模型类似，该模型也能从主成分分析（PCA）特征提取中获益。不过，本章不会使用这第三个调优参数，以便我们能在二维空间中可视化搜索过程。</p>
+<p>除了之前使用的对象（见第13.6节），还需要<code>svm_rec</code>、<code>svm_spec</code>和<code>svm_wflow</code>等tidymodels对象：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidymodels.tidymodels.org">tidymodels</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; ── Attaching packages ─────────────────────────────────── tidymodels 1.4.1 ──</span></span>
+<span><span class="co">#&gt; ✔ broom        1.0.9     ✔ recipes      1.3.1</span></span>
+<span><span class="co">#&gt; ✔ dials        1.4.2     ✔ rsample      1.3.1</span></span>
+<span><span class="co">#&gt; ✔ dplyr        1.1.4     ✔ tailor       0.1.0</span></span>
+<span><span class="co">#&gt; ✔ ggplot2      3.5.2     ✔ tidyr        1.3.1</span></span>
+<span><span class="co">#&gt; ✔ infer        1.0.9     ✔ tune         2.0.0</span></span>
+<span><span class="co">#&gt; ✔ modeldata    1.5.1     ✔ workflows    1.3.0</span></span>
+<span><span class="co">#&gt; ✔ parsnip      1.3.3     ✔ workflowsets 1.1.1</span></span>
+<span><span class="co">#&gt; ✔ purrr        1.1.0     ✔ yardstick    1.3.2</span></span>
+<span><span class="co">#&gt; ── Conflicts ────────────────────────────────────── tidymodels_conflicts() ──</span></span>
+<span><span class="co">#&gt; ✖ purrr::discard() masks scales::discard()</span></span>
+<span><span class="co">#&gt; ✖ dplyr::filter()  masks stats::filter()</span></span>
+<span><span class="co">#&gt; ✖ dplyr::lag()     masks stats::lag()</span></span>
+<span><span class="co">#&gt; ✖ recipes::step()  masks stats::step()</span></span>
+<span><span class="fu"><a href="https://tidymodels.tidymodels.org/reference/tidymodels_prefer.html">tidymodels_prefer</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="va">cells</span><span class="op">)</span></span>
+<span><span class="va">cells</span> <span class="op">&lt;-</span> <span class="va">cells</span> <span class="op">%&gt;%</span> <span class="fu">select</span><span class="op">(</span><span class="op">-</span><span class="va">case</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">1304</span><span class="op">)</span></span>
+<span><span class="va">cell_folds</span> <span class="op">&lt;-</span> <span class="fu">vfold_cv</span><span class="op">(</span><span class="va">cells</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">roc_res</span> <span class="op">&lt;-</span> <span class="fu">metric_set</span><span class="op">(</span><span class="va">roc_auc</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">svm_rec</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu">recipe</span><span class="op">(</span><span class="va">class</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">cells</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">step_YeoJohnson</span><span class="op">(</span><span class="fu">all_numeric_predictors</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">step_normalize</span><span class="op">(</span><span class="fu">all_numeric_predictors</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">svm_spec</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu">svm_rbf</span><span class="op">(</span>cost <span class="op">=</span> <span class="fu">tune</span><span class="op">(</span><span class="op">)</span>, rbf_sigma <span class="op">=</span> <span class="fu">tune</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">set_engine</span><span class="op">(</span><span class="st">"kernlab"</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">set_mode</span><span class="op">(</span><span class="st">"classification"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">svm_wflow</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu">workflow</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">add_model</span><span class="op">(</span><span class="va">svm_spec</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">add_recipe</span><span class="op">(</span><span class="va">svm_rec</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>两个调优参数<code>cost</code>和<code>rbf_sigma</code>的默认参数范围是</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">cost</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Cost (quantitative)</span></span>
+<span><span class="co">#&gt; Transformer: log-2 [1e-100, Inf]</span></span>
+<span><span class="co">#&gt; Range (transformed scale): [-10, 5]</span></span>
+<span><span class="fu">rbf_sigma</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Radial Basis Function sigma (quantitative)</span></span>
+<span><span class="co">#&gt; Transformer: log-10 [1e-100, Inf]</span></span>
+<span><span class="co">#&gt; Range (transformed scale): [-10, 0]</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>为了说明，让我们稍微改变核参数的范围，以改进搜索的可视化效果：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">svm_param</span> <span class="op">&lt;-</span></span>
+<span>  <span class="va">svm_wflow</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">extract_parameter_set_dials</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/update.html">update</a></span><span class="op">(</span>rbf_sigma <span class="op">=</span> <span class="fu">rbf_sigma</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">7</span>, <span class="op">-</span><span class="fl">1</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>在讨论迭代搜索的具体细节及其工作原理之前，让我们探究这个特定数据集的两个支持向量机（SVM）调优参数与ROC曲线下面积之间的关系。我们构建了一个非常大的规则网格，由2500个候选值组成，并通过重采样对该网格进行了评估。显然，这在常规数据分析中是不切实际的，而且效率极低。然而，它阐明了搜索过程应遵循的路径以及数值最优值出现的位置。</p>
+<p><a href="#fig-14.1" class="quarto-xref">Figure&nbsp;1</a> 展示了对该网格的评估结果，其中颜色越浅表示模型性能越高（越好）。参数空间的左下对角线区域有一大片相对平缓的区域，性能较差。性能最佳的脊线出现在该空间的右上部分。黑点表示最佳设置。从性能不佳的平台区域到性能最佳的脊线区域的过渡非常陡峭。在脊线右侧紧邻的位置，ROC曲线下面积也出现了急剧下降。</p>
+<div id="fig-14.1" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-14.1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="images/roc_surface.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-14.1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Heatmap of the mean area under the ROC curve for a high density grid of tuning parameter values. The best point is a solid dot in the upper-right corner.
+</figcaption></figure>
+</div>
+<p>以下搜索过程在继续之前至少需要一些重采样的性能统计数据。为此，下面的代码创建了一个位于参数空间平坦部分的小型规则网格。<code>tune_grid()</code>函数对该网格进行重采样：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">1401</span><span class="op">)</span></span>
+<span><span class="va">start_grid</span> <span class="op">&lt;-</span></span>
+<span>  <span class="va">svm_param</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/update.html">update</a></span><span class="op">(</span></span>
+<span>    cost <span class="op">=</span> <span class="fu">cost</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">6</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    rbf_sigma <span class="op">=</span> <span class="fu">rbf_sigma</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">6</span>, <span class="op">-</span><span class="fl">4</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">grid_regular</span><span class="op">(</span>levels <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">1402</span><span class="op">)</span></span>
+<span><span class="va">svm_initial</span> <span class="op">&lt;-</span></span>
+<span>  <span class="va">svm_wflow</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">tune_grid</span><span class="op">(</span>resamples <span class="op">=</span> <span class="va">cell_folds</span>, grid <span class="op">=</span> <span class="va">start_grid</span>, metrics <span class="op">=</span> <span class="va">roc_res</span><span class="op">)</span></span>
+<span><span class="co">#&gt; maximum number of iterations reached 0.01985804 0.01947119maximum number of iterations reached 0.01951676 0.01912962maximum number of iterations reached 0.01929118 0.01895888maximum number of iterations reached 0.01938124 0.01905198maximum number of iterations reached 0.01967913 0.01930207maximum number of iterations reached 0.02022452 0.01983573maximum number of iterations reached 0.0194954 0.01916201maximum number of iterations reached 0.0204274 0.01999696maximum number of iterations reached 0.01870142 0.01838042maximum number of iterations reached 0.01978898 0.01941516</span></span>
+<span></span>
+<span><span class="fu">collect_metrics</span><span class="op">(</span><span class="va">svm_initial</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 4 × 8</span></span>
+<span><span class="co">#&gt;     cost rbf_sigma .metric .estimator  mean     n std_err .config        </span></span>
+<span><span class="co">#&gt;    &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;          </span></span>
+<span><span class="co">#&gt; 1 0.0156  0.000001 roc_auc binary     0.864    10 0.00864 pre0_mod1_post0</span></span>
+<span><span class="co">#&gt; 2 0.0156  0.0001   roc_auc binary     0.863    10 0.00862 pre0_mod2_post0</span></span>
+<span><span class="co">#&gt; 3 2       0.000001 roc_auc binary     0.863    10 0.00867 pre0_mod3_post0</span></span>
+<span><span class="co">#&gt; 4 2       0.0001   roc_auc binary     0.866    10 0.00855 pre0_mod4_post0</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>这个初始网格显示出相当相近的结果，没有任何单个点比其他点好很多。这些结果可以被下一节讨论的迭代调优函数接收，用作初始值。</p>
+</section><section id="bayesian-optimization" class="level2"><h2 class="anchored" data-anchor-id="bayesian-optimization">Bayesian Optimization</h2>
+<p>贝叶斯优化技术会分析当前的重采样结果，并创建一个预测模型，以推荐尚未评估的调参参数值。然后对推荐的参数组合进行重采样。这些结果随后会被用于另一个预测模型，该模型会推荐更多供测试的候选值，依此类推。这个过程会进行设定好的迭代次数，或者直到不再有进一步的改进为止。Shahriari等人（2016）和Frazier（2018）对贝叶斯优化做了很好的介绍。</p>
+<p>在使用贝叶斯优化时，主要关注点是如何创建模型以及如何选择该模型推荐的参数。首先，让我们考虑贝叶斯优化中最常用的技术——高斯过程模型。</p>
+<section id="a-gaussian-process-model" class="level3"><h3 class="anchored" data-anchor-id="a-gaussian-process-model">A Gaussian process model</h3>
+<p>高斯过程（GP）（Schulz，Speekenbrink，and Krause，2018）模型是著名的统计技术，在空间统计学中有着悠久的历史（以“kriging methods”最为出名），它可以通过多种方式（包括贝叶斯模型）推导得出，详见 Rasmussen 和 Williams（2006）的参考文献。</p>
+<p>从数学角度来讲，高斯过程（GP）是一组随机变量的集合，其联合概率分布为多元高斯分布。在我们的应用场景中，这组随机变量是调优参数候选值对应的性能指标集合。之前的初始网格就提供了四个样本，观测值分别为0.8639, 0.8627, 0.8625, 0.8659。这些值被假设服从多元高斯分布。定义高斯过程模型中自变量（预测变量）的输入是相应的调优参数值（如 <a href="#tbl-14.1" class="quarto-xref">Table&nbsp;1</a> 所示）。</p>
+<div class="cell">
+<div id="tbl-14.1" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-14.1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1: Resampling statistics used as the initial substrate to the Gaussian process model.
+</figcaption><div aria-describedby="tbl-14.1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<table class="table do-not-create-environment cell caption-top table-sm table-striped small">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" style="text-align: center; border-bottom: hidden; padding-bottom: 0; padding-left: 3px; padding-right: 3px;"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+outcome
+</div></th>
+<th colspan="2" data-quarto-table-cell-role="th" style="text-align: center; border-bottom: hidden; padding-bottom: 0; padding-left: 3px; padding-right: 3px;"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+predictors
+</div></th>
+</tr>
+<tr class="even">
+<th style="text-align: left;" data-quarto-table-cell-role="th">ROC</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">cost</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">rbf_sigma</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">0.8639</td>
+<td style="text-align: left;">0.01562</td>
+<td style="text-align: left;">0.000001</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">0.8627</td>
+<td style="text-align: left;">0.01562</td>
+<td style="text-align: left;">0.000100</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">0.8625</td>
+<td style="text-align: left;">2.00000</td>
+<td style="text-align: left;">0.000001</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">0.8659</td>
+<td style="text-align: left;">2.00000</td>
+<td style="text-align: left;">0.000100</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<p>高斯过程模型由其均值函数和协方差函数来定义，不过后者对高斯过程模型的性质影响更大。协方差函数通常根据输入值（记为 <span class="math inline">\(x\)</span> ）进行参数化。例如，一种常用的协方差函数是平方指数函数：</p>
+<p><span class="math display">\[
+cov(x_i, x_j) = \exp\left(-\frac{1}{2}|x_i - x_j|^2\right) + \sigma^2_{ij}
+\]</span></p>
+<p>其中 <span class="math inline">\(\sigma^2_{ij}\)</span> 是一个恒定的误差方差项，当 <span class="math inline">\(i = j\)</span> 时，该误差方差项为零。这个方程可转化为：随着两个调优参数组合之间距离的增加，性能指标之间的协方差呈指数增长。该方程的性质还意味着，结果指标的变异在已观测到的点处达到最小（即当 <span class="math inline">\(|x_i−x_j|^2\)</span> 为零时）。这种协方差函数的特性使得高斯过程即便在只有少量数据的情况下，也能够表征模型性能与调优参数之间高度非线性的关系。然而，在某些情况下，拟合这些模型可能会很困难，而且随着调优参数组合数量的增加，模型的计算成本会变得更高。</p>
+<p>该模型的一个重要优点是，由于指定了完整的概率模型，对新输入的预测能够反映结果的整个分布。换句话说，新的性能统计数据可以从均值和方差两方面进行预测。假设正在考虑两个新的调优参数。在 <a href="#tbl-14.2" class="quarto-xref">Table&nbsp;2</a> 中，候选参数A的平均ROC值略高于候选参数B（当前最佳值为0.8659）。然而，其方差是B的四倍。这是好还是坏呢？选择选项A风险更高，但潜在回报也可能更高。方差的增加还反映出，这个新值与现有数据的距离比B更远。下一节将更详细地探讨高斯过程（GP）预测在贝叶斯优化中的这些方面。</p>
+<div class="cell">
+<div id="tbl-14.2" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-14.2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;2: Two example tuning parameters considered for further sampling.
+</figcaption><div aria-describedby="tbl-14.2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<table class="table do-not-create-environment cell caption-top table-sm table-striped small">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" style="text-align: left; empty-cells: hide; border-bottom: hidden;"></th>
+<th colspan="2" data-quarto-table-cell-role="th" style="text-align: center; border-bottom: hidden; padding-bottom: 0; padding-left: 3px; padding-right: 3px;"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+GP Prediction of ROC AUC
+</div></th>
+</tr>
+<tr class="even">
+<th style="text-align: left;" data-quarto-table-cell-role="th">candidate</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">mean</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">variance</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">A</td>
+<td style="text-align: left;">0.90</td>
+<td style="text-align: left;">0.000400</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">B</td>
+<td style="text-align: left;">0.89</td>
+<td style="text-align: left;">0.000025</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<p>贝叶斯优化是一个迭代过程。基于四个结果的初始网格，拟合GP模型，预测候选参数，并选择第五个调优参数组合。我们计算新配置的性能估计值，然后利用这五个现有结果重新拟合GP模型（以此类推）。</p>
+</section><section id="acquisition-functions" class="level3"><h3 class="anchored" data-anchor-id="acquisition-functions">Acquisition functions</h3>
+<p>一旦高斯过程拟合了当前数据，它将如何被使用呢？我们的目标是选择下一个最有可能比当前最佳结果“更好”的调优参数组合。实现这一目标的一种方法是创建一个大型候选集（或许可以采用空间填充设计），然后对每个候选参数组合进行均值和方差预测。利用这些信息，我们就能选出最有利的调优参数值。</p>
+<p>一类被称为 Acquisition 函数的目标函数有助于平衡均值和方差。回想一下，高斯过程模型的预测方差主要由它们与现有数据的距离决定。新候选点的预测均值和方差之间的权衡通常从探索和利用的角度来看待：</p>
+<ul>
+<li><p>探索会使选择偏向于观测到的候选模型较少（如果有的话）的区域。这往往会给方差较高的候选模型赋予更大的权重，并侧重于发现新的结果。</p></li>
+<li><p>利用主要依靠均值预测来找到最佳（均值）值。它侧重于已有的结果。</p></li>
+</ul>
+<p>为了说明这一点，让我们来看一个简单的例子，其中有一个参数，其值在[0, 1]之间，性能指标是 <span class="math inline">\(R^2\)</span>。真实函数如 <a href="#fig-14.2" class="quarto-xref">Figure&nbsp;2</a> 所示，同时还有五个具有现有结果的候选值（以点表示）。</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-14.2" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-14.2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="14-Iterative-Search_files/figure-html/fig-14.2-1.png" class="img-fluid figure-img" width="576">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-14.2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Hypothetical true performance profile over an arbitrary tuning parameter, with five estimated points
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>对于这些数据，<a href="#fig-14.3" class="quarto-xref">Figure&nbsp;3</a> 展示了高斯过程（GP）模型的拟合情况。阴影区域表示均值±1标准误差。两条竖线标示了两个候选点，后续会对其进行更详细的研究。阴影置信区域展示了平方指数方差函数；该区域在数据点之间会变得非常大，而在现有数据点处则收敛到零。</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-14.3" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-14.3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="14-Iterative-Search_files/figure-html/fig-14.3-1.png" class="img-fluid figure-img" width="576">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-14.3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: Estimated performance profile generated by the Gaussian process model. The shaded region shows one-standard-error bounds.
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>这种非线性趋势穿过每个观测点，但该模型并非完美无缺。在真实最优设置附近没有观测点，而在这个区域，拟合效果本可以好得多。尽管如此，高斯过程（GP）模型仍能有效地为我们指明正确方向。</p>
+<p>从纯粹的利用角度来看，最佳选择应该是选取具有最佳平均预测值的参数值。在这里，这个值是0.106，刚好在现有最佳观测点0.09的右侧。</p>
+<p>作为一种鼓励探索的方式，一种简单（但不常使用）的方法是找到与最大置信区间相关的调优参数。例如，通过为 <span class="math inline">\(R^2\)</span> 置信界限使用单一标准差，下一个要采样的点将是0.236。这稍微更深入到没有观测结果的区域。增加上界中使用的标准差数量会将选择进一步推向空白区域。</p>
+<p>最常用的“Acquisition”函数之一是<strong>期望改进</strong>（expected improvement）。改进的概念需要当前最佳结果的数值（这与置信区间方法不同）。由于高斯过程（GP）可以用一个分布来描述新的候选点，我们可以利用改进发生的概率，对分布中显示出改进的部分进行加权。</p>
+<p>例如，考虑两个候选参数值0.10和0.25（如 <a href="#fig-14.3" class="quarto-xref">Figure&nbsp;3</a> 中的竖线所示）。利用拟合的GP模型，它们的预测 <span class="math inline">\(R^2\)</span> 分布如 <a href="#fig-14.4" class="quarto-xref">Figure&nbsp;4</a> 所示，同时还有一条当前最佳结果的参考线。</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-14.4" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-14.4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="14-Iterative-Search_files/figure-html/fig-14.4-1.png" class="img-fluid figure-img" width="576">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-14.4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: Predicted performance distributions for two sampled tuning parameter values
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>仅考虑 <span class="math inline">\(R^2\)</span> 预测均值时，0.10的参数值是更好的选择（参见 <a href="#tbl-14.3" class="quarto-xref">Table&nbsp;3</a> ）。平均而言，0.25这个调优参数建议被预测为比当前最佳值更差。然而，由于它具有更高的方差，其整体概率分布中高于当前最佳值的区域更大。因此，它具有更大的期望改进：</p>
+<div class="cell">
+<div id="tbl-14.3" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-14.3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;3: Expected improvement for the two candidate tuning parameters.
+</figcaption><div aria-describedby="tbl-14.3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<table class="table do-not-create-environment cell caption-top table-sm table-striped small">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th" style="text-align: left; empty-cells: hide; border-bottom: hidden;"></th>
+<th colspan="3" data-quarto-table-cell-role="th" style="text-align: center; border-bottom: hidden; padding-bottom: 0; padding-left: 3px; padding-right: 3px;"><div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; ">
+Predictions
+</div></th>
+</tr>
+<tr class="even">
+<th style="text-align: left;" data-quarto-table-cell-role="th">Parameter Value</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Mean</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Std Dev</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Expected Improvement</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">0.10</td>
+<td style="text-align: left;">0.8679</td>
+<td style="text-align: left;">0.0004317</td>
+<td style="text-align: left;">0.000190</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">0.25</td>
+<td style="text-align: left;">0.8671</td>
+<td style="text-align: left;">0.0039301</td>
+<td style="text-align: left;">0.001216</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<p>当在整个调优参数范围内计算预期改进时，如 <a href="#fig-14.5" class="quarto-xref">Figure&nbsp;5</a> 所示，建议的采样点更接近0.25而非0.10。</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-14.5" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-14.5-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="14-Iterative-Search_files/figure-html/fig-14.5-1.png" class="img-fluid figure-img" width="768">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-14.5-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5: The estimated performance profile generated by the Gaussian process model (top panel) and the expected improvement (bottom panel). The vertical line indicates the point of maximum improvement
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>已经提出并讨论了许多获取函数；在tidymodels中，期望改进是默认的。</p>
+</section><section id="the-tune_bayes-function" class="level3"><h3 class="anchored" data-anchor-id="the-tune_bayes-function">The <code>tune_bayes()</code> function</h3>
+<p>要通过贝叶斯优化实现迭代搜索，请使用<code>tune_bayes()</code>函数。其语法与<code>tune_grid()</code>非常相似，但有几个额外的参数：</p>
+<ul>
+<li><p><code>iter</code>是最大搜索迭代次数。</p></li>
+<li><p><code>initial</code>可以是整数、使用<code>tune_grid()</code>生成的对象，或者是某个竞赛函数。使用整数时，它指定了在第一个高斯过程模型之前采样的空间填充设计的大小。</p></li>
+<li><p><code>objective</code>是一个用于确定应使用哪种“Acquisition”函数的参数。tune包中包含可在此处传递的函数，例如<code>exp_improve()</code>或<code>conf_bound()</code>。</p></li>
+<li><p><code>param_info</code>指定了参数的范围以及所使用的任何转换。这些用于定义搜索空间，当默认参数对象不够用时，<code>param_info</code>会被用来覆盖默认值。</p></li>
+</ul>
+<p><code>control</code>参数使用<code>control_bayes()</code>的结果。其中一些有用的参数包括：</p>
+<ul>
+<li><p><code>no_improve</code>是一个整数，如果在<code>no_improve</code>次迭代内没有发现更优的参数，它将停止搜索。</p></li>
+<li><p><code>uncertain</code>也是一个整数（或<code>Inf</code>），如果在<code>uncertain</code>次迭代内没有改进，它将进行一次不确定性抽样。这会选择具有较大变异性的下一个候选对象，由于它不考虑均值预测，因此具有纯粹探索的效果。</p></li>
+<li><p><code>verbose</code>是一个逻辑值，它会在搜索过程中打印日志信息。</p></li>
+</ul>
+<p>让我们使用第14.1节中的首个支持向量机（SVM）结果作为高斯过程模型的初始基础。回想一下，对于这个应用，我们希望最大化ROC曲线下的面积。我们的代码如下：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">ctrl</span> <span class="op">&lt;-</span> <span class="fu">control_bayes</span><span class="op">(</span>verbose <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">1403</span><span class="op">)</span></span>
+<span><span class="va">svm_bo</span> <span class="op">&lt;-</span></span>
+<span>  <span class="va">svm_wflow</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">tune_bayes</span><span class="op">(</span></span>
+<span>    resamples <span class="op">=</span> <span class="va">cell_folds</span>,</span>
+<span>    metrics <span class="op">=</span> <span class="va">roc_res</span>,</span>
+<span>    initial <span class="op">=</span> <span class="va">svm_initial</span>,</span>
+<span>    param_info <span class="op">=</span> <span class="va">svm_param</span>,</span>
+<span>    iter <span class="op">=</span> <span class="fl">25</span>,</span>
+<span>    control <span class="op">=</span> <span class="va">ctrl</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="co">#&gt; maximum number of iterations reached 4.047214e-05 4.046292e-05</span></span>
+<span><span class="co">#&gt; maximum number of iterations reached 5.209914e-05 5.211268e-05</span></span>
+<span><span class="co">#&gt; maximum number of iterations reached 6.032941e-05 6.035564e-05</span></span>
+<span><span class="co">#&gt; maximum number of iterations reached 5.733733e-05 5.734185e-05</span></span>
+<span><span class="co">#&gt; maximum number of iterations reached 6.465712e-05 6.467571e-05</span></span>
+<span><span class="co">#&gt; maximum number of iterations reached 3.238272e-05 3.237372e-05</span></span>
+<span><span class="co">#&gt; maximum number of iterations reached 3.48257e-05 3.481683e-05</span></span>
+<span><span class="co">#&gt; maximum number of iterations reached 4.664036e-05 4.664312e-05</span></span>
+<span><span class="co">#&gt; maximum number of iterations reached 2.853935e-05 2.853362e-05</span></span>
+<span><span class="co">#&gt; maximum number of iterations reached 3.949777e-05 3.949933e-05</span></span>
+<span><span class="co">#&gt; maximum number of iterations reached 0.0004813998 0.000481399</span></span>
+<span><span class="co">#&gt; maximum number of iterations reached 0.0004770225 0.0004770218</span></span>
+<span><span class="co">#&gt; maximum number of iterations reached 0.0004500721 0.0004500714</span></span>
+<span><span class="co">#&gt; maximum number of iterations reached 0.0004592099 0.0004592092</span></span>
+<span><span class="co">#&gt; maximum number of iterations reached 0.0004819724 0.0004819717</span></span>
+<span><span class="co">#&gt; maximum number of iterations reached 0.0004855306 0.0004855298</span></span>
+<span><span class="co">#&gt; maximum number of iterations reached 0.0004604447 0.0004604441</span></span>
+<span><span class="co">#&gt; maximum number of iterations reached 0.0005029539 0.0005029531</span></span>
+<span><span class="co">#&gt; maximum number of iterations reached 0.0004475102 0.0004475095</span></span>
+<span><span class="co">#&gt; maximum number of iterations reached 0.0004798083 0.0004798075</span></span>
+<span><span class="co">#&gt; maximum number of iterations reached 0.0151271 0.01501914</span></span>
+<span><span class="co">#&gt; maximum number of iterations reached 0.01495382 0.01484879</span></span>
+<span><span class="co">#&gt; maximum number of iterations reached 0.0142988 0.01420819</span></span>
+<span><span class="co">#&gt; maximum number of iterations reached 0.01459744 0.01450266</span></span>
+<span><span class="co">#&gt; maximum number of iterations reached 0.01515703 0.01504754</span></span>
+<span><span class="co">#&gt; maximum number of iterations reached 0.0151731 0.01506278</span></span>
+<span><span class="co">#&gt; maximum number of iterations reached 0.0145107 0.01441776</span></span>
+<span><span class="co">#&gt; maximum number of iterations reached 0.01570231 0.01557913</span></span>
+<span><span class="co">#&gt; maximum number of iterations reached 0.01420909 0.01412161</span></span>
+<span><span class="co">#&gt; maximum number of iterations reached 0.01490685 0.01480023</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>搜索过程从ROC曲线下面积的初始最佳值 0.8659 开始。高斯过程模型利用这四个统计量来构建模型。大型候选集通过“期望改进”函数自动生成并评分。</p>
+<p>用于查询结果的函数与网格搜索中使用的函数相同（例如，<code>collect_metrics()</code>等）。例如：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">show_best</span><span class="op">(</span><span class="va">svm_bo</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning in show_best(svm_bo): No value of `metric` was given; "roc_auc" will</span></span>
+<span><span class="co">#&gt; be used.</span></span>
+<span><span class="co">#&gt; # A tibble: 5 × 9</span></span>
+<span><span class="co">#&gt;    cost rbf_sigma .metric .estimator  mean     n std_err .config .iter</span></span>
+<span><span class="co">#&gt;   &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;   &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1  31.8   0.00160 roc_auc binary     0.899    10 0.00785 iter24     24</span></span>
+<span><span class="co">#&gt; 2  30.8   0.00191 roc_auc binary     0.899    10 0.00791 iter23     23</span></span>
+<span><span class="co">#&gt; 3  31.4   0.00166 roc_auc binary     0.899    10 0.00784 iter22     22</span></span>
+<span><span class="co">#&gt; 4  31.8   0.00153 roc_auc binary     0.899    10 0.00783 iter13     13</span></span>
+<span><span class="co">#&gt; 5  30.8   0.00163 roc_auc binary     0.899    10 0.00782 iter15     15</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><code>autoplot()</code>函数有几种用于迭代搜索方法的选项。<a href="#fig-14.6" class="quarto-xref">Figure&nbsp;6</a> 展示了通过使用<code>autoplot(svm_bo, type = "performance")</code>，结果在搜索过程中是如何变化的。</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-14.6" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-14.6-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="14-Iterative-Search_files/figure-html/fig-14.6-1.png" class="img-fluid figure-img" width="576">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-14.6-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;6: The progress of the Bayesian optimization produced when the <code>autoplot()</code> method is used with <code>type = "performance"</code>
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>另一种类型的图表使用<code>type = "parameters"</code>，它展示了参数值在迭代过程中的变化。</p>
+<p>下方的动画可视化了搜索结果。黑色的“××”值表示包含在<code>svm_initial</code>中的初始值。左上角的蓝色面板显示了ROC曲线下面积的预测均值。右上角的红色面板展示了ROC曲线下面积的预测变异性（方差），而底部的图表则可视化了预期改进。在每个面板中，颜色越深表示数值的吸引力越低（例如，均值小、变异性大以及改进小）。</p>
+<video width="100%" controls=""><source src="images/bo_search.mp4" type="video/mp4"></video><p>在搜索的最初几次迭代中，虽然预测的平均表面非常不准确，但它确实有助于将过程引导至性能良好的区域。换句话说，高斯过程模型虽然存在错误，但事实证明它非常有用。在最初的十次迭代内，搜索就在最优位置附近进行采样。</p>
+<p>虽然最佳的调优参数组合位于参数空间的边界上，但贝叶斯优化往往会选择边界另一侧的新点。尽管我们可以调整探索与利用的比例，但搜索往往会在早期对边界点进行采样。</p>
+<p>如果搜索以初始网格为种子，那么填充空间设计可能会是比常规设计更好的选择。它会对参数空间中更多独特的值进行采样，并能在早期迭代中改进对标准差的预测。</p>
+<p>最后，如果用户中断了<code>tune_bayes()</code>的计算，该函数会返回当前结果（而不是产生错误）。</p>
+</section></section><section id="simulated-annealing" class="level2"><h2 class="anchored" data-anchor-id="simulated-annealing">Simulated Annealing</h2>
+<p>模拟退火（Simulated annealing，SA）（Kirkpatrick，Gelatt 和 Vecchi，1983；Van Laarhoven 和 Aarts，1987）是一种受金属冷却过程启发的通用非线性搜索程序。它是一种全局搜索方法，能够有效遍历多种不同类型的搜索空间，包括不连续函数。与大多数基于梯度的优化程序不同，模拟退火可以重新评估之前的解决方案。</p>
+<section id="simulated-annealing-search-process" class="level3"><h3 class="anchored" data-anchor-id="simulated-annealing-search-process">Simulated annealing search process</h3>
+<p>使用模拟退火的过程始于一个初始值，并在参数空间中进行受控的随机游走。每个新的候选参数值都是前一个值的微小扰动，这使得新点保持在局部邻域内。</p>
+<p>对候选点进行重采样以获取其相应的性能值。如果该性能值比之前参数的结果更好，则将其作为新的最优解并继续该过程。如果结果比之前的值更差，搜索程序仍可能使用该参数来确定后续步骤。这取决于两个因素。首先，随着性能变差，接受不良结果的可能性会降低。换句话说，与性能大幅下降的结果相比，略有变差的结果被接受的概率更高。另一个因素是搜索迭代的次数。随着搜索的进行，模拟退火希望接受更少的次优值。基于这两个因素，不良结果的接受概率可以形式化表示为：</p>
+<p><span class="math display">\[
+\operatorname{Pr}[\text{accept suboptimal parameters at iteration } i] = \exp(c\times D_i \times i)
+\]</span></p>
+<p>其中i是迭代次数，<span class="math inline">\(c\)</span> 是用户指定的常数，<span class="math inline">\(D_i\)</span> 是新旧值之间的百分比差异（负值意味着结果更差）。对于较差的结果，我们会计算接受概率，并将其与一个随机均匀数进行比较。如果随机数大于该概率值，搜索会舍弃当前参数，下一次迭代会在之前值的邻域内生成候选值。否则，下一次迭代会基于当前（次优）值形成下一组参数。</p>
+<p>模拟退火的接受概率允许搜索朝着错误的方向进行，至少在短期内是这样，但从长远来看，有可能找到参数空间中一个好得多的区域。</p>
+<p>接受概率会受到怎样的影响？<a href="#fig-14.7" class="quarto-xref">Figure&nbsp;7</a> 中的热图展示了接受概率如何随着迭代次数、性能以及用户指定的系数而变化。</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-14.7" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-14.7-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="14-Iterative-Search_files/figure-html/fig-14.7-1.png" class="img-fluid figure-img" width="576">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-14.7-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;7: Heatmap of the simulated annealing acceptance probabilities for different coefficient values
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>用户可以调整系数，以找到适合自己需求的概率分布。在<code><a href="https://finetune.tidymodels.org/reference/control_sim_anneal.html">finetune::control_sim_anneal()</a></code>中，这个<code>cooling_coef</code>参数的默认值为0.02。减小该系数会使搜索过程对不佳结果更加宽容。</p>
+<p>这一过程会持续设定好的迭代次数，但如果在预先确定的迭代次数内没有出现全局最优结果，就会停止。不过，设置一个重启阈值会非常有帮助。如果出现一连串的失败，该功能会重新采用上一次的全局最优参数设置并重新开始。</p>
+<p>主要的重要细节是定义如何在迭代之间扰动调优参数。文献中对此有多种方法。我们采用了Bohachevsky, Johnson, and Stein（1986）提出的一种名为<strong>广义模拟退火</strong>（generalized simulated annealing）的方法。对于连续的调优参数，我们定义一个小半径来指定局部“邻域”。例如，假设有两个调优参数，每个参数的取值范围都在0到1之间。模拟退火过程会在周围的半径范围内生成随机值，并随机选择一个作为当前的候选值。</p>
+<p>在我们的实现中，邻域是通过根据参数对象的范围将当前候选值缩放到0到1之间来确定的，因此0.05到0.15之间的半径值似乎是合理的。对于这些值，搜索从参数空间的一侧到另一侧最快大约需要10次迭代。半径的大小控制着搜索探索参数空间的速度。在我们的实现中，会指定一个半径范围，因此不同大小的“局部”定义了新的候选值。</p>
+<p>为了说明这一点，我们将使用glmnet的两个主要调优参数：</p>
+<ul>
+<li><p>总正则化量（<code>penalty</code>）。该参数的默认范围是 <span class="math inline">\(10^{-10}\)</span> 到 <span class="math inline">\(10^{0}\)</span> 。通常对该参数进行以10为底的对数转换。</p></li>
+<li><p>Lasso惩罚的比例（<code>mixture</code>）。它在0到1之间有界，无需转换。</p></li>
+</ul>
+<p>该过程从初始值<code>penalty = 0.025</code>和<code>mixture = 0.050</code>开始。使用一个在0.050到0.015之间随机波动的半径，对数据进行适当缩放，在初始点周围的半径范围内生成随机值，然后随机选择一个作为候选值。为便于说明，我们假设所有候选值都是更优的。利用这个新值，生成一组新的随机邻近值，从中选择一个，依此类推。<a href="#fig-14.8" class="quarto-xref">Figure&nbsp;8</a> 展示了搜索过程向左上角推进的六个迭代步骤。</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-14.8" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-14.8-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="14-Iterative-Search_files/figure-html/fig-14.8-1.png" class="img-fluid figure-img" width="576">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-14.8-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;8: How simulated annealing determines the local neighborhood for two numeric tuning parameters. The clouds of points show possible next values where one would be selected at random.
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>请注意，在某些迭代过程中，沿半径生成的候选集不包括参数边界之外的点。此外，我们的实现会使下一个调优参数配置的选择倾向于远离与先前配置非常相似的新值。</p>
+<p>对于非数值参数，我们会为参数值的变化频率分配一个概率。</p>
+</section><section id="the-tune_sim_anneal-function" class="level3"><h3 class="anchored" data-anchor-id="the-tune_sim_anneal-function">The <code>tune_sim_anneal()</code> function</h3>
+<p>要通过模拟退火实现迭代搜索，请使用<code>tune_sim_anneal()</code>函数。该函数的语法与<code>tune_bayes()</code>几乎相同。它没有关于采集函数或不确定性抽样的选项。<code>control_sim_anneal()</code>函数包含一些用于定义局部邻域和冷却调度的细节：</p>
+<ul>
+<li><p><code>no_improve</code>，对于模拟退火算法而言，是一个整数，若在<code>no_improve</code>次迭代内未发现全局最优结果或改进结果，该整数将使搜索停止。被接受的次优参数或被丢弃的参数均算作“无改进”。</p></li>
+<li><p><code>restart</code>是指在从之前的最佳结果重新开始之前，没有新的最佳结果出现的迭代次数。</p></li>
+<li><p><code>radius</code>是一个取值在(0, 1)上的数值向量，它定义了初始点周围局部邻域的最小和最大半径。</p></li>
+<li><p><code>flip</code>是一个概率值，它定义了改变分类参数或整数参数值的可能性。</p></li>
+<li><p><code>cooling_coef</code>是 <span class="math inline">\(\exp(c\times D_i \times i)\)</span> 中的 <span class="math inline">\(c\)</span> 系数，它调节接受概率在迭代过程中的下降速度。<code>cooling_coef</code>的值越大，接受次优参数设置的概率就越低。</p></li>
+</ul>
+<p>对于细胞分割数据，其语法与之前使用的函数非常一致：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">ctrl_sa</span> <span class="op">&lt;-</span> <span class="fu">finetune</span><span class="fu">::</span><span class="fu"><a href="https://finetune.tidymodels.org/reference/control_sim_anneal.html">control_sim_anneal</a></span><span class="op">(</span>verbose <span class="op">=</span> <span class="cn">TRUE</span>, no_improve <span class="op">=</span> <span class="fl">10L</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">1404</span><span class="op">)</span></span>
+<span><span class="va">svm_sa</span> <span class="op">&lt;-</span></span>
+<span>  <span class="va">svm_wflow</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">finetune</span><span class="fu">::</span><span class="fu"><a href="https://finetune.tidymodels.org/reference/tune_sim_anneal.html">tune_sim_anneal</a></span><span class="op">(</span></span>
+<span>    resamples <span class="op">=</span> <span class="va">cell_folds</span>,</span>
+<span>    metrics <span class="op">=</span> <span class="va">roc_res</span>,</span>
+<span>    initial <span class="op">=</span> <span class="va">svm_initial</span>,</span>
+<span>    param_info <span class="op">=</span> <span class="va">svm_param</span>,</span>
+<span>    iter <span class="op">=</span> <span class="fl">50</span>,</span>
+<span>    control <span class="op">=</span> <span class="va">ctrl_sa</span></span>
+<span>  <span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>模拟退火过程在4个不同的迭代中发现了新的全局最优解。最早的改进出现在第5次迭代，最终的最优解出现在第27次迭代。总体最佳结果出现在第27次迭代，此时ROC曲线下的平均面积为0.8985（初始最佳值为0.8659）。在迭代过程中，分别在第13、21、35和43次迭代时进行了4次重启，同时还有12个候选解被舍弃。（此处过程描述可能不准确，参考实际日志信息）</p>
+<p>与其他<code>tune_*()</code>函数一样，相应的<code>autoplot()</code>函数会对结果进行可视化评估。使用<code>autoplot(svm_sa, type = "performance")</code>可以显示迭代过程中的性能（ <a href="#fig-14.9" class="quarto-xref">Figure&nbsp;9</a> ），而<code>autoplot(svm_sa, type = "parameters")</code>则会绘制性能与特定调优参数值的对比图（ <a href="#fig-14.10" class="quarto-xref">Figure&nbsp;10</a> ）。</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-14.9" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-14.9-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="14-Iterative-Search_files/figure-html/fig-14.9-1.png" class="img-fluid figure-img" width="576">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-14.9-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;9: Progress of the simulated annealing process shown when the <code>autoplot()</code> method is used with <code>type = "performance"</code>
+</figcaption></figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-14.10" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-14.10-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="14-Iterative-Search_files/figure-html/fig-14.10-1.png" class="img-fluid figure-img" width="576">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-14.10-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;10: Performance versus tuning parameter values shown when the <code>autoplot()</code> method is used with <code>type = "parameters"</code>
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>搜索路径的可视化有助于理解搜索过程在哪些地方表现良好，在哪些地方出现了偏差：</p>
+<video width="100%" controls=""><source src="images/sa_search.mp4" type="video/mp4"></video><p>与<code>tune_bayes()</code>类似，手动停止执行将会返回已完成的迭代。</p>
+</section></section><section id="chapter-summary" class="level2"><h2 class="anchored" data-anchor-id="chapter-summary">Chapter Summary</h2>
+<p>本章介绍了两种用于优化调优参数的迭代搜索方法。贝叶斯优化利用在现有重采样结果上训练的预测模型来推荐调优参数值，而模拟退火则在超参数空间中遍历以寻找合适的值。这两种方法无论是单独使用，还是作为初始网格搜索之后的后续方法来进一步微调性能，都能有效地找到合适的参数值。</p>
+
+
+</section><a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script><script src="https://utteranc.es/client.js" repo="hanguojun007/Blog" issue-term="pathname" theme="github-light" crossorigin="anonymous" async="">
+</script><nav class="page-navigation"><div class="nav-page nav-page-previous">
+      <a href="../../Books/Tidy Modeling with R/13 Grid Search.html" class="pagination-link" aria-label="13 Grid Search">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">13 Grid Search</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+</body></html>
