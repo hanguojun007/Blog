@@ -1,0 +1,295 @@
+---
+title: "17 Encoding Categorical Data"
+date: "2025-11-17"
+date-modified: "2025-11-17"
+
+format:
+  html:
+    code-link: true
+
+fig-width: 6
+fig-asp: 0.618
+out-width: 70%
+fig-align: center
+
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: "#>"
+    R.options:
+      dplyr.print_min: 6
+      dplyr.print_max: 6
+      pillar.max_footer_lines: 2
+      pillar.min_chars: 15
+      stringr.view_n: 6
+      cli.num_colors: 0
+      cli.hyperlink: FALSE
+      pillar.bold: TRUE
+      width: 77
+
+execute:
+  warning: true
+  error: true
+---
+
+在R中进行统计建模时，分类或名义数据的首选表示方法是因子（factor），这是一种只能取有限个不同值的变量；在内部，因子以整数向量的形式存储，并附带一组文本标签。在第8.4.1节中，我们介绍了特征工程方法，用于将定性或名义数据编码或转换为更适合大多数模型算法的表示形式。我们讨论了如何将一个分类变量（例如Ames住房数据中的`Bldg_Type`，其水平包括`OneFam`、`TwoFmCon`、`Duplex`、`Twnhs`和`TwnhsE`）转换为一组虚拟变量或指示变量，如 @tbl-17.1 所示。
+
+| **Raw Data** | **TwoFmCon** | **Duplex** | **Twnhs** | **TwnhsE** |
+|:-------------|-------------:|-----------:|----------:|-----------:|
+| OneFam       |            0 |          0 |         0 |          0 |
+| TwoFmCon     |            1 |          0 |         0 |          0 |
+| Duplex       |            0 |          1 |         0 |          0 |
+| Twnhs        |            0 |          0 |         1 |          0 |
+| TwnhsE       |            0 |          0 |         0 |          1 |
+
+: Dummy or indicator variable encodings for the building type predictor in the Ames training set.{#tbl-17.1}
+
+许多模型实现都需要将分类数据转换为数值表示形式。附录A列出了适用于不同模型的推荐预处理技术表；请注意，表中许多模型均要求对所有预测变量进行数值编码。
+
+然而，对于一些实际的数据集，直接使用虚拟变量并不适用。这种情况通常是因为类别数量过多，或者在预测时出现了新类别。本章将探讨更复杂的分类预测变量编码方法，以解决这些问题。这些方法可通过**tidymodels**的**recipe**步骤，在**embed**和**textrecipes**包中获得。
+
+## Is an Encoding Necessary?
+
+少数模型，例如基于树或规则的模型，能够原生处理分类数据，无需对这类特征进行编码或转换。例如，基于树的模型可直接将`Bldg_Type`这样的变量划分为若干个因子水平组——比如，将`OneFam`单独归为一组，而`Duplex`和`Twnhs`则合并为另一组。此外，朴素贝叶斯模型也是另一种典型例子：其模型结构本身就能自然地应对分类变量，具体而言，会在每个水平内分别计算概率分布，如针对数据集中所有不同类型的`Bldg_Type`。
+
+这些能够原生处理分类特征的模型，同样也能应对数值型、连续型特征，因此对这类变量的转换或编码变得可有可无。但这是否会在某种程度上帮助提升模型性能或缩短训练时间呢？通常情况下，并非如此——正如 M. Kuhn 和 Johnson（2020年）书中第5.7节所指出的，使用未经转换的因子变量与针对相同特征转换为虚拟变量后进行对比时，基准数据集的表现显示：采用虚拟编码方式不仅未显著改善模型性能，反而常常需要更长的训练时间。
+
+我们建议，在模型允许的情况下，优先使用未经过转换的分类变量；需要注意的是，对于这类模型，更复杂的编码方式通常并不会带来更好的性能。
+
+## Encoding Ordinal Predictors
+
+有时，定性列可以进行排序，例如“低”、“中”和“高”。在基础R中，默认的编码策略是创建新的数值列，这些列是数据的多项式展开。对于具有五个有序值的列——如 @tbl-17.2 所示的例子——因子列会被替换为线性、二次、三次和四次项的列：
+
+| **Raw Data**    | **Linear** | **Quadratic** | **Cubic** | **Quartic** |
+|:----------------|-----------:|--------------:|----------:|------------:|
+| none            |      -0.63 |          0.53 |     -0.32 |        0.12 |
+| a little        |      -0.32 |         -0.27 |      0.63 |       -0.48 |
+| some            |       0.00 |         -0.53 |      0.00 |        0.72 |
+| a bunch         |       0.32 |         -0.27 |     -0.63 |       -0.48 |
+| copious amounts |       0.63 |          0.53 |      0.32 |        0.12 |
+
+: Polynominal expansions for encoding an ordered variable.{#tbl-17.2}
+
+虽然这种做法并非毫无道理，但人们通常并不觉得它有用。例如，用一个11次多项式来编码一年中各个月份的顺序型因子，可能并不是最有效的方法。相反，不妨尝试使用与有序因子相关的配方步骤，比如`step_unorder()`，将其转换为普通因子；或者使用`step_ordinalscore()`，将特定的数值映射到每个因子水平。
+
+## Using the Outcome for Encoding Predictors
+
+除了虚拟变量或指示变量之外，还有多种更复杂的编码方式可供选择。其中一种方法称为效应编码（effect encoding）或似然编码（likelihood encoding），它用单个数值列取代了原有的分类变量，该数值列用于衡量这些数据的效应（Micci-Barreca 2001；Zumel 和 Mount 2019）。例如，在Ames住宅数据中，针对街区这一预测变量，我们可以计算每个街区的平均或中位数销售价格（如 @fig-17.1 所示），并用这些均值替换原始数据值：
+
+```{r}
+#| label: fig-17.1
+#| fig-cap: Mean home price for neighborhoods in the Ames training set, which can be used as an effect encoding for this categorical variable
+library(tidymodels)
+data(ames)
+
+ames <- mutate(ames, Sale_Price = log10(Sale_Price))
+
+set.seed(502)
+ames_split <- initial_split(ames, prop = 0.80, strata = Sale_Price)
+ames_train <- training(ames_split)
+
+ames_train %>%
+  group_by(Neighborhood) %>%
+  summarize(
+    mean = mean(Sale_Price),
+    std_err = sd(Sale_Price) / sqrt(length(Sale_Price))
+  ) %>%
+  ggplot(aes(y = reorder(Neighborhood, mean), x = mean)) +
+  geom_point() +
+  geom_errorbar(aes(xmin = mean - 1.64 * std_err, xmax = mean + 1.64 * std_err)) +
+  labs(y = NULL, x = "Price (mean, log scale)")
+```
+
+当你的分类变量具有大量水平时，这种效应编码方法效果尤为出色。在tidymodels中，embed包提供了多种用于不同效应编码的配方步骤函数，例如`step_lencode_glm()`、`step_lencode_mixed()`和`step_lencode_bayes()`。这些步骤利用广义线性模型来估计分类预测变量中每个水平对结果的影响。当你使用像`step_lencode_glm()`这样的recipe步骤时，需先指定要编码的变量，再通过`vars()`指明结果变量：
+
+```{r}
+library(embed)
+
+ames_glm <-
+  recipe(Sale_Price ~ Neighborhood + Gr_Liv_Area + Year_Built + Bldg_Type +
+    Latitude + Longitude, data = ames_train) %>%
+  step_log(Gr_Liv_Area, base = 10) %>%
+  step_lencode_glm(Neighborhood, outcome = vars(Sale_Price)) %>%
+  step_dummy(all_nominal_predictors()) %>%
+  step_interact(~ Gr_Liv_Area:starts_with("Bldg_Type_")) %>%
+  step_ns(Latitude, Longitude, deg_free = 20)
+
+ames_glm
+```
+
+正如第16.4节所详述，我们可以使用训练数据对配方进行`prep()`处理，以调整或估计预处理转换所需的参数。随后，我们可利用`tidy()`方法整理这一已准备好的配方，查看最终结果：
+
+```{r}
+glm_estimates <-
+  prep(ames_glm) %>%
+  tidy(number = 2)
+
+glm_estimates
+```
+
+当我们使用通过这种方法创建的全新编码的`Neighborhood`数值变量时，会用GLM模型中对`Sale_Price`的估计值来替换原始水平（例如`North_Ames`）。
+
+像这种效应编码方法，也能无缝应对数据中遇到新因子水平的情况。当我们在缺乏特定小区信息时，该值`value`正是我们从GLM模型预测出的价格：
+
+```{r}
+glm_estimates %>%
+  filter(level == "..new")
+```
+
+效应编码功能强大，但应谨慎使用。这些效应应在数据拆分后，基于训练集进行计算。这种有监督的预处理步骤需严格采用重采样方法，以避免过拟合（参见第10章）。
+
+当你为分类变量创建效应编码时，实际上是在你的实际模型内部叠加了一个小型模型。效应编码存在过拟合的风险，这正是第7章中所阐述的：特征工程必须被视为模型流程的一部分；同时，特征工程也应与模型参数一起，在重采样过程中一并进行估计。
+
+### Effect encodings with partial pooling
+
+使用`step_lencode_glm()`创建效应编码时，会针对每个因子水平（本例中为“街区”）分别估计效应。然而，有些街区的房屋数量较多，而另一些则只有少数几栋。因此，在“地标”街区的单套训练集房屋价格测量中，不确定性远高于北Ames街区的354套训练集房屋。我们可以通过部分分层法对这些估计值进行调整，使样本量较小的水平更接近整体均值。具体而言，各水平的效应将通过混合或分层广义线性模型一次性建模：
+
+```{r}
+ames_mixed <-
+  recipe(Sale_Price ~ Neighborhood + Gr_Liv_Area + Year_Built + Bldg_Type +
+    Latitude + Longitude, data = ames_train) %>%
+  step_log(Gr_Liv_Area, base = 10) %>%
+  step_lencode_mixed(Neighborhood, outcome = vars(Sale_Price)) %>%
+  step_dummy(all_nominal_predictors()) %>%
+  step_interact(~ Gr_Liv_Area:starts_with("Bldg_Type_")) %>%
+  step_ns(Latitude, Longitude, deg_free = 20)
+
+ames_mixed
+```
+
+让我们对这个recipe对象进行`prep()`和`tidy()`处理，看看效果：
+
+```{r}
+mixed_estimates <-
+  prep(ames_mixed) %>%
+  tidy(number = 2)
+
+mixed_estimates
+```
+
+随后，新等级的编码值与GLM几乎相同：
+
+```{r}
+mixed_estimates %>%
+  filter(level == "..new")
+```
+
+你可以使用完全贝叶斯层次模型来以相同的方式对效应进行建模，方法是调用`step_lencode_bayes()`。
+
+让我们在 @fig-17.2 中通过可视化方式比较部分聚合与无聚合的效果：
+
+```{r}
+#| label: fig-17.2
+#| fig-cap: Comparing the effect encodings for neighborhood estimated without pooling to those with partial pooling
+glm_estimates %>%
+  rename(`no pooling` = value) %>%
+  left_join(
+    mixed_estimates %>%
+      rename(`partial pooling` = value),
+    by = "level"
+  ) %>%
+  left_join(
+    ames_train %>%
+      count(Neighborhood) %>%
+      mutate(level = as.character(Neighborhood))
+  ) %>%
+  ggplot(aes(`no pooling`, `partial pooling`, size = sqrt(n))) +
+  geom_abline(color = "gray50", lty = 2) +
+  geom_point(alpha = 0.7) +
+  coord_fixed()
+#> Warning: Removed 1 rows containing missing values (`geom_point()`).
+```
+
+请注意，如 @fig-17.2 所示，当我们比较整体聚合与完全不聚合时，大多数关于邻里效应的估计值基本一致。然而，那些房屋数量最少的社区，其效应估计值已被拉向（向上或向下）平均效应水平。这是因为采用整体聚合方法时，我们对这些社区房价的证据相对较少，因而会将效应估计值向均值靠拢。
+
+## Feature Hashing
+
+传统虚拟变量如第8.4.1节所述，要求必须已知所有可能的类别，才能构建出完整的数值特征集。而特征哈希方法（Weinberger等，2009）同样会创建虚拟变量，但仅根据类别值将其分配到预定义的虚拟变量池中。让我们再次查看Ames数据集中的`Neighborhood`字段，并使用`rlang::hash()`函数来进一步理解：
+
+```{r}
+library(rlang)
+
+ames_hashed <-
+  ames_train %>%
+  mutate(Hash = map_chr(Neighborhood, hash))
+
+ames_hashed %>%
+  select(Neighborhood, Hash)
+```
+
+如果我们把“Briardale”输入这个哈希函数，每次都会得到相同的输出。在这种情况下，这些街区被称为“keys”，而输出结果则称为“hashes”。哈希函数将大小可变的输入映射为固定大小的输出。哈希函数广泛应用于密码学和数据库领域。
+
+`rlang::hash()`函数生成一个128位的哈希值，这意味着共有`2^128`种可能的哈希值。这对于某些应用来说非常理想，但并不适用于高基数变量（即具有大量水平的变量）的特征哈希。在特征哈希中，可能的哈希数量是一个超参数，由模型开发者通过计算整数哈希值的模来设定。例如，我们可以通过 `Hash %% 16` 获得16种可能的哈希值：
+
+```{r}
+ames_hashed %>%
+  ## first make a smaller hash for integers that R can handle
+  mutate(
+    Hash = strtoi(substr(Hash, 26, 32), base = 16L),
+    ## now take the modulo
+    Hash = Hash %% 16
+  ) %>%
+  select(Neighborhood, Hash)
+```
+
+现在，我们不再使用原始数据中的28个街区，也不再处理数量极其庞大的原始哈希值，而是仅保留了16个哈希值。这种方法速度非常快，且内存效率高，尤其在可能类别数量众多时，不失为一种不错的策略。
+
+特征哈希法不仅适用于文本数据，也适用于高基数的类别型数据。有关使用文本预测变量的案例研究演示，请参阅Hvitfeldt和Silge（2021）第6.7节。
+
+我们可以使用来自**textrecipes**包的recipe步骤来实现特征哈希：
+
+```{r}
+library(textrecipes)
+ames_hash <-
+  recipe(Sale_Price ~ Neighborhood + Gr_Liv_Area + Year_Built + Bldg_Type +
+    Latitude + Longitude, data = ames_train) %>%
+  step_log(Gr_Liv_Area, base = 10) %>%
+  step_dummy_hash(Neighborhood, signed = FALSE, num_terms = 16L) %>%
+  step_dummy(all_nominal_predictors()) %>%
+  step_interact(~ Gr_Liv_Area:starts_with("Bldg_Type_")) %>%
+  step_ns(Latitude, Longitude, deg_free = 20)
+
+ames_hash
+```
+
+特征哈希法速度快、效率高，但也存在一些缺点。例如，不同的类别值常常会被映射到同一个哈希值上，这被称为冲突或别名现象。那么，在艾姆斯的各个社区中，这种情况究竟有多频繁呢？@tbl-17.3 展示了每个哈希值对应的社区数量分布情况。
+
+| **Number of neighborhoods within a hash feature** | **Number of occurrences** |
+|---:|---:|
+| 0 | 1 |
+| 1 | 7 |
+| 2 | 4 |
+| 3 | 3 |
+| 4 | 1 |
+
+: The number of hash features at each number of neighborhoods.{#tbl-17.3}
+
+映射到每个哈希值的街区数量介于零到四之间。所有大于一的哈希值均属于哈希冲突的实例。
+
+使用特征哈希时，有哪些需要考虑的事项？
+
+-   特征哈希无法直接解释，因为哈希函数不可逆。我们无法从哈希值推断出输入的类别级别，也无法判断是否发生了冲突。
+
+-   哈希值的数量是这种预处理技术的一个调优参数，您应尝试多个数值，以确定哪种设置最适合您的特定建模方法。哈希值数量较少时会导致更多冲突，但若数量过高，可能并不会比您原本高基数变量的表现更好。
+
+-   特征哈希能够在预测时处理新的类别级别，因为它不依赖于预先确定的虚拟变量。
+
+-   你可以通过设置`signed = TRUE`，来减少有符号哈希中的哈希冲突。这样，哈希值将从原来的 1 扩展为根据哈希符号决定的 +1 或 -1。
+
+很可能会有一些哈希列包含全零值，正如我们在本例中所看到的。我们建议使用`step_zv()`函数实施零方差过滤，以剔除这些列。
+
+## More Encoding Options
+
+还有更多选项可用于将因子转换为数值表示。
+
+我们可以构建一套完整的实体嵌入（entity embeddings，Guo 和 Berkhahn，2016），将具有多个类别的分类变量转换为一组低维向量。这种方法尤其适用于类别数量众多的名义变量——其类别数远超我们在艾姆斯市社区示例中所使用的数量。实体嵌入的概念源自用于从文本数据中创建词嵌入的方法。更多关于词嵌入的内容，请参阅Hvitfeldt和Silge（2021）第5章。
+
+可以通过使用embed包中的`step_embed()`函数，借助TensorFlow神经网络来学习分类变量的嵌入表示。我们可以仅使用目标变量，也可选择性地结合一组额外的预测因子。与特征哈希类似，需创建的新编码列数量是特征工程的一个超参数。此外，我们还需决定神经网络的结构（隐藏单元的数量）以及如何训练该神经网络（训练多少个epoch，以及在评估指标时应使用多少数据进行验证）。
+
+另一种可用于处理二元结果的选项是，根据类别水平与二元结果的关联程度对其进行转换。这种基于证据权重（WoE）的转换方法（Good，1985）利用“贝叶斯因子”的对数（即后验比值与先验比值之比），并建立一个字典，将每个类别水平映射到相应的WoE值。WoE编码可通过embed中的`step_woe()`函数来确定。
+
+## Chapter Summary
+
+在本章中，你学习了如何使用预处理方案对分类预测变量进行编码。将分类变量转换为数值表示的最直接方法是根据其水平创建虚拟变量，但当变量的基数较高（水平数量过多）或在预测时可能遇到新值（出现新水平）时，这种方法的效果并不理想。在这种情况下，一种选择是采用效应编码，这是一种基于监督的学习编码方法，它会利用目标变量的信息。效应编码既可以单独学习，也可以通过类别聚合的方式进行学习。此外，还有一种方法是使用哈希函数，将类别映射到一组更小的新虚拟变量上。特征哈希法速度快、内存占用低。其他可选方法还包括：通过神经网络学习得到的实体嵌入，以及证据权重转换法。
+
+大多数模型算法都需要对分类变量进行某种形式的转换或编码。而少数模型，包括基于树和规则的模型，则能直接处理分类变量，无需此类编码。

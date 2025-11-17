@@ -238,9 +238,269 @@ bean_train %>% nrow()
 
 ## Feature Extraction Techniques
 
+由于在tidymodels中，recipe对象是进行降维的首选方法，因此我们来编写一个函数，用于估计变换，并通过ggforce包绘制出结果数据的散点图矩阵：
 
+```{r}
+library(ggforce)
+plot_validation_results <- function(recipe, dat = bean_validation) {
+  recipe %>%
+    # Estimate any additional steps
+    prep() %>%
+    # Process the data (the validation set by default)
+    bake(new_data = dat) %>%
+    # Create the scatterplot matrix
+    ggplot(aes(x = .panel_x, y = .panel_y, color = class, fill = class)) +
+    geom_point(alpha = 0.4, size = 0.5) +
+    geom_autodensity(alpha = .3) +
+    facet_matrix(vars(-class), layer.diag = 2) +
+    scale_color_brewer(palette = "Dark2") +
+    scale_fill_brewer(palette = "Dark2")
+}
+```
 
+在本章中，我们将多次使用此函数。
 
+这里探讨了一系列特征提取方法。关于这些方法的概述，可参见 M. Kuhn 和 Johnson（2020）第6.3.1节及其参考文献。UMAP方法则在McInnes、Healy 和 Melville（2020）中有所介绍。
 
+### Principal component analysis
 
+我们已经在本书中多次提到过PCA，现在是时候深入探讨了。PCA是一种无监督方法，它通过预测变量的线性组合来定义新特征。这些特征力求尽可能地捕捉原始数据中的变异信息。我们将在原始流程中加入step_pca()函数，并利用该函数在验证集上可视化结果，如 @fig-16.5 所示：
 
+```{r}
+#| label: fig-16.5
+#| fig-cap: Principal component scores for the bean validation set, colored by class
+bean_rec_trained %>%
+  step_pca(all_numeric_predictors(), num_comp = 4) %>%
+  plot_validation_results() +
+  ggtitle("Principal Component Analysis")
+```
+
+我们发现，前两个主成分`PC1`和`PC2`，尤其是当它们结合使用时，能够有效地区分或分离各个类别。这或许使我们预期，整体上对这些豆类进行分类的问题并不会特别棘手。
+
+请记住，PCA 是无监督的。对于这些数据，结果表明，能够解释预测变量中最大变异性的 PCA 成分，恰好也能用于预测类别。那么，究竟是哪些特征在推动模型表现呢？**learnedtidymodels** 包中提供了有助于可视化每个成分顶部特征的函数，见 @fig-16.6 。为此，我们需要预先准备好的recipe对象；PCA 步骤已添加到以下代码中，并同时调用了`prep()`函数：
+
+```{r}
+#| label: fig-16.6
+#| fig-cap: Predictor loadings for the PCA transformation
+library(learntidymodels)
+bean_rec_trained %>%
+  step_pca(all_numeric_predictors(), num_comp = 4) %>%
+  prep() %>%
+  plot_top_loadings(component_number <= 4, n = 5) +
+  scale_fill_brewer(palette = "Paired") +
+  ggtitle("Principal Component Analysis")
+```
+
+最主要的加载项大多与先前相关性图左上角所示的一组相关预测因子有关：周长、面积、主轴长度和凸包面积。这些指标均与豆子的大小密切相关。此外，根据 Symons 和 Fulcher（1988）提出的“shape factor 2”，即面积除以主轴长度的立方，同样与豆子大小相关。而伸长率的度量似乎主导了第二主成分。
+
+### Partial least squares
+
+我们在第13.5.1节中介绍的PLS，是PCA的一种有监督版本。它试图找到既能最大程度地反映预测变量的变异，又能最大化这些成分与结果之间关系的主成分。@fig-16.7 展示了这一经过略微修改的PCA代码的运行结果：
+
+```{r}
+#| label: fig-16.7
+#| fig-cap: PLS component scores for the bean validation set, colored by class
+bean_rec_trained %>%
+  step_pls(all_numeric_predictors(), outcome = "class", num_comp = 4) %>%
+  plot_validation_results() +
+  ggtitle("Partial Least Squares")
+```
+
+@fig-16.7 中绘制的前两个PLS成分与前两个PCA成分几乎完全相同！我们得出这一结论，是因为这些PCA成分在区分不同种类的豆子时表现得极为出色。而其余的成分则有所不同。@fig-16.8 则直观展示了各成分的载荷，即每种成分的首要特征。
+
+```{r}
+#| label: fig-16.8
+#| fig-cap: Predictor loadings for the PLS transformation
+bean_rec_trained %>%
+  step_pls(all_numeric_predictors(), outcome = "class", num_comp = 4) %>%
+  prep() %>%
+  plot_top_loadings(component_number <= 4, n = 5, type = "pls") +
+  scale_fill_brewer(palette = "Paired") +
+  ggtitle("Partial Least Squares")
+```
+
+坚实度（即豆子的密度）与圆润度共同决定了第三个PLS成分。其中，坚实度可能捕捉到了与豆子表面“凹凸不平”相关的特征，因为它能够精确测量豆粒边界的不规则程度。
+
+### Independent component analysis
+
+ICA与PCA略有不同，因为它寻找的是彼此间尽可能统计独立的成分（而非仅仅不相关）。可以说，ICA旨在最大化ICA成分的“非高斯性”，或者说是分离信息，而非像PCA那样通过压缩信息来实现降维。现在，让我们使用`step_ica()`函数生成 @fig-16.9 ：
+
+```{r}
+#| label: fig-16.9
+#| fig-cap: ICA component scores for the bean validation set, colored by class
+bean_rec_trained %>%
+  step_ica(all_numeric_predictors(), num_comp = 4) %>%
+  plot_validation_results() +
+  ggtitle("Independent Component Analysis")
+```
+
+观察这一图谱，使用ICA时，前几个主成分中各类别之间似乎没有明显分离。这些独立（或尽可能独立）的成分并未有效区分不同类型的豆子。
+
+### Uniform manifold approximation and projection
+
+UMAP 与流行的非线性降维方法 t-SNE 类似。在原始的高维空间中，UMAP 采用基于距离的最近邻方法，寻找数据中那些点之间更可能存在关联的局部区域。这些数据点之间的关系被保存为一个有向图模型，其中大部分点之间并不相连。
+
+随后，UMAP 将图中的点映射到降维后的空间中。为此，该算法采用了一种优化过程，利用交叉熵将数据点映射到更少数量的特征上，从而实现对原始图的精确近似。
+
+为了创建映射，**embed** 包中包含了一个用于该方法的步骤函数，如 @fig-16.10 所示。
+
+```{r}
+#| label: fig-16.10
+#| fig-cap: UMAP component scores for the bean validation set, colored by class
+library(embed)
+bean_rec_trained %>%
+  step_umap(all_numeric_predictors(), num_comp = 4) %>%
+  plot_validation_results() +
+  ggtitle("UMAP")
+```
+
+尽管类间空间明显存在，但每个簇内可能包含多种不同的类别。
+
+还有一种受监督的UMAP版本：
+
+```{r}
+#| label: fig-16.11
+#| fig-cap: Supervised UMAP component scores for the bean validation set, colored by class
+bean_rec_trained %>%
+  step_umap(all_numeric_predictors(), outcome = "class", num_comp = 4) %>%
+  plot_validation_results() +
+  ggtitle("UMAP (supervised)")
+```
+
+@fig-16.11 中展示的监督方法在数据建模方面前景可观。
+
+UMAP 是一种强大的降维方法，但它对调参非常敏感（例如，邻域数量等参数）。因此，建议尝试调整几个参数，以评估结果在这些数据上的稳健性。
+
+## Modeling
+
+PLS 和 UMAP 方法都值得结合不同模型进行深入研究。让我们借助这些降维技术（以及完全不进行任何变换的情况），探索多种不同的模型：单层神经网络、Bagged 树、柔性判别分析（FDA）、朴素贝叶斯，以及正则化判别分析（RDA）。
+
+现在我们已重新进入“建模模式”，将创建一系列模型规范，然后使用工作流集在以下代码中调优这些模型。请注意，模型参数是与配方参数协同调整的（例如，降维后的维度大小、UMAP 参数）。
+
+```{r}
+library(baguette)
+library(discrim)
+
+mlp_spec <-
+  mlp(hidden_units = tune(), penalty = tune(), epochs = tune()) %>%
+  set_engine("nnet") %>%
+  set_mode("classification")
+
+bagging_spec <-
+  bag_tree() %>%
+  set_engine("rpart") %>%
+  set_mode("classification")
+
+fda_spec <-
+  discrim_flexible(
+    prod_degree = tune()
+  ) %>%
+  set_engine("earth")
+
+rda_spec <-
+  discrim_regularized(frac_common_cov = tune(), frac_identity = tune()) %>%
+  set_engine("klaR")
+
+bayes_spec <-
+  naive_Bayes() %>%
+  set_engine("klaR")
+```
+
+我们还需要用于尝试的降维方法的配方。让我们从基础recipe对象`bean_rec`开始，然后逐步添加不同的降维步骤：
+
+```{r}
+bean_rec <-
+  recipe(class ~ ., data = bean_train) %>%
+  step_zv(all_numeric_predictors()) %>%
+  step_orderNorm(all_numeric_predictors()) %>%
+  step_normalize(all_numeric_predictors())
+
+pls_rec <-
+  bean_rec %>%
+  step_pls(all_numeric_predictors(), outcome = "class", num_comp = tune())
+
+umap_rec <-
+  bean_rec %>%
+  step_umap(
+    all_numeric_predictors(),
+    outcome = "class",
+    num_comp = tune(),
+    neighbors = tune(),
+    min_dist = tune()
+  )
+```
+
+再次，workflowsets 包将预处理器与模型进行交叉组合。同时，控制`control`选项`parallel_over`被设置为启用并行处理，以便能够同时对多种调参组合展开优化。`workflow_map()`函数则针对 10 种参数组合，应用网格搜索法来优化模型及预处理参数（如适用）。最后，在验证集上估算多分类 ROC 曲线下的面积。
+
+```{r}
+ctrl <- control_grid(parallel_over = "everything")
+bean_res <-
+  workflow_set(
+    preproc = list(basic = class ~ ., pls = pls_rec, umap = umap_rec),
+    models = list(
+      bayes = bayes_spec, fda = fda_spec,
+      rda = rda_spec, bag = bagging_spec,
+      mlp = mlp_spec
+    )
+  ) %>%
+  workflow_map(
+    verbose = TRUE,
+    seed = 1603,
+    resamples = bean_val,
+    grid = 10,
+    metrics = metric_set(roc_auc),
+    control = ctrl
+  )
+```
+
+我们可以通过模型在验证集上估计的ROC曲线下的面积对其进行排序，如 @fig-16.12 ：
+
+```{r}
+rankings <-
+  rank_results(bean_res, select_best = TRUE) %>%
+  mutate(method = map_chr(wflow_id, ~ str_split(.x, "_", simplify = TRUE)[1]))
+
+tidymodels_prefer()
+filter(rankings, rank <= 5) %>% dplyr::select(rank, mean, model, method)
+```
+
+```{r}
+#| echo: false
+#| label: fig-16.12
+#| fig-cap: Area under the ROC curve from the validation set
+rankings %>%
+  ggplot(aes(x = rank, y = mean, pch = method, color = model)) +
+  geom_point(cex = 3.5) +
+  theme(legend.position = "right") +
+  labs(y = "ROC AUC") +
+  geom_text(aes(y = mean - 0.01, label = wflow_id), angle = 90, hjust = 1) +
+  lims(y = c(0.9, NA))
+```
+
+从这些结果可以看出，大多数模型的表现都非常出色；这里几乎没有糟糕的选择。为了演示，我们将使用结合了PLS特征的RDA模型作为最终模型。接下来，我们将以数值上最优的参数确定工作流程，先将其拟合到训练集，再用测试集进行评估：
+
+```{r}
+rda_res <-
+  bean_res %>%
+  extract_workflow("pls_rda") %>%
+  finalize_workflow(
+    bean_res %>%
+      extract_workflow_set_result("pls_rda") %>%
+      select_best(metric = "roc_auc")
+  ) %>%
+  last_fit(split = bean_split, metrics = metric_set(roc_auc))
+
+rda_wflow_fit <- extract_workflow(rda_res)
+```
+
+我们在测试集上该指标（多分类ROC AUC）的结果是什么？
+
+```{r}
+collect_metrics(rda_res)
+```
+
+很不错！我们将在下一章中使用这个模型，来展示变量重要性分析方法。
+
+## Chapter Summary
+
+降维方法既可用于探索性数据分析，也可用于建模。recipes和embed包中包含了多种不同方法的步骤，而工作流集则有助于根据数据集的特点选择合适的方法。本章还探讨了如何单独使用recipes对象，无论是用于调试recipe对象中的问题，还是直接应用于探索性数据分析与数据可视化。

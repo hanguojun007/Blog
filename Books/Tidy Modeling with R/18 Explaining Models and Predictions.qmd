@@ -1,0 +1,135 @@
+---
+title: "18 Explaining Models and Predictions"
+date: "2025-11-17"
+date-modified: "2025-11-17"
+
+format:
+  html:
+    code-link: true
+
+fig-width: 6
+fig-asp: 0.618
+out-width: 70%
+fig-align: center
+
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: "#>"
+    R.options:
+      dplyr.print_min: 6
+      dplyr.print_max: 6
+      pillar.max_footer_lines: 2
+      pillar.min_chars: 15
+      stringr.view_n: 6
+      cli.num_colors: 0
+      cli.hyperlink: FALSE
+      pillar.bold: TRUE
+      width: 77
+
+execute:
+  warning: true
+  error: true
+---
+
+在第1.2节中，我们概述了一种模型分类法，并指出模型通常被构建为描述性、推理性或预测性中的一种或多种类型。我们还提到，无论何种建模应用，模型性能都至关重要——这可由适当的评估指标来衡量，例如回归任务中的RMSE，或分类任务中的ROC曲线下的面积。同样地，模型解释——即解答模型为何做出特定预测——无论你的模型主要用于描述性分析、检验假设，还是进行预测，都可能发挥关键作用。通过回答“为什么”这个问题，建模从业者能够深入了解哪些特征对预测结果起到了重要作用，甚至能预测当特征值发生变化时，模型的预测结果将如何调整。本章将介绍如何向模型提问，以揭示其做出预测的原因。
+
+对于一些模型，比如线性回归，通常很容易解释为何模型会做出预测。线性模型的结构中包含每个预测变量的系数，这些系数往往直观易懂。然而，对于其他模型，例如随机森林——由于其天生具备捕捉非线性行为的能力，单纯从模型结构本身来解释预测结果则显得不够清晰。因此，我们可以借助模型解释算法，帮助深入理解模型的预测过程。
+
+模型解释分为两种类型：全局解释和局部解释。全局模型解释提供基于整组观测数据的总体理解；而局部模型解释则针对单个观测结果的预测，给出相关的信息。
+
+## Software for Model Explanations
+
+tidymodels 框架本身并不包含用于模型解释的软件。相反，使用 tidymodels 训练和评估的模型，可以通过 R 包中的其他补充软件（如 lime、vip 和 DALEX）来进行解释。我们通常会选择：
+
+-   当希望采用利用模型结构的基于模型的方法时，使用 vip 函数（这些方法通常速度更快）；
+
+-   当需要应用适用于任何模型的与模型无关的方法时，使用 DALEX 函数。
+
+在第10章和第11章中，我们训练并比较了几种模型，以预测爱荷华州Ames市的房价，其中包括一个包含交互项的线性模型和一个随机森林模型，结果如图18.1所示。
+
+```{r}
+#| include: false
+library(tidymodels)
+library(forcats)
+tidymodels_prefer()
+conflicted::conflict_prefer("vi", "vip")
+conflicted::conflict_prefer("explain", "lime")
+
+data(ames)
+ames <- mutate(ames, Sale_Price = log10(Sale_Price))
+
+set.seed(502)
+ames_split <- initial_split(ames, prop = 0.80, strata = Sale_Price)
+ames_train <- training(ames_split)
+ames_test <- testing(ames_split)
+
+ames_rec <-
+  recipe(Sale_Price ~ Neighborhood + Gr_Liv_Area + Year_Built + Bldg_Type +
+    Latitude + Longitude, data = ames_train) %>%
+  step_log(Gr_Liv_Area, base = 10) %>%
+  step_other(Neighborhood, threshold = 0.01) %>%
+  step_dummy(all_nominal_predictors()) %>%
+  step_interact(~ Gr_Liv_Area:starts_with("Bldg_Type_")) %>%
+  step_ns(Latitude, Longitude, deg_free = 20)
+
+lm_model <- linear_reg() %>% set_engine("lm")
+
+lm_wflow <-
+  workflow() %>%
+  add_model(lm_model) %>%
+  add_recipe(ames_rec)
+
+# cached in RData/lm_fit.RData
+# lm_fit <- fit(lm_wflow, ames_train)
+
+rf_model <-
+  rand_forest(trees = 1000) %>%
+  set_engine("ranger") %>%
+  set_mode("regression")
+
+rf_wflow <-
+  workflow() %>%
+  add_formula(
+    Sale_Price ~ Neighborhood + Gr_Liv_Area + Year_Built + Bldg_Type +
+      Latitude + Longitude
+  ) %>%
+  add_model(rf_model)
+
+set.seed(1001)
+ames_folds <- vfold_cv(ames_train, v = 10)
+
+ames_train <- ames_train %>%
+  mutate_if(is.integer, as.numeric)
+
+rf_model <-
+  rand_forest(trees = 1000) %>%
+  set_engine("ranger") %>%
+  set_mode("regression")
+
+rf_wflow <-
+  workflow() %>%
+  add_formula(
+    Sale_Price ~ Neighborhood + Gr_Liv_Area + Year_Built + Bldg_Type +
+      Latitude + Longitude
+  ) %>%
+  add_model(rf_model)
+
+rf_fit <- rf_wflow %>% fit(data = ames_train)
+lm_fit <- lm_wflow %>% fit(data = ames_train)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
