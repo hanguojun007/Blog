@@ -1,0 +1,353 @@
+---
+title: "20 Ensembles of Models"
+date: "2025-11-18"
+date-modified: "2025-11-18"
+
+format:
+  html:
+    code-link: true
+
+fig-width: 6
+fig-asp: 0.618
+out-width: 70%
+fig-align: center
+
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: "#>"
+    R.options:
+      dplyr.print_min: 6
+      dplyr.print_max: 6
+      pillar.max_footer_lines: 2
+      pillar.min_chars: 15
+      stringr.view_n: 6
+      cli.num_colors: 0
+      cli.hyperlink: FALSE
+      pillar.bold: TRUE
+      width: 77
+
+execute:
+  warning: true
+  error: true
+---
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+library(tidymodels)
+library(rules)
+library(baguette)
+library(stacks)
+library(patchwork)
+library(kableExtra)
+
+load("Books/Tidy Modeling with R/Rdata/concrete_results.RData")
+```
+
+通过整合多个单一学习器的预测结果以形成最终预测，模型集成方法能够构建出性能卓越的最终模型。目前最流行的几种集成方法包括自助法（Bagging，Breiman 1996a）、随机森林（Ho 1995；Breiman 2001）以及提升法（Boosting，Freund 和 Schapire 1997）。这些方法均基于对同类型模型（如分类树）的多个版本预测结果进行组合。然而，最早出现的集成方法之一则是模型堆叠法（Wolpert 1992；Breiman 1996）。
+
+模型堆叠可结合任何类型模型的预测结果。例如，逻辑回归、分类树和支持向量机都可以被纳入到一个堆叠集成中。
+
+本章将介绍如何使用stacks包来堆叠预测模型。我们将复用第15章中的结果，当时曾评估了多个模型，以预测混凝土混合料的抗压强度。
+
+构建堆叠集成模型的过程如下：
+
+1.  汇总通过重采样生成的留出预测结果，组成训练集。
+2.  构建一个模型，用于融合这些预测结果。
+3.  对于集成中的每个成员，使用原始训练集来拟合该模型。
+
+在接下来的章节中，我们将详细描述这一过程。不过，在继续之前，我们先明确一下“模型”可能指代的各种术语及其差异。特别是在进行复杂的建模分析时，“模型”这个词很容易变得含义过于宽泛！让我们以第15章中创建的多层感知器（MLP）模型（又称神经网络）为例进行说明。一般来说，我们会将MLP模型视为一种模型类型。线性回归和支持向量机则是其他类型的模型。
+
+调参是模型的一个重要环节。在第15章中，我们曾对MLP模型进行了25种调参值的优化。而在之前的章节中，我们把这些候选的调参值或模型配置称为“模型配置”。此外，在集成学习的相关文献中，这些模型也被称为“基模型”。我们将使用“候选成员”一词来描述可能被纳入堆叠集成模型中的各种模型配置（涵盖所有模型类型）。这意味着，一个集成模型可以包含不同类型的模型（例如，树模型和神经网络），也可以包含同一种模型的不同配置（例如，深度不同的树模型）。
+
+## Creating the Training Set for Stacking
+
+构建堆叠集成模型的第一步，依赖于通过多次划分的重采样方案生成的评估集预测结果。对于训练集中的每个数据点，堆叠方法都需要某种形式的“样本外”预测：对于回归模型，这一预测即为预期输出值；而对于分类模型，则可直接使用预测的类别或概率，尽管后者的信息量比硬性分类预测更为丰富。针对一组模型，我们会构建一个数据集，其中行对应训练集中的样本，列则包含由这组模型分别产生的“样本外”预测结果。
+
+在第15章中，我们使用了五次10折交叉验证来对数据进行重采样。这种重采样方案为每个训练集样本生成了五组评估集预测结果。此外，在其他多种重采样技术（如自助法）中，也可能出现多次的样本外预测。然而，为了实现堆叠集成方法，我们会将训练集中某个数据点的多次重复预测值取平均，从而确保每个训练集样本针对每个候选成员仅有一个最终预测值。
+
+简单的验证集也可用于堆叠方法，因为tidymodels将其视为一种单一的重采样方式。
+
+以具体为例，用于模型堆叠的训练集包含所有候选调参结果的列。@tbl-20.1 展示了前六行及部分选定的列。
+
+```{r echo = FALSE, results = "asis", warning = FALSE, message = FALSE}
+stacks() %>%
+  add_candidates(grid_results) %>%
+  as_tibble() %>%
+  mutate(
+    sample_num = row_number(),
+    buffer_1 = "",
+    buffer_2 = "") %>%
+  slice_head(n = 6) %>%
+  select(sample_num, CART_bagged_1_1, starts_with("MARS"), Cubist_1_01,
+         buffer_1, Cubist_1_18, buffer_2) %>%
+  knitr::kable(
+    digits = 2,
+    align = rep("c", 8),
+    col.names = c("Sample #", "Bagged Tree", "MARS 1", "MARS 2", "Cubist 1",
+                  "...", "Cubist 25", "..."),
+    caption = "Predictions from candidate tuning parameter configurations.",
+    label = "tbl-20.1"
+  ) %>%
+  kable_styling("striped", full_width = TRUE) %>%
+  add_header_above(c(" ", "Ensemble Candidate Predictions" = 7)) %>%
+  row_spec(0, align = "c")
+```
+
+袋装树模型仅有一列，因为它没有调优参数。此外，需要注意的是，MARS 模型仅通过一个参数（乘积度）进行调优，且该参数有两种可能的配置，因此此模型由两列表示。而大多数其他模型则有25列对应，如本例中的Cubist所示。
+
+对于分类模型，候选预测列将是预测的类别概率。由于这些列在每个模型中加起来等于1，因此可以省略其中一类的概率。
+
+到目前为止，总结一下我们的进展：堆叠的第一步是，从每个候选模型中收集训练集的评估集预测结果。接下来，我们可以利用这些评估集预测，继续构建最终的堆叠集成模型。
+
+要开始使用 stacks 包进行模型集成，首先使用`stacks()`函数创建一个空的数据堆栈，然后添加候选模型。回想一下，我们曾利用工作流集合，将多种多样的模型拟合到这些数据中。接下来，我们将以赛车比赛结果为例：
+
+```{r}
+race_results
+```
+
+在本例中，我们的语法是：
+
+```{r}
+library(tidymodels)
+library(stacks)
+tidymodels_prefer()
+
+concrete_stack <-
+  stacks() %>%
+  add_candidates(race_results)
+
+concrete_stack
+```
+
+请注意，基于重采样的方法（第13.5.5节）更为高效，因为它们可能无需对所有重抽样数据集中的所有配置进行评估。而堆叠法则要求所有候选成员都具备完整的重抽样结果集。因此，`add_candidates()`函数仅包含那些已获得完整结果的模型配置。
+
+为什么使用赛车结果，而不是`grid_results`中包含的完整候选模型集？两者其实都可以用。我们发现，针对这些数据，赛车结果的表现更优。这可能是因为赛车方法预先从更大的网格中筛选出了最佳模型（或模型们）。
+
+如果我们没有使用workflowsets包，tune和finetune中的对象也可以直接传递给`add_candidates()`。这些对象既可包含网格搜索对象，也包括迭代式搜索对象。
+
+## Blend the Predictions
+
+训练集的预测值与对应的观测结果数据被用来构建一个元学习模型，其中评估集的预测值作为观测结果数据的预测因子。元学习可以采用任何模型来实现，而最常用的模型则是正则化的广义线性模型，该模型涵盖了线性、逻辑斯蒂及多项式模型。尤其值得一提的是，通过Lasso惩罚（Tibshirani, 1996）进行正则化的方法具有多重优势：
+
+-   使用Lasso惩罚能够从集成中剔除部分候选模型（有时甚至直接移除整个模型类型）。
+
+-   集成中各候选模型之间的相关性往往非常高，而正则化有助于有效缓解这一问题。
+
+Breiman（1996）还建议，当使用线性模型来融合预测结果时，将融合系数限制为非负值可能会有所帮助。我们通常认为这是个不错的建议，也是stacks包的默认设置（但可通过可选参数进行更改）。
+
+由于我们的结果是数值型的，因此采用线性回归来构建元模型。拟合元模型的过程与以下操作一样简单：
+
+```{r}
+set.seed(2001)
+ens <- blend_predictions(concrete_stack)
+```
+
+本文在预定义的套索惩罚值网格上评估了元学习模型，并采用内部重采样方法确定最佳值。如 @fig-20.1 所示的`autoplot()`方法，有助于我们判断默认的惩罚方法是否已足够：
+
+```{r}
+#| label: fig-20.1
+#| fig-cap:  Results of using the `autoplot()` method on the blended stacks object
+autoplot(ens)
+```
+
+@fig-20.1 的上半部分展示了元学习模型保留的候选集成成员的平均数量。我们可以看到，成员数量基本保持稳定，但随着其增加，均方根误差（RMSE）也随之上升。
+
+默认范围在此处可能并未发挥良好作用。为了评估采用更大惩罚项的元学习模型，让我们传入一个额外的选项：
+
+```{r}
+set.seed(2002)
+ens <- blend_predictions(concrete_stack, penalty = 10^seq(-2, -0.5, length = 20))
+```
+
+现在，在 @fig-20.2 中，我们看到一个区间，在这个区间内，集成模型的表现略逊于我们的首次融合方法（但差距并不明显）。随着成员数量的增加和惩罚力度的加大，$R^2$值反而有所提升。
+
+```{r}
+#| label: fig-20.2
+#| fig-cap: The results of using the `autoplot()` method on the updated blended stacks object
+autoplot(ens)
+```
+
+在使用回归模型进行预测融合时，通常会限制融合参数为非负值。对于这些数据而言，这一约束条件导致许多潜在的集成成员被排除；即使在惩罚力度相对较低的情况下，最终形成的集成也仅限于最初十八个成员中的一小部分。
+
+与最小RMSE相关的惩罚值为0.051。打印该对象可显示元学习模型的详细信息：
+
+```{r}
+ens
+```
+
+```{r}
+#| echo: false
+res <- stacks:::top_coefs(ens)
+model_key <-
+  tribble(
+    ~ type, ~ descr,
+    'bag_tree', "bagged tree",
+    'boost_tree', "boosted tree",
+    'cubist_rules', "Cubist",
+    'decision_tree', "decision tree",
+    'linear_reg', "linear regression",
+    'mars', "multivariate adaptive regression splines",
+    'mlp', "neural network",
+    'nearest_neighbor', "K-nearest neighbors",
+    'rand_forest', "random forest",
+    'svm_poly', "support vector machine (polynomial)",
+    'svm_rbf', "support vector machine (RBF)"
+  )
+
+res <- left_join(res, model_key, by = "type")
+top_two <- paste(res$descr[1:2], collapse = " 和 ")
+blending_alt <-
+  glue::glue('fig.alt = "Blending coefficients for the stacking ensemble. The {top_two} models have the largest effects on the ensemble predictions."')
+
+num_coefs <- xfun::numbers_to_words(nrow(res))
+num_types <- xfun::numbers_to_words(length(unique(res$type)))
+```
+
+正则化线性回归元学习模型包含四种类型模型的七个融合系数。可以再次使用`autoplot()`方法，以展示每种模型类型的贡献，从而生成 @fig-20.3 。
+
+```{r}
+#| label: fig-20.3
+#| fig-cap: Blending coefficients for the stacking ensemble
+autoplot(ens, "weights") +
+  geom_text(aes(x = weight + 0.01, label = model), hjust = 0) +
+  theme(legend.position = "none") +
+  lims(x = c(-0.01, 0.8))
+```
+
+`r top_two`对集成模型的贡献最大。对于该集成模型，预测结果采用以下公式：
+
+```{r echo = FALSE, results = "asis", message = FALSE, warning = FALSE}
+all_members <-
+  tibble(
+    member = unname(unlist(ens$cols_map)),
+    obj = rep(names(ens$cols_map), map_int(ens$cols_map, length))
+  ) %>%
+  inner_join(res, by = "member") %>%
+  arrange(type, member)
+
+glmn_int <-
+  tidy(ens$coefs) %>%
+  filter(term == "(Intercept)") %>%
+  mutate(estimate = format(estimate, digits = 2))
+
+config_label <- function(x) {
+  x <- dplyr::arrange(x, member)
+  x$type <- gsub("_", " ", x$type)
+  if (length(unique(x$member)) == 1) {
+    x$config <- paste(x$type, "prediction")
+  } else {
+    congif_chr <- paste0("prediction (config ", 1:nrow(x), ")")
+    x$config <- paste(x$type, congif_chr)
+  }
+  x$weight <- format(x$weight, digits = 2, scientific = FALSE)
+  x$term <- paste0(x$weight, " \\times \\text{", x$config, "} \\notag")
+  select(x, term, weight)
+}
+tmp <-
+  all_members %>%
+  group_nest(obj, keep = TRUE) %>%
+  mutate(data = map(data, ~ config_label(.x))) %>%
+  unnest(cols = "data") %>%
+  arrange(desc(weight))
+
+eqn <- paste(c(glmn_int$estimate, tmp$term), collapse = " \\\\\n\t+&")
+eqn <- paste0("\n\\begin{align}\n \\text{ensemble prediction} &=", eqn, "\n\\end{align}\n")
+
+cat(eqn)
+```
+
+其中，方程中的预测变量是来自这些模型的预测抗压强度值。
+
+## Fit the Member Models
+
+该集成模型包含七个候选成员，目前我们已掌握如何将它们的预测结果融合为集成模型的最终预测。然而，这些单个模型的拟合尚未完成。为了能够应用堆叠模型，还需额外训练七个模型，这些模型将使用包含原始预测变量的完整训练集。
+
+```{r ensembles-show-members, echo = FALSE, results = "asis"}
+param_filter <- function(object, config, stack_obj) {
+  res <-
+    collect_parameters(stack_obj, candidates = object) %>%
+    dplyr::filter(member == config) %>%
+    dplyr::select(-coef)
+
+  params <- res %>% dplyr::select(-member)
+  param_labs <- map_chr(names(params), name_to_label)
+  if (length(param_labs) > 0) {
+    names(params) <- param_labs
+    fmt <- format(as.data.frame(params), digits = 3)
+    fmt <- as.matrix(fmt)[1,,drop = FALSE]
+    chr_param <- paste0(colnames(fmt), " = ", unname(fmt))
+    chr_param <- knitr::combine_words(chr_param)
+    items <- paste0("- ", gsub("_", " ", object), ": ", chr_param)
+  } else {
+    items <- paste0("- ", gsub("_", " ", object))
+  }
+  items
+}
+name_to_label <- function(x) {
+  if (x %in% c("committees")) {
+    ns <- "rules"
+  } else {
+    ns <- "dials"
+  }
+  .fn <- rlang::call2(x, .ns = ns)
+  object <- rlang::eval_tidy(.fn)
+  res <- unname(object$label)
+  res <- gsub("^# ", "number of ", tolower(res))
+  res
+}
+config_text <- function(x) {
+  if (nrow(x) == 1) {
+    res <- "\n\n"
+  } else {
+    res <- paste0(" (config ", 1:nrow(x), ")\n\n")
+  }
+  res
+}
+get_configs <- function(x) {
+  dplyr::group_nest(x, type) %>%
+    dplyr::mutate(confg = purrr::map(data, config_text)) %>%
+    dplyr::select(confg) %>%
+    tidyr::unnest(cols = c(confg)) %>%
+    purrr::pluck("confg")
+}
+
+param <- map2_chr(all_members$obj, all_members$member, param_filter, ens)
+param <- paste0(param, get_configs(all_members))
+param <- gsub("full quad linear reg", "linear regression (quadratic features)", param)
+param <- gsub("number of observations sampled", "proportion of observations sampled", param)
+cat(param, sep = "")
+
+ens_rmse <- dplyr::filter(ens$metrics, penalty == ens$penalty$penalty & .metric == "rmse")$mean
+boost_rmse <- collect_metrics(boosting_test_results) %>% dplyr::filter(.metric == "rmse")
+```
+
+堆叠包中有一个函数`fit_members()`，它可以训练并返回这些模型：
+
+```{r}
+ens <- fit_members(ens)
+```
+
+这会使用为每个成员拟合的工作流对象更新堆叠对象。此时，堆叠模型即可用于预测。
+
+## Test Set Results
+
+由于混合过程使用了重采样技术，我们可以估计，由7个成员组成的集成模型的RMSE约为4.12。回想一下第15章的内容，表现最佳的提升树在测试集上的RMSE为3.41。那么，该集成模型在测试集上的表现会如何呢？我们可以通过`predict()`来一探究竟：
+
+```{r}
+reg_metrics <- metric_set(rmse, rsq)
+ens_test_pred <-
+  predict(ens, concrete_test) %>%
+  bind_cols(concrete_test)
+
+ens_test_pred %>%
+  reg_metrics(compressive_strength, .pred)
+```
+
+这比我们最好的单一模型略好一些。与最佳单模型相比，堆叠方法通常能带来逐步提升的收益，这种情况相当常见。
+
+## Chapter Summary
+
+本章展示了如何将不同模型组合成集成模型，以提升预测性能。通过构建集成模型的过程，系统能够自动筛选候选模型，最终找到一个性能更优的小型子集。此外，stacks包提供了一个流畅的接口，便于将重采样和调参结果整合到元模型中。
