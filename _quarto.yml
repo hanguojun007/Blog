@@ -5,6 +5,12 @@ project:
     - "*.qmd"
     - "!log.qmd"
     - "!Books/Js4R/*"
+    - "!Books/Tidy Modeling with R/16*"
+    - "!Books/Tidy Modeling with R/17*"
+    - "!Books/Tidy Modeling with R/18*"
+    - "!Books/Tidy Modeling with R/19*"
+    - "!Books/Tidy Modeling with R/20*"
+    - "!Books/Tidy Modeling with R/21*"
 
 language:
   search-text-placeholder: Search
