@@ -442,7 +442,7 @@ tr_plot + pca_plot + pca_dist + dist_hist
 ```{r}
 #| echo: false
 #| label: fig-19.7
-#| fig-cap: The reference distribution with two new points: one using the test set and one from the 2020 data
+#| fig-cap: "The reference distribution with two new points: one using the test set and one from the 2020 data"
 test_pca_dist <-
   training_pca %>%
   ggplot() +
