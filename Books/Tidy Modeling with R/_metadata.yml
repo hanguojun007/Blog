@@ -22,3 +22,5 @@ website:
         - Books/Tidy Modeling with R/13 Grid Search.qmd
         - Books/Tidy Modeling with R/14 Iterative Search.qmd
         - Books/Tidy Modeling with R/15 Screening Many Models.qmd
+        - Beyond the Basics
+        - Books/Tidy Modeling with R/16 Dimensionality Reduction.qmd
