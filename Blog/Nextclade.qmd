@@ -1,0 +1,565 @@
+---
+title: "Nextclade"
+author: "大番薯本薯"
+date: "2025-12-07"
+date-modified: "2025-12-07"
+draft: false
+categories: [nextclade]
+
+format:
+  html:
+    code-link: true
+
+fig-width: 6
+fig-asp: 0.618
+out-width: 70%
+fig-align: center
+
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: "#>"
+    R.options:
+      dplyr.print_min: 6
+      dplyr.print_max: 6
+      pillar.max_footer_lines: 2
+      pillar.min_chars: 15
+      stringr.view_n: 6
+      cli.num_colors: 0
+      cli.hyperlink: FALSE
+      pillar.bold: TRUE
+      width: 77
+
+execute:
+  warning: true
+  error: true
+---
+
+[官方手册](https://docs.nextstrain.org/projects/nextclade/en/stable/index.html)
+
+主要分两种方式使用：
+
+-   [Nextclade Web](https://docs.nextstrain.org/projects/nextclade/en/stable/user/nextclade-web/index.html)
+
+-   [Nextclade CLI](https://docs.nextstrain.org/projects/nextclade/en/stable/user/nextclade-cli/index.html)
+
+## Nextstrain 与 Nextclade
+
+[Nextstrain](https://docs.nextstrain.org/) 项目提供了一套对数据进行处理，分析，可视化的开源软件工具，[Nextclade](https://docs.nextstrain.org/projects/nextclade/en/stable/index.html#) 的分析基于这些工具，例如：nextclade 使用的输入数据集“dataset”是由 [Augur](https://docs.nextstrain.org/projects/augur/en/stable/) 工具生成，输出结果的可视化由 [Auspice](https://docs.nextstrain.org/projects/auspice/en/stable/) 工具支持。
+
+### Augur 和 Auspice
+
+Augur 与 Auspice 的关系如下：
+
+```{mermaid}
+graph LR
+  A[/equences.fasta/] --> B(filter)
+  C[/metadata.tsv/] --> B
+  subgraph Augur
+  B --> D(align)
+  D --> E(tree)
+  E --> F(refine)
+  F --> G(export)
+  end
+  G --> H[(Dataset)]
+  H --> I[Auspice]
+
+  classDef input fill:#d3d3d3,stroke:black
+  classDef Tool fill:#a6cee3,stroke:#1f78b4
+  classDef tool fill:white,stroke:#1f78b4
+
+  class A,C input
+  class B,D,E,F,G tool
+  class Augur,I Tool
+```
+
+### nextclade 工作流程
+
+-   将查询序列与参考序列进行比对
+-   检测突变
+-   根据突变进行基于“参考树”的分支
+-   将查询序列整合到“参考树”中
+
+## Nextclade CLI
+
+### 安装
+
+有四种安装方式，暂时先使用docker镜像，进行初步研究。
+
+- [Standalone download](https://docs.nextstrain.org/projects/nextclade/en/stable/user/nextclade-cli/installation/standalone.html)
+
+- [With Docker](https://docs.nextstrain.org/projects/nextclade/en/stable/user/nextclade-cli/installation/docker.html)
+
+- [With Conda](https://docs.nextstrain.org/projects/nextclade/en/stable/user/nextclade-cli/installation/conda.html)
+
+- [Build from source](https://docs.nextstrain.org/projects/nextclade/en/stable/user/nextclade-cli/installation/build-from-source.html)
+
+#### docker
+
+下载方式：
+
+```sh
+docker pull nextstrain/nextclade:latest
+docker run -it --rm nextstrain/nextclade:latest nextclade --help
+```
+
+使用示例：
+
+```sh
+docker run -it --rm \
+  --volume="$(pwd):/data/" \
+  --user="$(id -u):$(id -g)" \
+  "nextstrain/nextclade" \
+  nextclade run \
+      --dataset-name="sars-cov-2" \
+      --output-dir="/data/output/" \
+      "/data/my_sequences.fasta"
+
+docker run -it --name nextclade -v /home/hgj/D/NextClade/Test:/root/data nextstrain/nextclade
+```
+
+### CLI 使用方法
+
+`nextclade [OPTIONS] <COMMAND>`
+
+主要的command有：
+
+- `run`：运行 Nextclade
+- `dataset`：获取数据集信息
+- `schema`：生成json格式模板
+
+详细参数见，`nextclade -h` 或 `nextclade <command> -h`，及官方参考[refrence](https://docs.nextstrain.org/projects/nextclade/en/stable/user/nextclade-cli/reference.html)。
+
+测试示例：
+
+```sh
+nextclade run --input-dataset data/sars-cov-2 --output-all=output/ data/sars-cov-2/sequences.fasta
+```
+
+输入`--input-dataset`与输出`--output-all`可以更细致地进行自定义。
+
+```sh
+nextclade run \
+   --verbose \
+   --include-reference \
+   --in-order \
+   # 输入数据集控制
+   --input-dataset=data/sars-cov-2 \
+   --input-ref=data/sars-cov-2/reference.fasta \
+   --input-annotation=data/sars-cov-2/genome_annotation.gff3 \
+   --cds-selection=E,M,N,ORF1a,ORF1b,ORF3a,ORF6,ORF7a,ORF7b,ORF8,ORF9b,S \
+   --input-tree=data/sars-cov-2/tree.json \
+   --input-pathogen-json=data/sars-cov-2/pathogen.json \
+   # 输出数据控制
+   --output-fasta=output/nextclade.aligned.fasta.gz \
+   --output-json=output/nextclade.json \
+   --output-ndjson=output/nextclade.ndjson \
+   --output-csv=output/nextclade.csv \
+   --output-tsv=output/nextclade.tsv \
+   --output-tree=output/nextclade.auspice.json \
+   --output-tree-nwk=output/nextclade.tree.nwk \
+   --output-translations=output/nextclade_CDS_{cds}.translation.fasta.zst \
+   # 多种输入文件
+   data/sars-cov-2/sequences.fasta \
+   my_sequences1.fasta.gz \
+   my_sequences2.fasta.xz
+```
+
+输入序列格式：fasta, gz, xz, bz2, zst，可以同时进行多个fasta文件分析。
+
+## Nextclade 输入文件
+
+由两部分组成：
+
+- 查询序列，可以是多个文件，也可以是单个文件多条序列。
+- 由参考序列，参考树，注释文件等组成的“dataset”，可以是路径，也可以是压缩文件。
+
+### 查询序列
+
+fasta 格式，支持除`U`外的[IUPAC characters](https://www.bioinformatics.org/sms/iupac.html)，必须有“id”且以`>`开头。
+
+### dataset
+
+数据集“dataset”是nextclade运行时，针对输入序列所需要的一些底层文件。它至少要包含两个文件：
+
+-   `reference.fasta`：参考序列
+-   `pathogen.json`：datasets 配置文件，类似身份证
+
+其他分析用文件：
+
+-   `genome_annotation.gff3`：参考序列的注释文件，[GFF3](https://github.com/The-Sequence-Ontology/Specifications/blob/master/gff3.md)格式
+-   `tree.json`：参考树，Auspice JSON v2格式，可以使用 https://auspice.us/ 进行可视化
+
+及说明文件：
+
+-   `README.md`
+-   `CHANGELOG.md`
+
+测试数据：
+
+-   `sequences.fasta`
+
+[nextstrain/nextclade_data](https://github.com/nextstrain/nextclade_data/tree/master/data)是官方和社区维护的数据集。自己也可以创建数据集——[dataset 自制手册](https://github.com/nextstrain/nextclade_data/blob/master/docs/dataset-curation-guide.md)
+。
+
+#### datasets 的 name 和 version
+
+name 由四级路径名称组成，例如`nextstrain/sars-cov-2/wuhan-hu-1/orfs`表示：由 Nextstrain 维护 的 **SARS-CoV-2** ，使用 **Wuhan-Hu-1/2019 (MN908947)** 毒株作为参考序列，并且这个序列带有 ORFs（开放阅读框），而不是其他成熟蛋白注释信息。
+
+version 和软件的版本概念一致，用来确保结果的可重复性；它是一个数据释放时间戳`YYYY-MM-DDTHH:MM:SSZ`。Nextclade Web 和 CLI 都默认使用最新的版本；Web 使用URL来选择版本，CLI可以直接选择。
+
+要保证结果能够复现，需要：
+
+-   保证 Nextclade CLI 版本一致
+
+-   保证 datasets 版本一致
+
+查看可用的datasets：`nextclade dataset list --only-names`
+
+```text
+nextstrain/sars-cov-2/wuhan-hu-1/orfs
+nextstrain/sars-cov-2/wuhan-hu-1/proteins
+nextstrain/sars-cov-2/BA.2.86
+nextstrain/flu/h1n1pdm/ha/CY121680
+nextstrain/flu/h1n1pdm/ha/MW626062
+nextstrain/flu/h1n1pdm/na/MW626056
+nextstrain/flu/h3n2/ha/CY163680
+nextstrain/flu/h3n2/ha/EPI1857216
+nextstrain/flu/h3n2/na/EPI1857215
+nextstrain/flu/vic/ha/KX058884
+nextstrain/flu/vic/na/CY073894
+nextstrain/flu/yam/ha/JN993010
+nextstrain/rsv/a/EPI_ISL_412866
+nextstrain/rsv/b/EPI_ISL_1653999
+nextstrain/mpox/all-clades
+nextstrain/mpox/clade-i
+nextstrain/mpox/clade-iib
+nextstrain/mpox/lineage-b.1
+nextstrain/orthoebolavirus/ebov
+nextstrain/orthoebolavirus/sudv
+nextstrain/flu/h3n2/pb1
+nextstrain/flu/h3n2/np
+nextstrain/flu/h1n1pdm/pa
+nextstrain/flu/h3n2/ns
+nextstrain/flu/h1n1pdm/mp
+nextstrain/flu/h1n1pdm/np
+nextstrain/flu/h1n1pdm/ns
+nextstrain/flu/h3n2/mp
+nextstrain/flu/h3n2/pa
+nextstrain/flu/h1n1pdm/pb2
+nextstrain/flu/h1n1pdm/pb1
+nextstrain/flu/h3n2/pb2
+nextstrain/measles/genome/WHO-2012
+nextstrain/measles/N450/WHO-2012
+nextstrain/dengue/all
+nextstrain/yellow-fever/prM-E
+nextstrain/hmpv/all-clades/NC_039199
+nextstrain/flu/vic/pa
+nextstrain/flu/vic/pb1
+nextstrain/flu/vic/np
+nextstrain/flu/vic/mp
+nextstrain/flu/vic/pb2
+nextstrain/flu/vic/ns
+nextstrain/rubella/E1
+nextstrain/herpes/vzv/NC_001348
+nextstrain/mumps/sh
+nextstrain/mumps/genome
+nextstrain/rubella/genome
+enpen/enterovirus/ev-d68
+community/isuvdl/mazeller/prrsv1/orf5/yimim2025
+community/isuvdl/mazeller/prrsv2/orf5/yimim2023
+community/neherlab/hiv-1/hxb2
+community/moncla-lab/iav-h5/ha/2.3.4.4
+community/moncla-lab/iav-h5/ha/all-clades
+community/moncla-lab/iav-h5/ha/2.3.2.1
+community/v-gen-lab/dengue/denv1
+community/v-gen-lab/dengue/denv2
+community/v-gen-lab/dengue/denv3
+community/v-gen-lab/dengue/denv4
+community/genspectrum/marburg/HK1980/all-lineages
+community/pathoplexus/cchfv/L
+community/pathoplexus/cchfv/S
+community/pathoplexus/cchfv/M
+community/v-gen-lab/chikV/genotypes
+```
+
+下载datasets：
+
+```sh
+nextclade dataset get \
+   --name 'nextstrain/sars-cov-2/wuhan-hu-1' \
+   --tag '2021-06-25T00:00:00Z' \
+   --output-dir 'data/sars-cov-2'
+```
+
+#### Reference sequence
+
+`--input-ref`/`-r`
+
+当参考序列是一个注释完善、广泛使用的高质量基因组（例如来自 RefSeq）时，能获得最佳结果，该基因组最好是完整且明确的（涵盖整个基因组，没有模糊的核苷酸）。
+
+参考序列最好不要有“gap”`-`
+
+#### Genome annotation
+
+`--input-annotation`/`-m`
+
+[GFF3](https://github.com/The-Sequence-Ontology/Specifications/blob/master/gff3.md) 格式，但有额外要求：
+
+-   gene 名唯一
+-   CDS 名唯一
+-   protein 名唯一
+
+```text
+##gff-version 3
+##sequence-region   . 266 29533
+.	.	gene	26245	26472	.	+	.	gene_name=E
+.	.	gene	26523	27191	.	+	.	gene_name=M
+.	.	gene	28274	29533	.	+	.	gene_name=N
+.	.	gene	266	13468	.	+	.	gene_name=ORF1a
+.	.	gene	13468	21555	.	+	.	gene_name=ORF1b
+.	.	gene	25393	26220	.	+	.	gene_name=ORF3a
+.	.	gene	27202	27387	.	+	.	gene_name=ORF6
+.	.	gene	27394	27759	.	+	.	gene_name=ORF7a
+.	.	gene	27756	27887	.	+	.	gene_name=ORF7b
+.	.	gene	27894	28259	.	+	.	gene_name=ORF8
+.	.	gene	28284	28577	.	+	.	gene_name=ORF9b
+.	.	gene	21563	25384	.	+	.	gene_name=S
+```
+
+注释文件与后续的密码子比对，CDS翻译分析有关，如果不提供该文件，则不会生成肽段序列文件和检测氨基酸突变。
+
+#### Reference tree
+
+`--input-tree`/`-a`
+
+格式： Auspice JSON v2
+
+由 `augur export` 生产，使用 [Auspice](https://auspice.us/) 进行可视化
+
+#### Pathogen configuration
+
+`--input-pathogen-json`/`-R`
+
+使用 `nextclade schema write --for input-pathogen-json` 生成模板。
+
+要求 `schemaVersion` 格式，其中 `files` 字段是必须的，
+
+```json
+{
+  "files": {
+    "reference": "reference.fasta",
+    "pathogenJson": "pathogen.json",
+    "genomeAnnotation": "genome_annotation.gff3",
+    "treeJson": "tree.json",
+    "examples": "sequences.fasta",
+    "readme": "README.md",
+    "changelog": "CHANGELOG.md"
+  }
+}
+```
+
+可选属性：
+
+-   `attributes`：`name`,`refrence name`等信息
+-   `qc`：有该字段时执行QC检查，具体参数见 [Algorithm: Quality control](https://docs.nextstrain.org/projects/nextclade/en/stable/user/algorithm/06-quality-control.html)。
+-   `compatibility`：数据集要求的 nextclade 最低版本
+-   `defaultCds`：
+-   `cdsOrderPreference`：
+-   `generalParams`：
+-   `alignmentParams`：
+-   `treeBuilderParams`：
+-   `phenotypeData`：
+-   `aaMotifs`：
+-   `mutLabels`：
+
+## Nextclade 输出文件
+
+以 `nextclade run --input-dataset data/sars-cov-2 --output-all=output/ data/sars-cov-2/sequences.fasta` 的结果为例，`--output-all`参数表示输出所有结果（包括不同格式），`output/`表示输出路径。输出结果可以分为五大部分：
+
+- Nucleotide alignment
+- Translations
+- Analysis results
+- Phylogenetic tree
+- Genome annotation of query sequences
+
+```text
+nextclade.aligned.fasta
+
+nextclade.cds_translation.ORF3a.fasta
+nextclade.cds_translation.ORF6.fasta
+nextclade.cds_translation.E.fasta
+nextclade.cds_translation.ORF7a.fasta
+nextclade.cds_translation.M.fasta
+nextclade.cds_translation.ORF7b.fasta
+nextclade.cds_translation.N.fasta
+nextclade.cds_translation.ORF8.fasta
+nextclade.cds_translation.ORF1a.fasta
+nextclade.cds_translation.ORF9b.fasta
+nextclade.cds_translation.ORF1b.fasta
+nextclade.cds_translation.S.fasta
+
+nextclade.tsv
+nextclade.csv
+nextclade.json
+nextclade.ndjson
+
+nextclade.auspice.json
+nextclade.nwk
+
+nextclade.gff
+nextclade.tbl
+```
+
+### Nucleotide alignment
+
+`nextclade.aligned.fasta`
+
+`--output-fasta`/`-o` `<FILENAME>`
+
+由 `sequence alignment` 步骤生产，输出结果是 相较于参考序列的 fasta 格式文件，任何相较于参考序列的插入片段都被移除，这些片段可以在后面的 tabular 和 json 文件中找到。
+
+### Translations
+
+模板字符串：`nextclade.cds_translation.{cds}.fasta`
+
+`--output-translations`/`-P` `<TEMPLATE_STRING>`
+
+由 `translation and peptide alignment` 步骤生成，每个 CDS/gene 一个结果，格式同上。
+
+### Analysis results
+
+突变检测、进化分支分配、质量控制和 PCR 引物变化的结果有：表格格式（TSV、CSV）或 JSON 格式（经典 JSON 或 NDJSON）。
+
+#### tabular
+
+`nextclade.tsv` or `nextclade.csv`
+
+`--output-tsv`/`-t` or `--output-csv`/`-c`
+
+结果是“1-base”，位置采用参考序列坐标（插入序列会被移除），坐标范围是闭区间的。
+
+“seqName”列往往不唯一，需要通过“index”将输入与输出进行关联。
+
+存在有关clade的额外列，例如示例结果中的“Nextclade_pango”，它们来自于参考树中的`meta.extensions.clade_node_attrs`。
+
+推荐使用tsv格式，csv格式由于历史原因存在分隔符错乱的情况。
+
+#### JSON
+
+`nextclade.json` or `nextclade.ndjson`
+
+`--output-json`/`-J` or `--output-ndjson`/`-N`
+
+JSON 结果会比tabular格式的结果多。NDJSON适合大型数据分析。
+
+结果是“0-base”，位置采用参考序列坐标（插入序列会被移除），坐标范围左闭右开。
+
+### Phylogenetic tree
+
+`nextclade.auspice.json` or `nextclade.nwk`
+
+`--output-tree`/`-T` or `--output-tree-nwk`
+
+由 `phylogenetic placement` 步骤生成 “Auspice JSON v2” 或 “Newick”格式
+
+### Genome annotation of query sequences
+
+此项结果仍在实验中！！！
+
+`nextclade.gff` or `nextclade.tbl`
+
+`--output-annotation-gff` or `--output-annotation-tbl`
+
+注释结果来源于输入的GFF文件，但是注释的坐标参考查询序列。
+
+两种格式：Genbank的[TBL](https://www.ncbi.nlm.nih.gov/genbank/feature_table/)格式，GFF3格式
+
+GFF文件中有`seq_index`信息，用来绑定查询序列，因为查询序列的“name”信息不唯一。
+
+添加`--retry-reverse-complement`会有额外的`is_reverse_complement`列。
+
+如果输入的GFF文件中CDS没有对应的gene，nextclade会在结果中创建虚拟的gene；同样的，也会创建虚拟的CDS。
+
+#### Errors and warnings
+
+格外要注意在tabular或json格式的结果中有“警告”或“错误”的序列，它们在其他结果中不存在。
+
+## Algorithm
+
+nextclade 内部进行了并行化处理。
+
+### Sequence alignment
+
+采用的比对策略：“a banded local alignment algorithm with affine gap-cost”
+
+可以使用 `--alignment-preset` 中的预制参数，也可以在 `pathogen.json` 中设置，或在 `run` 中设置，优先级依次提高。
+
+正链失败会尝试负链，不建议小于100个核苷酸的序列进行分析，如果查询序列与参考序列差异过大可能也会失败。
+
+序列比对通常会存在模糊匹配结果，如果提供了基因组注释，Nextclade会在密码子的起始处（由上述模式中的|字符分隔）使用较低的缺口开放罚分，从而在可能的情况下将缺口锁定在阅读框内。同样，在存在歧义的情况下，Nextclade会优先将缺口放置在基因外部。
+
+### Translation
+
+当dataset中提供GFF3注释文件时运行。注释文件中的CDS可以通过`--cds-selection`/`-g`来选择。
+
+将查询序列的CDS翻译后与参考序列的进行比对，比对算法同上。
+
+### Phylogenetic placement
+
+计算查询序列相较于参考序列的突变与其他树节点的距离，找到距离最近的节点。距离相近的节点的优先级可以在参考树中进行设置。
+
+$$
+D = M_{ref} + M_{query} - 2 M_{agree} - M_{disagree} - M_{unknown}
+$$
+
+在查看最近距离节点的过程中，不会将以放置的查询序列纳入计算。只有在后续进行贪婪型树的重构时才会将查询序列纳入计算。
+
+将查询序列与树最近节点分开的突变是私有突变，二者共有的突变是共有突变。QC质控会检查私有突变是否是由测序或组装错误引起，同时检查这些突变在基因组上的位置。
+
+nextclade 在设计时，考虑到了普通PC上的浏览器性能，所以树的准确性依赖参考树的多样性（dataset/tree.json）。
+
+输入的系统发育树的根必须与输入的参考（根）序列相对应。如果参考序列与根节点的序列不同，则必须将两者之间的差异作为根节点的祖先突变添加进去。当遇到树中的多样性与参考序列之间存在不一致时，Nextclade 会报错。
+
+### Clade assignment
+
+nextclade 在参考树中使用 nextstrain 定义的“clade”和 PANGO 定义的 “lineage” 两种谱系分类方式。
+
+分配时，基于 Phylogenetic placement 步骤中的结果；只能分配树中已有的 clade/lineage，无法识别参考树里没有的，它只会就近分配。
+
+### Mutation calling
+
+nextclade 会统计三种突变类型：替换，缺失，插入；同时统计`N`、非`ATCGN`等信息。氨基酸突变检测需要提供注释文件。
+
+对于查询序列相较于树节点的私有突变，nextclade会进一步分析，将其分为：
+
+-   回复突变：极大可能是测序时导致
+-   标记突变：可能是测序时导致
+-   未标突变：不太可能是测试时导致
+
+三种突变在分支过程中的权重不同。
+
+### Quality Control (QC)
+
+在 dataset 中的 `pathogen.json` 中可以设置质控标准，也即每种病毒的质控标准不同。
+
+质控的检测指标有：
+
+-   Missing data (N)
+-   Mised sites (M)
+-   Private mutations (P)
+-   Mutation clusters (C)
+-   Stop codons (S)
+-   Frame shifts (F)
+
+QC 评分是多种指标的综合结果:
+
+$$
+S = \sum_{i} \frac{S_i^2}{100}
+$$
+
+QC质控结果只是参考，并不代表真实的质量情况。
+
+### Detection of PCR primer changes
+
+当 dataset 中的 `pathogen.json` 中配置了PCR引物表时，触发运行。
