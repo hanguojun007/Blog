@@ -24,3 +24,4 @@ website:
         - Books/Tidy Modeling with R/15 Screening Many Models.qmd
         - Beyond the Basics
         - Books/Tidy Modeling with R/16 Dimensionality Reduction.qmd
+        - Books/Tidy Modeling with R/17 Encoding Categorical Data.qmd

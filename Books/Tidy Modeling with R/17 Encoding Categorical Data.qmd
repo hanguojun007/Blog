@@ -1,7 +1,7 @@
 ---
 title: "17 Encoding Categorical Data"
 date: "2025-11-17"
-date-modified: "2025-11-17"
+date-modified: "2025-12-07"
 
 format:
   html:
@@ -32,7 +32,7 @@ execute:
   error: true
 ---
 
-在R中进行统计建模时，分类或名义数据的首选表示方法是因子（factor），这是一种只能取有限个不同值的变量；在内部，因子以整数向量的形式存储，并附带一组文本标签。在第8.4.1节中，我们介绍了特征工程方法，用于将定性或名义数据编码或转换为更适合大多数模型算法的表示形式。我们讨论了如何将一个分类变量（例如Ames住房数据中的`Bldg_Type`，其水平包括`OneFam`、`TwoFmCon`、`Duplex`、`Twnhs`和`TwnhsE`）转换为一组虚拟变量或指示变量，如 @tbl-17.1 所示。
+在R中进行统计建模时，分类或名称数据的首选表示方法是因子（factor），这是一种只能取有限个不同值的变量；在内部，因子以整数向量的形式存储，并附带一组文本标签。在第8.4.1节中，我们介绍了特征工程方法，用于将定性或名称数据编码或转换为更适合大多数模型算法的表示形式。我们讨论了如何将一个分类变量（例如Ames住房数据中的`Bldg_Type`，其水平包括`OneFam`、`TwoFmCon`、`Duplex`、`Twnhs`和`TwnhsE`）转换为一组虚拟变量或指示变量，如 @tbl-17.1 所示。
 
 | **Raw Data** | **TwoFmCon** | **Duplex** | **Twnhs** | **TwnhsE** |
 |:-------------|-------------:|-----------:|----------:|-----------:|
@@ -42,11 +42,11 @@ execute:
 | Twnhs        |            0 |          0 |         1 |          0 |
 | TwnhsE       |            0 |          0 |         0 |          1 |
 
-: Dummy or indicator variable encodings for the building type predictor in the Ames training set.{#tbl-17.1}
+: Dummy or indicator variable encodings for the building type predictor in the Ames training set. {#tbl-17.1}
 
 许多模型实现都需要将分类数据转换为数值表示形式。附录A列出了适用于不同模型的推荐预处理技术表；请注意，表中许多模型均要求对所有预测变量进行数值编码。
 
-然而，对于一些实际的数据集，直接使用虚拟变量并不适用。这种情况通常是因为类别数量过多，或者在预测时出现了新类别。本章将探讨更复杂的分类预测变量编码方法，以解决这些问题。这些方法可通过**tidymodels**的**recipe**步骤，在**embed**和**textrecipes**包中获得。
+然而，对于一些实际的数据集，直接使用虚拟变量并不适用。这种情况通常是因为类别数量过多，或者在预测时出现了新类别。本章将探讨更复杂的分类预测变量编码方法，以解决这些问题。这些方法可通过 tidymodels 的 recipe 步骤，在**embed**和**textrecipes**包中获得。
 
 ## Is an Encoding Necessary?
 
@@ -58,7 +58,7 @@ execute:
 
 ## Encoding Ordinal Predictors
 
-有时，定性列可以进行排序，例如“低”、“中”和“高”。在基础R中，默认的编码策略是创建新的数值列，这些列是数据的多项式展开。对于具有五个有序值的列——如 @tbl-17.2 所示的例子——因子列会被替换为线性、二次、三次和四次项的列：
+有时，定性列可以进行排序，例如“低”、“中”和“高”。在 base R 中，默认的编码策略是创建新的数值列，这些列是数据的多项式展开。对于具有五个有序值的列——如 @tbl-17.2 所示的例子——因子列会被替换为线性、二次、三次和四次项的列：
 
 | **Raw Data**    | **Linear** | **Quadratic** | **Cubic** | **Quartic** |
 |:----------------|-----------:|--------------:|----------:|------------:|
@@ -68,9 +68,9 @@ execute:
 | a bunch         |       0.32 |         -0.27 |     -0.63 |       -0.48 |
 | copious amounts |       0.63 |          0.53 |      0.32 |        0.12 |
 
-: Polynominal expansions for encoding an ordered variable.{#tbl-17.2}
+: Polynominal expansions for encoding an ordered variable. {#tbl-17.2}
 
-虽然这种做法并非毫无道理，但人们通常并不觉得它有用。例如，用一个11次多项式来编码一年中各个月份的顺序型因子，可能并不是最有效的方法。相反，不妨尝试使用与有序因子相关的配方步骤，比如`step_unorder()`，将其转换为普通因子；或者使用`step_ordinalscore()`，将特定的数值映射到每个因子水平。
+虽然这种做法并非毫无道理，但人们通常并不觉得它有用。例如，用一个11次多项式来编码一年中各个月份的顺序型因子，可能并不是最有效的方法。相反，不妨尝试使用与有序因子相关的recipe步骤，比如`step_unorder()`，将其转换为普通因子；或者使用`step_ordinalscore()`，将特定的数值映射到每个因子水平。
 
 ## Using the Outcome for Encoding Predictors
 
@@ -100,7 +100,7 @@ ames_train %>%
   labs(y = NULL, x = "Price (mean, log scale)")
 ```
 
-当你的分类变量具有大量水平时，这种效应编码方法效果尤为出色。在tidymodels中，embed包提供了多种用于不同效应编码的配方步骤函数，例如`step_lencode_glm()`、`step_lencode_mixed()`和`step_lencode_bayes()`。这些步骤利用广义线性模型来估计分类预测变量中每个水平对结果的影响。当你使用像`step_lencode_glm()`这样的recipe步骤时，需先指定要编码的变量，再通过`vars()`指明结果变量：
+当你的分类变量具有大量水平时，这种效应编码方法效果尤为出色。在tidymodels中，embed包提供了多种用于不同效应编码的recipe步骤函数，例如`step_lencode_glm()`、`step_lencode_mixed()`和`step_lencode_bayes()`。这些步骤利用广义线性模型来估计分类预测变量中每个水平对结果的影响。当你使用像`step_lencode_glm()`这样的recipe步骤时，需先指定要编码的变量，再通过`vars()`指明结果变量：
 
 ```{r}
 library(embed)
@@ -117,7 +117,7 @@ ames_glm <-
 ames_glm
 ```
 
-正如第16.4节所详述，我们可以使用训练数据对配方进行`prep()`处理，以调整或估计预处理转换所需的参数。随后，我们可利用`tidy()`方法整理这一已准备好的配方，查看最终结果：
+正如第16.4节所详述，我们可以使用训练数据对recipe进行`prep()`处理，以调整或估计预处理转换所需的参数。随后，我们可利用`tidy()`方法整理这一已准备好的recipe，查看最终结果：
 
 ```{r}
 glm_estimates <-
@@ -197,7 +197,6 @@ glm_estimates %>%
   geom_abline(color = "gray50", lty = 2) +
   geom_point(alpha = 0.7) +
   coord_fixed()
-#> Warning: Removed 1 rows containing missing values (`geom_point()`).
 ```
 
 请注意，如 @fig-17.2 所示，当我们比较整体聚合与完全不聚合时，大多数关于邻里效应的估计值基本一致。然而，那些房屋数量最少的社区，其效应估计值已被拉向（向上或向下）平均效应水平。这是因为采用整体聚合方法时，我们对这些社区房价的证据相对较少，因而会将效应估计值向均值靠拢。
@@ -252,7 +251,7 @@ ames_hash <-
 ames_hash
 ```
 
-特征哈希法速度快、效率高，但也存在一些缺点。例如，不同的类别值常常会被映射到同一个哈希值上，这被称为冲突或别名现象。那么，在艾姆斯的各个社区中，这种情况究竟有多频繁呢？@tbl-17.3 展示了每个哈希值对应的社区数量分布情况。
+特征哈希法速度快、效率高，但也存在一些缺点。例如，不同的类别值常常会被映射到同一个哈希值上，这被称为冲突或别名现象。那么，在Ames的各个社区中，这种情况究竟有多频繁呢？@tbl-17.3 展示了每个哈希值对应的社区数量分布情况。
 
 | **Number of neighborhoods within a hash feature** | **Number of occurrences** |
 |---:|---:|
@@ -262,7 +261,7 @@ ames_hash
 | 3 | 3 |
 | 4 | 1 |
 
-: The number of hash features at each number of neighborhoods.{#tbl-17.3}
+: The number of hash features at each number of neighborhoods. {#tbl-17.3}
 
 映射到每个哈希值的街区数量介于零到四之间。所有大于一的哈希值均属于哈希冲突的实例。
 
@@ -282,7 +281,7 @@ ames_hash
 
 还有更多选项可用于将因子转换为数值表示。
 
-我们可以构建一套完整的实体嵌入（entity embeddings，Guo 和 Berkhahn，2016），将具有多个类别的分类变量转换为一组低维向量。这种方法尤其适用于类别数量众多的名义变量——其类别数远超我们在艾姆斯市社区示例中所使用的数量。实体嵌入的概念源自用于从文本数据中创建词嵌入的方法。更多关于词嵌入的内容，请参阅Hvitfeldt和Silge（2021）第5章。
+我们可以构建一套完整的实体嵌入（entity embeddings，Guo 和 Berkhahn，2016），将具有多个类别的分类变量转换为一组低维向量。这种方法尤其适用于类别数量众多的名称变量——其类别数远超我们在Ames市社区示例中所使用的数量。实体嵌入的概念源自用于从文本数据中创建词嵌入的方法。更多关于词嵌入的内容，请参阅Hvitfeldt和Silge（2021）第5章。
 
 可以通过使用embed包中的`step_embed()`函数，借助TensorFlow神经网络来学习分类变量的嵌入表示。我们可以仅使用目标变量，也可选择性地结合一组额外的预测因子。与特征哈希类似，需创建的新编码列数量是特征工程的一个超参数。此外，我们还需决定神经网络的结构（隐藏单元的数量）以及如何训练该神经网络（训练多少个epoch，以及在评估指标时应使用多少数据进行验证）。
 
