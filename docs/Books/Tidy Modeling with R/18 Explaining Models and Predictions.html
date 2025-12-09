@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.26">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<meta name="dcterms.date" content="2025-11-17">
+<title>18 Explaining Models and Predictions</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../Books/Tidy Modeling with R/17 Encoding Categorical Data.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-6fb6fcbaca076a07ad0b43b7bab862d0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light"><script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": true,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "Search",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script><script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script><script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script><script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script><link rel="stylesheet" href="../../styles.css">
+</head>
+<body class="nav-sidebar floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top"><nav class="navbar navbar-expand-lg " data-bs-theme="dark"><div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">RSSPtho</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+<li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-books" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Books</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-books">
+<li>
+    <a class="dropdown-item" href="../../Books/ggplot2/index.html">
+ <span class="dropdown-text">ggplot2</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Books/R4DS2/index.html">
+ <span class="dropdown-text">R for Data Science(2e)</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Books/Tidy Modeling with R/index.html">
+ <span class="dropdown-text">Tidy Modeling with R</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Books/Advanced R(2e)/index.html">
+ <span class="dropdown-text">Advanced R(2e)</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Books/quarto/Project Basics.html">
+ <span class="dropdown-text">Quarto</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Books/Js4R/00 Preface.qmd">
+ <span class="dropdown-text">Js4R</span></a>
+  </li>  
+    </ul>
+</li>
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About me</span></a>
+  </li>  
+</ul>
+<div class="quarto-navbar-tools">
+    <a href="https://github.com/hanguojun007/Blog" title="" class="quarto-navigation-tool px-1" aria-label=""><i class="bi bi-github"></i></a>
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav><nav class="quarto-secondary-nav"><div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../Books/Tidy Modeling with R/18 Explaining Models and Predictions.html">18 Explaining Models and Predictions</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav></header><!-- content --><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto"><div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Hello World</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+ <span class="menu-text">Introduction</span>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/1 Software for modeling.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1 Software for modeling</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/2 A Tidyverse Primer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2 A Tidyverse Primer</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/3 A Review of R Modeling Fundamentals.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">3 A Review of R Modeling Fundamentals</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+ <span class="menu-text">Moduling Basics</span>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/4 The Ames Housing Data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">4 The Ames Housing Data</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/5 Spending our Data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">5 Spending our Data</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/6 Fitting Models with parsnip.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">6 Fitting Models with parsnip</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/7 A Model Workflow.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">7 A Model Workflow</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/8 Feature Engineering with recipes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">8 Feature Engineering with recipes</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/9 Judging Model Effectiveness.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">9 Judging Model Effectiveness</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+ <span class="menu-text">Tools For Creating Effective Models</span>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/10 Resampling for Evaluating Performance.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">10 Resampling for Evaluating Performance</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/11 Comparing Models with Resampling.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">11 Comparing Models with Resampling</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/12 Model Tuning and the Dangers of Overfitting.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">12 Model Tuning and the Dangers of Overfitting</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/13 Grid Search.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">13 Grid Search</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/14 Iterative Search.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">14 Iterative Search</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/15 Screening Many Models.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">15 Screening Many Models</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+ <span class="menu-text">Beyond the Basics</span>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/16 Dimensionality Reduction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">16 Dimensionality Reduction</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/17 Encoding Categorical Data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">17 Encoding Categorical Data</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/18 Explaining Models and Predictions.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">18 Explaining Models and Predictions</span></a>
+  </div>
+</li>
+    </ul>
+</div>
+</nav><div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active"><h2 id="toc-title">On this page</h2>
+   
+  <ul>
+<li><a href="#software-for-model-explanations" id="toc-software-for-model-explanations" class="nav-link active" data-scroll-target="#software-for-model-explanations">Software for Model Explanations</a></li>
+  <li><a href="#local-explanations" id="toc-local-explanations" class="nav-link" data-scroll-target="#local-explanations">Local Explanations</a></li>
+  <li><a href="#global-explanations" id="toc-global-explanations" class="nav-link" data-scroll-target="#global-explanations">Global Explanations</a></li>
+  <li><a href="#building-global-explanations-from-local-explanations" id="toc-building-global-explanations-from-local-explanations" class="nav-link" data-scroll-target="#building-global-explanations-from-local-explanations">Building Global Explanations from Local Explanations</a></li>
+  <li><a href="#back-to-beans" id="toc-back-to-beans" class="nav-link" data-scroll-target="#back-to-beans">Back to Beans!</a></li>
+  <li><a href="#chapter-summary" id="toc-chapter-summary" class="nav-link" data-scroll-target="#chapter-summary">Chapter Summary</a></li>
+  </ul></nav>
+    <div class="quarto-margin-footer"><div class="margin-footer-item">
+<p><img src="../../logo.jpg" class="conditional-footer img-fluid" width="200"></p>
+</div></div></div>
+<!-- main -->
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
+<h1 class="title">18 Explaining Models and Predictions</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">November 17, 2025</p>
+    </div>
+  </div>
+  
+    <div>
+    <div class="quarto-title-meta-heading">Modified</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date-modified">December 9, 2025</p>
+    </div>
+  </div>
+    
+  </div>
+  
+
+
+</header><p>在第1.2节中，我们概述了一种模型分类法，并指出模型通常被构建为描述性、推理性或预测性中的一种或多种类型。我们还提到，无论何种建模应用，模型性能都至关重要——这可由适当的评估指标来衡量，例如回归任务中的RMSE，或分类任务中的ROC曲线下的面积。同样地，模型解释——即解答模型为何做出特定预测——无论你的模型主要用于描述性分析、检验假设，还是进行预测，都可能发挥关键作用。通过回答“为什么”这个问题，建模从业者能够深入了解哪些特征对预测结果起到了重要作用，甚至能预测当特征值发生变化时，模型的预测结果将如何调整。本章将介绍如何向模型提问，以揭示其做出预测的原因。</p>
+<p>对于一些模型，比如线性回归，通常很容易解释为何模型会做出预测。线性模型的结构中包含每个预测变量的系数，这些系数往往直观易懂。然而，对于其他模型，例如随机森林——由于其天生具备捕捉非线性行为的能力，单纯从模型结构本身来解释预测结果则显得不够清晰。因此，我们可以借助模型解释算法，帮助深入理解模型的预测过程。</p>
+<p>模型解释分为两种类型：全局解释和局部解释。全局模型解释提供基于整组观测数据的总体理解；而局部模型解释则针对单个观测结果的预测，给出相关的信息。</p>
+<section id="software-for-model-explanations" class="level2"><h2 class="anchored" data-anchor-id="software-for-model-explanations">Software for Model Explanations</h2>
+<p>tidymodels 框架本身并不包含用于模型解释的软件。相反，使用 tidymodels 训练和评估的模型，可以通过 R 包中的其他补充软件（如 lime、vip 和 DALEX）来进行解释。我们通常会选择：</p>
+<ul>
+<li><p>当希望采用利用模型结构的，基于模型的方法时，使用 vip 函数（这些方法通常速度更快）；</p></li>
+<li><p>当需要应用适用于任何模型的，与模型无关的方法时，使用 DALEX 函数。</p></li>
+</ul>
+<p>在第10章和第11章中，我们训练并比较了几种模型，以预测爱荷华州Ames市的房价，其中包括一个包含交互项的线性模型和一个随机森林模型，结果如 <a href="#fig-18.1" class="quarto-xref">Figure&nbsp;1</a> 所示。</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-18.1" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-18.1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="18-Explaining-Models-and-Predictions_files/figure-html/fig-18.1-1.png" class="img-fluid figure-img" width="576">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-18.1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Comparing predicted prices for a linear model with interactions and a random forest model
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>让我们为这两种模型构建与模型无关的解释器，以揭示它们做出这些预测的原因。我们可以使用 <strong>DALEX</strong> 的附加包 <strong>DALEXtra</strong>，该包为tidymodels提供了支持。Biecek 和 Burzykowski（2021）详细探讨了如何利用 DALEX 进行模型解释；本章仅简要总结几种适用于tidymodels的重要方法。无论要计算全局还是局部的任何类型模型解释，首先我们需要准备合适的数据，然后分别为每个模型创建一个解释器：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ModelOriented.github.io/DALEXtra/">DALEXtra</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; Loading required package: DALEX</span></span>
+<span><span class="co">#&gt; Welcome to DALEX (version: 2.5.3).</span></span>
+<span><span class="co">#&gt; Find examples and detailed introduction at: http://ema.drwhy.ai/</span></span>
+<span><span class="co">#&gt; Additional features will be available after installation of: ggpubr.</span></span>
+<span><span class="co">#&gt; Use 'install_dependencies()' to get all suggested dependencies</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Attaching package: 'DALEX'</span></span>
+<span><span class="co">#&gt; The following object is masked from 'package:dplyr':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     explain</span></span>
+<span><span class="va">vip_features</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span></span>
+<span>  <span class="st">"Neighborhood"</span>, <span class="st">"Gr_Liv_Area"</span>, <span class="st">"Year_Built"</span>,</span>
+<span>  <span class="st">"Bldg_Type"</span>, <span class="st">"Latitude"</span>, <span class="st">"Longitude"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">vip_train</span> <span class="op">&lt;-</span></span>
+<span>  <span class="va">ames_train</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">select</span><span class="op">(</span><span class="fu">all_of</span><span class="op">(</span><span class="va">vip_features</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">explainer_lm</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu"><a href="https://ModelOriented.github.io/DALEXtra/reference/explain_tidymodels.html">explain_tidymodels</a></span><span class="op">(</span></span>
+<span>    <span class="va">lm_fit</span>,</span>
+<span>    data <span class="op">=</span> <span class="va">vip_train</span>,</span>
+<span>    y <span class="op">=</span> <span class="va">ames_train</span><span class="op">$</span><span class="va">Sale_Price</span>,</span>
+<span>    label <span class="op">=</span> <span class="st">"lm + interactions"</span>,</span>
+<span>    verbose <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span><span class="va">explainer_rf</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu"><a href="https://ModelOriented.github.io/DALEXtra/reference/explain_tidymodels.html">explain_tidymodels</a></span><span class="op">(</span></span>
+<span>    <span class="va">rf_fit</span>,</span>
+<span>    data <span class="op">=</span> <span class="va">vip_train</span>,</span>
+<span>    y <span class="op">=</span> <span class="va">ames_train</span><span class="op">$</span><span class="va">Sale_Price</span>,</span>
+<span>    label <span class="op">=</span> <span class="st">"random forest"</span>,</span>
+<span>    verbose <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  <span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>线性模型通常易于理解和解释；你可能很少需要为线性模型专门使用额外的模型解释算法。然而，一旦模型中引入了样条函数和交互项，即使是线性模型的预测结果也可能变得难以理解或解释！</p>
+<p>在模型可解释性过程中处理重要的特征工程转换时，凸显了我们所拥有的几种选择（有时，这类分析也存在模糊性）。我们可以从以下两个角度量化全局或局部的模型解释：</p>
+<ul>
+<li><p>以未经显著特征工程转换、原始的基本预测变量为基准；</p></li>
+<li><p>或者采用衍生特征，例如通过降维技术（第16章）或本例中提到的交互项和样条函数生成的特征。</p></li>
+</ul></section><section id="local-explanations" class="level2"><h2 class="anchored" data-anchor-id="local-explanations">Local Explanations</h2>
+<p>局部模型解释提供了针对单个观测值预测的相关信息。例如，让我们考虑位于“North Ames”社区的一栋较老的复式住宅（第4.1节）：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">duplex</span> <span class="op">&lt;-</span> <span class="va">vip_train</span><span class="op">[</span><span class="fl">120</span>, <span class="op">]</span></span>
+<span><span class="va">duplex</span></span>
+<span><span class="co">#&gt; # A tibble: 1 × 6</span></span>
+<span><span class="co">#&gt;   Neighborhood Gr_Liv_Area Year_Built Bldg_Type Latitude Longitude</span></span>
+<span><span class="co">#&gt;   &lt;fct&gt;              &lt;dbl&gt;      &lt;dbl&gt; &lt;fct&gt;        &lt;dbl&gt;     &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 North_Ames          1040       1949 Duplex        42.0     -93.6</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>理解为何模型会为这套复式住宅预测出特定价格，有多种可能的方法。其中一种是分解式解释，可通过DALEX函数<code><a href="https://modeloriented.github.io/DALEX/reference/predict_parts.html">predict_parts()</a></code>实现；该方法计算各个特征的贡献如何改变模型对特定观测值（如我们的这套复式住宅）的平均预测结果。对于线性模型而言，复式住宅的建筑类型（<code>Bldg_Type = 3</code>）、面积、经度以及房龄，都是导致价格相较于截距值被拉低的主要因素。</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">lm_breakdown</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://modeloriented.github.io/DALEX/reference/predict_parts.html">predict_parts</a></span><span class="op">(</span>explainer <span class="op">=</span> <span class="va">explainer_lm</span>, new_observation <span class="op">=</span> <span class="va">duplex</span><span class="op">)</span></span>
+<span><span class="va">lm_breakdown</span></span>
+<span><span class="co">#&gt;                                              contribution</span></span>
+<span><span class="co">#&gt; lm + interactions: intercept                        5.221</span></span>
+<span><span class="co">#&gt; lm + interactions: Gr_Liv_Area = 1040              -0.082</span></span>
+<span><span class="co">#&gt; lm + interactions: Bldg_Type = Duplex              -0.049</span></span>
+<span><span class="co">#&gt; lm + interactions: Longitude = -93.608903          -0.043</span></span>
+<span><span class="co">#&gt; lm + interactions: Year_Built = 1949               -0.039</span></span>
+<span><span class="co">#&gt; lm + interactions: Latitude = 42.035841            -0.007</span></span>
+<span><span class="co">#&gt; lm + interactions: Neighborhood = North_Ames        0.001</span></span>
+<span><span class="co">#&gt; lm + interactions: prediction                       5.002</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>由于该线性模型是使用经纬度的样条项进行训练的，因此此处显示的经度<code>Longitude</code>对价格的贡献，已综合考虑了其所有单独样条项的影响。这一贡献是以原始经度<code>Longitude</code>特征为单位计算的，而非基于派生的样条特征。</p>
+<p>随机森林模型最重要的特征略有不同，其中房屋面积、年龄和是否为复式结构最为关键：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">rf_breakdown</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://modeloriented.github.io/DALEX/reference/predict_parts.html">predict_parts</a></span><span class="op">(</span>explainer <span class="op">=</span> <span class="va">explainer_rf</span>, new_observation <span class="op">=</span> <span class="va">duplex</span><span class="op">)</span></span>
+<span><span class="va">rf_breakdown</span></span>
+<span><span class="co">#&gt;                                          contribution</span></span>
+<span><span class="co">#&gt; random forest: intercept                        5.221</span></span>
+<span><span class="co">#&gt; random forest: Year_Built = 1949               -0.076</span></span>
+<span><span class="co">#&gt; random forest: Gr_Liv_Area = 1040              -0.075</span></span>
+<span><span class="co">#&gt; random forest: Bldg_Type = Duplex              -0.027</span></span>
+<span><span class="co">#&gt; random forest: Longitude = -93.608903          -0.043</span></span>
+<span><span class="co">#&gt; random forest: Latitude = 42.035841            -0.028</span></span>
+<span><span class="co">#&gt; random forest: Neighborhood = North_Ames       -0.003</span></span>
+<span><span class="co">#&gt; random forest: prediction                       4.969</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>像这样的模型分解解释依赖于特征的顺序。</p>
+<p>如果我们选择随机森林模型的特征重要性排序方式与线性模型的默认方式相同（通过启发式方法确定），我们就能改变各特征的相对重要性：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://modeloriented.github.io/DALEX/reference/predict_parts.html">predict_parts</a></span><span class="op">(</span></span>
+<span>  explainer <span class="op">=</span> <span class="va">explainer_rf</span>,</span>
+<span>  new_observation <span class="op">=</span> <span class="va">duplex</span>,</span>
+<span>  order <span class="op">=</span> <span class="va">lm_breakdown</span><span class="op">$</span><span class="va">variable_name</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt;                                          contribution</span></span>
+<span><span class="co">#&gt; random forest: intercept                        5.221</span></span>
+<span><span class="co">#&gt; random forest: Gr_Liv_Area = 1040              -0.075</span></span>
+<span><span class="co">#&gt; random forest: Bldg_Type = Duplex              -0.019</span></span>
+<span><span class="co">#&gt; random forest: Longitude = -93.608903          -0.023</span></span>
+<span><span class="co">#&gt; random forest: Year_Built = 1949               -0.104</span></span>
+<span><span class="co">#&gt; random forest: Latitude = 42.035841            -0.028</span></span>
+<span><span class="co">#&gt; random forest: Neighborhood = North_Ames       -0.003</span></span>
+<span><span class="co">#&gt; random forest: prediction                       4.969</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>我们可以利用这些分解解释会随顺序变化这一特性，来计算在所有（或多种）可能顺序下的最重要特征。这正是Shapley可加性解释法（Lundberg 和 Lee，2017）的核心思想：通过不同特征顺序的组合或“联盟”，计算出特征在各种情况下的平均贡献。现在，让我们为我们的双层住宅模型计算SHAP归因值，采用<code>B = 20</code>随机顺序：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">1801</span><span class="op">)</span></span>
+<span><span class="va">shap_duplex</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu"><a href="https://modeloriented.github.io/DALEX/reference/predict_parts.html">predict_parts</a></span><span class="op">(</span></span>
+<span>    explainer <span class="op">=</span> <span class="va">explainer_rf</span>,</span>
+<span>    new_observation <span class="op">=</span> <span class="va">duplex</span>,</span>
+<span>    type <span class="op">=</span> <span class="st">"shap"</span>,</span>
+<span>    B <span class="op">=</span> <span class="fl">20</span></span>
+<span>  <span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>我们可以调用 <code>plot(shap_duplex)</code> 来使用 DALEX 提供的默认绘图方法，或者也可以直接访问底层数据，创建自定义图表。<a href="#fig-18.2" class="quarto-xref">Figure&nbsp;2</a> 中的箱形图展示了我们在所有尝试过的排序中贡献值的分布情况，而条形图则显示了每个特征的平均归因值：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://forcats.tidyverse.org/">forcats</a></span><span class="op">)</span></span>
+<span><span class="va">shap_duplex</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">group_by</span><span class="op">(</span><span class="va">variable</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>mean_val <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">contribution</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">ungroup</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>variable <span class="op">=</span> <span class="fu"><a href="https://forcats.tidyverse.org/reference/fct_reorder.html">fct_reorder</a></span><span class="op">(</span><span class="va">variable</span>, <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span><span class="op">(</span><span class="va">mean_val</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span><span class="va">contribution</span>, <span class="va">variable</span>, fill <span class="op">=</span> <span class="va">mean_val</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_col</span><span class="op">(</span></span>
+<span>    data <span class="op">=</span> <span class="op">~</span> <span class="fu">distinct</span><span class="op">(</span><span class="va">.</span>, <span class="va">variable</span>, <span class="va">mean_val</span><span class="op">)</span>,</span>
+<span>    <span class="fu">aes</span><span class="op">(</span><span class="va">mean_val</span>, <span class="va">variable</span><span class="op">)</span>,</span>
+<span>    alpha <span class="op">=</span> <span class="fl">0.5</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_boxplot</span><span class="op">(</span>width <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">theme</span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">scale_fill_viridis_d</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">labs</span><span class="op">(</span>y <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div id="fig-18.2" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-18.2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="18-Explaining-Models-and-Predictions_files/figure-html/fig-18.2-1.png" class="img-fluid figure-img" width="576">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-18.2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Shapley additive explanations from the random forest model for a duplex property
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>那我们数据集中有没有其他不同的观察结果呢？让我们来看看吉尔伯特社区一栋更大、更新的一户住宅：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">big_house</span> <span class="op">&lt;-</span> <span class="va">vip_train</span><span class="op">[</span><span class="fl">1269</span>, <span class="op">]</span></span>
+<span><span class="va">big_house</span></span>
+<span><span class="co">#&gt; # A tibble: 1 × 6</span></span>
+<span><span class="co">#&gt;   Neighborhood Gr_Liv_Area Year_Built Bldg_Type Latitude Longitude</span></span>
+<span><span class="co">#&gt;   &lt;fct&gt;              &lt;dbl&gt;      &lt;dbl&gt; &lt;fct&gt;        &lt;dbl&gt;     &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 Gilbert             2267       2002 OneFam        42.1     -93.6</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>我们可以以相同的方式计算这栋房子的SHAP平均贡献值：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">1802</span><span class="op">)</span></span>
+<span><span class="va">shap_house</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu"><a href="https://modeloriented.github.io/DALEX/reference/predict_parts.html">predict_parts</a></span><span class="op">(</span></span>
+<span>    explainer <span class="op">=</span> <span class="va">explainer_rf</span>,</span>
+<span>    new_observation <span class="op">=</span> <span class="va">big_house</span>,</span>
+<span>    type <span class="op">=</span> <span class="st">"shap"</span>,</span>
+<span>    B <span class="op">=</span> <span class="fl">20</span></span>
+<span>  <span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>结果如 <a href="#fig-18.3" class="quarto-xref">Figure&nbsp;3</a> 所示；与复式住宅不同，这栋房屋的面积和房龄使其价格更高。</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">shap_house</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">group_by</span><span class="op">(</span><span class="va">variable</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>mean_val <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">contribution</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">ungroup</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>variable <span class="op">=</span> <span class="fu"><a href="https://forcats.tidyverse.org/reference/fct_reorder.html">fct_reorder</a></span><span class="op">(</span><span class="va">variable</span>, <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">abs</a></span><span class="op">(</span><span class="va">mean_val</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span><span class="va">contribution</span>, <span class="va">variable</span>, fill <span class="op">=</span> <span class="va">mean_val</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_col</span><span class="op">(</span></span>
+<span>    data <span class="op">=</span> <span class="op">~</span> <span class="fu">distinct</span><span class="op">(</span><span class="va">.</span>, <span class="va">variable</span>, <span class="va">mean_val</span><span class="op">)</span>,</span>
+<span>    <span class="fu">aes</span><span class="op">(</span><span class="va">mean_val</span>, <span class="va">variable</span><span class="op">)</span>,</span>
+<span>    alpha <span class="op">=</span> <span class="fl">0.5</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_boxplot</span><span class="op">(</span>width <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">scale_fill_viridis_d</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">theme</span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">labs</span><span class="op">(</span>y <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div id="fig-18.3" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-18.3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="18-Explaining-Models-and-Predictions_files/figure-html/fig-18.3-1.png" class="img-fluid figure-img" width="576">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-18.3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: Shapley additive explanations from the random forest model for a one-family home in Gilbert
+</figcaption></figure>
+</div>
+</div>
+</div>
+</section><section id="global-explanations" class="level2"><h2 class="anchored" data-anchor-id="global-explanations">Global Explanations</h2>
+<p>全局模型解释，也称为全局特征重要性或变量重要性，有助于我们理解哪些特征在整体上对线性模型和随机森林模型的预测起着最重要作用——这种重要性是基于整个训练集进行汇总分析得出的。尽管前一节讨论的是哪些变量或特征最能单独预测某栋房屋的销售价格，但全局特征重要性关注的则是模型中所有变量的综合重要性。</p>
+<p>计算变量重要性的一种方法是通过对特征进行置换（Breiman 2001）。我们可以随机打乱某个特征的取值，用模型进行预测，然后衡量与未打乱时相比，模型对数据的拟合效果究竟恶化了多少。</p>
+<p>如果对某一列进行洗牌后，模型性能显著下降，那么该列就非常重要；而如果洗牌该列的值对模型表现几乎没有影响，则说明它并非关键变量。这种方法适用于任何类型的模型（具有模型无关性），且结果易于理解。</p>
+<p>借助DALEX，我们通过<code><a href="https://modeloriented.github.io/DALEX/reference/model_parts.html">model_parts()</a></code>函数计算此类变量的重要性：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">1803</span><span class="op">)</span></span>
+<span><span class="va">vip_lm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://modeloriented.github.io/DALEX/reference/model_parts.html">model_parts</a></span><span class="op">(</span><span class="va">explainer_lm</span>, loss_function <span class="op">=</span> <span class="va">loss_root_mean_square</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">1804</span><span class="op">)</span></span>
+<span><span class="va">vip_rf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://modeloriented.github.io/DALEX/reference/model_parts.html">model_parts</a></span><span class="op">(</span><span class="va">explainer_rf</span>, loss_function <span class="op">=</span> <span class="va">loss_root_mean_square</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>同样，我们可以通过调用<code>plot(vip_lm, vip_rf)</code>来使用 DALEX 提供的默认绘图方法，但底层数据也可用于探索、分析和进一步绘图。让我们来创建一个绘图函数：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">ggplot_imp</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span>
+<span>  <span class="va">metric_name</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/attr.html">attr</a></span><span class="op">(</span><span class="va">obj</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>, <span class="st">"loss_name"</span><span class="op">)</span></span>
+<span>  <span class="va">metric_lab</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span></span>
+<span>    <span class="va">metric_name</span>,</span>
+<span>    <span class="st">"after permutations\n(higher indicates more important)"</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span>  <span class="va">full_vip</span> <span class="op">&lt;-</span> <span class="fu">bind_rows</span><span class="op">(</span><span class="va">obj</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">variable</span> <span class="op">!=</span> <span class="st">"_baseline_"</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="va">perm_vals</span> <span class="op">&lt;-</span> <span class="va">full_vip</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">variable</span> <span class="op">==</span> <span class="st">"_full_model_"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>    <span class="fu">group_by</span><span class="op">(</span><span class="va">label</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>    <span class="fu">summarise</span><span class="op">(</span>dropout_loss <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">dropout_loss</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="va">p</span> <span class="op">&lt;-</span> <span class="va">full_vip</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">variable</span> <span class="op">!=</span> <span class="st">"_full_model_"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>    <span class="fu">mutate</span><span class="op">(</span>variable <span class="op">=</span> <span class="fu"><a href="https://forcats.tidyverse.org/reference/fct_reorder.html">fct_reorder</a></span><span class="op">(</span><span class="va">variable</span>, <span class="va">dropout_loss</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>    <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span><span class="va">dropout_loss</span>, <span class="va">variable</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">1</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">p</span> <span class="op">&lt;-</span> <span class="va">p</span> <span class="op">+</span></span>
+<span>      <span class="fu">facet_wrap</span><span class="op">(</span><span class="fu">vars</span><span class="op">(</span><span class="va">label</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>      <span class="fu">geom_vline</span><span class="op">(</span></span>
+<span>        data <span class="op">=</span> <span class="va">perm_vals</span>, <span class="fu">aes</span><span class="op">(</span>xintercept <span class="op">=</span> <span class="va">dropout_loss</span>, color <span class="op">=</span> <span class="va">label</span><span class="op">)</span>,</span>
+<span>        linewidth <span class="op">=</span> <span class="fl">1.4</span>, lty <span class="op">=</span> <span class="fl">2</span>, alpha <span class="op">=</span> <span class="fl">0.7</span></span>
+<span>      <span class="op">)</span> <span class="op">+</span></span>
+<span>      <span class="fu">geom_boxplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>color <span class="op">=</span> <span class="va">label</span>, fill <span class="op">=</span> <span class="va">label</span><span class="op">)</span>, alpha <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span></span>
+<span>  <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
+<span>    <span class="va">p</span> <span class="op">&lt;-</span> <span class="va">p</span> <span class="op">+</span></span>
+<span>      <span class="fu">geom_vline</span><span class="op">(</span></span>
+<span>        data <span class="op">=</span> <span class="va">perm_vals</span>, <span class="fu">aes</span><span class="op">(</span>xintercept <span class="op">=</span> <span class="va">dropout_loss</span><span class="op">)</span>,</span>
+<span>        linewidth <span class="op">=</span> <span class="fl">1.4</span>, lty <span class="op">=</span> <span class="fl">2</span>, alpha <span class="op">=</span> <span class="fl">0.7</span></span>
+<span>      <span class="op">)</span> <span class="op">+</span></span>
+<span>      <span class="fu">geom_boxplot</span><span class="op">(</span>fill <span class="op">=</span> <span class="st">"#91CBD765"</span>, alpha <span class="op">=</span> <span class="fl">0.4</span><span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span>  <span class="va">p</span> <span class="op">+</span></span>
+<span>    <span class="fu">theme</span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu">labs</span><span class="op">(</span></span>
+<span>      x <span class="op">=</span> <span class="va">metric_lab</span>,</span>
+<span>      y <span class="op">=</span> <span class="cn">NULL</span>, fill <span class="op">=</span> <span class="cn">NULL</span>, color <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>    <span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>使用<code>ggplot_imp(vip_lm, vip_rf)</code>生成了 <a href="#fig-18.4" class="quarto-xref">Figure&nbsp;4</a> 。</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">ggplot_imp</span><span class="op">(</span><span class="va">vip_lm</span>, <span class="va">vip_rf</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div id="fig-18.4" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-18.4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="18-Explaining-Models-and-Predictions_files/figure-html/fig-18.4-1.png" class="img-fluid figure-img" width="576">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-18.4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: Global explainer for the random forest and linear regression models
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p><a href="#fig-18.4" class="quarto-xref">Figure&nbsp;4</a> 中每个面板中的虚线显示了完整模型的RMSE，即线性模型或随机森林模型。越靠右侧的特征越重要，因为打乱这些特征后会导致RMSE显著升高。从该图中可以发现许多有趣的信息：例如，在包含交互项和样条函数的线性模型中，邻里信息非常重要；而在随机森林模型中，它却是第二不重要的特征。</p>
+</section><section id="building-global-explanations-from-local-explanations" class="level2"><h2 class="anchored" data-anchor-id="building-global-explanations-from-local-explanations">Building Global Explanations from Local Explanations</h2>
+<p>到目前为止，本章我们主要关注针对单个样本的局部模型解释（通过Shapley加性解释），以及针对整个数据集的全局模型解释（通过特征置换法）。此外，还可以通过聚合局部模型解释来构建全局模型解释，例如使用偏导数依赖图（partial dependence profiles）。</p>
+<p>偏导数依赖图展示了模型预测的期望值（例如Ames房屋的预测价格）如何随某一特征（如房屋年龄或总居住面积）的变化而变化。</p>
+<p>构建此类特征图的一种方法是，通过汇总或平均单个观测的特征图来实现。一种展示单个观测预测值如何随特定特征变化的特征图，被称为ICE（individual conditional expectation）特征图，或简称CP（ceteris paribus）特征图。我们可以计算这些个体特征图（针对训练集中500个观测），然后利用DALEX函数中的<code><a href="https://modeloriented.github.io/DALEX/reference/model_profile.html">model_profile()</a></code>进行汇总：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">1805</span><span class="op">)</span></span>
+<span><span class="va">pdp_age</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://modeloriented.github.io/DALEX/reference/model_profile.html">model_profile</a></span><span class="op">(</span><span class="va">explainer_rf</span>, N <span class="op">=</span> <span class="fl">500</span>, variables <span class="op">=</span> <span class="st">"Year_Built"</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>让我们再创建一个函数，用于绘制该对象中的底层数据：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">ggplot_pdp</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">obj</span>, <span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">p</span> <span class="op">&lt;-</span></span>
+<span>    <span class="fu">as_tibble</span><span class="op">(</span><span class="va">obj</span><span class="op">$</span><span class="va">agr_profiles</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>    <span class="fu">mutate</span><span class="op">(</span>`_label_` <span class="op">=</span> <span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_remove.html">str_remove</a></span><span class="op">(</span><span class="va">`_label_`</span>, <span class="st">"^[^_]*_"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>    <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span><span class="va">`_x_`</span>, <span class="va">`_yhat_`</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu">geom_line</span><span class="op">(</span></span>
+<span>      data <span class="op">=</span> <span class="fu">as_tibble</span><span class="op">(</span><span class="va">obj</span><span class="op">$</span><span class="va">cp_profiles</span><span class="op">)</span>,</span>
+<span>      <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="op">{</span><span class="op">{</span> <span class="va">x</span> <span class="op">}</span><span class="op">}</span>, group <span class="op">=</span> <span class="va">`_ids_`</span><span class="op">)</span>,</span>
+<span>      linewidth <span class="op">=</span> <span class="fl">0.5</span>, alpha <span class="op">=</span> <span class="fl">0.05</span>, color <span class="op">=</span> <span class="st">"gray50"</span></span>
+<span>    <span class="op">)</span></span>
+<span></span>
+<span>  <span class="va">num_colors</span> <span class="op">&lt;-</span> <span class="fu">n_distinct</span><span class="op">(</span><span class="va">obj</span><span class="op">$</span><span class="va">agr_profiles</span><span class="op">$</span><span class="va">`_label_`</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="va">num_colors</span> <span class="op">&gt;</span> <span class="fl">1</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">p</span> <span class="op">&lt;-</span> <span class="va">p</span> <span class="op">+</span> <span class="fu">geom_line</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>color <span class="op">=</span> <span class="va">`_label_`</span><span class="op">)</span>, linewidth <span class="op">=</span> <span class="fl">1.2</span>, alpha <span class="op">=</span> <span class="fl">0.8</span><span class="op">)</span></span>
+<span>  <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
+<span>    <span class="va">p</span> <span class="op">&lt;-</span> <span class="va">p</span> <span class="op">+</span> <span class="fu">geom_line</span><span class="op">(</span>color <span class="op">=</span> <span class="st">"midnightblue"</span>, linewidth <span class="op">=</span> <span class="fl">1.2</span>, alpha <span class="op">=</span> <span class="fl">0.8</span><span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span></span>
+<span>  <span class="va">p</span></span>
+<span><span class="op">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>使用此功能可生成 <a href="#fig-18.5" class="quarto-xref">Figure&nbsp;5</a> ，从中我们可以看到随机森林模型的非线性行为。</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">ggplot_pdp</span><span class="op">(</span><span class="va">pdp_age</span>, <span class="va">Year_Built</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">labs</span><span class="op">(</span></span>
+<span>    x <span class="op">=</span> <span class="st">"Year built"</span>,</span>
+<span>    y <span class="op">=</span> <span class="st">"Sale Price (log)"</span>,</span>
+<span>    color <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  <span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div id="fig-18.5" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-18.5-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="18-Explaining-Models-and-Predictions_files/figure-html/fig-18.5-1.png" class="img-fluid figure-img" width="576">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-18.5-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5: Partial dependence profiles for the random forest model focusing on the year built predictor
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>不同年份建造的房屋售价基本持平，但在1960年左右之后出现小幅上涨。此外，我们还可以针对模型中的任何其他特征，以及数据中的各类别（例如<code>Bldg_Type</code>），计算部分依赖性曲线。本次分析将采用1000个观测值来生成这些曲线。</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">1806</span><span class="op">)</span></span>
+<span><span class="va">pdp_liv</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://modeloriented.github.io/DALEX/reference/model_profile.html">model_profile</a></span><span class="op">(</span><span class="va">explainer_rf</span>,</span>
+<span>  N <span class="op">=</span> <span class="fl">1000</span>,</span>
+<span>  variables <span class="op">=</span> <span class="st">"Gr_Liv_Area"</span>,</span>
+<span>  groups <span class="op">=</span> <span class="st">"Bldg_Type"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">ggplot_pdp</span><span class="op">(</span><span class="va">pdp_liv</span>, <span class="va">Gr_Liv_Area</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">scale_x_log10</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">scale_color_brewer</span><span class="op">(</span>palette <span class="op">=</span> <span class="st">"Dark2"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">labs</span><span class="op">(</span></span>
+<span>    x <span class="op">=</span> <span class="st">"Gross living area"</span>,</span>
+<span>    y <span class="op">=</span> <span class="st">"Sale Price (log)"</span>,</span>
+<span>    color <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">theme</span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"top"</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div id="fig-18.6" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-18.6-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="18-Explaining-Models-and-Predictions_files/figure-html/fig-18.6-1.png" class="img-fluid figure-img" width="576">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-18.6-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;6: Partial dependence profiles for the random forest model focusing on building types and gross living area
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>从 <a href="#fig-18.6" class="quarto-xref">Figure&nbsp;6</a> 中我们可以看到，销售价格在居住面积约为1000至3000平方英尺之间增长最为显著；同时，不同类型的住宅（如独立式住宅或不同类型的联排别墅）在其售价随居住面积增加时，大多呈现出相似的增长趋势。</p>
+<p>我们可以选择使用<code>plot(pdp_liv)</code>来生成默认的DALEX图表，但由于我们这里直接基于原始数据绘制图表，因此甚至可以按其中一个特征进行分面处理，以直观展示预测结果是否因不同子组而有所变化，并突出这些子组间的不平衡现象（如 <a href="#fig-18.7" class="quarto-xref">Figure&nbsp;7</a> 所示）。</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">as_tibble</span><span class="op">(</span><span class="va">pdp_liv</span><span class="op">$</span><span class="va">agr_profiles</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>Bldg_Type <span class="op">=</span> <span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_remove.html">str_remove</a></span><span class="op">(</span><span class="va">`_label_`</span>, <span class="st">"random forest_"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span><span class="va">`_x_`</span>, <span class="va">`_yhat_`</span>, color <span class="op">=</span> <span class="va">Bldg_Type</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_line</span><span class="op">(</span></span>
+<span>    data <span class="op">=</span> <span class="fu">as_tibble</span><span class="op">(</span><span class="va">pdp_liv</span><span class="op">$</span><span class="va">cp_profiles</span><span class="op">)</span>,</span>
+<span>    <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">Gr_Liv_Area</span>, group <span class="op">=</span> <span class="va">`_ids_`</span><span class="op">)</span>,</span>
+<span>    linewidth <span class="op">=</span> <span class="fl">0.5</span>, alpha <span class="op">=</span> <span class="fl">0.1</span>, color <span class="op">=</span> <span class="st">"gray50"</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_line</span><span class="op">(</span>linewidth <span class="op">=</span> <span class="fl">1.2</span>, alpha <span class="op">=</span> <span class="fl">0.8</span>, show.legend <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">scale_x_log10</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">facet_wrap</span><span class="op">(</span><span class="op">~</span><span class="va">Bldg_Type</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">scale_color_brewer</span><span class="op">(</span>palette <span class="op">=</span> <span class="st">"Dark2"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">labs</span><span class="op">(</span></span>
+<span>    x <span class="op">=</span> <span class="st">"Gross living area"</span>,</span>
+<span>    y <span class="op">=</span> <span class="st">"Sale Price (log)"</span>,</span>
+<span>    color <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  <span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div id="fig-18.7" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-18.7-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="18-Explaining-Models-and-Predictions_files/figure-html/fig-18.7-1.png" class="img-fluid figure-img" width="576">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-18.7-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;7: Partial dependence profiles for the random forest model focusing on building types and gross living area using facets
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>构建模型解释并没有唯一正确的方法，本章所列出的选项也并非详尽无遗。我们重点介绍了适用于个体层面和全局层面的良好解释方法，以及如何实现两者的有效衔接，并推荐您进一步阅读Biecek和Burzykowski（2021）及Molnar（2020）的相关内容。</p>
+</section><section id="back-to-beans" class="level2"><h2 class="anchored" data-anchor-id="back-to-beans">Back to Beans!</h2>
+<p>在第16章中，我们讨论了在建模高维数据时，如何将降维技术用作特征工程或预处理步骤。以我们用于预测豆类品种的干豆形态测量数据集为例，发现结合正则化判别分析模型与偏最小二乘法（PLS）降维后，效果非常显著。那么，在这些形态特征中，哪些对豆类品种的预测最为重要呢？我们可以采用本章中介绍的方法，构建一种与模型无关的解释工具，并通过<code><a href="https://modeloriented.github.io/DALEX/reference/model_parts.html">model_parts()</a></code>函数计算全局模型解释，例如：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb19"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">beans</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">1601</span><span class="op">)</span></span>
+<span><span class="va">bean_split</span> <span class="op">&lt;-</span> <span class="fu">initial_split</span><span class="op">(</span><span class="va">beans</span>, strata <span class="op">=</span> <span class="va">class</span>, prop <span class="op">=</span> <span class="fl">3</span> <span class="op">/</span> <span class="fl">4</span><span class="op">)</span></span>
+<span><span class="va">bean_train</span> <span class="op">&lt;-</span> <span class="fu">training</span><span class="op">(</span><span class="va">bean_split</span><span class="op">)</span></span>
+<span><span class="va">bean_test</span> <span class="op">&lt;-</span> <span class="fu">testing</span><span class="op">(</span><span class="va">bean_split</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/load.html">load</a></span><span class="op">(</span><span class="st">"/home/hgj/D/Blog/Books/Tidy Modeling with R/Rdata/rda_fit.RData"</span><span class="op">)</span></span>
+<span><span class="co"># load("RData/rda_fit.RData")</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">1807</span><span class="op">)</span></span>
+<span><span class="va">vip_beans</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu"><a href="https://ModelOriented.github.io/DALEXtra/reference/explain_tidymodels.html">explain_tidymodels</a></span><span class="op">(</span></span>
+<span>    <span class="va">rda_wflow_fit</span>,</span>
+<span>    data <span class="op">=</span> <span class="va">bean_train</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu">select</span><span class="op">(</span><span class="op">-</span><span class="va">class</span><span class="op">)</span>,</span>
+<span>    y <span class="op">=</span> <span class="va">bean_train</span><span class="op">$</span><span class="va">class</span>,</span>
+<span>    label <span class="op">=</span> <span class="st">"RDA"</span>,</span>
+<span>    verbose <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://modeloriented.github.io/DALEX/reference/model_parts.html">model_parts</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-18.8" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-18.8-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="18-Explaining-Models-and-Predictions_files/figure-html/fig-18.8-1.png" class="img-fluid figure-img" width="576">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-18.8-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;8: Global explainer for the regularized discriminant analysis model on the beans data
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>使用我们之前定义的重要度绘图函数，<code>ggplot_imp(vip_beans)</code> 生成了 <a href="#fig-18.8" class="quarto-xref">Figure&nbsp;8</a> 。我们在 <a href="#fig-18.8" class="quarto-xref">Figure&nbsp;8</a> 中看到的全局特征重要性度量，综合考虑了所有PLS成分的影响，但以原始变量为依据。<a href="#fig-18.8" class="quarto-xref">Figure&nbsp;8</a> 向我们展示了，形状因子是预测豆类类型最重要的特征之一，尤其是形状因子4——一种综合考虑面积<span class="math inline">\(A\)</span>、长轴<span class="math inline">\(L\)</span>和短轴<span class="math inline">\(l\)</span>的坚实度衡量指标：</p>
+<p><span class="math display">\[
+\text{SF4} = \frac{A}{\pi(L/2)(l/2)}
+\]</span></p>
+<p>从 <a href="#fig-18.8" class="quarto-xref">Figure&nbsp;8</a> 中我们可以看到，形状因子1（长轴与面积之比）、短轴长度及圆度是预测豆类品种的接下来最重要的几个特征。</p>
+</section><section id="chapter-summary" class="level2"><h2 class="anchored" data-anchor-id="chapter-summary">Chapter Summary</h2>
+<p>对于某些类型的模型，解释模型为何做出特定预测的答案非常直接；但对另一些模型而言，我们必须借助专门的解释算法，才能弄清哪些特征对预测结果最为关键。从训练好的模型中，你可以生成两种主要类型的模型解释：全局解释提供基于整个数据集汇总的信息，而局部解释则帮助理解模型针对单个样本的具体预测情况。</p>
+<p>像DALEX及其配套包DALEXtra、vip和lime这样的工具，都可以整合到tidymodels分析中，以提供这些模型解释器。然而，模型解释只是理解你的模型是否合适且有效的一个方面，此外还需结合模型性能的评估；第19章将进一步探讨预测的质量与可信度。</p>
+
+
+</section><a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script><script src="https://utteranc.es/client.js" repo="hanguojun007/Blog" issue-term="pathname" theme="github-light" crossorigin="anonymous" async="">
+</script><nav class="page-navigation"><div class="nav-page nav-page-previous">
+      <a href="../../Books/Tidy Modeling with R/17 Encoding Categorical Data.html" class="pagination-link" aria-label="17 Encoding Categorical Data">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">17 Encoding Categorical Data</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+</body></html>

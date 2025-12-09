@@ -180,15 +180,16 @@ fasta 格式，支持除`U`外的[IUPAC characters](https://www.bioinformatics.o
 
 ### dataset
 
-数据集“dataset”是nextclade运行时，针对输入序列所需要的一些底层文件。它至少要包含两个文件：
+数据集“dataset”是nextclade运行时，针对输入序列所需要的一些底层文件。它至少要包含参考序列文件：
 
--   `reference.fasta`：参考序列
--   `pathogen.json`：datasets 配置文件，类似身份证
+-   `reference.fasta`：参考序
 
 其他分析用文件：
 
 -   `genome_annotation.gff3`：参考序列的注释文件，[GFF3](https://github.com/The-Sequence-Ontology/Specifications/blob/master/gff3.md)格式
 -   `tree.json`：参考树，Auspice JSON v2格式，可以使用 https://auspice.us/ 进行可视化
+
+-   `pathogen.json`：datasets 配置文件，类似身份证
 
 及说明文件：
 

@@ -1,0 +1,6 @@
+.git/
+.quarto/
+_freeze/
+docs/
+*.RData
+*.rds

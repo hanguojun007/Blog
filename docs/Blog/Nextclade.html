@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.8.24">
+<meta name="generator" content="quarto-1.8.26">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <meta name="author" content="大番薯本薯">
 <meta name="dcterms.date" content="2025-12-07">
@@ -69,10 +69,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dc55a5b9e770e841cd82e46aadbfb9b0.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-2bc269ba33bfe0c9779ec90686b7c52e.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light"><script id="quarto-search-options" type="application/json">{
+<link href="../site_libs/bootstrap/bootstrap-6fb6fcbaca076a07ad0b43b7bab862d0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light"><script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": true,
   "collapse-after": 3,
@@ -130,8 +130,6 @@ window.Quarto = {
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top"><nav class="navbar navbar-expand-lg " data-bs-theme="dark"><div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a href="../index.html" class="navbar-brand navbar-brand-logo">
-    </a>
     <a class="navbar-brand" href="../index.html">
     <span class="navbar-title">RSSPtho</span>
     </a>
@@ -248,7 +246,7 @@ window.Quarto = {
 </li>
   </ul></nav>
     <div class="quarto-margin-footer"><div class="margin-footer-item">
-<p><img src="..\logo.jpg" class="conditional-footer img-fluid" width="200"></p>
+<p><img src="../logo.jpg" class="conditional-footer img-fluid" width="200"></p>
 </div></div></div>
 <!-- main -->
 <main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
@@ -406,19 +404,16 @@ window.Quarto = {
 <section id="查询序列" class="level3"><h3 class="anchored" data-anchor-id="查询序列">查询序列</h3>
 <p>fasta 格式，支持除<code>U</code>外的<a href="https://www.bioinformatics.org/sms/iupac.html">IUPAC characters</a>，必须有“id”且以<code>&gt;</code>开头。</p>
 </section><section id="dataset" class="level3"><h3 class="anchored" data-anchor-id="dataset">dataset</h3>
-<p>数据集“dataset”是nextclade运行时，针对输入序列所需要的一些底层文件。它至少要包含两个文件：</p>
+<p>数据集“dataset”是nextclade运行时，针对输入序列所需要的一些底层文件。它至少要包含参考序列文件：</p>
 <ul>
 <li>
-<code>reference.fasta</code>：参考序列</li>
-<li>
-<code>pathogen.json</code>：datasets 配置文件，类似身份证</li>
+<code>reference.fasta</code>：参考序</li>
 </ul>
 <p>其他分析用文件：</p>
 <ul>
-<li>
-<code>genome_annotation.gff3</code>：参考序列的注释文件，<a href="https://github.com/The-Sequence-Ontology/Specifications/blob/master/gff3.md">GFF3</a>格式</li>
-<li>
-<code>tree.json</code>：参考树，Auspice JSON v2格式，可以使用 https://auspice.us/ 进行可视化</li>
+<li><p><code>genome_annotation.gff3</code>：参考序列的注释文件，<a href="https://github.com/The-Sequence-Ontology/Specifications/blob/master/gff3.md">GFF3</a>格式</p></li>
+<li><p><code>tree.json</code>：参考树，Auspice JSON v2格式，可以使用 https://auspice.us/ 进行可视化</p></li>
+<li><p><code>pathogen.json</code>：datasets 配置文件，类似身份证</p></li>
 </ul>
 <p>及说明文件：</p>
 <ul>

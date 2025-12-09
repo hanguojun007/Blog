@@ -25,3 +25,4 @@ website:
         - Beyond the Basics
         - Books/Tidy Modeling with R/16 Dimensionality Reduction.qmd
         - Books/Tidy Modeling with R/17 Encoding Categorical Data.qmd
+        - Books/Tidy Modeling with R/18 Explaining Models and Predictions.qmd
