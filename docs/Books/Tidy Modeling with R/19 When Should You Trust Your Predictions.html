@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.26">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<meta name="dcterms.date" content="2025-11-18">
+<title>19 When Should You Trust Your Predictions ?</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../Books/Tidy Modeling with R/18 Explaining Models and Predictions.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-a8995632026c11c334ae4c6181bc8d1f.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light"><script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": true,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "Search",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script><script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script><script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script><script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script><link rel="stylesheet" href="../../styles.css">
+</head>
+<body class="nav-sidebar floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top"><nav class="navbar navbar-expand-lg " data-bs-theme="dark"><div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">RSSPtho</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+<li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-books" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Books</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-books">
+<li>
+    <a class="dropdown-item" href="../../Books/ggplot2/index.html">
+ <span class="dropdown-text">ggplot2</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Books/R4DS2/index.html">
+ <span class="dropdown-text">R for Data Science(2e)</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Books/Tidy Modeling with R/index.html">
+ <span class="dropdown-text">Tidy Modeling with R</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Books/Advanced R(2e)/index.html">
+ <span class="dropdown-text">Advanced R(2e)</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Books/quarto/Project Basics.html">
+ <span class="dropdown-text">Quarto</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Books/Js4R/00 Preface.qmd">
+ <span class="dropdown-text">Js4R</span></a>
+  </li>  
+    </ul>
+</li>
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About me</span></a>
+  </li>  
+</ul>
+<div class="quarto-navbar-tools">
+    <a href="https://github.com/hanguojun007/Blog" title="" class="quarto-navigation-tool px-1" aria-label=""><i class="bi bi-github"></i></a>
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav><nav class="quarto-secondary-nav"><div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../Books/Tidy Modeling with R/19 When Should You Trust Your Predictions.html">19 When Should You Trust Your Predictions ?</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav></header><!-- content --><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto"><div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Hello World</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+ <span class="menu-text">Introduction</span>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/1 Software for modeling.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1 Software for modeling</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/2 A Tidyverse Primer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2 A Tidyverse Primer</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/3 A Review of R Modeling Fundamentals.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">3 A Review of R Modeling Fundamentals</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+ <span class="menu-text">Moduling Basics</span>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/4 The Ames Housing Data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">4 The Ames Housing Data</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/5 Spending our Data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">5 Spending our Data</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/6 Fitting Models with parsnip.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">6 Fitting Models with parsnip</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/7 A Model Workflow.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">7 A Model Workflow</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/8 Feature Engineering with recipes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">8 Feature Engineering with recipes</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/9 Judging Model Effectiveness.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">9 Judging Model Effectiveness</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+ <span class="menu-text">Tools For Creating Effective Models</span>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/10 Resampling for Evaluating Performance.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">10 Resampling for Evaluating Performance</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/11 Comparing Models with Resampling.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">11 Comparing Models with Resampling</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/12 Model Tuning and the Dangers of Overfitting.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">12 Model Tuning and the Dangers of Overfitting</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/13 Grid Search.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">13 Grid Search</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/14 Iterative Search.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">14 Iterative Search</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/15 Screening Many Models.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">15 Screening Many Models</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+ <span class="menu-text">Beyond the Basics</span>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/16 Dimensionality Reduction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">16 Dimensionality Reduction</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/17 Encoding Categorical Data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">17 Encoding Categorical Data</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/18 Explaining Models and Predictions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">18 Explaining Models and Predictions</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/19 When Should You Trust Your Predictions.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">19 When Should You Trust Your Predictions ?</span></a>
+  </div>
+</li>
+    </ul>
+</div>
+</nav><div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active"><h2 id="toc-title">On this page</h2>
+   
+  <ul>
+<li><a href="#equivocal-results" id="toc-equivocal-results" class="nav-link active" data-scroll-target="#equivocal-results">Equivocal Results</a></li>
+  <li><a href="#determining-model-applicability" id="toc-determining-model-applicability" class="nav-link" data-scroll-target="#determining-model-applicability">Determining Model Applicability</a></li>
+  <li><a href="#chapter-summary" id="toc-chapter-summary" class="nav-link" data-scroll-target="#chapter-summary">Chapter Summary</a></li>
+  </ul></nav>
+    <div class="quarto-margin-footer"><div class="margin-footer-item">
+<p><img src="../../logo.jpg" class="conditional-footer img-fluid" width="200"></p>
+</div></div></div>
+<!-- main -->
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
+<h1 class="title">19 When Should You Trust Your Predictions ?</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">November 18, 2025</p>
+    </div>
+  </div>
+  
+    <div>
+    <div class="quarto-title-meta-heading">Modified</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date-modified">November 18, 2025</p>
+    </div>
+  </div>
+    
+  </div>
+  
+
+
+</header><p>预测模型几乎总能在给定输入数据的情况下生成预测结果。然而，在许多情况下，这种预测可能是不合适的。当新数据点明显超出用于构建模型的数据范围时，进行预测可能属于不当的外推行为。更典型的例子是，当模型被应用于完全不同的情境时，其预测结果同样可能不适用。例如，第14章中使用的细胞分割数据，旨在判断人类乳腺癌细胞能否在图像中被准确分离。但若将基于这些数据建立的模型直接套用到胃细胞上以实现相同目的，则显然是不恰当的——尽管我们或许能得出一个预测结果，但它很可能无法适用于不同类型的细胞。</p>
+<p>本章探讨了两种用于量化预测潜在质量的方法：</p>
+<ul>
+<li><p>模糊区域：利用预测值提醒用户，结果可能存在疑问。</p></li>
+<li><p>适用性：通过预测变量来衡量新样本的外推程度（如有）。</p></li>
+</ul>
+<section id="equivocal-results" class="level2"><h2 class="anchored" data-anchor-id="equivocal-results">Equivocal Results</h2>
+<p>在某些情况下，与预测相关的不确定性程度过高，以至于无法信任。</p>
+<p>如果模型结果显示你有51%的几率感染了新冠病毒，自然会对此诊断抱持一定怀疑态度。事实上，监管机构通常要求许多医学诊断都设有“模棱两可区域”。这一区域指的是某些结果范围，在此范围内，检测结果不应直接告知患者——例如，某些新冠检测结果过于模糊，无法明确报告给患者。具体案例可参见Danowski等人（1970）及Kerleguer等人（2003）。同样的概念同样适用于那些并非专门用于医学诊断的模型。</p>
+<p>让我们使用一个能够模拟具有两个类别和两个预测变量（<code>x</code> 和 <code>y</code>）的分类数据的函数。真实模型是一个逻辑回归模型，其方程为：</p>
+<p><span class="math display">\[
+\mathrm{logit}(p) = -1 - 2x - \frac{x^2}{5} + 2y^2
+\]</span></p>
+<p>这两个预测变量服从相关系数为0.70的双变量正态分布。我们将创建一个包含200个样本的训练集，以及一个包含50个样本的测试集：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidymodels.tidymodels.org">tidymodels</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; ── Attaching packages ─────────────────────────────────── tidymodels 1.4.1 ──</span></span>
+<span><span class="co">#&gt; ✔ broom        1.0.11     ✔ recipes      1.3.1 </span></span>
+<span><span class="co">#&gt; ✔ dials        1.4.2      ✔ rsample      1.3.1 </span></span>
+<span><span class="co">#&gt; ✔ dplyr        1.1.4      ✔ tailor       0.1.0 </span></span>
+<span><span class="co">#&gt; ✔ ggplot2      4.0.1      ✔ tidyr        1.3.1 </span></span>
+<span><span class="co">#&gt; ✔ infer        1.0.9      ✔ tune         2.0.1 </span></span>
+<span><span class="co">#&gt; ✔ modeldata    1.5.1      ✔ workflows    1.3.0 </span></span>
+<span><span class="co">#&gt; ✔ parsnip      1.4.0      ✔ workflowsets 1.1.1 </span></span>
+<span><span class="co">#&gt; ✔ purrr        1.2.0      ✔ yardstick    1.3.2</span></span>
+<span><span class="co">#&gt; ── Conflicts ────────────────────────────────────── tidymodels_conflicts() ──</span></span>
+<span><span class="co">#&gt; ✖ purrr::discard() masks scales::discard()</span></span>
+<span><span class="co">#&gt; ✖ dplyr::filter()  masks stats::filter()</span></span>
+<span><span class="co">#&gt; ✖ dplyr::lag()     masks stats::lag()</span></span>
+<span><span class="co">#&gt; ✖ recipes::step()  masks stats::step()</span></span>
+<span><span class="fu"><a href="https://tidymodels.tidymodels.org/reference/tidymodels_prefer.html">tidymodels_prefer</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">simulate_two_classes</span> <span class="op">&lt;-</span></span>
+<span>  <span class="kw">function</span><span class="op">(</span><span class="va">n</span>, <span class="va">error</span> <span class="op">=</span> <span class="fl">0.1</span>, <span class="va">eqn</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/substitute.html">quote</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span> <span class="op">-</span> <span class="fl">2</span> <span class="op">*</span> <span class="va">x</span> <span class="op">-</span> <span class="fl">0.2</span> <span class="op">*</span> <span class="va">x</span><span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="fl">2</span> <span class="op">*</span> <span class="va">y</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="co"># Slightly correlated predictors</span></span>
+<span>    <span class="va">sigma</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0.7</span>, <span class="fl">0.7</span>, <span class="fl">1</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fl">2</span>, ncol <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span>    <span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu">MASS</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/MASS/man/mvrnorm.html">mvrnorm</a></span><span class="op">(</span>n <span class="op">=</span> <span class="va">n</span>, mu <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, Sigma <span class="op">=</span> <span class="va">sigma</span><span class="op">)</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/colnames.html">colnames</a></span><span class="op">(</span><span class="va">dat</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"x"</span>, <span class="st">"y"</span><span class="op">)</span></span>
+<span>    <span class="va">cls</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="st">"class_"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">)</span></span>
+<span>    <span class="va">dat</span> <span class="op">&lt;-</span></span>
+<span>      <span class="fu">as_tibble</span><span class="op">(</span><span class="va">dat</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>      <span class="fu">mutate</span><span class="op">(</span></span>
+<span>        linear_pred <span class="op">=</span> <span class="op">!</span><span class="op">!</span><span class="va">eqn</span>,</span>
+<span>        <span class="co"># Add some misclassification noise</span></span>
+<span>        linear_pred <span class="op">=</span> <span class="va">linear_pred</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="va">n</span>, sd <span class="op">=</span> <span class="va">error</span><span class="op">)</span>,</span>
+<span>        prob <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/family.html">binomial</a></span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="fu">linkinv</span><span class="op">(</span><span class="va">linear_pred</span><span class="op">)</span>,</span>
+<span>        class <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html">ifelse</a></span><span class="op">(</span><span class="va">prob</span> <span class="op">&gt;</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span>, <span class="va">cls</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, <span class="va">cls</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span>,</span>
+<span>        class <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">factor</a></span><span class="op">(</span><span class="va">class</span>, levels <span class="op">=</span> <span class="va">cls</span><span class="op">)</span></span>
+<span>      <span class="op">)</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">dat</span>, <span class="va">x</span>, <span class="va">y</span>, <span class="va">class</span><span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">1901</span><span class="op">)</span></span>
+<span><span class="va">training_set</span> <span class="op">&lt;-</span> <span class="fu">simulate_two_classes</span><span class="op">(</span><span class="fl">200</span><span class="op">)</span></span>
+<span><span class="va">testing_set</span> <span class="op">&lt;-</span> <span class="fu">simulate_two_classes</span><span class="op">(</span><span class="fl">50</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>我们采用贝叶斯方法估计了一个逻辑回归模型（对参数使用了默认的高斯先验分布）：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">two_class_mod</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu">logistic_reg</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">set_engine</span><span class="op">(</span><span class="st">"stan"</span>, seed <span class="op">=</span> <span class="fl">1902</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">fit</span><span class="op">(</span><span class="va">class</span> <span class="op">~</span> <span class="va">.</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html">I</a></span><span class="op">(</span><span class="va">x</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html">I</a></span><span class="op">(</span><span class="va">y</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span>, data <span class="op">=</span> <span class="va">training_set</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html">print</a></span><span class="op">(</span><span class="va">two_class_mod</span>, digits <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
+<span><span class="co">#&gt; parsnip model object</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; stan_glm</span></span>
+<span><span class="co">#&gt;  family:       binomial [logit]</span></span>
+<span><span class="co">#&gt;  formula:      class ~ . + I(x^2) + I(y^2)</span></span>
+<span><span class="co">#&gt;  observations: 200</span></span>
+<span><span class="co">#&gt;  predictors:   5</span></span>
+<span><span class="co">#&gt; ------</span></span>
+<span><span class="co">#&gt;             Median MAD_SD</span></span>
+<span><span class="co">#&gt; (Intercept)  1.092  0.287</span></span>
+<span><span class="co">#&gt; x            2.290  0.423</span></span>
+<span><span class="co">#&gt; y            0.314  0.354</span></span>
+<span><span class="co">#&gt; I(x^2)       0.077  0.307</span></span>
+<span><span class="co">#&gt; I(y^2)      -2.465  0.424</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ------</span></span>
+<span><span class="co">#&gt; * For help interpreting the printed output see ?print.stanreg</span></span>
+<span><span class="co">#&gt; * For info on the priors used see ?prior_summary.stanreg</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><a href="#fig-19.1" class="quarto-xref">Figure&nbsp;1</a> 中，拟合的类别边界被叠加在测试集上。最接近类别边界的数据点不确定性最高——如果这些点的值稍有变化，其预测的类别可能会随之改变。一种简单的排除某些结果的方法是：若数据点的值位于50%（或特定情境下的适当概率阈值）附近的某个范围内，则将其标记为“模棱两可”。根据模型所应用的具体问题，这可能意味着我们需要采集更多测量数据，或者在得出可靠预测之前，还需获取更多信息。</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-19.1" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-19.1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="19-When-Should-You-Trust-Your-Predictions_files/figure-html/fig-19.1-1.png" class="img-fluid figure-img" width="576">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-19.1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Simulated two-class data set with a logistic regression fit and decision boundary.
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>我们可以根据去除不确定结果后性能的提升情况，来确定带宽的宽度。然而，我们还应估算可报告率（即预期可用结果的比例）。例如，在实际应用中，即使模型表现完美，但如果仅对2%的通过样本发布预测，也是毫无意义的。</p>
+<p>让我们使用测试集来确定提升性能与确保足够可报告结果之间的平衡。预测是通过以下方式生成的：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">test_pred</span> <span class="op">&lt;-</span> <span class="fu">augment</span><span class="op">(</span><span class="va">two_class_mod</span>, <span class="va">testing_set</span><span class="op">)</span></span>
+<span><span class="va">test_pred</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 6 × 6</span></span>
+<span><span class="co">#&gt;   .pred_class .pred_class_1 .pred_class_2      x      y class  </span></span>
+<span><span class="co">#&gt;   &lt;fct&gt;               &lt;dbl&gt;         &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt; &lt;fct&gt;  </span></span>
+<span><span class="co">#&gt; 1 class_2           0.0256          0.974  1.12  -0.176 class_2</span></span>
+<span><span class="co">#&gt; 2 class_1           0.555           0.445 -0.126 -0.582 class_2</span></span>
+<span><span class="co">#&gt; 3 class_2           0.00620         0.994  1.92   0.615 class_2</span></span>
+<span><span class="co">#&gt; 4 class_2           0.472           0.528 -0.400  0.252 class_2</span></span>
+<span><span class="co">#&gt; 5 class_2           0.163           0.837  1.30   1.09  class_1</span></span>
+<span><span class="co">#&gt; 6 class_2           0.0317          0.968  2.59   1.36  class_2</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>借助tidymodels，probably包中包含用于不确定区间的函数。对于两类情况，<code><a href="https://probably.tidymodels.org/reference/make_class_pred.html">make_two_class_pred()</a></code>函数会创建一个类似因子的列，其中包含带有不确定区间的预测类别：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/tidymodels/probably">probably</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">lvls</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/levels.html">levels</a></span><span class="op">(</span><span class="va">training_set</span><span class="op">$</span><span class="va">class</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">test_pred</span> <span class="op">&lt;-</span></span>
+<span>  <span class="va">test_pred</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>.pred_with_eqz <span class="op">=</span> <span class="fu"><a href="https://probably.tidymodels.org/reference/make_class_pred.html">make_two_class_pred</a></span><span class="op">(</span><span class="va">.pred_class_1</span>, <span class="va">lvls</span>, buffer <span class="op">=</span> <span class="fl">0.15</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">test_pred</span> <span class="op">%&gt;%</span> <span class="fu">count</span><span class="op">(</span><span class="va">.pred_with_eqz</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 3 × 2</span></span>
+<span><span class="co">#&gt;   .pred_with_eqz     n</span></span>
+<span><span class="co">#&gt;       &lt;clss_prd&gt; &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1           [EQ]     9</span></span>
+<span><span class="co">#&gt; 2        class_1    20</span></span>
+<span><span class="co">#&gt; 3        class_2    21</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>位于 <span class="math inline">\(0.50 ± 0.15\)</span> 的值被赋予<code>[EQ]</code>。在这个示例中，符号<code>[EQ]</code>并不是一个因子水平，而是该列的一个属性。</p>
+<p>由于因子水平与原始数据相同，因此可以准确地计算混淆矩阵及其他统计指标。在使用yardstick包中的标准函数时，模棱两可的结果会被转换为NA，并且不会用于基于硬类别预测的计算中。请注意这些混淆矩阵之间的差异：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># All data</span></span>
+<span><span class="va">test_pred</span> <span class="op">%&gt;%</span> <span class="fu">conf_mat</span><span class="op">(</span><span class="va">class</span>, <span class="va">.pred_class</span><span class="op">)</span></span>
+<span><span class="co">#&gt;           Truth</span></span>
+<span><span class="co">#&gt; Prediction class_1 class_2</span></span>
+<span><span class="co">#&gt;    class_1      20       6</span></span>
+<span><span class="co">#&gt;    class_2       5      19</span></span>
+<span></span>
+<span><span class="co"># Reportable results only:</span></span>
+<span><span class="va">test_pred</span> <span class="op">%&gt;%</span> <span class="fu">conf_mat</span><span class="op">(</span><span class="va">class</span>, <span class="va">.pred_with_eqz</span><span class="op">)</span></span>
+<span><span class="co">#&gt;           Truth</span></span>
+<span><span class="co">#&gt; Prediction class_1 class_2</span></span>
+<span><span class="co">#&gt;    class_1      17       3</span></span>
+<span><span class="co">#&gt;    class_2       5      16</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>同时，还提供了一个<code><a href="https://probably.tidymodels.org/reference/locate-equivocal.html">is_equivocal()</a></code>函数，用于从数据中筛选出这些行。</p>
+<p>模糊区有助于提高准确性吗？让我们来看看不同缓冲区大小的情况，如 <a href="#fig-19.2" class="quarto-xref">Figure&nbsp;2</a> 所示：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># A function to change the buffer then compute performance.</span></span>
+<span><span class="va">eq_zone_results</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">buffer</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">test_pred</span> <span class="op">&lt;-</span></span>
+<span>    <span class="va">test_pred</span> <span class="op">%&gt;%</span></span>
+<span>    <span class="fu">mutate</span><span class="op">(</span>.pred_with_eqz <span class="op">=</span> <span class="fu"><a href="https://probably.tidymodels.org/reference/make_class_pred.html">make_two_class_pred</a></span><span class="op">(</span><span class="va">.pred_class_1</span>, <span class="va">lvls</span>, buffer <span class="op">=</span> <span class="va">buffer</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="va">acc</span> <span class="op">&lt;-</span> <span class="va">test_pred</span> <span class="op">%&gt;%</span> <span class="fu">accuracy</span><span class="op">(</span><span class="va">class</span>, <span class="va">.pred_with_eqz</span><span class="op">)</span></span>
+<span>  <span class="va">rep_rate</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://probably.tidymodels.org/reference/reportable_rate.html">reportable_rate</a></span><span class="op">(</span><span class="va">test_pred</span><span class="op">$</span><span class="va">.pred_with_eqz</span><span class="op">)</span></span>
+<span>  <span class="fu">tibble</span><span class="op">(</span>accuracy <span class="op">=</span> <span class="va">acc</span><span class="op">$</span><span class="va">.estimate</span>, reportable <span class="op">=</span> <span class="va">rep_rate</span>, buffer <span class="op">=</span> <span class="va">buffer</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="co"># Evaluate a sequence of buffers and plot the results.</span></span>
+<span><span class="fu">map</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">.1</span>, length.out <span class="op">=</span> <span class="fl">40</span><span class="op">)</span>, <span class="va">eq_zone_results</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">list_rbind</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">pivot_longer</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="op">-</span><span class="va">buffer</span><span class="op">)</span>, names_to <span class="op">=</span> <span class="st">"statistic"</span>, values_to <span class="op">=</span> <span class="st">"value"</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">buffer</span>, y <span class="op">=</span> <span class="va">value</span>, lty <span class="op">=</span> <span class="va">statistic</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_step</span><span class="op">(</span>linewidth <span class="op">=</span> <span class="fl">1.2</span>, alpha <span class="op">=</span> <span class="fl">0.8</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">labs</span><span class="op">(</span>y <span class="op">=</span> <span class="cn">NULL</span>, lty <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">theme</span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"top"</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div id="fig-19.2" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-19.2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="19-When-Should-You-Trust-Your-Predictions_files/figure-html/fig-19.2-1.png" class="img-fluid figure-img" width="576">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-19.2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: The effect of equivocal zones on model performance
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p><a href="#fig-19.2" class="quarto-xref">Figure&nbsp;2</a> 向我们展示了，虽然准确率提高了几个百分点，但代价却是近10%的预测结果无法使用！这种折衷方案的价值，取决于模型预测的具体用途。</p>
+<p>本次分析着重于利用预测的类别概率来剔除异常点，因为这是分类模型中衡量不确定性的基本指标。相比之下，更优的做法是采用类别概率的标准误差。由于我们使用的是贝叶斯模型，所得到的概率估计实际上正是后验预测分布的均值——换句话说，贝叶斯模型为我们提供了类别概率的整个分布。通过计算这一分布的标准差，我们便能获得该概率预测的标准误差。在大多数情况下，这一标准误差与类别概率的均值呈直接关联。大家可能还记得，对于一个伯努利随机变量，其概率为 <span class="math inline">\(p\)</span>，方差恰好是 <span class="math inline">\(p(1 - p)\)</span>。正因如此，当概率为50%时，标准误差达到最大值。因此，与其单纯依据类别概率判定结果模棱两可，我们不妨改用预测标准误差作为筛选的临界值。</p>
+<p>预测标准误差的一个重要方面是，它不仅考虑了类别概率，还特别关注那些存在显著外推或异常预测变量值的情况，此时标准误差可能会增大。使用预测标准误差的益处在于，它不仅能反映预测的不确定性，还能有效识别出存在问题的预测结果。我们之所以采用贝叶斯模型，正是因为它能自然地估算预测标准误差——这一点并非所有模型都能做到。对于我们的测试集，通过设置<code>type = "pred_int"</code>，将生成上下限；而<code>std_error</code>则会额外添加一列，显示这一数值。以80%的置信区间为例：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">test_pred</span> <span class="op">&lt;-</span></span>
+<span>  <span class="va">test_pred</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">bind_cols</span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">two_class_mod</span>, <span class="va">testing_set</span>, type <span class="op">=</span> <span class="st">"pred_int"</span>, std_error <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>对于我们模型和数据表现良好的示例，<a href="#fig-19.3" class="quarto-xref">Figure&nbsp;3</a> 展示了整个空间中的预测标准误差：</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-19.3" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-19.3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="19-When-Should-You-Trust-Your-Predictions_files/figure-html/fig-19.3-1.png" class="img-fluid figure-img" width="576">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-19.3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: The effect of the standard error of prediction overlaid with the test set data
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>使用标准误差作为衡量指标以排除无法预测的样本，同样适用于具有数值结果的模型。然而，正如下一节所示，这种方法并非总是有效。</p>
+</section><section id="determining-model-applicability" class="level2"><h2 class="anchored" data-anchor-id="determining-model-applicability">Determining Model Applicability</h2>
+<p>模糊区域试图根据模型输出来衡量预测的可靠性。然而，模型统计量（如预测的标准误差）可能无法有效评估外推法带来的影响，因此我们需要另一种方法，以判断是否可信地依赖该预测，并回答：“我们的模型是否适用于预测特定的数据点？”让我们以 Kuhn 和 Johnson（2019）中广泛使用的芝加哥火车数据为例，该数据最初在第2.2节中展示。我们的目标是预测每天进入克拉克与湖站火车站的顾客数量。</p>
+<p>modeldata 包（一个包含示例数据集的 tidymodels 包）中的数据集，涵盖了 2001年1月22日至2016年8月28日之间的每日数值。让我们使用数据的最后两周创建一个小规模的测试集：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co">## loads both `Chicago` data set as well as `stations`</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="va">Chicago</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">Chicago</span> <span class="op">&lt;-</span> <span class="va">Chicago</span> <span class="op">%&gt;%</span> <span class="fu">select</span><span class="op">(</span><span class="va">ridership</span>, <span class="va">date</span>, <span class="fu">one_of</span><span class="op">(</span><span class="va">stations</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">n</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">Chicago</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">Chicago_train</span> <span class="op">&lt;-</span> <span class="va">Chicago</span> <span class="op">%&gt;%</span> <span class="fu">slice</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="op">(</span><span class="va">n</span> <span class="op">-</span> <span class="fl">14</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">Chicago_test</span> <span class="op">&lt;-</span> <span class="va">Chicago</span> <span class="op">%&gt;%</span> <span class="fu">slice</span><span class="op">(</span><span class="op">(</span><span class="va">n</span> <span class="op">-</span> <span class="fl">13</span><span class="op">)</span><span class="op">:</span><span class="va">n</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>主要的预测因子包括不同火车站（如克拉克站和湖站）的历史客流量数据，以及日期信息。这些客流量预测因子之间存在高度相关性。在接下来的模型中，日期列将被扩展为多个新特征，而客流量预测因子则通过偏最小二乘法（PLS）成分来表示。正如我们在第16.5.2节中所讨论的，PLS（Geladi 和 Kowalski 1986）是主成分分析的一种有监督版本，它不仅能消除新特征间的相关性，还能有效预测目标数据。</p>
+<p>使用预处理后的数据，我们拟合了一个标准线性模型：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">base_recipe</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu">recipe</span><span class="op">(</span><span class="va">ridership</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">Chicago_train</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="co"># Create date features</span></span>
+<span>  <span class="fu">step_date</span><span class="op">(</span><span class="va">date</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">step_holiday</span><span class="op">(</span><span class="va">date</span>, keep_original_cols <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="co"># Create dummy variables from factor columns</span></span>
+<span>  <span class="fu">step_dummy</span><span class="op">(</span><span class="fu">all_nominal</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="co"># Remove any columns with a single unique value</span></span>
+<span>  <span class="fu">step_zv</span><span class="op">(</span><span class="fu">all_predictors</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">step_normalize</span><span class="op">(</span><span class="op">!</span><span class="op">!</span><span class="op">!</span><span class="va">stations</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">step_pls</span><span class="op">(</span><span class="op">!</span><span class="op">!</span><span class="op">!</span><span class="va">stations</span>, num_comp <span class="op">=</span> <span class="fl">10</span>, outcome <span class="op">=</span> <span class="fu">vars</span><span class="op">(</span><span class="va">ridership</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">lm_spec</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu">linear_reg</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">set_engine</span><span class="op">(</span><span class="st">"lm"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">lm_wflow</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu">workflow</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">add_recipe</span><span class="op">(</span><span class="va">base_recipe</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">add_model</span><span class="op">(</span><span class="va">lm_spec</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">1902</span><span class="op">)</span></span>
+<span><span class="va">lm_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html">fit</a></span><span class="op">(</span><span class="va">lm_wflow</span>, data <span class="op">=</span> <span class="va">Chicago_train</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>数据在测试集上的拟合效果如何？我们可以对测试集使用<code><a href="https://rdrr.io/r/stats/predict.html">predict()</a></code>方法，以同时获得预测值和预测区间：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">res_test</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">lm_fit</span>, <span class="va">Chicago_test</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">bind_cols</span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">lm_fit</span>, <span class="va">Chicago_test</span>, type <span class="op">=</span> <span class="st">"pred_int"</span><span class="op">)</span>,</span>
+<span>    <span class="va">Chicago_test</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span><span class="va">res_test</span> <span class="op">%&gt;%</span> <span class="fu">select</span><span class="op">(</span><span class="va">date</span>, <span class="va">ridership</span>, <span class="fu">starts_with</span><span class="op">(</span><span class="st">".pred"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 14 × 5</span></span>
+<span><span class="co">#&gt;   date       ridership .pred .pred_lower .pred_upper</span></span>
+<span><span class="co">#&gt;   &lt;date&gt;         &lt;dbl&gt; &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 2016-08-15     20.6  20.3        16.2         24.5</span></span>
+<span><span class="co">#&gt; 2 2016-08-16     21.0  21.3        17.1         25.4</span></span>
+<span><span class="co">#&gt; 3 2016-08-17     21.0  21.4        17.3         25.6</span></span>
+<span><span class="co">#&gt; 4 2016-08-18     21.3  21.4        17.3         25.5</span></span>
+<span><span class="co">#&gt; 5 2016-08-19     20.4  20.9        16.7         25.0</span></span>
+<span><span class="co">#&gt; 6 2016-08-20      6.22  7.52        3.34        11.7</span></span>
+<span><span class="co">#&gt; # ℹ 8 more rows</span></span>
+<span><span class="va">res_test</span> <span class="op">%&gt;%</span> <span class="fu">rmse</span><span class="op">(</span><span class="va">ridership</span>, <span class="va">.pred</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 1 × 3</span></span>
+<span><span class="co">#&gt;   .metric .estimator .estimate</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 rmse    standard       0.865</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>这些是相当不错的结果。 <a href="#fig-19.4" class="quarto-xref">Figure&nbsp;4</a> 展示了预测结果，并附有95%的预测区间。</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-19.4" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-19.4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="19-When-Should-You-Trust-Your-Predictions_files/figure-html/fig-19.4-1.png" class="img-fluid figure-img" width="576">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-19.4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: Two weeks of 2016 predictions for the Chicago data along with 95% prediction intervals
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>鉴于乘客数量的规模，对于这样一个简单的模型来说，这些结果显得尤为出色。如果将该模型投入实际应用，它在几年后的2020年6月表现会如何？事实上，该模型成功地做出了预测——毕竟，作为预测模型，只要输入数据充足，几乎总是能给出准确的结果：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># load("Books/Tidy Modeling with R/Rdata/Chicago_2020.RData")</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/load.html">load</a></span><span class="op">(</span><span class="st">"Rdata/Chicago_2020.RData"</span><span class="op">)</span></span>
+<span><span class="va">res_2020</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">lm_fit</span>, <span class="va">Chicago_2020</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">bind_cols</span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/stats/predict.html">predict</a></span><span class="op">(</span><span class="va">lm_fit</span>, <span class="va">Chicago_2020</span>, type <span class="op">=</span> <span class="st">"pred_int"</span><span class="op">)</span>,</span>
+<span>    <span class="va">Chicago_2020</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span><span class="va">res_2020</span> <span class="op">%&gt;%</span> <span class="fu">select</span><span class="op">(</span><span class="va">date</span>, <span class="fu">contains</span><span class="op">(</span><span class="st">".pred"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 14 × 4</span></span>
+<span><span class="co">#&gt;   date       .pred .pred_lower .pred_upper</span></span>
+<span><span class="co">#&gt;   &lt;date&gt;     &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 2020-06-01 20.1        15.9         24.3</span></span>
+<span><span class="co">#&gt; 2 2020-06-02 21.4        17.2         25.6</span></span>
+<span><span class="co">#&gt; 3 2020-06-03 21.5        17.3         25.6</span></span>
+<span><span class="co">#&gt; 4 2020-06-04 21.3        17.1         25.4</span></span>
+<span><span class="co">#&gt; 5 2020-06-05 20.7        16.6         24.9</span></span>
+<span><span class="co">#&gt; 6 2020-06-06  9.04        4.88        13.2</span></span>
+<span><span class="co">#&gt; # ℹ 8 more rows</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>尽管这些数据远远超出了原始训练集的时间范围，但预测区间的大致宽度却基本相同。然而，考虑到2020年全球爆发的疫情，这些数据的表现可谓惨不忍睹：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">res_2020</span> <span class="op">%&gt;%</span> <span class="fu">select</span><span class="op">(</span><span class="va">date</span>, <span class="va">ridership</span>, <span class="fu">starts_with</span><span class="op">(</span><span class="st">".pred"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 14 × 5</span></span>
+<span><span class="co">#&gt;   date       ridership .pred .pred_lower .pred_upper</span></span>
+<span><span class="co">#&gt;   &lt;date&gt;         &lt;dbl&gt; &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 2020-06-01     0.002 20.1        15.9         24.3</span></span>
+<span><span class="co">#&gt; 2 2020-06-02     0.005 21.4        17.2         25.6</span></span>
+<span><span class="co">#&gt; 3 2020-06-03     0.566 21.5        17.3         25.6</span></span>
+<span><span class="co">#&gt; 4 2020-06-04     1.66  21.3        17.1         25.4</span></span>
+<span><span class="co">#&gt; 5 2020-06-05     1.95  20.7        16.6         24.9</span></span>
+<span><span class="co">#&gt; 6 2020-06-06     1.08   9.04        4.88        13.2</span></span>
+<span><span class="co">#&gt; # ℹ 8 more rows</span></span>
+<span><span class="va">res_2020</span> <span class="op">%&gt;%</span> <span class="fu">rmse</span><span class="op">(</span><span class="va">ridership</span>, <span class="va">.pred</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 1 × 3</span></span>
+<span><span class="co">#&gt;   .metric .estimator .estimate</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 rmse    standard        17.2</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>你可以在 <a href="#fig-19.5" class="quarto-xref">Figure&nbsp;5</a> 中直观地看到这种糟糕的模型表现。</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-19.5" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-19.5-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="19-When-Should-You-Trust-Your-Predictions_files/figure-html/fig-19.5-1.png" class="img-fluid figure-img" width="576">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-19.5-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5: Two weeks of 2020 predictions for the Chicago data along with 95% prediction intervals
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>线性回归的置信区间和预测区间会随着数据逐渐偏离训练集中心而扩大。不过，这种影响并不显著到足以表明这些预测结果不佳。有时，模型生成的统计数据并不能很好地衡量预测的质量。</p>
+<p>可以通过一种辅助方法来避免这种情况，该方法能够量化模型对任何新预测的适用性（即模型的适用性域）。目前已有多种计算适用性域模型的方法，例如Jaworska、Nikolova-Jeliazkova和Aldenberg（2005），或Netzeva等人（2005）。而本章采用的方法则是一种较为简单的无监督学习法，旨在衡量新数据点与训练数据之间的偏离程度——如果有的话。</p>
+<p>想法是，为预测结果附上一个评分，用以衡量新数据点与训练集的相似程度。</p>
+<p>一种行之有效的方法是将主成分分析（PCA）应用于数值型预测变量。我们将以加州站和奥斯汀站的客流量对应的两个预测变量为例，来演示这一过程。训练集如 <a href="#fig-19.6" class="quarto-xref">Figure&nbsp;6</a> 中的(a)面板所示。这些站点的客流量数据高度相关，散点图中显示的两种分布分别对应周末和工作日的客流量情况。</p>
+<p>第一步是对训练数据进行PCA分析。<a href="#fig-19.6" class="quarto-xref">Figure&nbsp;6</a> 中的(b)面板展示了训练集的PCA得分。接下来，我们利用这些结果，计算每个训练集数据点到PCA数据中心的距离（ <a href="#fig-19.6" class="quarto-xref">Figure&nbsp;6</a> 的(c)面板）。随后，我们可以借助这一参考分布（ <a href="#fig-19.6" class="quarto-xref">Figure&nbsp;6</a> 的(d)面板），评估某个数据点偏离训练数据主流的程度。</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-19.6" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-19.6-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="19-When-Should-You-Trust-Your-Predictions_files/figure-html/fig-19.6-1.png" class="img-fluid figure-img" width="576">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-19.6-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;6: The PCA reference distribution based on the training set
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>对于新样本，我们会计算其PCA得分，并同时确定它与训练集中心的距离。</p>
+<p>然而，当一个新样本的距离为X时，这究竟意味着什么？由于不同数据集的PCA成分可能具有不同的取值范围，因此很难明确界定“距离过大”这一概念。</p>
+<p>一种方法是将训练集数据的距系列为“正常”范围。对于新样本，我们可以根据其与参考分布（来自训练集）中距离范围的对比情况，判断新样本的异常程度。此外，还可为新样本计算一个百分位数，以反映有多少训练集样本比新样本更不极端。</p>
+<p>90%的百分位数意味着，训练集中的大部分数据比新样本更接近数据中心。</p>
+<p><a href="#fig-19.7" class="quarto-xref">Figure&nbsp;7</a> 中的图表将测试集样本（三角形和虚线）与2020年样本（圆形和实线），按其与训练集的PCA距离进行了叠加显示。</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-19.7" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-19.7-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="19-When-Should-You-Trust-Your-Predictions_files/figure-html/fig-19.7-1.png" class="img-fluid figure-img" width="576">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-19.7-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;7: The reference distribution with two new points: one using the test set and one from the 2020 data
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>测试集的设定点距离为1.28，位于训练集分布的第51.8百分位，表明它恰好处于训练集的主流范围内。</p>
+<p>而2020年的样本则比训练集中的任何样本都更远离中心（百分位达100%），这说明该样本极为极端，其对应的预测结果将属于严重外推范畴（因此很可能不应予以报告）。</p>
+<p>“applicable”包可以使用PCA开发一个适用性域模型。我们将以过去20期的车站客流量预测因子作为PCA分析的输入。此外，还有一个名为“阈值”的参数，用于确定在距离计算中使用多少个主成分。在本例中，我们将使用一个较大的值，表明应选用足够多的主成分，以涵盖客流量预测因子中99%的变异情况。</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/tidymodels/applicable">applicable</a></span><span class="op">)</span></span>
+<span><span class="va">pca_stat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://applicable.tidymodels.org/reference/apd_pca.html">apd_pca</a></span><span class="op">(</span><span class="op">~</span><span class="va">.</span>,</span>
+<span>  data <span class="op">=</span> <span class="va">Chicago_train</span> <span class="op">%&gt;%</span> <span class="fu">select</span><span class="op">(</span><span class="fu">one_of</span><span class="op">(</span><span class="va">stations</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  threshold <span class="op">=</span> <span class="fl">0.99</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">pca_stat</span></span>
+<span><span class="co">#&gt; # Predictors:</span></span>
+<span><span class="co">#&gt;    20</span></span>
+<span><span class="co">#&gt; # Principal Components:</span></span>
+<span><span class="co">#&gt;    9 components were needed</span></span>
+<span><span class="co">#&gt;    to capture at least 99% of the</span></span>
+<span><span class="co">#&gt;    total variation in the predictors.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><code><a href="https://ggplot2.tidyverse.org/reference/autoplot.html">autoplot()</a></code>方法用于绘制参考分布。它有一个可选参数，用于指定要绘制的数据。我们将添加一个距离值，以仅绘制训练集的距离分布。这段代码生成了 <a href="#fig-19.8" class="quarto-xref">Figure&nbsp;8</a> 中的图表：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/autoplot.html">autoplot</a></span><span class="op">(</span><span class="va">pca_stat</span>, <span class="va">distance</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"distance"</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div id="fig-19.8" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-19.8-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="19-When-Should-You-Trust-Your-Predictions_files/figure-html/fig-19.8-1.png" class="img-fluid figure-img" width="576">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-19.8-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;8: The results of using the <code><a href="https://ggplot2.tidyverse.org/reference/autoplot.html">autoplot()</a></code> method on an applicable object
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>X轴显示距离的数值，Y轴则标示分布的百分位数。例如，训练集样本中有一半的距离小于3.7。</p>
+<p>要计算新数据的百分位数，<code><a href="https://applicable.tidymodels.org/reference/score.html">score()</a></code>函数的工作方式与<code><a href="https://rdrr.io/r/stats/predict.html">predict()</a></code>相同：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://applicable.tidymodels.org/reference/score.html">score</a></span><span class="op">(</span><span class="va">pca_stat</span>, <span class="va">Chicago_test</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu">select</span><span class="op">(</span><span class="fu">starts_with</span><span class="op">(</span><span class="st">"distance"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 14 × 2</span></span>
+<span><span class="co">#&gt;   distance distance_pctl</span></span>
+<span><span class="co">#&gt;      &lt;dbl&gt;         &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1     4.88          66.7</span></span>
+<span><span class="co">#&gt; 2     5.21          71.4</span></span>
+<span><span class="co">#&gt; 3     5.19          71.1</span></span>
+<span><span class="co">#&gt; 4     5.00          68.5</span></span>
+<span><span class="co">#&gt; 5     4.36          59.3</span></span>
+<span><span class="co">#&gt; 6     4.10          55.2</span></span>
+<span><span class="co">#&gt; # ℹ 8 more rows</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>这些看起来相当合理。以下是2020年的数据：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://applicable.tidymodels.org/reference/score.html">score</a></span><span class="op">(</span><span class="va">pca_stat</span>, <span class="va">Chicago_2020</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="fu">select</span><span class="op">(</span><span class="fu">starts_with</span><span class="op">(</span><span class="st">"distance"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 14 × 2</span></span>
+<span><span class="co">#&gt;   distance distance_pctl</span></span>
+<span><span class="co">#&gt;      &lt;dbl&gt;         &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1     9.39          99.8</span></span>
+<span><span class="co">#&gt; 2     9.40          99.8</span></span>
+<span><span class="co">#&gt; 3     9.30          99.7</span></span>
+<span><span class="co">#&gt; 4     9.30          99.7</span></span>
+<span><span class="co">#&gt; 5     9.29          99.7</span></span>
+<span><span class="co">#&gt; 6    10.1            1  </span></span>
+<span><span class="co">#&gt; # ℹ 8 more rows</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>2020年的距离值表明，这些预测值超出了模型在训练过程中所见的绝大多数数据范围。因此，应将这些值标记出来，以确保相关预测要么完全不被报告，要么需持审慎态度看待。</p>
+<p>本次分析的一个重要方面涉及用于构建适用性域模型的预测变量选择。在我们的分析中，我们直接使用了原始的预测变量列，但在实际建模时，则改用PLS得分特征。那么，<code><a href="https://applicable.tidymodels.org/reference/apd_pca.html">apd_pca()</a></code>函数究竟应该使用哪种方式？实际上，<code><a href="https://applicable.tidymodels.org/reference/apd_pca.html">apd_pca()</a></code>函数也支持以配方（而非公式）作为输入，这样计算出的距离将反映PLS得分，而非单个预测变量列。你可以同时评估这两种方法，以确定哪一种能提供更贴合实际的结果。</p>
+</section><section id="chapter-summary" class="level2"><h2 class="anchored" data-anchor-id="chapter-summary">Chapter Summary</h2>
+<p>本章介绍了两种评估是否应将预测结果报告给模型使用者的方法。模棱两可区域针对的是结果或预测，当预测的不确定性过大时，这一方法尤为有用。</p>
+<p>适用性域模型则关注特征或预测因子，并量化在进行预测时可能存在的外推程度（如有）。本章展示了一种基于主成分分析的基本方法，当然，衡量适用性的途径其实还有很多种。此外，applicable 包还包含专门适用于所有预测因子均为二值型数据集的方法——该方法通过计算训练集数据点之间的相似度得分，以确定参考分布。</p>
+
+
+</section><a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script><script src="https://utteranc.es/client.js" repo="hanguojun007/Blog" issue-term="pathname" theme="github-light" crossorigin="anonymous" async="">
+</script><nav class="page-navigation"><div class="nav-page nav-page-previous">
+      <a href="../../Books/Tidy Modeling with R/18 Explaining Models and Predictions.html" class="pagination-link" aria-label="18 Explaining Models and Predictions">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">18 Explaining Models and Predictions</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+</body></html>

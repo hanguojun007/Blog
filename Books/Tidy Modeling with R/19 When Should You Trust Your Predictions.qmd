@@ -307,8 +307,8 @@ res_test %>%
 鉴于乘客数量的规模，对于这样一个简单的模型来说，这些结果显得尤为出色。如果将该模型投入实际应用，它在几年后的2020年6月表现会如何？事实上，该模型成功地做出了预测——毕竟，作为预测模型，只要输入数据充足，几乎总是能给出准确的结果：
 
 ```{r}
-load("Books/Tidy Modeling with R/Rdata/Chicago_2020.RData")
-# load("Rdata/Chicago_2020.RData")
+# load("Books/Tidy Modeling with R/Rdata/Chicago_2020.RData")
+load("Rdata/Chicago_2020.RData")
 res_2020 <-
   predict(lm_fit, Chicago_2020) %>%
   bind_cols(
