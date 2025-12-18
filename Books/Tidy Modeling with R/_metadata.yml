@@ -27,3 +27,4 @@ website:
         - Books/Tidy Modeling with R/17 Encoding Categorical Data.qmd
         - Books/Tidy Modeling with R/18 Explaining Models and Predictions.qmd
         - Books/Tidy Modeling with R/19 When Should You Trust Your Predictions.qmd
+        - Books/Tidy Modeling with R/20 Ensembles of Models.qmd

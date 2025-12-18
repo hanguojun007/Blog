@@ -1,7 +1,7 @@
 ---
 title: "20 Ensembles of Models"
 date: "2025-11-18"
-date-modified: "2025-11-18"
+date-modified: "2025-12-18"
 
 format:
   html:
@@ -43,14 +43,15 @@ library(stacks)
 library(patchwork)
 library(kableExtra)
 
-load("Books/Tidy Modeling with R/Rdata/concrete_results.RData")
+# load("Books/Tidy Modeling with R/Rdata/concrete_results.RData")
+load("Rdata/concrete_results.RData")
 ```
 
-通过整合多个单一学习器的预测结果以形成最终预测，模型集成方法能够构建出性能卓越的最终模型。目前最流行的几种集成方法包括自助法（Bagging，Breiman 1996a）、随机森林（Ho 1995；Breiman 2001）以及提升法（Boosting，Freund 和 Schapire 1997）。这些方法均基于对同类型模型（如分类树）的多个版本预测结果进行组合。然而，最早出现的集成方法之一则是模型堆叠法（Wolpert 1992；Breiman 1996）。
+通过整合多个单一学习器的预测结果以形成最终预测，模型集成方法能够构建出性能卓越的最终模型。目前最流行的几种集成方法包括自助法（Bagging，Breiman 1996a）、随机森林（Ho 1995；Breiman 2001）以及提升法（Boosting，Freund 和 Schapire 1997）。这些方法均基于对同类型模型（如分类树）的多个版本预测结果进行组合。然而，最早出现的集成方法之一则是模型堆叠法（model stacking，Wolpert 1992；Breiman 1996）。
 
 模型堆叠可结合任何类型模型的预测结果。例如，逻辑回归、分类树和支持向量机都可以被纳入到一个堆叠集成中。
 
-本章将介绍如何使用stacks包来堆叠预测模型。我们将复用第15章中的结果，当时曾评估了多个模型，以预测混凝土混合料的抗压强度。
+本章将介绍如何使用**stacks**包来堆叠预测模型。我们将复用第15章中的结果，当时曾评估了多个模型，以预测混凝土混合料的抗压强度。
 
 构建堆叠集成模型的过程如下：
 
@@ -60,7 +61,7 @@ load("Books/Tidy Modeling with R/Rdata/concrete_results.RData")
 
 在接下来的章节中，我们将详细描述这一过程。不过，在继续之前，我们先明确一下“模型”可能指代的各种术语及其差异。特别是在进行复杂的建模分析时，“模型”这个词很容易变得含义过于宽泛！让我们以第15章中创建的多层感知器（MLP）模型（又称神经网络）为例进行说明。一般来说，我们会将MLP模型视为一种模型类型。线性回归和支持向量机则是其他类型的模型。
 
-调参是模型的一个重要环节。在第15章中，我们曾对MLP模型进行了25种调参值的优化。而在之前的章节中，我们把这些候选的调参值或模型配置称为“模型配置”。此外，在集成学习的相关文献中，这些模型也被称为“基模型”。我们将使用“候选成员”一词来描述可能被纳入堆叠集成模型中的各种模型配置（涵盖所有模型类型）。这意味着，一个集成模型可以包含不同类型的模型（例如，树模型和神经网络），也可以包含同一种模型的不同配置（例如，深度不同的树模型）。
+调参是建模的一个重要环节。在第15章中，我们曾对MLP模型进行了25种调参值的优化。而在之前的章节中，我们把这些候选的调参值或模型配置称为“模型配置”。此外，在集成学习的相关文献中，这些模型也被称为“基模型”。我们将使用“候选成员”一词来描述可能被纳入堆叠集成模型中的各种模型配置（涵盖所有模型类型）。这意味着，一个集成模型可以包含不同类型的模型（例如，树模型和神经网络），也可以包含同一种模型的不同配置（例如，深度不同的树模型）。
 
 ## Creating the Training Set for Stacking
 
@@ -91,14 +92,12 @@ stacks() %>%
     caption = "Predictions from candidate tuning parameter configurations.",
     label = "tbl-20.1"
   ) %>%
-  kable_styling("striped", full_width = TRUE) %>%
-  add_header_above(c(" ", "Ensemble Candidate Predictions" = 7)) %>%
-  row_spec(0, align = "c")
+  kableExtra::kable_styling("striped", full_width = TRUE) %>%
+  kableExtra::add_header_above(c(" ", "Ensemble Candidate Predictions" = 7)) %>%
+  kableExtra::row_spec(0, align = "c")
 ```
 
-袋装树模型仅有一列，因为它没有调优参数。此外，需要注意的是，MARS 模型仅通过一个参数（乘积度）进行调优，且该参数有两种可能的配置，因此此模型由两列表示。而大多数其他模型则有25列对应，如本例中的Cubist所示。
-
-对于分类模型，候选预测列将是预测的类别概率。由于这些列在每个模型中加起来等于1，因此可以省略其中一类的概率。
+Bagged Tree 模型仅有一列，因为它没有调优参数。此外，需要注意的是，MARS 模型仅通过一个参数（乘积度）进行调优，且该参数有两种可能的配置，因此此模型由两列表示。而大多数其他模型则有25列对应，如本例中的Cubist所示。对于分类模型，候选预测列将是预测的类别概率。由于这些列在每个模型中加起来等于1，因此可以省略其中一类的概率。
 
 到目前为止，总结一下我们的进展：堆叠的第一步是，从每个候选模型中收集训练集的评估集预测结果。接下来，我们可以利用这些评估集预测，继续构建最终的堆叠集成模型。
 
@@ -124,7 +123,7 @@ concrete_stack
 
 请注意，基于重采样的方法（第13.5.5节）更为高效，因为它们可能无需对所有重抽样数据集中的所有配置进行评估。而堆叠法则要求所有候选成员都具备完整的重抽样结果集。因此，`add_candidates()`函数仅包含那些已获得完整结果的模型配置。
 
-为什么使用赛车结果，而不是`grid_results`中包含的完整候选模型集？两者其实都可以用。我们发现，针对这些数据，赛车结果的表现更优。这可能是因为赛车方法预先从更大的网格中筛选出了最佳模型（或模型们）。
+为什么使用`race_results`，而不是`grid_results`中包含的完整候选模型集？两者其实都可以用。我们发现，针对这些数据，`race_results`的表现更优。这可能是因为rece方法预先从更大的网格中筛选出了最佳模型（或模型们）。
 
 如果我们没有使用workflowsets包，tune和finetune中的对象也可以直接传递给`add_candidates()`。这些对象既可包含网格搜索对象，也包括迭代式搜索对象。
 
@@ -327,6 +326,7 @@ boost_rmse <- collect_metrics(boosting_test_results) %>% dplyr::filter(.metric =
 堆叠包中有一个函数`fit_members()`，它可以训练并返回这些模型：
 
 ```{r}
+#| eval: false
 ens <- fit_members(ens)
 ```
 
@@ -337,6 +337,7 @@ ens <- fit_members(ens)
 由于混合过程使用了重采样技术，我们可以估计，由7个成员组成的集成模型的RMSE约为4.12。回想一下第15章的内容，表现最佳的提升树在测试集上的RMSE为3.41。那么，该集成模型在测试集上的表现会如何呢？我们可以通过`predict()`来一探究竟：
 
 ```{r}
+#| eval: false
 reg_metrics <- metric_set(rmse, rsq)
 ens_test_pred <-
   predict(ens, concrete_test) %>%
@@ -344,6 +345,11 @@ ens_test_pred <-
 
 ens_test_pred %>%
   reg_metrics(compressive_strength, .pred)
+#> # A tibble: 2 × 3
+#>   .metric .estimator .estimate
+#>   <chr>   <chr>          <dbl>
+#> 1 rmse    standard       3.33
+#> 2 rsq     standard       0.957
 ```
 
 这比我们最好的单一模型略好一些。与最佳单模型相比，堆叠方法通常能带来逐步提升的收益，这种情况相当常见。
