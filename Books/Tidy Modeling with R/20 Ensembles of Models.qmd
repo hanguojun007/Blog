@@ -73,7 +73,8 @@ load("Rdata/concrete_results.RData")
 
 以具体为例，用于模型堆叠的训练集包含所有候选调参结果的列。@tbl-20.1 展示了前六行及部分选定的列。
 
-```{r echo = FALSE, results = "asis", warning = FALSE, message = FALSE}
+```{r echo = FALSE, warning = FALSE, message = FALSE}
+#| label: tbl-20.1
 stacks() %>%
   add_candidates(grid_results) %>%
   as_tibble() %>%

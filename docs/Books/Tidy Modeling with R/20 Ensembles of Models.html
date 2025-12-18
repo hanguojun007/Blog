@@ -404,9 +404,14 @@ window.Quarto = {
 <p>构建堆叠集成模型的第一步，依赖于通过多次划分的重采样方案生成的评估集预测结果。对于训练集中的每个数据点，堆叠方法都需要某种形式的“样本外”预测：对于回归模型，这一预测即为预期输出值；而对于分类模型，则可直接使用预测的类别或概率，尽管后者的信息量比硬性分类预测更为丰富。针对一组模型，我们会构建一个数据集，其中行对应训练集中的样本，列则包含由这组模型分别产生的“样本外”预测结果。</p>
 <p>在第15章中，我们使用了五次10折交叉验证来对数据进行重采样。这种重采样方案为每个训练集样本生成了五组评估集预测结果。此外，在其他多种重采样技术（如自助法）中，也可能出现多次的样本外预测。然而，为了实现堆叠集成方法，我们会将训练集中某个数据点的多次重复预测值取平均，从而确保每个训练集样本针对每个候选成员仅有一个最终预测值。</p>
 <p>简单的验证集也可用于堆叠方法，因为tidymodels将其视为一种单一的重采样方式。</p>
-<p>以具体为例，用于模型堆叠的训练集包含所有候选调参结果的列。<strong>?@tbl-20.1</strong> 展示了前六行及部分选定的列。</p>
-<table class="table table-striped caption-top">
-<caption>Predictions from candidate tuning parameter configurations.</caption>
+<p>以具体为例，用于模型堆叠的训练集包含所有候选调参结果的列。<a href="#tbl-20.1" class="quarto-xref">Table&nbsp;1</a> 展示了前六行及部分选定的列。</p>
+<div class="cell">
+<div id="tbl-20.1" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-20.1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1: Predictions from candidate tuning parameter configurations.
+</figcaption><div aria-describedby="tbl-20.1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<table class="table table-striped do-not-create-environment cell caption-top table-sm small">
 <colgroup>
 <col style="width: 12%">
 <col style="width: 12%">
@@ -498,6 +503,11 @@ Ensemble Candidate Predictions
 </tr>
 </tbody>
 </table>
+</div>
+</div>
+</figure>
+</div>
+</div>
 <p>Bagged Tree 模型仅有一列，因为它没有调优参数。此外，需要注意的是，MARS 模型仅通过一个参数（乘积度）进行调优，且该参数有两种可能的配置，因此此模型由两列表示。而大多数其他模型则有25列对应，如本例中的Cubist所示。对于分类模型，候选预测列将是预测的类别概率。由于这些列在每个模型中加起来等于1，因此可以省略其中一类的概率。</p>
 <p>到目前为止，总结一下我们的进展：堆叠的第一步是，从每个候选模型中收集训练集的评估集预测结果。接下来，我们可以利用这些评估集预测，继续构建最终的堆叠集成模型。</p>
 <p>要开始使用 stacks 包进行模型集成，首先使用<code><a href="https://stacks.tidymodels.org/reference/stacks.html">stacks()</a></code>函数创建一个空的数据堆栈，然后添加候选模型。回想一下，我们曾利用工作流集合，将多种多样的模型拟合到这些数据中。接下来，我们将以赛车比赛结果为例：</p>
