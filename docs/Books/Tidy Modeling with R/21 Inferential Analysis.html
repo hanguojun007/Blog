@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.26">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<meta name="dcterms.date" content="2025-11-18">
+<title>21 Inferential Analysis</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../Books/Tidy Modeling with R/20 Ensembles of Models.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-a8995632026c11c334ae4c6181bc8d1f.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light"><script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": true,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "Search",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script><script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script><script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script><script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script><link rel="stylesheet" href="../../styles.css">
+</head>
+<body class="nav-sidebar floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top"><nav class="navbar navbar-expand-lg " data-bs-theme="dark"><div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">RSSPtho</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+<li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-books" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Books</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-books">
+<li>
+    <a class="dropdown-item" href="../../Books/ggplot2/index.html">
+ <span class="dropdown-text">ggplot2</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Books/R4DS2/index.html">
+ <span class="dropdown-text">R for Data Science(2e)</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Books/Tidy Modeling with R/index.html">
+ <span class="dropdown-text">Tidy Modeling with R</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Books/Advanced R(2e)/index.html">
+ <span class="dropdown-text">Advanced R(2e)</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Books/quarto/Project Basics.html">
+ <span class="dropdown-text">Quarto</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Books/Js4R/00 Preface.qmd">
+ <span class="dropdown-text">Js4R</span></a>
+  </li>  
+    </ul>
+</li>
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About me</span></a>
+  </li>  
+</ul>
+<div class="quarto-navbar-tools">
+    <a href="https://github.com/hanguojun007/Blog" title="" class="quarto-navigation-tool px-1" aria-label=""><i class="bi bi-github"></i></a>
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav><nav class="quarto-secondary-nav"><div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../Books/Tidy Modeling with R/21 Inferential Analysis.html">21 Inferential Analysis</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav></header><!-- content --><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto"><div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+<li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Hello World</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+ <span class="menu-text">Introduction</span>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/1 Software for modeling.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">1 Software for modeling</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/2 A Tidyverse Primer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">2 A Tidyverse Primer</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/3 A Review of R Modeling Fundamentals.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">3 A Review of R Modeling Fundamentals</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+ <span class="menu-text">Moduling Basics</span>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/4 The Ames Housing Data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">4 The Ames Housing Data</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/5 Spending our Data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">5 Spending our Data</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/6 Fitting Models with parsnip.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">6 Fitting Models with parsnip</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/7 A Model Workflow.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">7 A Model Workflow</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/8 Feature Engineering with recipes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">8 Feature Engineering with recipes</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/9 Judging Model Effectiveness.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">9 Judging Model Effectiveness</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+ <span class="menu-text">Tools For Creating Effective Models</span>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/10 Resampling for Evaluating Performance.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">10 Resampling for Evaluating Performance</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/11 Comparing Models with Resampling.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">11 Comparing Models with Resampling</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/12 Model Tuning and the Dangers of Overfitting.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">12 Model Tuning and the Dangers of Overfitting</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/13 Grid Search.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">13 Grid Search</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/14 Iterative Search.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">14 Iterative Search</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/15 Screening Many Models.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">15 Screening Many Models</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+ <span class="menu-text">Beyond the Basics</span>
+  </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/16 Dimensionality Reduction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">16 Dimensionality Reduction</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/17 Encoding Categorical Data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">17 Encoding Categorical Data</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/18 Explaining Models and Predictions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">18 Explaining Models and Predictions</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/19 When Should You Trust Your Predictions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">19 When Should You Trust Your Predictions ?</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/20 Ensembles of Models.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">20 Ensembles of Models</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../Books/Tidy Modeling with R/21 Inferential Analysis.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">21 Inferential Analysis</span></a>
+  </div>
+</li>
+    </ul>
+</div>
+</nav><div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active"><h2 id="toc-title">On this page</h2>
+   
+  <ul>
+<li><a href="#inference-for-count-data" id="toc-inference-for-count-data" class="nav-link active" data-scroll-target="#inference-for-count-data">Inference for Count Data</a></li>
+  <li><a href="#comparisons-with-two-sample-tests" id="toc-comparisons-with-two-sample-tests" class="nav-link" data-scroll-target="#comparisons-with-two-sample-tests">Comparisons with Two-Sample Tests</a></li>
+  <li><a href="#log-linear-models" id="toc-log-linear-models" class="nav-link" data-scroll-target="#log-linear-models">Log-Linear Models</a></li>
+  <li><a href="#a-more-complex-model" id="toc-a-more-complex-model" class="nav-link" data-scroll-target="#a-more-complex-model">A More Complex Model</a></li>
+  <li><a href="#more-inferential-analysis" id="toc-more-inferential-analysis" class="nav-link" data-scroll-target="#more-inferential-analysis">More Inferential Analysis</a></li>
+  <li><a href="#chapter-summary" id="toc-chapter-summary" class="nav-link" data-scroll-target="#chapter-summary">Chapter Summary</a></li>
+  </ul></nav>
+    <div class="quarto-margin-footer"><div class="margin-footer-item">
+<p><img src="../../logo.jpg" class="conditional-footer img-fluid" width="200"></p>
+</div></div></div>
+<!-- main -->
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
+<h1 class="title">21 Inferential Analysis</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">November 18, 2025</p>
+    </div>
+  </div>
+  
+    <div>
+    <div class="quarto-title-meta-heading">Modified</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date-modified">December 26, 2025</p>
+    </div>
+  </div>
+    
+  </div>
+  
+
+
+</header><p>在1.2节中，我们概述了模型的分类法，并指出大多数模型可归类为描述性、推理性及/或预测性。</p>
+<p>本书的大部分章节都从预测值的准确性角度出发，探讨了模型的相关问题——这一特性对所有类型的模型都很重要，尤其在预测模型中尤为关键。而推断性模型的构建，通常不仅为了实现预测功能，还旨在对模型中的某些要素（如系数值或其他参数）做出推论或判断。这些推断结果常被用来解答一些事先设定好的问题或验证相关假设。相比之下，在预测模型中，我们通常借助对预留数据的预测结果来评估或衡量模型的质量；而在推断性模型中，则更注重检验建模前预先设定的概率值或结构假设是否合理。</p>
+<p>例如，在普通的线性回归中，通常假设残差彼此独立，并且服从均值为零、方差恒定的正态分布。尽管你可能具备科学或领域知识，能够为模型分析中的这一假设提供支持，但实际操作中，通常仍需检查拟合模型所得的残差，以判断该假设是否合理。因此，判断模型假设是否满足的方法，并不像单纯查看预留数据的预测结果那样简单——尽管它同样非常有用。</p>
+<p>本章我们将使用p值，然而 tidymodels 框架更倾向于置信区间而非p值，作为衡量支持备择假设证据的方法。正如第11.4节先前所展示的，从解释的便捷性来看，贝叶斯方法通常优于p值和置信区间（但其计算成本可能更高）。近年来，人们越来越倾向于摒弃p值，转而采用其他方法（Wasserstein 和 Lazar，2016）。更多相关信息及讨论，请参阅《The American Statistician》第73卷。</p>
+<p>在本章中，我们介绍如何使用tidymodels来拟合和评估推断模型。在某些情况下，tidymodels框架可以帮助用户处理模型生成的对象；而在另一些情况下，它则能用于评估特定模型的质量。</p>
+<section id="inference-for-count-data" class="level2"><h2 class="anchored" data-anchor-id="inference-for-count-data">Inference for Count Data</h2>
+<p>我们以一个计数数据为例，来了解如何使用tidymodels包进行推断性建模。我们将使用来自pscl包的生物化学发表论文数据。这些数据包含915名生物化学博士毕业生的信息，旨在解释影响他们学术产出的因素（以三年内发表的文章数量或计数衡量）。预测变量包括毕业生的性别、婚姻状况、毕业生至少5岁孩子的数量、所在院系的声望，以及其导师同期发表的文章数量。数据记录的是1956年至1963年间完成学业的生物化学博士，但由于信息完整性问题，这一样本在一定程度上存在偏差，并不能完全代表该时期所有生物化学博士的情况。</p>
+<p>回想一下，在第19章中，我们曾提出过这样一个问题：“我们的模型是否适用于预测某个特定的数据点？” 明确推断分析所适用的范围至关重要。对于示例数据而言，研究结果很可能适用于数据收集时段前后授予的生物化学博士学位。但它们是否也适用于其他类型的化学博士（例如药物化学等）呢？在进行推断分析时，这些问题不仅需要认真探讨，更应详细记录下来。</p>
+<p><a href="#fig-21.1" class="quarto-xref">Figure&nbsp;1</a> 所示数据的图表表明，许多毕业生在此期间未发表任何文章，且结果呈现右偏分布：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidymodels.tidymodels.org">tidymodels</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; ── Attaching packages ─────────────────────────────────── tidymodels 1.4.1 ──</span></span>
+<span><span class="co">#&gt; ✔ broom        1.0.11     ✔ recipes      1.3.1 </span></span>
+<span><span class="co">#&gt; ✔ dials        1.4.2      ✔ rsample      1.3.1 </span></span>
+<span><span class="co">#&gt; ✔ dplyr        1.1.4      ✔ tailor       0.1.0 </span></span>
+<span><span class="co">#&gt; ✔ ggplot2      4.0.1      ✔ tidyr        1.3.1 </span></span>
+<span><span class="co">#&gt; ✔ infer        1.0.9      ✔ tune         2.0.1 </span></span>
+<span><span class="co">#&gt; ✔ modeldata    1.5.1      ✔ workflows    1.3.0 </span></span>
+<span><span class="co">#&gt; ✔ parsnip      1.4.0      ✔ workflowsets 1.1.1 </span></span>
+<span><span class="co">#&gt; ✔ purrr        1.2.0      ✔ yardstick    1.3.2</span></span>
+<span><span class="co">#&gt; ── Conflicts ────────────────────────────────────── tidymodels_conflicts() ──</span></span>
+<span><span class="co">#&gt; ✖ purrr::discard() masks scales::discard()</span></span>
+<span><span class="co">#&gt; ✖ dplyr::filter()  masks stats::filter()</span></span>
+<span><span class="co">#&gt; ✖ dplyr::lag()     masks stats::lag()</span></span>
+<span><span class="co">#&gt; ✖ recipes::step()  masks stats::step()</span></span>
+<span><span class="fu"><a href="https://tidymodels.tidymodels.org/reference/tidymodels_prefer.html">tidymodels_prefer</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="st">"bioChemists"</span>, package <span class="op">=</span> <span class="st">"pscl"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">ggplot</span><span class="op">(</span><span class="va">bioChemists</span>, <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">art</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_histogram</span><span class="op">(</span>binwidth <span class="op">=</span> <span class="fl">1</span>, color <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">labs</span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Number of articles within 3y of graduation"</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div id="fig-21.1" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-21.1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="21-Inferential-Analysis_files/figure-html/fig-21.1-1.png" class="img-fluid figure-img" width="576">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-21.1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Distribution of the number of articles written within 3 years of graduation
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>由于结果数据是计数，最常见的分布假设是：该结果服从泊松分布。本章将利用这些数据进行多种类型的分析。</p>
+</section><section id="comparisons-with-two-sample-tests" class="level2"><h2 class="anchored" data-anchor-id="comparisons-with-two-sample-tests">Comparisons with Two-Sample Tests</h2>
+<p>我们可以从假设检验开始。原作者使用这套生物化学出版数据集的目的是，确定男性与女性之间的出版物是否存在差异（Long, 1992）。研究数据显示：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">bioChemists</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">group_by</span><span class="op">(</span><span class="va">fem</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">summarize</span><span class="op">(</span>counts <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">art</span><span class="op">)</span>, n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">art</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 2 × 3</span></span>
+<span><span class="co">#&gt;   fem   counts     n</span></span>
+<span><span class="co">#&gt;   &lt;fct&gt;  &lt;int&gt; &lt;int&gt;</span></span>
+<span><span class="co">#&gt; 1 Men      930   494</span></span>
+<span><span class="co">#&gt; 2 Women    619   421</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>尽管数据中男性人数更多，但男性的发表数量也明显更多。分析这些数据最简单的方法，是使用stats包中的<code><a href="https://rdrr.io/r/stats/poisson.test.html">poisson.test()</a></code>函数进行两样本比较。该函数需要一个或两个组别的计数数据。</p>
+<p>对于我们的应用，比较两性之间的假设如下，其中<span class="math inline">\(\lambda\)</span>值为同期的出版速率。</p>
+<p><span class="math display">\[
+\begin{align}
+H_0&amp;: \lambda_m = \lambda_f \notag \\
+H_a&amp;: \lambda_m \ne \lambda_f \notag
+\end{align}
+\]</span></p>
+<p>该假设的一个基本应用是：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/poisson.test.html">poisson.test</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">930</span>, <span class="fl">619</span><span class="op">)</span>, T <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;  Comparison of Poisson rates</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; data:  c(930, 619) time base: 3</span></span>
+<span><span class="co">#&gt; count1 = 930, expected count1 = 774.5, p-value = 2.727e-15</span></span>
+<span><span class="co">#&gt; alternative hypothesis: true rate ratio is not equal to 1</span></span>
+<span><span class="co">#&gt; 95 percent confidence interval:</span></span>
+<span><span class="co">#&gt;  1.355716 1.665905</span></span>
+<span><span class="co">#&gt; sample estimates:</span></span>
+<span><span class="co">#&gt; rate ratio </span></span>
+<span><span class="co">#&gt;   1.502423</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>该函数报告了发表率比值的p值及置信区间。结果显示，观察到的差异显著大于实验误差，支持备择假设 <span class="math inline">\(H_a\)</span>。</p>
+<p>使用此函数的一个问题在于，结果会以<code>htest</code>对象的形式返回。尽管这种对象具有明确的结构，但要将其用于后续操作（如报告或可视化）时，可能会比较困难。而tidymodels为推断模型提供的最有力工具，正是broom包中的<code><a href="https://generics.r-lib.org/reference/tidy.html">tidy()</a></code>函数。正如之前所见，该函数能够从对象中提取出格式规范、命名一致的tibble。现在，我们可以对两样本比较检验的结果应用<code><a href="https://generics.r-lib.org/reference/tidy.html">tidy()</a></code>：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/poisson.test.html">poisson.test</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">930</span>, <span class="fl">619</span><span class="op">)</span>, T <span class="op">=</span> <span class="fl">3</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">tidy</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 1 × 8</span></span>
+<span><span class="co">#&gt;   estimate statistic  p.value parameter conf.low conf.high method            </span></span>
+<span><span class="co">#&gt;      &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt; &lt;chr&gt;             </span></span>
+<span><span class="co">#&gt; 1     1.50       930 2.73e-15      774.     1.36      1.67 Comparison of Poi…</span></span>
+<span><span class="co">#&gt; # ℹ 1 more variable: alternative &lt;chr&gt;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><strong>broom</strong>与<strong>broom.mixed</strong>包提供了150多种<code><a href="https://generics.r-lib.org/reference/tidy.html">tidy()</a></code>方法。</p>
+<p>尽管泊松分布是合理的，我们或许还希望在减少对分布假设依赖的情况下进行评估。两种可能有所帮助的方法是自助法和置换检验（Davison 和 Hinkley，1997）。</p>
+<p><strong>infer</strong> 包是 tidymodels 框架的一部分，它是一个功能强大且直观的假设检验工具（Ismay 和 Kim 2021）。其语法简洁明了，专为非统计专业人士设计。</p>
+<p>首先，我们使用<code><a href="https://infer.tidymodels.org/reference/specify.html">specify()</a></code>指定将比较性别间文章数量均值的差异，然后通过<code><a href="https://infer.tidymodels.org/reference/calculate.html">calculate()</a></code>从数据中计算出该统计量。需要注意的是，泊松分布均值的最大似然估计量正是样本均值。这里所检验的假设与之前相同（但采用的是不同的检验方法）。</p>
+<p>通过infer包，我们指定结果和协变量，然后说明感兴趣的统计量：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/tidymodels/infer">infer</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">observed</span> <span class="op">&lt;-</span></span>
+<span>  <span class="va">bioChemists</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://infer.tidymodels.org/reference/specify.html">specify</a></span><span class="op">(</span><span class="va">art</span> <span class="op">~</span> <span class="va">fem</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://infer.tidymodels.org/reference/calculate.html">calculate</a></span><span class="op">(</span>stat <span class="op">=</span> <span class="st">"diff in means"</span>, order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Men"</span>, <span class="st">"Women"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">observed</span></span>
+<span><span class="co">#&gt; Response: art (numeric)</span></span>
+<span><span class="co">#&gt; Explanatory: fem (factor)</span></span>
+<span><span class="co">#&gt; # A tibble: 1 × 1</span></span>
+<span><span class="co">#&gt;    stat</span></span>
+<span><span class="co">#&gt;   &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 0.412</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>从这里，我们通过<code><a href="https://infer.tidymodels.org/reference/generate.html">generate()</a></code>函数生成自助分布，进而计算该均值的置信区间；对于数据的每个重采样版本，都会计算相同的统计量：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">2101</span><span class="op">)</span></span>
+<span><span class="va">bootstrapped</span> <span class="op">&lt;-</span></span>
+<span>  <span class="va">bioChemists</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://infer.tidymodels.org/reference/specify.html">specify</a></span><span class="op">(</span><span class="va">art</span> <span class="op">~</span> <span class="va">fem</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://infer.tidymodels.org/reference/generate.html">generate</a></span><span class="op">(</span>reps <span class="op">=</span> <span class="fl">2000</span>, type <span class="op">=</span> <span class="st">"bootstrap"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://infer.tidymodels.org/reference/calculate.html">calculate</a></span><span class="op">(</span>stat <span class="op">=</span> <span class="st">"diff in means"</span>, order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Men"</span>, <span class="st">"Women"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">bootstrapped</span></span>
+<span><span class="co">#&gt; Response: art (numeric)</span></span>
+<span><span class="co">#&gt; Explanatory: fem (factor)</span></span>
+<span><span class="co">#&gt; # A tibble: 2,000 × 2</span></span>
+<span><span class="co">#&gt;   replicate  stat</span></span>
+<span><span class="co">#&gt;       &lt;int&gt; &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1         1 0.467</span></span>
+<span><span class="co">#&gt; 2         2 0.107</span></span>
+<span><span class="co">#&gt; 3         3 0.467</span></span>
+<span><span class="co">#&gt; 4         4 0.308</span></span>
+<span><span class="co">#&gt; 5         5 0.369</span></span>
+<span><span class="co">#&gt; 6         6 0.428</span></span>
+<span><span class="co">#&gt; # ℹ 1,994 more rows</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>百分位区间通过以下方式计算：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">percentile_ci</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://infer.tidymodels.org/reference/get_confidence_interval.html">get_ci</a></span><span class="op">(</span><span class="va">bootstrapped</span><span class="op">)</span></span>
+<span><span class="va">percentile_ci</span></span>
+<span><span class="co">#&gt; # A tibble: 1 × 2</span></span>
+<span><span class="co">#&gt;   lower_ci upper_ci</span></span>
+<span><span class="co">#&gt;      &lt;dbl&gt;    &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1    0.158    0.653</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>infer 包提供了一个高级 API，用于展示分析结果，如 <a href="#fig-21.2" class="quarto-xref">Figure&nbsp;2</a> 所示。</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://infer.tidymodels.org/reference/visualize.html">visualize</a></span><span class="op">(</span><span class="va">bootstrapped</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://infer.tidymodels.org/reference/shade_confidence_interval.html">shade_confidence_interval</a></span><span class="op">(</span>endpoints <span class="op">=</span> <span class="va">percentile_ci</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div id="fig-21.2" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-21.2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="21-Inferential-Analysis_files/figure-html/fig-21.2-1.png" class="img-fluid figure-img" width="576">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-21.2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: The bootstrap distribution of the difference in means. The highlighted region is the confidence interval.
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>由于 <a href="#fig-21.2" class="quarto-xref">Figure&nbsp;2</a> 中所显示的区间不包含零，这些结果表明，男性发表的文章数量多于女性。</p>
+<p>如果我们需要一个p值，infer 包可以通过排列检验来计算该值，具体代码如下。其语法与我们之前使用的自助法代码非常相似。我们只需添加一个<code><a href="https://infer.tidymodels.org/reference/hypothesize.html">hypothesize()</a></code>动词，以明确说明要检验的假设类型；而<code><a href="https://infer.tidymodels.org/reference/generate.html">generate()</a></code>调用中则包含了一个选项，用于随机打乱数据。</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">2102</span><span class="op">)</span></span>
+<span><span class="va">permuted</span> <span class="op">&lt;-</span></span>
+<span>  <span class="va">bioChemists</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://infer.tidymodels.org/reference/specify.html">specify</a></span><span class="op">(</span><span class="va">art</span> <span class="op">~</span> <span class="va">fem</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://infer.tidymodels.org/reference/hypothesize.html">hypothesize</a></span><span class="op">(</span>null <span class="op">=</span> <span class="st">"independence"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://infer.tidymodels.org/reference/generate.html">generate</a></span><span class="op">(</span>reps <span class="op">=</span> <span class="fl">2000</span>, type <span class="op">=</span> <span class="st">"permute"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://infer.tidymodels.org/reference/calculate.html">calculate</a></span><span class="op">(</span>stat <span class="op">=</span> <span class="st">"diff in means"</span>, order <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Men"</span>, <span class="st">"Women"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">permuted</span></span>
+<span><span class="co">#&gt; Response: art (numeric)</span></span>
+<span><span class="co">#&gt; Explanatory: fem (factor)</span></span>
+<span><span class="co">#&gt; Null Hypothesis: independence</span></span>
+<span><span class="co">#&gt; # A tibble: 2,000 × 2</span></span>
+<span><span class="co">#&gt;   replicate     stat</span></span>
+<span><span class="co">#&gt;       &lt;int&gt;    &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1         1  0.201  </span></span>
+<span><span class="co">#&gt; 2         2 -0.133  </span></span>
+<span><span class="co">#&gt; 3         3  0.109  </span></span>
+<span><span class="co">#&gt; 4         4 -0.195  </span></span>
+<span><span class="co">#&gt; 5         5 -0.00128</span></span>
+<span><span class="co">#&gt; 6         6 -0.102  </span></span>
+<span><span class="co">#&gt; # ℹ 1,994 more rows</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>以下可视化代码也与 Bootstrap 方法非常相似。该代码生成 <a href="#fig-21.3" class="quarto-xref">Figure&nbsp;3</a> ，其中竖线表示观测值：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://infer.tidymodels.org/reference/visualize.html">visualize</a></span><span class="op">(</span><span class="va">permuted</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://infer.tidymodels.org/reference/shade_p_value.html">shade_p_value</a></span><span class="op">(</span>obs_stat <span class="op">=</span> <span class="va">observed</span>, direction <span class="op">=</span> <span class="st">"two-sided"</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div id="fig-21.3" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-21.3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="21-Inferential-Analysis_files/figure-html/fig-21.3-1.png" class="img-fluid figure-img" width="576">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-21.3-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: Empirical distribution of the test statistic under the null hypothesis. The vertical line indicates the observed test statistic.
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>实际的p值是：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">permuted</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://infer.tidymodels.org/reference/get_p_value.html">get_p_value</a></span><span class="op">(</span>obs_stat <span class="op">=</span> <span class="va">observed</span>, direction <span class="op">=</span> <span class="st">"two-sided"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 1 × 1</span></span>
+<span><span class="co">#&gt;   p_value</span></span>
+<span><span class="co">#&gt;     &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1   0.002</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><a href="#fig-21.3" class="quarto-xref">Figure&nbsp;3</a> 中代表零假设的垂直线远离排列分布。这意味着，如果零假设实际上为真，那么观察到的数据至少与当前数据一样极端的可能性微乎其微。</p>
+<p>本节中展示的两样本检验可能并非最优，因为它们未能考虑其他可能解释发表率与性别之间观测到关系的因素。让我们转向一个更复杂的模型，该模型能够纳入更多协变量。</p>
+</section><section id="log-linear-models" class="level2"><h2 class="anchored" data-anchor-id="log-linear-models">Log-Linear Models</h2>
+<p>本章其余部分的重点将放在广义线性模型上（Dobson，1999），我们假设这些计数服从泊松分布。对于该模型，协变量/预测变量以对数线性方式进入模型，其中，<span class="math inline">\(\lambda\)</span>是计数的期望值：</p>
+<p><span class="math display">\[
+\log(\lambda) = \beta_0 + \beta_1x_1 + \ldots + \beta_px_p
+\]</span></p>
+<p>让我们拟合一个包含所有预测变量列的简单模型。tidymodels 中的 parsnip 扩展包——<strong>poissonreg</strong> 包，将用于拟合此模型规范：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/tidymodels/poissonreg">poissonreg</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># default engine is 'glm'</span></span>
+<span><span class="va">log_lin_spec</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://parsnip.tidymodels.org/reference/poisson_reg.html">poisson_reg</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">log_lin_fit</span> <span class="op">&lt;-</span></span>
+<span>  <span class="va">log_lin_spec</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html">fit</a></span><span class="op">(</span><span class="va">art</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">bioChemists</span><span class="op">)</span></span>
+<span><span class="va">log_lin_fit</span></span>
+<span><span class="co">#&gt; parsnip model object</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Call:  stats::glm(formula = art ~ ., family = stats::poisson, data = data)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Coefficients:</span></span>
+<span><span class="co">#&gt; (Intercept)     femWomen   marMarried         kid5          phd  </span></span>
+<span><span class="co">#&gt;     0.30462     -0.22459      0.15524     -0.18488      0.01282  </span></span>
+<span><span class="co">#&gt;        ment  </span></span>
+<span><span class="co">#&gt;     0.02554  </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Degrees of Freedom: 914 Total (i.e. Null);  909 Residual</span></span>
+<span><span class="co">#&gt; Null Deviance:       1817 </span></span>
+<span><span class="co">#&gt; Residual Deviance: 1634  AIC: 3314</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><code><a href="https://generics.r-lib.org/reference/tidy.html">tidy()</a></code> 方法简洁地总结了模型的系数（以及90%的置信区间）：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="va">log_lin_fit</span>, conf.int <span class="op">=</span> <span class="cn">TRUE</span>, conf.level <span class="op">=</span> <span class="fl">0.90</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 6 × 7</span></span>
+<span><span class="co">#&gt;   term        estimate std.error statistic  p.value conf.low conf.high</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 (Intercept)   0.305    0.103       2.96  3.10e- 3   0.134     0.473 </span></span>
+<span><span class="co">#&gt; 2 femWomen     -0.225    0.0546     -4.11  3.92e- 5  -0.315    -0.135 </span></span>
+<span><span class="co">#&gt; 3 marMarried    0.155    0.0614      2.53  1.14e- 2   0.0545    0.256 </span></span>
+<span><span class="co">#&gt; 4 kid5         -0.185    0.0401     -4.61  4.08e- 6  -0.251    -0.119 </span></span>
+<span><span class="co">#&gt; 5 phd           0.0128   0.0264      0.486 6.27e- 1  -0.0305    0.0563</span></span>
+<span><span class="co">#&gt; 6 ment          0.0255   0.00201    12.7   3.89e-37   0.0222    0.0288</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>在该输出中，p 值对应于每个参数的独立假设检验：</p>
+<p><span class="math display">\[
+\begin{align}
+H_0&amp;: \beta_j = 0 \notag \\
+H_a&amp;: \beta_j \ne 0 \notag
+\end{align}
+\]</span></p>
+<p>对于模型中的每个参数而言。从这些结果来看，<code>phd</code>（即他们所在院系的声望）可能与最终结果并无关联。</p>
+<p>虽然泊松分布通常是这类数据的常规假设，但为了更稳妥起见，我们不妨先粗略检验一下模型假设：可以不采用泊松似然函数来计算置信区间，直接拟合模型。rsample 包提供了一个便捷函数，可用于为<code><a href="https://rdrr.io/r/stats/lm.html">lm()</a></code>和<code><a href="https://rdrr.io/r/stats/glm.html">glm()</a></code>模型计算自助法置信区间。我们可以利用这一函数，并明确指定<code>family = poisson</code>，以生成大量模型拟合结果。默认情况下，我们将计算90%的自助法的t置信区间（当然，分位数区间也可选）：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">2103</span><span class="op">)</span></span>
+<span><span class="va">glm_boot</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu">reg_intervals</span><span class="op">(</span><span class="va">art</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">bioChemists</span>, model_fn <span class="op">=</span> <span class="st">"glm"</span>, family <span class="op">=</span> <span class="va">poisson</span><span class="op">)</span></span>
+<span><span class="va">glm_boot</span></span>
+<span><span class="co">#&gt; # A tibble: 5 × 6</span></span>
+<span><span class="co">#&gt;   term          .lower .estimate  .upper .alpha .method  </span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt;    </span></span>
+<span><span class="co">#&gt; 1 femWomen   -0.358      -0.226  -0.0856   0.05 student-t</span></span>
+<span><span class="co">#&gt; 2 kid5       -0.298      -0.184  -0.0789   0.05 student-t</span></span>
+<span><span class="co">#&gt; 3 marMarried  0.000264    0.155   0.317    0.05 student-t</span></span>
+<span><span class="co">#&gt; 4 ment        0.0182      0.0256  0.0322   0.05 student-t</span></span>
+<span><span class="co">#&gt; 5 phd        -0.0707      0.0130  0.102    0.05 student-t</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>将 <a href="#fig-21.4" class="quarto-xref">Figure&nbsp;4</a> 中的这些结果与<code><a href="https://rdrr.io/r/stats/glm.html">glm()</a></code>函数得到的纯参数化结果进行比较，我们会发现自助法置信区间略显宽泛。如果数据确实符合泊松分布，这些区间则会具有更接近的宽度。</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-21.4" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-21.4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="21-Inferential-Analysis_files/figure-html/fig-21.4-1.png" class="img-fluid figure-img" width="576">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-21.4-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: Two types of confidence intervals for the Poisson regression model
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>确定哪些预测变量应纳入模型是一个棘手的问题。一种方法是通过嵌套模型之间的似然比检验（LRT）（McCullagh 和 Nelder, 1989）。根据置信区间，我们有证据表明，一个不包含博士学位的简化模型可能已足够。接下来，让我们拟合一个更小的模型，然后进行统计检验：</p>
+<p><span class="math display">\[
+\begin{align}
+H_0&amp;: \beta_{phd} = 0 \notag \\
+H_a&amp;: \beta_{phd} \ne 0 \notag
+\end{align}
+\]</span></p>
+<p>此前，我们已通过展示<code>log_lin_fit</code>的整理后结果对这一假设进行了检验。该方法采用的是单一模型拟合的结果，并借助Wald统计量（即参数除以其标准误差）来计算。结果显示，对应的p值为0.63。接下来，我们可以对似然比检验（LRT）的结果进行整理，以获得最终的p值：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">log_lin_reduced</span> <span class="op">&lt;-</span></span>
+<span>  <span class="va">log_lin_spec</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html">fit</a></span><span class="op">(</span><span class="va">art</span> <span class="op">~</span> <span class="va">ment</span> <span class="op">+</span> <span class="va">kid5</span> <span class="op">+</span> <span class="va">fem</span> <span class="op">+</span> <span class="va">mar</span>, data <span class="op">=</span> <span class="va">bioChemists</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/anova.html">anova</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://hardhat.tidymodels.org/reference/hardhat-extract.html">extract_fit_engine</a></span><span class="op">(</span><span class="va">log_lin_reduced</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://hardhat.tidymodels.org/reference/hardhat-extract.html">extract_fit_engine</a></span><span class="op">(</span><span class="va">log_lin_fit</span><span class="op">)</span>,</span>
+<span>  test <span class="op">=</span> <span class="st">"LRT"</span></span>
+<span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 2 × 6</span></span>
+<span><span class="co">#&gt;   term                   df.residual residual.deviance    df deviance p.value</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;                        &lt;dbl&gt;             &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;   &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 art ~ ment + kid5 + f…         910             1635.    NA   NA      NA    </span></span>
+<span><span class="co">#&gt; 2 art ~ fem + mar + kid…         909             1634.     1    0.236   0.627</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>结果相同，并且根据这些结果以及该参数的置信区间，我们将不再将<code>phd</code>纳入后续分析，因为它似乎与研究结果无关。</p>
+</section><section id="a-more-complex-model" class="level2"><h2 class="anchored" data-anchor-id="a-more-complex-model">A More Complex Model</h2>
+<p>我们可以在tidymodels方法中进一步探索更复杂的模型。对于计数数据，有时零值的出现频率会高于简单泊松分布所预测的水平。针对这种情况，一种更为复杂的模型是零膨胀泊松（ZIP）模型；具体可参考Mullahy（1986）、Lambert（1992）以及Zeileis、Kleiber和Jackman（2008）。在这个模型中，我们使用两组协变量：一组用于处理计数数据，另一组则影响零值的概率（记为 <span class="math inline">\(\pi\)</span>）。均值<span class="math inline">\(\lambda\)</span>的计算公式如下：</p>
+<p><span class="math display">\[\lambda = 0 \pi + (1 - \pi) \lambda_{nz}\]</span></p>
+<p>其中：</p>
+<p><span class="math display">\[
+\begin{align}
+\log(\lambda_{nz}) &amp;= \beta_0 + \beta_1x_1 + \ldots + \beta_px_p \notag \\
+\log\left(\frac{\pi}{1-\pi}\right) &amp;= \gamma_0 + \gamma_1z_1 + \ldots + \gamma_qz_q \notag
+\end{align}
+\]</span></p>
+<p>以及<span class="math inline">\(x\)</span>协变量影响计数值，而<span class="math inline">\(z\)</span>协变量则影响零概率。这两组预测变量无需彼此互斥。</p>
+<p>我们将拟合一个包含完整一组<span class="math inline">\(z\)</span>协变量的模型：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">zero_inflated_spec</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://parsnip.tidymodels.org/reference/poisson_reg.html">poisson_reg</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html">set_engine</a></span><span class="op">(</span><span class="st">"zeroinfl"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">zero_inflated_fit</span> <span class="op">&lt;-</span></span>
+<span>  <span class="va">zero_inflated_spec</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html">fit</a></span><span class="op">(</span><span class="va">art</span> <span class="op">~</span> <span class="va">fem</span> <span class="op">+</span> <span class="va">mar</span> <span class="op">+</span> <span class="va">kid5</span> <span class="op">+</span> <span class="va">ment</span> <span class="op">|</span> <span class="va">fem</span> <span class="op">+</span> <span class="va">mar</span> <span class="op">+</span> <span class="va">kid5</span> <span class="op">+</span> <span class="va">phd</span> <span class="op">+</span> <span class="va">ment</span>,</span>
+<span>    data <span class="op">=</span> <span class="va">bioChemists</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span><span class="va">zero_inflated_fit</span></span>
+<span><span class="co">#&gt; parsnip model object</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Call:</span></span>
+<span><span class="co">#&gt; pscl::zeroinfl(formula = art ~ fem + mar + kid5 + ment | fem + mar + </span></span>
+<span><span class="co">#&gt;     kid5 + phd + ment, data = data)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Count model coefficients (poisson with log link):</span></span>
+<span><span class="co">#&gt; (Intercept)     femWomen   marMarried         kid5         ment  </span></span>
+<span><span class="co">#&gt;     0.62116     -0.20907      0.10505     -0.14281      0.01798  </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Zero-inflation model coefficients (binomial with logit link):</span></span>
+<span><span class="co">#&gt; (Intercept)     femWomen   marMarried         kid5          phd  </span></span>
+<span><span class="co">#&gt;    -0.60864      0.10927     -0.35293      0.21946      0.01236  </span></span>
+<span><span class="co">#&gt;        ment  </span></span>
+<span><span class="co">#&gt;    -0.13509</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>由于该模型的系数也是通过最大似然法估计的，因此我们尝试使用另一种似然比检验，以判断新模型项是否有效。我们将同时检验以下假设：</p>
+<p><span class="math display">\[
+\begin{align}
+H_0&amp;: \gamma_1 = 0, \gamma_2 = 0, \cdots, \gamma_5 = 0 \notag \\
+H_a&amp;: \text{at least one } \gamma \ne 0  \notag
+\end{align}
+\]</span></p>
+<p>我们再试一次ANOVA：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/anova.html">anova</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://hardhat.tidymodels.org/reference/hardhat-extract.html">extract_fit_engine</a></span><span class="op">(</span><span class="va">zero_inflated_fit</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://hardhat.tidymodels.org/reference/hardhat-extract.html">extract_fit_engine</a></span><span class="op">(</span><span class="va">log_lin_reduced</span><span class="op">)</span>,</span>
+<span>  test <span class="op">=</span> <span class="st">"LRT"</span></span>
+<span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Error in UseMethod("anova"): no applicable method for 'anova' applied to an object of class "zeroinfl"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><code>zeroinfl</code>对象未实现<code><a href="https://rdrr.io/r/stats/anova.html">anova()</a></code>方法！</p>
+<p>另一种方法是使用信息准则统计量，例如赤池信息准则（AIC）（Claeskens 2016）。该准则通过计算训练集的对数似然值，并根据训练集大小及模型参数数量对该值进行惩罚。在R语言的参数化设置中，AIC值越小越好。需要注意的是，这里我们并非进行正式的统计检验，而是评估数据拟合自身的能力。</p>
+<p>结果表明，ZIP模型更为可取：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">zero_inflated_fit</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://hardhat.tidymodels.org/reference/hardhat-extract.html">extract_fit_engine</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/AIC.html">AIC</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 3231.585</span></span>
+<span><span class="va">log_lin_reduced</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://hardhat.tidymodels.org/reference/hardhat-extract.html">extract_fit_engine</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/AIC.html">AIC</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 3312.349</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>然而，很难将这对单一数值置于具体情境中，也难以评估它们究竟有多大的差异。为了解决这一问题，我们将对这两种模型分别进行大量重采样。通过这些重采样数据，我们可以计算出每种模型的AIC值，并确定结果有多少次倾向于ZIP模型。简而言之，我们将量化AIC统计量的不确定性，从而判断其与数据中噪声相比的差异程度。</p>
+<p>此外，我们稍后还会计算更多基于自助法的参数置信区间，因此在生成自助样本时，需明确指定<code>apparent = TRUE</code>选项。这是某些类型区间所必需的设置。</p>
+<p>首先，我们创建了4000个模型拟合：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb19"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">zip_form</span> <span class="op">&lt;-</span> <span class="va">art</span> <span class="op">~</span> <span class="va">fem</span> <span class="op">+</span> <span class="va">mar</span> <span class="op">+</span> <span class="va">kid5</span> <span class="op">+</span> <span class="va">ment</span> <span class="op">|</span> <span class="va">fem</span> <span class="op">+</span> <span class="va">mar</span> <span class="op">+</span> <span class="va">kid5</span> <span class="op">+</span> <span class="va">phd</span> <span class="op">+</span> <span class="va">ment</span></span>
+<span><span class="va">glm_form</span> <span class="op">&lt;-</span> <span class="va">art</span> <span class="op">~</span> <span class="va">fem</span> <span class="op">+</span> <span class="va">mar</span> <span class="op">+</span> <span class="va">kid5</span> <span class="op">+</span> <span class="va">ment</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">2104</span><span class="op">)</span></span>
+<span><span class="va">bootstrap_models</span> <span class="op">&lt;-</span></span>
+<span>  <span class="fu">bootstraps</span><span class="op">(</span><span class="va">bioChemists</span>, times <span class="op">=</span> <span class="fl">2000</span>, apparent <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">mutate</span><span class="op">(</span></span>
+<span>    glm <span class="op">=</span> <span class="fu">map</span><span class="op">(</span><span class="va">splits</span>, <span class="op">~</span> <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html">fit</a></span><span class="op">(</span><span class="va">log_lin_spec</span>, <span class="va">glm_form</span>, data <span class="op">=</span> <span class="fu">analysis</span><span class="op">(</span><span class="va">.x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    zip <span class="op">=</span> <span class="fu">map</span><span class="op">(</span><span class="va">splits</span>, <span class="op">~</span> <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html">fit</a></span><span class="op">(</span><span class="va">zero_inflated_spec</span>, <span class="va">zip_form</span>, data <span class="op">=</span> <span class="fu">analysis</span><span class="op">(</span><span class="va">.x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="va">bootstrap_models</span></span>
+<span><span class="co">#&gt; # Bootstrap sampling with apparent sample </span></span>
+<span><span class="co">#&gt; # A tibble: 2,001 × 4</span></span>
+<span><span class="co">#&gt;   splits            id            glm      zip     </span></span>
+<span><span class="co">#&gt;   &lt;list&gt;            &lt;chr&gt;         &lt;list&gt;   &lt;list&gt;  </span></span>
+<span><span class="co">#&gt; 1 &lt;split [915/355]&gt; Bootstrap0001 &lt;fit[+]&gt; &lt;fit[+]&gt;</span></span>
+<span><span class="co">#&gt; 2 &lt;split [915/333]&gt; Bootstrap0002 &lt;fit[+]&gt; &lt;fit[+]&gt;</span></span>
+<span><span class="co">#&gt; 3 &lt;split [915/337]&gt; Bootstrap0003 &lt;fit[+]&gt; &lt;fit[+]&gt;</span></span>
+<span><span class="co">#&gt; 4 &lt;split [915/344]&gt; Bootstrap0004 &lt;fit[+]&gt; &lt;fit[+]&gt;</span></span>
+<span><span class="co">#&gt; 5 &lt;split [915/351]&gt; Bootstrap0005 &lt;fit[+]&gt; &lt;fit[+]&gt;</span></span>
+<span><span class="co">#&gt; 6 &lt;split [915/354]&gt; Bootstrap0006 &lt;fit[+]&gt; &lt;fit[+]&gt;</span></span>
+<span><span class="co">#&gt; # ℹ 1,995 more rows</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>现在，我们可以提取模型拟合结果及其对应的AIC值：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb20"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">bootstrap_models</span> <span class="op">&lt;-</span></span>
+<span>  <span class="va">bootstrap_models</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">mutate</span><span class="op">(</span></span>
+<span>    glm_aic <span class="op">=</span> <span class="fu">map_dbl</span><span class="op">(</span><span class="va">glm</span>, <span class="op">~</span> <span class="fu"><a href="https://hardhat.tidymodels.org/reference/hardhat-extract.html">extract_fit_engine</a></span><span class="op">(</span><span class="va">.x</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/stats/AIC.html">AIC</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    zip_aic <span class="op">=</span> <span class="fu">map_dbl</span><span class="op">(</span><span class="va">zip</span>, <span class="op">~</span> <span class="fu"><a href="https://hardhat.tidymodels.org/reference/hardhat-extract.html">extract_fit_engine</a></span><span class="op">(</span><span class="va">.x</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/stats/AIC.html">AIC</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">bootstrap_models</span><span class="op">$</span><span class="va">zip_aic</span> <span class="op">&lt;</span> <span class="va">bootstrap_models</span><span class="op">$</span><span class="va">glm_aic</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 1</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>从这些结果来看，考虑过多的零计数显然是个好主意。</p>
+<p>我们本可以使用<code>fit_resamples()</code>或工作流设置来执行这些计算。在本节中，我们利用<code>mutate()</code>和<code>map()</code>函数来构建模型，以展示如何针对那些未被某个parsnip包支持的模型，灵活运用tidymodels工具。</p>
+<p>既然我们已经计算了重新采样的模型拟合结果，接下来让我们为零概率模型的系数（即 <span class="math inline">\(\gamma_j\)</span>）创建自助法置信区间。我们可以通过<code><a href="https://generics.r-lib.org/reference/tidy.html">tidy()</a></code>方法提取这些系数，并使用<code>type = "zero"</code>选项来获得这些估计值：</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb21"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">bootstrap_models</span> <span class="op">&lt;-</span></span>
+<span>  <span class="va">bootstrap_models</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>zero_coefs <span class="op">=</span> <span class="fu">map</span><span class="op">(</span><span class="va">zip</span>, <span class="op">~</span> <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html">tidy</a></span><span class="op">(</span><span class="va">.x</span>, type <span class="op">=</span> <span class="st">"zero"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># One example:</span></span>
+<span><span class="va">bootstrap_models</span><span class="op">$</span><span class="va">zero_coefs</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
+<span><span class="co">#&gt; # A tibble: 6 × 6</span></span>
+<span><span class="co">#&gt;   term        type  estimate std.error statistic   p.value</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;       &lt;chr&gt;    &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 (Intercept) zero   -0.128     0.497     -0.257 0.797    </span></span>
+<span><span class="co">#&gt; 2 femWomen    zero   -0.0763    0.319     -0.240 0.811    </span></span>
+<span><span class="co">#&gt; 3 marMarried  zero   -0.112     0.365     -0.307 0.759    </span></span>
+<span><span class="co">#&gt; 4 kid5        zero    0.270     0.186      1.45  0.147    </span></span>
+<span><span class="co">#&gt; 5 phd         zero   -0.178     0.132     -1.35  0.177    </span></span>
+<span><span class="co">#&gt; 6 ment        zero   -0.123     0.0315    -3.91  0.0000936</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>建议像 <a href="#fig-21.5" class="quarto-xref">Figure&nbsp;5</a> 那样，直观地展示系数的自助分布。</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb22"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">bootstrap_models</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">unnest</span><span class="op">(</span><span class="va">zero_coefs</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span> <span class="va">estimate</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_histogram</span><span class="op">(</span>bins <span class="op">=</span> <span class="fl">25</span>, color <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">facet_wrap</span><span class="op">(</span><span class="op">~</span><span class="va">term</span>, scales <span class="op">=</span> <span class="st">"free_x"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_vline</span><span class="op">(</span>xintercept <span class="op">=</span> <span class="fl">0</span>, lty <span class="op">=</span> <span class="fl">2</span>, color <span class="op">=</span> <span class="st">"gray70"</span><span class="op">)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div id="fig-21.5" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure"><div aria-describedby="fig-21.5-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="21-Inferential-Analysis_files/figure-html/fig-21.5-1.png" class="img-fluid figure-img" width="576">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-21.5-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5: Bootstrap distributions of the ZIP model coefficients. The vertical lines indicate the observed estimates.
+</figcaption></figure>
+</div>
+</div>
+</div>
+<p>其中一个看似重要的协变量（<code>ment</code>）呈现出严重偏斜的分布。部分小图中出现的额外空白，表明估计值中存在一些异常值。这种情况可能发生在模型未能收敛时；因此，这些结果很可能应从重采样中剔除。而在 <a href="#fig-21.5" class="quarto-xref">Figure&nbsp;5</a> 所展示的结果中，异常值仅由极端的参数估计所致；所有模型均成功收敛。</p>
+<p>rsample 包包含一组名为<code>int_*()</code>的函数，用于计算不同类型的自助区间。由于<code><a href="https://generics.r-lib.org/reference/tidy.html">tidy()</a></code>方法中包含了标准误差估计，因此可以计算“bootstrap-t”区间。我们还将计算标准百分位区间。默认情况下，系统会计算 90% 的置信区间。</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb23"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">bootstrap_models</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu">int_pctl</span><span class="op">(</span><span class="va">zero_coefs</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 6 × 6</span></span>
+<span><span class="co">#&gt;   term        .lower .estimate  .upper .alpha .method   </span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;        &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt;     </span></span>
+<span><span class="co">#&gt; 1 (Intercept) -1.76    -0.624   0.420    0.05 percentile</span></span>
+<span><span class="co">#&gt; 2 femWomen    -0.523    0.116   0.818    0.05 percentile</span></span>
+<span><span class="co">#&gt; 3 kid5        -0.327    0.217   0.677    0.05 percentile</span></span>
+<span><span class="co">#&gt; 4 marMarried  -1.20    -0.381   0.362    0.05 percentile</span></span>
+<span><span class="co">#&gt; 5 ment        -0.401   -0.162  -0.0515   0.05 percentile</span></span>
+<span><span class="co">#&gt; 6 phd         -0.274    0.0229  0.333    0.05 percentile</span></span>
+<span><span class="va">bootstrap_models</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> <span class="fu">int_t</span><span class="op">(</span><span class="va">zero_coefs</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 6 × 6</span></span>
+<span><span class="co">#&gt;   term        .lower .estimate  .upper .alpha .method  </span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;        &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt;    </span></span>
+<span><span class="co">#&gt; 1 (Intercept) -1.61    -0.624   0.332    0.05 student-t</span></span>
+<span><span class="co">#&gt; 2 femWomen    -0.486    0.116   0.671    0.05 student-t</span></span>
+<span><span class="co">#&gt; 3 kid5        -0.211    0.217   0.599    0.05 student-t</span></span>
+<span><span class="co">#&gt; 4 marMarried  -0.988   -0.381   0.293    0.05 student-t</span></span>
+<span><span class="co">#&gt; 5 ment        -0.322   -0.162  -0.0275   0.05 student-t</span></span>
+<span><span class="co">#&gt; 6 phd         -0.276    0.0229  0.291    0.05 student-t</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>通过这些结果，我们可以很好地了解应将哪些预测变量纳入零计数概率模型。此外，重新拟合一个更小的模型以评估<code>ment</code>的自助分布是否仍呈偏态，可能是明智之举。</p>
+</section><section id="more-inferential-analysis" class="level2"><h2 class="anchored" data-anchor-id="more-inferential-analysis">More Inferential Analysis</h2>
+<p>本章仅展示了tidymodels中可用于推断分析的一小部分内容，重点介绍了重采样和频率学方法。不过，不可否认的是，贝叶斯分析是一种非常有效、甚至常常更优的推断方法。通过parsnip包，用户可以轻松访问多种贝叶斯模型。此外，multilevelmod包还支持用户拟合分层的贝叶斯及非贝叶斯模型（如混合效应模型）。而broom.mixed和tidybayes这两个包则是提取数据以生成图表和汇总结果的绝佳工具。最后，对于具有单一层次结构的数据集——例如简单的时间序列或重复测量数据——rsample包中的<code>group_vfold_cv()</code>函数能够帮助用户便捷地评估模型的样本外表现。</p>
+</section><section id="chapter-summary" class="level2"><h2 class="anchored" data-anchor-id="chapter-summary">Chapter Summary</h2>
+<p>tidymodels 框架的应用不仅限于预测建模。通过 tidymodels 中的包和函数，不仅可以进行假设检验，还能用于拟合和评估推断模型。此外，tidymodels 框架还支持与非 tidymodels R 模型协同工作，帮助你全面评估所构建模型的统计特性。</p>
+
+
+</section><a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script><script src="https://utteranc.es/client.js" repo="hanguojun007/Blog" issue-term="pathname" theme="github-light" crossorigin="anonymous" async="">
+</script><nav class="page-navigation"><div class="nav-page nav-page-previous">
+      <a href="../../Books/Tidy Modeling with R/20 Ensembles of Models.html" class="pagination-link" aria-label="20 Ensembles of Models">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">20 Ensembles of Models</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+</body></html>
