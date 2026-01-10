@@ -1,0 +1,6 @@
+website:
+  sidebar:
+    - id: OUIS
+      title: OutStanding User Interfaces with Shiny
+      contents:
+        - Books/OutStanding User Interfaces with Shiny/01 Shiny and the Web.qmd

@@ -58,9 +58,11 @@ website:
           - sidebar:ggplot2
           - sidebar:R4DS2
           - sidebar:TiMoR
+          - sidebar:ESL2
           - sidebar:AdR2
           - sidebar:quarto
           - sidebar:Js4R
+          - sidebar:OUIS
       - text: Blog
         href: blog.qmd
       - about.qmd
@@ -75,9 +77,11 @@ metadata-files:
   - Books/ggplot2/_metadata.yml
   - Books/R4DS2/_metadata.yml
   - Books/Tidy Modeling with R/_metadata.yml
+  - Books/The Elements of Statistical Learning/_metadata.yml
   - Books/Advanced R(2e)/_metadata.yml
   - Books/quarto/_metadata.yml
   - Books/Js4R/_metadata.yml
+  - Books/OutStanding User Interfaces with Shiny/_metadata.yml
 
 
 format:

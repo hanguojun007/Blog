@@ -3785,5 +3785,65 @@
     "crumbs": [
       "21 Inferential Analysis"
     ]
+  },
+  {
+    "objectID": "Books/OutStanding User Interfaces with Shiny/01 Shiny and the Web.html",
+    "href": "Books/OutStanding User Interfaces with Shiny/01 Shiny and the Web.html",
+    "title": "Shiny and the Web",
+    "section": "",
+    "text": "shiny 可以用来构建简单的 Web 应用。但许多时候，一个产品级的 shiny-web 应用需要的自定义策略不被 shiny 包括或被隐藏在 shiny 底层代码中。但完全使用 shiny 也是可以构建一个产品级的 shiny-web 应用的，如 Figure 1 所示的内容：\n可以运行下面的的代码生成：",
+    "crumbs": [
+      "Shiny and the Web"
+    ]
+  },
+  {
+    "objectID": "Books/OutStanding User Interfaces with Shiny/01 Shiny and the Web.html#html-basics",
+    "href": "Books/OutStanding User Interfaces with Shiny/01 Shiny and the Web.html#html-basics",
+    "title": "Shiny and the Web",
+    "section": "HTML basics",
+    "text": "HTML basics\nhtml 中的 tag 元素遵循 box-model 模型，即元素被分为 4 个部分：padding、margin、boder（width & height） 和 content。元素的排列方式称为 flow layout。据此，元素可以分为：\n\nBlock，可以包含其他 tag 元素，元素相互叠加显示，例如 &lt;div&gt;。\nInline，在一行显示，不能包含 block 元素，例如 &lt;a&gt;、&lt;img&gt;、&lt;span&gt; 等。\nInline-block，允许在一行中插入 block 元素。\n\n\n\n\n\n\nFigure 2: Flow layout and box model in an HTML document.\n\n\n&lt;div&gt;, &lt;span&gt; 这两个标签是没有语义的，不同于 &lt;header&gt;, &lt;footer&gt; 等标签，如 Figure 3 所示:\n\n\n\n\n\nFigure 3: Example of semantic tags in the {bs4Dash} Shiny Bootstrap 4 dashboard template.",
+    "crumbs": [
+      "Shiny and the Web"
+    ]
+  },
+  {
+    "objectID": "Books/OutStanding User Interfaces with Shiny/01 Shiny and the Web.html#tag-attributes",
+    "href": "Books/OutStanding User Interfaces with Shiny/01 Shiny and the Web.html#tag-attributes",
+    "title": "Shiny and the Web",
+    "section": "Tag attributes",
+    "text": "Tag attributes\n标签具有属性（attribute），用来控制标签的样式和行为。最常见的是 id 和 class 属性，其中 id 属性唯一，class 属性可以重复。除 HTML5 规定的标准属性外，还有可以使用非标准属性（non-standard attributes），如 data-* 属性，这些属性会被 JS 代码读取使用。\n&lt;div class=\"awesome-item\" id=\"myitem\"&gt;&lt;/div&gt;\n&lt;!-- the class awesome-item may be applied to multiple tags --&gt;\n&lt;span class=\"awesome-item\"&gt;&lt;/span&gt;",
+    "crumbs": [
+      "Shiny and the Web"
+    ]
+  },
+  {
+    "objectID": "Books/OutStanding User Interfaces with Shiny/01 Shiny and the Web.html#the-simplest-html-skeleton",
+    "href": "Books/OutStanding User Interfaces with Shiny/01 Shiny and the Web.html#the-simplest-html-skeleton",
+    "title": "Shiny and the Web",
+    "section": "The simplest HTML skeleton",
+    "text": "The simplest HTML skeleton\n下面是一个最简单的 HTML 骨架，其中只有 &lt;body&gt; 部分会显示在屏幕上。\n&lt;!DOCTYPE HTML&gt;\n&lt;html lang=\"en\"&gt;\n  &lt;head&gt;\n  &lt;!-- head content here --&gt;\n    &lt;title&gt;A title&lt;/title&gt;\n  &lt;/head&gt;\n  &lt;body&gt;\n  &lt;!-- body content here --&gt;\n  &lt;/body&gt;\n&lt;/html&gt;\nW3C validation 可以检查 HTML 文档的语法，并且提出 HTML 文档至少要有一个带 &lt;title&gt; 的 &lt;head&gt; 标签和带有 lang 属性的 &lt;html&gt; 标签。",
+    "crumbs": [
+      "Shiny and the Web"
+    ]
+  },
+  {
+    "objectID": "Books/OutStanding User Interfaces with Shiny/01 Shiny and the Web.html#about-the-document-object-model-dom",
+    "href": "Books/OutStanding User Interfaces with Shiny/01 Shiny and the Web.html#about-the-document-object-model-dom",
+    "title": "Shiny and the Web",
+    "section": "About the Document Object Model (DOM)",
+    "text": "About the Document Object Model (DOM)\nVisualizing the DOM with the developer tools\nDOM（Document Object Model）是 HTML 文档被浏览器读取后生成的对象模型，它存在于内存中，可以被 JS 脚本访问修改。使用浏览器的开发者工具可以查看 DOM ，如 Figure 4 所示：\n\n\n\n\n\nFigure 4: Inspection of the DOM in the Hello World example.\n\n\nWeb Inspector 101\n浏览器的开发者工具不仅可以用来显示 HTML 结构，还可以：\n\n实时动态地修改希纳是 CSS 。\n对 JavaScript 代码进行调试。\n在终端中运行 JS 代码。\n监管任何警告和错误。\n切换不同设备情况下的显示情况。\n\n我们以一个 shiny app 为例，对这些功能进行快速练习：\nlibrary(shiny)\nui &lt;- fluidPage(p(\"Hello World\"))\n\nserver &lt;- function(input, output, session) {}\n\nshinyApp(ui, server)\n\n使用 Inspect 按钮可以定位所选内容在 HTML 结构中的位置，当鼠标悬停在内容上时，会显示内容的 CSS 样式，如 Figure 5 。\n\n\n\n\n\n\nFigure 5: Inspection of the p element in the Hello World example.\n\n\n\n在 Elements 面板中，可以双击 &lt;p&gt; &lt;/p&gt; 标签，修改它的内容。单击右键后会展示更多可以执行的操作：添加属性、修改内容、拷贝删除隐藏标签、提取XPath等。见 Figure 6 。\n\n\n\n\n\n\nFigure 6: Modifications of the p element in the Hello World example.\n\n\n\n使用 Ctrl + F 可以在 HTML 文档中搜索内容，如 Figure 7 。\n\n\n\n\n\n\nFigure 7: Search for element having the awesome-text class.",
+    "crumbs": [
+      "Shiny and the Web"
+    ]
+  },
+  {
+    "objectID": "Books/OutStanding User Interfaces with Shiny/01 Shiny and the Web.html#preliminary-introduction-to-css-and-javascript",
+    "href": "Books/OutStanding User Interfaces with Shiny/01 Shiny and the Web.html#preliminary-introduction-to-css-and-javascript",
+    "title": "Shiny and the Web",
+    "section": "Preliminary introduction to CSS and JavaScript",
+    "text": "Preliminary introduction to CSS and JavaScript\nCSS\nCSS 可以重新定义特定标签（class、id属性）的样式，例如我们对 p 标签赋予红色，可以这样写：\np {\n  color: red;\n}\n在 HTML 中，我们可以把 CSS 放在 style 标签中：\n&lt;!DOCTYPE HTML&gt;\n&lt;html lang=\"en\"&gt;\n  &lt;head&gt;\n    &lt;style type=\"text/css\"&gt;\n      p {\n        color: red;\n      }\n    &lt;/style&gt;\n    &lt;title&gt;A title&lt;/title&gt;\n  &lt;/head&gt;\n  &lt;body&gt;\n    &lt;p&gt;Hello World&lt;/p&gt;\n  &lt;/body&gt;\n&lt;/html&gt;\n在 shiny 中，可以使用 tags$style() 函数来定义 CSS 样式：\nui &lt;- fluidPage(\n  tags$style(\"p { color: red;}\"),\n  p(\"Hello World\")\n)\n\nserver &lt;- function(input, output, session) {}\n\nshinyApp(ui, server)\nJavaScript\nJavaScript 赋予了 web-app “灵魂”，允许我们直接操作 HTML 中的元素。例如下面的例子，定义了 changeColor() 函数，该函数能随着点击改变 &lt;p&gt; 标签的样式：\n&lt;!DOCTYPE HTML&gt;\n&lt;html lang=\"en\"&gt;\n  &lt;head&gt;\n    &lt;style type=\"text/css\"&gt;\n      p {\n        color: red;\n      }\n    &lt;/style&gt;\n    &lt;script language=\"javascript\"&gt;\n      // displays an alert\n      alert('Click on the Hello World text!');\n      // change text color\n      function changeColor(color){\n        document.getElementById('hello').style.color = color;\n      }\n    &lt;/script&gt;\n    &lt;title&gt;A title&lt;/title&gt;\n  &lt;/head&gt;\n  &lt;body&gt;\n    &lt;!-- onclick attributes applies the JavaScript\n    function changeColor define above --&gt;\n    &lt;p id=\"hello\" onclick=\"changeColor('green')\"&gt;Hello World&lt;/p&gt;\n  &lt;/body&gt;\n&lt;/html&gt;\n同样可以使用 shiny 进行构建：\nui &lt;- fluidPage(\n  tags$script(\n    \"alert('Click on the Hello World text!');\n     // change text color\n     function changeColor(color){\n       document.getElementById('hello').style.color = color;\n     }\n    \"\n  ),\n  p(id = \"hello\", onclick=\"changeColor('green')\", \"Hello World\")\n)\n\nserver &lt;- function(input, output, session) {}\n\nshinyApp(ui, server)",
+    "crumbs": [
+      "Shiny and the Web"
+    ]
   }
 ]
