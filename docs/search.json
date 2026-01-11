@@ -3845,5 +3845,15 @@
     "crumbs": [
       "Shiny and the Web"
     ]
+  },
+  {
+    "objectID": "Books/OutStanding User Interfaces with Shiny/00 index.html",
+    "href": "Books/OutStanding User Interfaces with Shiny/00 index.html",
+    "title": "index",
+    "section": "",
+    "text": "本书主要介绍了如何使用 shiny 构建产品级 web-app 。\n\n\n\n Back to top",
+    "crumbs": [
+      "index"
+    ]
   }
 ]
