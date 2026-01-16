@@ -1,0 +1,218 @@
+---
+title: "ggtree--绘图1"
+author: "大番薯本薯"
+date: "2026-01-14"
+date-modified: "2026-01-14"
+draft: false
+categories: [ggtree]
+
+format:
+  html:
+    code-link: true
+
+fig-width: 6
+fig-asp: 0.618
+out-width: 70%
+fig-align: center
+
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: "#>"
+    R.options:
+      dplyr.print_min: 6
+      dplyr.print_max: 6
+      pillar.max_footer_lines: 2
+      pillar.min_chars: 15
+      stringr.view_n: 6
+      cli.num_colors: 0
+      cli.hyperlink: FALSE
+      pillar.bold: TRUE
+      width: 77
+
+execute:
+  warning: true
+  error: true
+---
+
+使用`ggtree()`函数等于使用`ggplot(tree, aes(x, y)) + geom_tree() + theme_tree()`。对于ggtree及其相关包中的许多函数，我将它们按照“点-线-面-域”的形式进行了分类：
+
+-   点：图中的单个元素，ggtree图中的“点”元素包括：`root`,`node`,`tip`,`branch`。
+-   线：不同“点”之间连接的线。
+-   面：主要指由`node`和`tip`组成的clade及树的整体布局`layout`。
+-   域：可以理解为ggplot中的分面`facet`，用来展示多个树，或与树相关的meta信息。
+
+首先让我们加载一个树，并添加额外的相关信息，用于后续函数的使用说明。
+
+```{r}
+library(treeio)
+library(ggtree)
+# library(ggimage)
+
+nwk <- system.file("extdata", "sample.nwk", package = "treeio")
+tree <- treeio::read.tree(nwk)
+tree$node.label <- c("root", paste("node", 2:treeio::Nnode(tree)))
+p <- ggtree(tree)
+```
+
+## 点元素
+
+点元素是ggtree树图中最重要的部分，因为每种点元素都有自己的坐标。使用`fortify()`函数提取绘图数据（见上一节），我们可以看到`root`就是`x = 0`的点，是一种特殊得`node`；`isTip`用来区分是否是tip；`x`,`y`构成了node与tip的坐标；`branch`与`y`构成了branch的坐标（此处坐标是branch的中心点）；`angle`用来描述`x`极坐标化后的角度。
+
+```{r}
+pd <- ggtree::fortify(tree)
+pd
+
+# root
+dplyr::filter(pd, parent == node)
+```
+
+让我们先简单地展示一下这些信息：
+
+```{r}
+p +
+  geom_nodelab(hjust = 0) +
+  geom_text2(aes(subset = branch != 0, x = branch), label = "branch") +
+  geom_tiplab()
+```
+
+### `root`相关的函数
+
+-   `geom_rootpoint()`：与`geom_point()`类似，但是单独调整`root`的美学映射。
+-   `geom_rootedge()`：调整`root`相关`branch`的长度，上面的结果也显示，默认长度为0。
+
+```{r}
+p +
+  geom_rootpoint(shape = 21, size = 5, color = "red", fill = "blue") +
+  geom_rootedge(rootedge = 2)
+```
+
+### `node`相关的函数
+
+`node`可以有具体的含义，例如共同祖先，也可以没有。相关的函数有：
+
+-   `geom_nodepoint()`：与`geom_point()`类似，调整`node`美学映射。
+-   `geom_nodelab()`：绘制`node`的标签。
+
+```{r}
+p +
+  geom_nodepoint(shape = 21, size = 5, color = "red", fill = "blue") +
+  geom_nodelab(hjust = 0)
+```
+
+从图中也可以看到，`root`属于`node`，相关美学映射及label被调整。可以使用`subset`映射来剔除对`root`的调整：
+
+```{r}
+p +
+  geom_nodepoint(aes(subset = node != parent), shape = 21, size = 5, color = "red", fill = "blue") +
+  geom_nodelab(aes(subset = node != parent), hjust = 0)
+```
+
+### `tip`相关的函数
+
+`tip`也称为`taxa`，是树末端的点。与之相关的函数有：
+
+-   `geom_tippoint()`：与`geom_point()`类似，调整`tip`美学映射。
+-   `geom_tiplab()`：绘制`tip`的标签。
+
+```{r}
+p +
+  geom_tippoint(shape = 21, size = 5, color = "red", fill = "blue") +
+  geom_tiplab()
+```
+
+`geom_tiplab()`除`label`映射外，还有`image`映射，可以用来添加额外的图片或“phhylopic"。
+
+```{r}
+annimals <- c("Homo sapiens", "Pan troglodytes", "Gorilla gorilla", "Pongo abelii", "Hylobates lar", "Macaca mulatta", "Papio anubis", "Lemur catta", "Mus musculus", "Rattus norvegicus", "Canis lupus", "Felis catus", "Gallus gallus")
+
+d <- ggimage::phylopic_uid(annimals)
+d$name <- tree$tip.label
+
+ggtree(tree) %<+% d +
+  geom_tiplab(aes(image = uid), color = "grey", geom = "phylopic", offset = 2.5) +
+  hexpand(0.1)
+```
+
+`geom_tiplab()`也支持解析emoji字符，详见[ggtree-chaper8](https://yulab-smu.top/treedata-book/chapter8.html)。
+
+### `branch`相关的函数
+
+`branch`没有对应的函数，它作为树的主体，其映射由`ggtree()`或`geom_tree()`直接进行调整，标签可以由`geom_text()`或`geom_label()`进行设置：
+
+```{r}
+p +
+  geom_tree(aes(color = "red")) +
+  geom_text(aes(x = branch, y), label = "branch")
+```
+
+### 其他相关函数
+
+除上述函数外，ggtree提供了一些其他用来处理“点”元素的函数，它们大多具有普适性，大致可以分为两类：
+
+#### ggtree特有
+
+##### `geom_range()`
+
+如果某个“点”元素具有某个范围信息，那么就可以使用`geom_range()`进行绘制，例如我们为`tree`添加枝长的范围，并使用`scale_x_range()`为其添加x轴（但轴的意义不大，具体可见[ggtree-5.3](https://yulab-smu.top/treedata-book/chapter5.html#uncertainty-of-evolutionary-inference)）：
+
+```{r}
+rangeInfo <- tibble(
+  label = c("node 2", "A"),
+  year = list(c(3, 7), c(1, 2))
+)
+
+tree2 <- full_join(tree, rangeInfo, by = "label")
+
+ggtree(tree2) +
+  geom_tiplab() +
+  geom_nodelab() +
+  geom_range("year", color = "red", alpha = .6, size = 2) +
+  scale_x_range() +
+  theme_tree2()
+```
+
+##### `geom_inset()`
+
+`geom_inset()`接受一个ggplot对象list，且list的name是`node`（`tip`）的编号（即`pd`中的node列）。它会将这些对象绘制到`node`（`tip`）上或`node`（`tip`）对应的`branch`上。
+
+ggtree提供了`nodepie()`与`nodebar()`两个函数，分别绘制饼图和条形图，你可以创建任何ggplot对象，或者使用ggplotify包来将某个对象转换为ggplot对象。
+
+```{r}
+df2 <- as.data.frame(abs(matrix(rnorm(39), ncol = 3)))
+df2$node <- 1:13
+bars <- nodebar(df2, cols = 1:3)
+bars <- lapply(bars, function(g) g + scale_fill_discrete())
+
+p + geom_inset(bars, width = .08, height = .05, x = "node")
+```
+
+::: {.callout-warning}
+在实际运行中，`nodepie()`会报错，暂时不清楚原因
+:::
+
+#### ggplot升级版
+
+具有`subset`映射，可以直接根据`subset`映射`对绘图数据进行过滤，然后进行绘制：
+
+-   `geom_label2()`
+-   `geom_text2()`
+-   `geom_point2()`
+-   `geom_segment2()`
+
+```{r}
+p +
+  geom_label2(aes(subset = isTip, label = label)) +
+  geom_point2(aes(subset = !isTip), color = "red", size = 5)
+```
+
+这些函数不仅可以用于tree的绘制，其他类型的散点图也可以使用。除`subset`映射外，ggtree还提供了两个函数，可以直接应用到`geom_*()`函数中：
+
+-   `td_filter()`：筛选绘图数据
+-   `td_unnest()`：展开绘图数据
+
+```{r}
+p +
+  geom_label(aes(label = label), data = td_filter(isTip)) +
+  geom_nodepoint(data = td_filter(node == 14), size = 5, color = "red")
+```

@@ -1,0 +1,111 @@
+-   `%<+%`
+
+
+场景：
+
+-   设置tip的顺序
+-   注释文本被截断
+-   分面图的美学映射设置
+-   bootstrap树展示——`ggdensitree()`
+-   theme：树主题，相关的函数有：`theme_tree()`, `theme_tree2()`, `hexpand()`, `vexpand()`
+
+`get_taxa_name()`
+`label_pad()`
+`identify()`
+
+
+
+某些函数可能不适配某些layout。
+
+```{r}
+ggplot(tree_object) +
+  geom_tree() +
+  theme_tree()
+ggtree(tree_object)
+ggdensitree()
+
+geom_treescale()
+geom_range()
+geom_tiplab()
+geom_tippoint()
+geom_nodepoint()
+geom_hilight()
+geom_cladelab()
+```
+
+5.1节提供详细geom函数
+
+ggtree不仅支持 treedata格式，也支持其他包的对象，phylo4 and phylo4d defined in the phylobase package, obkdata defined in the OutbreakTools package, and phyloseq defined in the phyloseq package
+具体见第9章。
+
+
+
+
+```{r}
+library("treeio")
+library("ggtree")
+
+nwk <- system.file("extdata", "sample.nwk", package = "treeio")
+tree <- read.tree(nwk)
+
+ggplot(tree, aes(x, y)) +
+  geom_tree() +
+  theme_tree()
+
+```
+
+basics
+layout
+
+treescale 比例尺图例
+
+root，node，tip 节点样式，label
+
+
+
+`geom_cladelab()` 对同源clade进行注释，可以是文字也可以是图片，如果注释多个clade，最好是使用data.frame格式进行mapping。
+
+`geom_strip()` 对多源clade进行注释，如何进行clade的定位？
+
+`geom_hilight()` 高亮clade，`geom_balance()` 在高亮的clade内部再高亮。高亮支持渐变，如何设置颜色范围？
+
+
+`geom_taxalink()` 链接节点
+
+`geom_range()` 描述
+
+
+`viewClade()`
+
+`collapse()` `expand()`
+
+`rotate()` `flip()` `rotate_tree()`
+
+
+`%<+%` 向ggplot对象中添加数据。
+
+`geom_facet()` 绘制tip的其他注释信息图形，并且与树对齐，例如热图
+`facet_widths()` 调整facet的宽度占比
+`facet_labeller()` 调整分面标题
+`xlim_expand()` 绘制的x轴范围，因为y轴始终是离散的tip，所以不用设置范围。
+`hexpand()` `vexpand()` 基于当前x轴、y轴进行比例延展或缩放。
+
+
+
+
+`gheatmap()`
+
+`geom_facet()`不支持极坐标系的layout，需要使用`ggtreeExtra`包中的`geom_fruit()`
+
+`td_filter()` geom内进行数据过滤，`td_unnest()` geom内进行数据展开
+
+
+`get_taxa_name()` 按照绘图顺序抽取taxa名称
+
+
+phytools 包对树进行处理。
+
+```{r}
+geom_highlight()
+
+```

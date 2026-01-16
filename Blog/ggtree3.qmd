@@ -1,0 +1,241 @@
+---
+title: "ggtree--绘图2"
+author: "大番薯本薯"
+date: "2026-01-15"
+date-modified: "2026-01-15"
+draft: false
+categories: [ggtree]
+
+format:
+  html:
+    code-link: true
+
+fig-width: 6
+fig-asp: 0.618
+out-width: 70%
+fig-align: center
+
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: "#>"
+    R.options:
+      dplyr.print_min: 6
+      dplyr.print_max: 6
+      pillar.max_footer_lines: 2
+      pillar.min_chars: 15
+      stringr.view_n: 6
+      cli.num_colors: 0
+      cli.hyperlink: FALSE
+      pillar.bold: TRUE
+      width: 77
+
+execute:
+  warning: true
+  error: true
+---
+
+本节针对“线”与“面”元素进行介绍，让我们先加载一个基本的树。
+
+```{r}
+library(treeio)
+library(ggtree)
+
+nwk <- system.file("extdata", "sample.nwk", package = "treeio")
+tree <- treeio::read.tree(nwk)
+tree$node.label <- c("root", paste("node", 2:treeio::Nnode(tree)))
+p <- ggtree(tree)
+```
+
+## 线元素
+
+我们称tip（taxa）之间的关系为“线”。可以使用`geom_taxalink()`进行绘制：
+
+```{r}
+dat <- data.frame(
+  from = c("A", "F", "L"),
+  to = c("E", "K", "M"),
+  h = c(1, 1, 0.1),
+  type = c("t1", "t2", "t3")
+)
+p + geom_tiplab() +
+  geom_taxalink(
+    data = dat,
+    mapping = aes(
+      taxa1 = from,
+      taxa2 = to,
+      color = type
+    ),
+    curvature = -0.2
+  )
+```
+
+## 面元素
+
+“面”元素指的是树图中的一部分或全部，即某个分支`clade`和整棵树的布局`layout`。
+
+### `clade`
+
+树的分支--`clade`--由`node`和`tip`组成。与clade相关的函数，可以分为两大类：
+
+-   在图中进行标记或美学映射来注释`clade`信息。
+-   对特定的`clade`进行删减，压缩，旋转等，实现修改树的`layout`。
+
+#### 注释信息类
+
+-   `groupClade()`：对`clade`进行分组，搭配`geom_tree()`实现对不同`clade`的美学映射。
+-   `groupOTU()`：根据`tip`对`clade`进行分组，搭配`geom_tree()`实现对不同`clade`的美学映射。
+-   `geom_cladelab()`：对某个`clade`添加文本信息，同样支持image和phylopic。
+-   `geom_strip()`：对某群`tip`添加文本信息，同样支持image和phylopic。
+-   `geom_hilight()`：对特定`clade`进行高亮。
+-   `geom_balance()`：对特定`clade`的`subclade`进行高亮。
+
+```{r}
+tree_g <- groupClade(tree, .node = c("node 4", "node 8"), group_name = "clade")
+tree_g <- groupOTU(tree_g, .node = LETTERS[1:5], group_name = "otu")
+ggtree(tree_g, aes(color = clade)) + geom_nodelab()
+ggtree(tree_g, aes(color = otu)) + geom_tiplab()
+
+p +
+  geom_cladelab(
+    node = 17,
+    label = "clade 4",
+    align = TRUE, offset = 1, offset.text = 0.5
+  ) +
+  scale_x_continuous(expand = c(0.2, 0))
+
+p + geom_strip(
+  "D", "J",
+  label = "otu 1",
+  align = TRUE, offset = 1, offset.text = 0.5
+) +
+  scale_x_continuous(expand = c(0.2, 0))
+
+p + geom_hilight(node = 17, fill = "red", to.bottom = TRUE)
+p + geom_balance(node = 17)
+```
+
+#### 修改布局类
+
+-   `viewClade()`：只显示特定的`clade`。
+-   `scaleClade()`：对特定的`clade`进行纵向缩放。
+-   `collapse()`：对特定的`clade`进行折叠，有`max`,`min`,`mixed`三种显示折叠的样式。
+-   `expand()`：对特定的`clade`进行展开。
+-   `rotate()`：对特定的`clade`进行旋转。
+
+这些函数都是在ggplot对象上进行操作，不会对数据进行增删
+
+```{r}
+p1 <- ggtree(tree) + geom_tiplab()
+viewClade(p1, MRCA(p, "I", "L"))
+
+p2 <- ggtree(tree_g, aes(color = clade)) +
+  geom_tiplab() +
+  scale_color_manual(values = c("black", "firebrick", "steelblue")) +
+  theme(legend.position = "none")
+scaleClade(p2, node = 17, scale = .1)
+
+p3 <- p1 %>% collapse(node = 21) +
+  geom_point2(aes(subset = (node == 21)), shape = 21, size = 5, fill = "green")
+p3 <- collapse(p3, node = 23) +
+  geom_point2(aes(subset = (node == 23)), shape = 23, size = 5, fill = "red")
+
+p4 <- expand(p3, node = 21)
+
+p5 <- p2 +
+  geom_tiplab() +
+  geom_point2(aes(subset = node == 16), color = "darkgreen", size = 5)
+rotate(p5, node = 21)
+```
+
+`scaleClade()`与`collapse()`搭配使用，调整树的布局：
+
+```{r}
+## 三种折叠样式
+collapse(p2, 21, "max") %>% expand(21)
+collapse(p2, 21, "min") %>% expand(21)
+collapse(p2, 21, "mixed") %>% expand(21)
+## 设置块的样式
+collapse(p2, 21, "mixed", fill = "steelblue", alpha = .4) %>%
+  collapse(23, "mixed", fill = "firebrick", color = "blue")
+## 搭配使用
+scaleClade(p, 23, .2) %>% collapse(23, "min", fill = "darkgreen")
+```
+
+### `layout`
+
+树的布局`layout`通常在`geom_tree()`或`ggtree()`中设置，`layout`参数的有效设置有："rectangular", "roundrect", "slanted", "ellipse", "dendrogram", "circular", "fan", "inward_circular", "daylight", "equal_angle", "radial", "ape" 等布局。
+
+#### 布局类型
+
+树的布局可以分为五类：
+
+-   Phylogram："rectangular", "roundrect", "slanted", "ellipse", "dendrogram", "circular", "fan", "inward_circular"。
+-   Unrooted layout："daylight", "equal_angle", "radial", "ape"。
+-   Cladogram：不考虑枝长的树，设置`branch.length = "none"`即可。
+-   Timescaled layout：设置`mrsd`参数且添加`theme_tree2()`主题，ggtree会添加一根时间轴。
+-   Two-dimensional tree layout：设置`yscale`参数，会添加一根参数所在范围的y轴，需要使用能显示轴的主题，例如`theme_classic()`，当使用categorical数据时，请设置`yscale_mapping`参数。
+
+```{r}
+## Phylogram:
+ggtree(tree) # 默认 rectangular
+ggtree(tree, layout = "roundrect")
+ggtree(tree, layout = "slanted")
+ggtree(tree, layout = "ellipse")
+ggtree(tree, layout = "dendrogram")
+ggtree(tree, layout = "circular")
+ggtree(tree, layout = "fan", open.angle = 120)
+ggtree(tree, layout = "inward_circular")
+## Unrooted layout:
+ggtree(tree, layout = "daylight")
+ggtree(tree, layout = "equal_angle")
+ggtree(tree, layout = "radial")
+ggtree(tree, layout = "ape")
+## Cladogram:
+ggtree(tree, branch.length = "none")
+## Timescaled layout:
+ggtree(tree, mrsd = "2010-01-01") + theme_tree2() # 此处仅展示，没有实际含义
+## Two-dimensional tree layout:
+ggtree(tree, yscale = "branch.length") + theme_classic() +
+  geom_nodepoint(size = 2, color = "red") +
+  geom_tippoint(size = 2, color = "blue")
+```
+
+#### 树布局变换
+
+ggplot或ggtree系提供了一下调整树布局的函数，大致可以分为两类：
+
+-   旋转，翻转等：
+    -   `scale_x_reverse()`：左右翻转
+    -   `scale_y_reverse()`：上下翻转
+    -   `coord_flip()`：上下左右翻转
+    -   `ggplotify::as.ggplot()`：旋转
+    -   `rotate_tree()`：旋转极坐标系布局`layout`
+-   布局变换：
+    -   `layout_circular()`：笛卡尔系布局转换为极坐标系的"circular"
+    -   `layout_dendrogram()`: 转换为"dendrogram"
+    -   `layout_fan()`/`open_tree()`: 转换为"fan"
+    -   `layout_inward_circular()`: 转换为"inward_circular"
+    -   `layout_rectangular()`：极坐标系转换为笛卡尔系的"rentangular"
+
+对于极坐标系的布局，可以使用`scale_x_continuous()`中的`limits`和`expand`参数调整空白圆圈的半径。
+
+```{r}
+## 翻转
+ggtree(tree) + scale_x_reverse()
+ggtree(tree) + scale_y_reverse()
+ggtree(tree) + coord_flip()
+## 旋转
+ggplotify::as.ggplot(ggtree(tree), angle = -30, scale = .9)
+rotate_tree(ggtree(tree, layout = "circular"), 180)
+## 布局变换
+ggtree(tree, layout = "slanted") + layout_circular()
+ggtree(tree) + layout_dendrogram()
+ggtree(tree) + layout_fan(angle = 60)
+open_tree(p, 180)
+ggtree(tree) + layout_inward_circular(xlim = 100)
+ggtree(tree, layout = "circular") + layout_rectangular()
+## 调整空白圆圈
+ggtree(tree, layout = "circular") +
+  scale_x_continuous(expand = c(1, 0))
+```
