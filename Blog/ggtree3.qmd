@@ -88,7 +88,7 @@ p + geom_tiplab() +
 -   `geom_cladelab()`：对某个`clade`添加文本信息，同样支持image和phylopic。
 -   `geom_strip()`：对某群`tip`添加文本信息，同样支持image和phylopic。
 -   `geom_hilight()`：对特定`clade`进行高亮。
--   `geom_balance()`：对特定`clade`的`subclade`进行高亮。
+-   `geom_balance()`：对特定`clade`的所有`subclade`进行高亮。
 
 ```{r}
 tree_g <- groupClade(tree, .node = c("node 4", "node 8"), group_name = "clade")

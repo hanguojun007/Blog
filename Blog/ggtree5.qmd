@@ -1,111 +1,106 @@
--   `%<+%`
+---
+title: "ggtree5"
+author: "大番薯本薯"
+date: "2026-01-23"
+date-modified: "2026-01-23"
+draft: false
+categories: [ggtree]
+
+format:
+  html:
+    code-link: true
+
+fig-width: 6
+fig-asp: 0.618
+out-width: 70%
+fig-align: center
+
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: "#>"
+    R.options:
+      dplyr.print_min: 6
+      dplyr.print_max: 6
+      pillar.max_footer_lines: 2
+      pillar.min_chars: 15
+      stringr.view_n: 6
+      cli.num_colors: 0
+      cli.hyperlink: FALSE
+      pillar.bold: TRUE
+      width: 77
+
+execute:
+  warning: true
+  error: true
+---
+
+本节是对前四节的补充，它们大多是一些通用的函数。
+
+-   `%<+%`：类似于`full_join()`，但是直接在ggplot对象中添加新的数据
+-   `hexpand()`, `vexpand()`：延长树图的宽度和高度
+-   `get_taxa_name()`：获取ggplot图中taxa的顺序和名称
+-   `label_pad()`：设置label的间隔
+-   `identify()`：获取ggplot对象中的数据
 
 
-场景：
-
--   设置tip的顺序
--   注释文本被截断
--   分面图的美学映射设置
--   bootstrap树展示——`ggdensitree()`
--   theme：树主题，相关的函数有：`theme_tree()`, `theme_tree2()`, `hexpand()`, `vexpand()`
-
-`get_taxa_name()`
-`label_pad()`
-`identify()`
-
-
-
-某些函数可能不适配某些layout。
+加载一颗基本树
 
 ```{r}
-ggplot(tree_object) +
-  geom_tree() +
-  theme_tree()
-ggtree(tree_object)
-ggdensitree()
-
-geom_treescale()
-geom_range()
-geom_tiplab()
-geom_tippoint()
-geom_nodepoint()
-geom_hilight()
-geom_cladelab()
-```
-
-5.1节提供详细geom函数
-
-ggtree不仅支持 treedata格式，也支持其他包的对象，phylo4 and phylo4d defined in the phylobase package, obkdata defined in the OutbreakTools package, and phyloseq defined in the phyloseq package
-具体见第9章。
-
-
-
-
-```{r}
-library("treeio")
-library("ggtree")
+library(treeio)
+library(ggtree)
+# library(ggimage)
 
 nwk <- system.file("extdata", "sample.nwk", package = "treeio")
-tree <- read.tree(nwk)
-
-ggplot(tree, aes(x, y)) +
-  geom_tree() +
-  theme_tree()
-
+tree <- treeio::read.tree(nwk)
+tree$node.label <- c("root", paste("node", 2:treeio::Nnode(tree)))
+p <- ggtree(tree)
 ```
 
-basics
-layout
+## `%<+%`
 
-treescale 比例尺图例
-
-root，node，tip 节点样式，label
-
-
-
-`geom_cladelab()` 对同源clade进行注释，可以是文字也可以是图片，如果注释多个clade，最好是使用data.frame格式进行mapping。
-
-`geom_strip()` 对多源clade进行注释，如何进行clade的定位？
-
-`geom_hilight()` 高亮clade，`geom_balance()` 在高亮的clade内部再高亮。高亮支持渐变，如何设置颜色范围？
-
-
-`geom_taxalink()` 链接节点
-
-`geom_range()` 描述
-
-
-`viewClade()`
-
-`collapse()` `expand()`
-
-`rotate()` `flip()` `rotate_tree()`
-
-
-`%<+%` 向ggplot对象中添加数据。
-
-`geom_facet()` 绘制tip的其他注释信息图形，并且与树对齐，例如热图
-`facet_widths()` 调整facet的宽度占比
-`facet_labeller()` 调整分面标题
-`xlim_expand()` 绘制的x轴范围，因为y轴始终是离散的tip，所以不用设置范围。
-`hexpand()` `vexpand()` 基于当前x轴、y轴进行比例延展或缩放。
-
-
-
-
-`gheatmap()`
-
-`geom_facet()`不支持极坐标系的layout，需要使用`ggtreeExtra`包中的`geom_fruit()`
-
-`td_filter()` geom内进行数据过滤，`td_unnest()` geom内进行数据展开
-
-
-`get_taxa_name()` 按照绘图顺序抽取taxa名称
-
-
-phytools 包对树进行处理。
+`%<+%` 固定使用数据第一列与`p$data`中的label列进行匹配。
 
 ```{r}
-geom_highlight()
-
+fortify(tree)
+d <- data.frame(tip = LETTERS[1:13], value = 1:treeio::Ntip(tree))
+(p %<+% d)$data
 ```
+
+## `hexpand()`, `vexpand()`
+
+`text`的长度在ggplot中不被考虑，很多时候文本注释信息会在图中显示不全被截断。
+
+当使用`coord_cartesian(clip = "off")`时，超出边界的文本不会被裁剪，但仍然可能仍然无法显示。需要将`x`，`y`轴延展。
+
+```{r}
+tree2 <- tree
+tree2$tip.label <- paste0('to make the label longer_', tree2$tip.label)
+ggtree::ggtree(tree2) + geom_tiplab() + hexpand(.4)
+```
+
+## `get_taxa_name()`
+
+获取taxa名称，顺序以树图中展示的为准。
+
+```{r}
+get_taxa_name(p)
+get_taxa_name(p, node = "node 12")
+```
+
+## `label_pad()`
+
+用来将label对齐，不足的部分使用某个字符填充。
+
+```{r}
+chr <- c("a", "b", "cccccccc")
+tibble::tibble(
+  label = chr,
+  label_pad = label_pad(label, pad = "."),
+  label_pad_2 = label_pad(label, justify = "left", pad = ".")
+)
+```
+
+## `identify()`
+
+使用`identify()`函数，可以手动选择注释clade或tip（可能需要使用Rstudio）。
