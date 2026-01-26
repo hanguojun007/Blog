@@ -10,7 +10,7 @@ format:
   html:
     code-link: true
 
-fig-width: 6
+fig-width: 10
 fig-asp: 0.618
 out-width: 70%
 fig-align: center
@@ -35,7 +35,9 @@ execute:
   error: true
 ---
 
-使用`ggtree()`函数等于使用`ggplot(tree, aes(x, y)) + geom_tree() + theme_tree()`。对于ggtree及其相关包中的许多函数，我将它们按照“点-线-面-域”的形式进行了分类：
+使用`ggtree()`函数等于使用`ggplot(tree, aes(x, y)) + geom_tree() + theme_tree()`。
+
+对于ggtree及其相关包中的许多函数，我将它们按照“点-线-面-域”的形式进行了分类：
 
 -   点：图中的单个元素，ggtree图中的“点”元素包括：`root`,`node`,`tip`,`branch`。
 -   线：不同“点”之间连接的线。
@@ -45,8 +47,8 @@ execute:
 首先让我们加载一个树，并添加额外的相关信息，用于后续函数的使用说明。
 
 ```{r}
-library(treeio)
-library(ggtree)
+suppressMessages(library(treeio))
+suppressMessages(library(ggtree))
 # library(ggimage)
 
 nwk <- system.file("extdata", "sample.nwk", package = "treeio")

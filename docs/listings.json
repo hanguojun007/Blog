@@ -2,17 +2,19 @@
   {
     "listing": "/blog.html",
     "items": [
+      "/Blog/ggtree5.html",
+      "/Blog/ggtree4.html",
+      "/Blog/ggtree3.html",
+      "/Blog/ggtree2.html",
+      "/Blog/ggtree1.html",
       "/Blog/Selenium.html",
       "/Blog/Nextclade.html",
       "/Blog/双环网络图.html",
       "/Blog/ExWAS.html",
       "/Blog/替换多对字符串.html",
-      "/Blog/创建示例数据.html",
       "/Blog/绘制点脊图.html",
       "/Blog/相关性计算.html",
       "/Blog/Data Masking.html",
-      "/Blog/and or in R.html",
-      "/Blog/capture.output.html",
       "/Blog/Object in R1.html",
       "/Blog/Code chunks.html"
     ]

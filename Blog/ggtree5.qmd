@@ -1,5 +1,5 @@
 ---
-title: "ggtree5"
+title: "ggtree--通用函数"
 author: "大番薯本薯"
 date: "2026-01-23"
 date-modified: "2026-01-23"
@@ -47,8 +47,9 @@ execute:
 加载一颗基本树
 
 ```{r}
-library(treeio)
-library(ggtree)
+suppressMessages(library(tidyverse))
+suppressMessages(library(treeio))
+suppressMessages(library(ggtree))
 # library(ggimage)
 
 nwk <- system.file("extdata", "sample.nwk", package = "treeio")

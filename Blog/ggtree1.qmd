@@ -113,7 +113,12 @@ SpeciesD  TTGCGT
 三种对象可以相互转换：`as_tibble()`, `as.phylo()`, `as.treedata()`。
 
 ```{r}
-library(ape)
+suppressMessages(library(tidyverse))
+suppressMessages(library(ape))
+suppressMessages(library(ggtree))
+suppressMessages(library(treeio))
+suppressMessages(library(tidytree))
+
 set.seed(2026)
 tree_phylo <- rtree(4)
 tree_phylo
@@ -142,8 +147,6 @@ tidytree提供了一些函数用来提取一个子树：
 -   `drop.tip()`：丢弃某些tip。
 
 ```{r}
-library(tidytree)
-
 # 适配三种对象类型
 child(tbl_tree, 5)
 offspring(tbl_tree, 5)
@@ -164,8 +167,7 @@ tree_d
 `tree_subset()`的提取方式——数竖线；在提取的同时会默认将该node的offspring节点归为一组，其他归为另一组，并添加group信息。
 
 ```{r}
-#| width: 10
-library(ggtree)
+#| width: 12
 
 p1 <- ggtree(tree_phylo) + geom_tiplab()
 p2 <- ggtree(tree_s, aes(color = group)) + geom_tiplab()
@@ -238,9 +240,6 @@ ggtree(rescale_tree(as.treedata(tree_rel), "new.length")) +
 可以使用`ggtree(tree)$data`或`fortify()`两种方式生成适配`geom_tree()`函数的数据，这在生成复杂图形及其有用。
 
 ```{r}
-library(dplyr)
-library(ggtree)
-
 set.seed(1024)
 x <- rtree(30)
 y <- rtree(30)

@@ -38,8 +38,9 @@ execute:
 本节针对“线”与“面”元素进行介绍，让我们先加载一个基本的树。
 
 ```{r}
-library(treeio)
-library(ggtree)
+suppressMessages(library(tidyverse))
+suppressMessages(library(treeio))
+suppressMessages(library(ggtree))
 
 nwk <- system.file("extdata", "sample.nwk", package = "treeio")
 tree <- treeio::read.tree(nwk)
@@ -91,12 +92,13 @@ p + geom_tiplab() +
 -   `geom_balance()`：对特定`clade`的所有`subclade`进行高亮。
 
 ```{r}
+#| warning: false
 tree_g <- groupClade(tree, .node = c("node 4", "node 8"), group_name = "clade")
 tree_g <- groupOTU(tree_g, .node = LETTERS[1:5], group_name = "otu")
 ggtree(tree_g, aes(color = clade)) + geom_nodelab()
 ggtree(tree_g, aes(color = otu)) + geom_tiplab()
 
-p +
+p1 <- p +
   geom_cladelab(
     node = 17,
     label = "clade 4",
@@ -104,15 +106,16 @@ p +
   ) +
   scale_x_continuous(expand = c(0.2, 0))
 
-p + geom_strip(
+p2<-p + geom_strip(
   "D", "J",
   label = "otu 1",
   align = TRUE, offset = 1, offset.text = 0.5
 ) +
   scale_x_continuous(expand = c(0.2, 0))
 
-p + geom_hilight(node = 17, fill = "red", to.bottom = TRUE)
-p + geom_balance(node = 17)
+p3 <- p + geom_hilight(node = 17, fill = "red", to.bottom = TRUE)
+p4 <- p + geom_balance(node = 17)
+plot_list(p1, p2, p3, p4, tag_levels = "A", ncol = 2)
 ```
 
 #### 修改布局类
@@ -126,31 +129,43 @@ p + geom_balance(node = 17)
 这些函数都是在ggplot对象上进行操作，不会对数据进行增删
 
 ```{r}
+#| fig-weight: 10
+#| fig-asp: 1.5
 p1 <- ggtree(tree) + geom_tiplab()
-viewClade(p1, MRCA(p, "I", "L"))
+p2 <- viewClade(p1, MRCA(p, "I", "L"))
 
-p2 <- ggtree(tree_g, aes(color = clade)) +
+p3 <- ggtree(tree_g, aes(color = clade)) +
   geom_tiplab() +
   scale_color_manual(values = c("black", "firebrick", "steelblue")) +
   theme(legend.position = "none")
-scaleClade(p2, node = 17, scale = .1)
+p4 <- scaleClade(p3, node = 17, scale = .1)
 
-p3 <- p1 %>% collapse(node = 21) +
+p5 <- p1 %>% collapse(node = 21) +
   geom_point2(aes(subset = (node == 21)), shape = 21, size = 5, fill = "green")
-p3 <- collapse(p3, node = 23) +
+p5 <- collapse(p5, node = 23) +
   geom_point2(aes(subset = (node == 23)), shape = 23, size = 5, fill = "red")
 
-p4 <- expand(p3, node = 21)
+p6 <- expand(p5, node = 21)
 
-p5 <- p2 +
+p7 <- p3 +
   geom_tiplab() +
   geom_point2(aes(subset = node == 16), color = "darkgreen", size = 5)
-rotate(p5, node = 21)
+p8 <- rotate(p7, node = 21)
+plot_list(p1, p2, p3, p4, p5,p6,p7,p8, tag_levels = "A", ncol = 2)
 ```
 
 `scaleClade()`与`collapse()`搭配使用，调整树的布局：
 
 ```{r}
+#| layout-ncol: 2
+#| fig-cap:
+#|   -  "max"
+#|   -  "min"
+#|   -  "mixed"
+#|   -  "set style"
+#|   -  "with scaleClade()"
+#| fig-width: 3
+
 ## 三种折叠样式
 collapse(p2, 21, "max") %>% expand(21)
 collapse(p2, 21, "min") %>% expand(21)
@@ -177,6 +192,25 @@ scaleClade(p, 23, .2) %>% collapse(23, "min", fill = "darkgreen")
 -   Two-dimensional tree layout：设置`yscale`参数，会添加一根参数所在范围的y轴，需要使用能显示轴的主题，例如`theme_classic()`，当使用categorical数据时，请设置`yscale_mapping`参数。
 
 ```{r}
+#| warning: false
+#| layout-ncol: 4
+#| fig-cap:
+#|   -  "rectangular"
+#|   -  "roundrect"
+#|   -  "slanted"
+#|   -  "ellipse"
+#|   -  "dendrogram"
+#|   -  "circular"
+#|   -  "fan"
+#|   -  "inward_circular"
+#|   -  "daylight"
+#|   -  "equal_angle"
+#|   -  "radial"
+#|   -  "ape"
+#|   -  "Cladogram"
+#|   -  "Timescaled"
+#|   -  "Two-dimensional"
+
 ## Phylogram:
 ggtree(tree) # 默认 rectangular
 ggtree(tree, layout = "roundrect")
@@ -221,6 +255,21 @@ ggplot或ggtree系提供了一下调整树布局的函数，大致可以分为�
 对于极坐标系的布局，可以使用`scale_x_continuous()`中的`limits`和`expand`参数调整空白圆圈的半径。
 
 ```{r}
+#| warning: false
+#| layout-ncol: 4
+#| fig-cap:
+#|   -  "scale_x_reverse()"
+#|   -  "scale_y_reverse()"
+#|   -  "coord_flip()"
+#|   -  "ggplotify::as.ggplot()"
+#|   -  "rotate_tree()"
+#|   -  "layout_circular()"
+#|   -  "layout_dendrogram()"
+#|   -  "layout_fan()"
+#|   -  "open_tree()"
+#|   -  "layout_inward_circular()"
+#|   -  "layout_rectangular()"
+#|   -  "scale_x_continuous()"
 ## 翻转
 ggtree(tree) + scale_x_reverse()
 ggtree(tree) + scale_y_reverse()
