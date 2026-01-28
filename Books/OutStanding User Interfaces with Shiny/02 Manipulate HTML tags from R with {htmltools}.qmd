@@ -1,0 +1,167 @@
+---
+title: "02 Manipulate HTML tags from R with {htmltools}"
+date: "2026-01-27"
+date-modified: "2026-01-27"
+
+format:
+  html:
+    code-link: true
+
+fig-width: 6
+fig-asp: 0.618
+out-width: 70%
+fig-align: center
+
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: "#>"
+    R.options:
+      dplyr.print_min: 6
+      dplyr.print_max: 6
+      pillar.max_footer_lines: 2
+      pillar.min_chars: 15
+      stringr.view_n: 6
+      cli.num_colors: 0
+      cli.hyperlink: FALSE
+      pillar.bold: TRUE
+      width: 77
+
+execute:
+  warning: true
+  error: true
+---
+
+htmltools包脱胎自shiny，功能主要涉及两方面：创建HTML-tag和处理web依赖。它的最终目标是实现操纵、组合和重新排列标签，以便从R中创建灵活丰富的HTML结构。
+
+安装htmltools包
+
+```r
+# CRAN
+install.packages("htmltools")
+# development version
+remotes::install_github("rstudio/htmltools")
+```
+
+下面是一个依赖htmltools包的例子
+
+```r
+remotes::install_github("RinteRface/shinyRPG")
+library(shinyRPG)
+shinyRPGDemo()
+```
+
+## Writing HTML Tags from R
+
+使用htmltools包可以很方便地创建HTML标签。这类创建标签的函数有一个共同点：有name的参数会被转换为标签的属性（attributes），没有name的参数被转换为标签包裹的内容（children）。
+
+```{r}
+library(htmltools)
+div(id = "header", class = "main", "Hello", strong("World"))
+```
+
+某些标签具有空属性（empty attributes），比如`<input disabled>`标签，此时可以用`input(disabled = NA)`表示。
+
+```{r}
+tags$input(disabled = NA)
+```
+
+## Notations
+
+在R终端中使用`htmltools::tags$`时可以显示可用的标签，同时为了方便，有些标签拥有简单的函数，例如`div()`，`h1()`等。
+
+```{r}
+# good
+h1("This is a title")
+
+# correct but not necessary
+tags$h1("This is a title")
+```
+
+当然有些标签只能通过`tags$`来创建，比如上面的`<input>`标签。
+
+```{r}
+#| error: true
+input(disabled = NA)
+tags$input(disabled = NA)
+```
+
+当需要使用多个`tags$<TAG_NAME>`函数时，可以使用`withTags()`函数，来避免重复输入`tags$`：
+
+```{r}
+# Better
+withTags(
+  nav(div(), ul(li(), li()))
+)
+
+# instead of
+tags$nav(div(), tags$ul(tags$li(), tags$li()))
+```
+
+当你想将多个标签收集到一起时，是用`tagList()`，而不是`list()`。前者结果中拥有额外的`class`属性——`shiny.tag.list`，导致结果完全不同：
+
+```{r}
+# good
+tag_list_1 <- tagList(
+  p("Some text"),
+  div("Content")
+)
+
+# correct but not optimal
+tag_list_2 <- list(
+  p("Some text"),
+  div("Content")
+)
+
+## 内部结构
+str(tag_list_1)
+str(tag_list_2)
+
+## 结果
+tag_list_1
+tag_list_2
+```
+
+如果使用`as.character()`时，结果也完全不同：
+
+```{r}
+as.character(tag_list_1)
+as.character(tag_list_2)
+```
+
+## Adding new tags
+
+使用`tag()`可以自定义HTML标签，但是要遵循HTML的命名规则。
+
+```{r}
+customTag <- tag(
+  "test",
+  list(class = "test", p("Custom Tag"))
+)
+str(customTag)
+customTag
+```
+
+## Alternative way to write tags
+
+`HTML()`函数可以直接包裹HTML文本信息，避免发生转义：
+
+```{r}
+div(HTML("Hello <u>World</u>"))
+div("Hello <u>World</u>")
+```
+
+下面代码的结果相同，但是它们的class属性不同：
+
+```{r}
+HTML("<div>Blabla</div>")
+div("Blabla")
+
+class(HTML("<div>Blabla</div>"))
+class(div("Blabla"))
+```
+
+如果你想转换HTML文本为R code，可以使用[html2R](https://github.com/alandipert/html2r/tree/4217b5430e2bfc3af0d841cbefcd94bc1aadbcdf)包，但无法处理非标准属性。
+
+## Playing with tags
+
