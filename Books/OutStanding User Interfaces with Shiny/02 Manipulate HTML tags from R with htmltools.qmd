@@ -1,7 +1,7 @@
 ---
 title: "02 Manipulate HTML tags from R with {htmltools}"
-date: "2026-01-27"
-date-modified: "2026-01-27"
+date: "2026-01-28"
+date-modified: "2026-01-28"
 
 format:
   html:
@@ -31,6 +31,12 @@ execute:
   warning: true
   error: true
 ---
+
+欢迎大家关注我的公众号：RSSPhto
+![](/logo.jpg){width=150px}
+
+-----------------------------
+
 
 htmltools包脱胎自shiny，功能主要涉及两方面：创建HTML-tag和处理web依赖。它的最终目标是实现操纵、组合和重新排列标签，以便从R中创建灵活丰富的HTML结构。
 

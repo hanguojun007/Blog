@@ -3974,5 +3974,47 @@
     "title": "ggtree–通用函数",
     "section": "identify()",
     "text": "identify()\n使用identify()函数，可以手动选择注释clade或tip（可能需要使用Rstudio）。"
+  },
+  {
+    "objectID": "Books/OutStanding User Interfaces with Shiny/02 Manipulate HTML tags from R with htmltools.html",
+    "href": "Books/OutStanding User Interfaces with Shiny/02 Manipulate HTML tags from R with htmltools.html",
+    "title": "02 Manipulate HTML tags from R with {htmltools}",
+    "section": "",
+    "text": "欢迎大家关注我的公众号：RSSPhto\nhtmltools包脱胎自shiny，功能主要涉及两方面：创建HTML-tag和处理web依赖。它的最终目标是实现操纵、组合和重新排列标签，以便从R中创建灵活丰富的HTML结构。\n安装htmltools包\n下面是一个依赖htmltools包的例子"
+  },
+  {
+    "objectID": "Books/OutStanding User Interfaces with Shiny/02 Manipulate HTML tags from R with htmltools.html#writing-html-tags-from-r",
+    "href": "Books/OutStanding User Interfaces with Shiny/02 Manipulate HTML tags from R with htmltools.html#writing-html-tags-from-r",
+    "title": "02 Manipulate HTML tags from R with {htmltools}",
+    "section": "Writing HTML Tags from R",
+    "text": "Writing HTML Tags from R\n使用htmltools包可以很方便地创建HTML标签。这类创建标签的函数有一个共同点：有name的参数会被转换为标签的属性（attributes），没有name的参数被转换为标签包裹的内容（children）。\n\nlibrary(htmltools)\ndiv(id = \"header\", class = \"main\", \"Hello\", strong(\"World\"))\n\n\nHello\nWorld\n\n\n\n某些标签具有空属性（empty attributes），比如&lt;input disabled&gt;标签，此时可以用input(disabled = NA)表示。\n\ntags$input(disabled = NA)"
+  },
+  {
+    "objectID": "Books/OutStanding User Interfaces with Shiny/02 Manipulate HTML tags from R with htmltools.html#notations",
+    "href": "Books/OutStanding User Interfaces with Shiny/02 Manipulate HTML tags from R with htmltools.html#notations",
+    "title": "02 Manipulate HTML tags from R with {htmltools}",
+    "section": "Notations",
+    "text": "Notations\n在R终端中使用htmltools::tags$时可以显示可用的标签，同时为了方便，有些标签拥有简单的函数，例如div()，h1()等。\n\n# good\nh1(\"This is a title\")\n\nThis is a title\n\n\n# correct but not necessary\ntags$h1(\"This is a title\")\n\nThis is a title\n\n\n当然有些标签只能通过tags$来创建，比如上面的&lt;input&gt;标签。\n\ninput(disabled = NA)\n#&gt; Error in `input()`:\n#&gt; ! could not find function \"input\"\ntags$input(disabled = NA)\n\n\n\n\n当需要使用多个tags$&lt;TAG_NAME&gt;函数时，可以使用withTags()函数，来避免重复输入tags$：\n\n# Better\nwithTags(\n  nav(div(), ul(li(), li()))\n)\n\n\n\n\n\n\n\n\n# instead of\ntags$nav(div(), tags$ul(tags$li(), tags$li()))\n\n\n\n\n\n\n\n\n当你想将多个标签收集到一起时，是用tagList()，而不是list()。前者结果中拥有额外的class属性——shiny.tag.list，导致结果完全不同：\n\n# good\ntag_list_1 &lt;- tagList(\n  p(\"Some text\"),\n  div(\"Content\")\n)\n\n# correct but not optimal\ntag_list_2 &lt;- list(\n  p(\"Some text\"),\n  div(\"Content\")\n)\n\n## 内部结构\nstr(tag_list_1)\n#&gt; List of 2\n#&gt;  $ :List of 3\n#&gt;   ..$ name    : chr \"p\"\n#&gt;   ..$ attribs : Named list()\n#&gt;   ..$ children:List of 1\n#&gt;   .. ..$ : chr \"Some text\"\n#&gt;   ..- attr(*, \"class\")= chr \"shiny.tag\"\n#&gt;  $ :List of 3\n#&gt;   ..$ name    : chr \"div\"\n#&gt;   ..$ attribs : Named list()\n#&gt;   ..$ children:List of 1\n#&gt;   .. ..$ : chr \"Content\"\n#&gt;   ..- attr(*, \"class\")= chr \"shiny.tag\"\n#&gt;  - attr(*, \"class\")= chr [1:2] \"shiny.tag.list\" \"list\"\nstr(tag_list_2)\n#&gt; List of 2\n#&gt;  $ :List of 3\n#&gt;   ..$ name    : chr \"p\"\n#&gt;   ..$ attribs : Named list()\n#&gt;   ..$ children:List of 1\n#&gt;   .. ..$ : chr \"Some text\"\n#&gt;   ..- attr(*, \"class\")= chr \"shiny.tag\"\n#&gt;  $ :List of 3\n#&gt;   ..$ name    : chr \"div\"\n#&gt;   ..$ attribs : Named list()\n#&gt;   ..$ children:List of 1\n#&gt;   .. ..$ : chr \"Content\"\n#&gt;   ..- attr(*, \"class\")= chr \"shiny.tag\"\n\n## 结果\ntag_list_1\n\nSome text\nContent\n\ntag_list_2\n#&gt; [[1]]\n#&gt; &lt;p&gt;Some text&lt;/p&gt;\n#&gt; \n#&gt; [[2]]\n#&gt; &lt;div&gt;Content&lt;/div&gt;\n\n如果使用as.character()时，结果也完全不同：\n\nas.character(tag_list_1)\n#&gt; [1] \"&lt;p&gt;Some text&lt;/p&gt;\\n&lt;div&gt;Content&lt;/div&gt;\"\nas.character(tag_list_2)\n#&gt; [1] \"list(name = \\\"p\\\", attribs = list(), children = list(\\\"Some text\\\"))\"\n#&gt; [2] \"list(name = \\\"div\\\", attribs = list(), children = list(\\\"Content\\\"))\""
+  },
+  {
+    "objectID": "Books/OutStanding User Interfaces with Shiny/02 Manipulate HTML tags from R with htmltools.html#adding-new-tags",
+    "href": "Books/OutStanding User Interfaces with Shiny/02 Manipulate HTML tags from R with htmltools.html#adding-new-tags",
+    "title": "02 Manipulate HTML tags from R with {htmltools}",
+    "section": "Adding new tags",
+    "text": "Adding new tags\n使用tag()可以自定义HTML标签，但是要遵循HTML的命名规则。\n\ncustomTag &lt;- tag(\n  \"test\",\n  list(class = \"test\", p(\"Custom Tag\"))\n)\nstr(customTag)\n#&gt; List of 3\n#&gt;  $ name    : chr \"test\"\n#&gt;  $ attribs :List of 1\n#&gt;   ..$ class: chr \"test\"\n#&gt;  $ children:List of 1\n#&gt;   ..$ :List of 3\n#&gt;   .. ..$ name    : chr \"p\"\n#&gt;   .. ..$ attribs : Named list()\n#&gt;   .. ..$ children:List of 1\n#&gt;   .. .. ..$ : chr \"Custom Tag\"\n#&gt;   .. ..- attr(*, \"class\")= chr \"shiny.tag\"\n#&gt;  - attr(*, \"class\")= chr \"shiny.tag\"\ncustomTag\n\nCustom Tag"
+  },
+  {
+    "objectID": "Books/OutStanding User Interfaces with Shiny/02 Manipulate HTML tags from R with htmltools.html#alternative-way-to-write-tags",
+    "href": "Books/OutStanding User Interfaces with Shiny/02 Manipulate HTML tags from R with htmltools.html#alternative-way-to-write-tags",
+    "title": "02 Manipulate HTML tags from R with {htmltools}",
+    "section": "Alternative way to write tags",
+    "text": "Alternative way to write tags\nHTML()函数可以直接包裹HTML文本信息，避免发生转义：\n\ndiv(HTML(\"Hello &lt;u&gt;World&lt;/u&gt;\"))\n\nHello World\n\n\ndiv(\"Hello &lt;u&gt;World&lt;/u&gt;\")\n\nHello &lt;u&gt;World&lt;/u&gt;\n\n\n下面代码的结果相同，但是它们的class属性不同：\n\nHTML(\"&lt;div&gt;Blabla&lt;/div&gt;\")\n\nBlabla\n\ndiv(\"Blabla\")\n\nBlabla\n\n\nclass(HTML(\"&lt;div&gt;Blabla&lt;/div&gt;\"))\n#&gt; [1] \"html\"      \"character\"\nclass(div(\"Blabla\"))\n#&gt; [1] \"shiny.tag\"\n\n如果你想转换HTML文本为R code，可以使用html2R包，但无法处理非标准属性。"
+  },
+  {
+    "objectID": "Books/OutStanding User Interfaces with Shiny/02 Manipulate HTML tags from R with htmltools.html#playing-with-tags",
+    "href": "Books/OutStanding User Interfaces with Shiny/02 Manipulate HTML tags from R with htmltools.html#playing-with-tags",
+    "title": "02 Manipulate HTML tags from R with {htmltools}",
+    "section": "Playing with tags",
+    "text": "Playing with tags"
   }
 ]
