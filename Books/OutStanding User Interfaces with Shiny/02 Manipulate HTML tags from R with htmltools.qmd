@@ -171,3 +171,146 @@ class(div("Blabla"))
 
 ## Playing with tags
 
+### Tags structure
+
+如上所属，一个**shiny tag**对象通常具有：
+
+-   name，即诸如`span`，`div`，`h1`，`p`，`ul`，`li`等标签名，使用`tag$name`访问
+
+-   attributes，即有name的参数，如`class`，`id`，`style`，`src`，`href`，`value`等，使用`tag$attribs`访问
+
+-   children，即没有name的参数，通常是文本或其他标签，使用`tag$children`访问
+
+-   R的class属性——`shiny.tag`
+
+```{r}
+# create the tag
+myTag <- div(
+  class = "divclass",
+  id = "first",
+  h1("My first child!"),
+  span(class = "child", id = "baby", "Crying")
+)
+myTag
+myTag$name
+myTag$attribs
+myTag$children
+class(myTag)
+```
+
+可以用过上面的访问函数来修改相应的内容：
+
+```{r}
+myTag$children[[2]]$attribs$class <- "adult"
+myTag
+```
+
+### Practical examples: shinyRPG
+
+通过修改tag对象，可以重塑标签的样式。例如 @fig-2.1 所示，是通过修改`shiny::selectInput()`对象实现的。
+
+![](images/rpgui-select.png){#fig-2.1}
+
+详细的内容见原文 [2.5.2](https://unleash-shiny.rinterface.com/htmltools-overview#htmltools-shinyRPG)
+
+### Useful functions for tags
+
+htmltools包提供了一些函数用来方便的操作标签的内容：
+
+-   `tagAppendAttributes()`，追加属性
+
+-   `tagHasAttribute()`，判断属性是否存在
+
+-   `tagGetAttribute()`，获取属性值
+
+-   `tagSetChildren()`，重置内容，会覆盖所有旧的内容
+
+-   `tagAppendChildren()`，追加内容
+
+-   `tagInsertChildren()`，插入内容
+
+```{r}
+myTag <- div("A tag")
+myTag
+
+myTag <-tagAppendAttributes(myTag, id = "myid")
+myTag
+
+tagHasAttribute(myTag, "id")
+
+tagGetAttribute(myTag, "id")
+
+myTag <- tagSetChildren(myTag, span("Test"))
+myTag
+
+myTag <- tagAppendChildren(myTag, span("Test2"))
+myTag
+
+myTag <- tagInsertChildren(myTag, span("Test3"), after = 1)
+myTag
+```
+
+golem包提供了`tagRemoveAttributes()`函数模板来删除属性：
+
+```{r}
+tagRemoveAttributes <- function(tag, ...) {
+  attrs <- as.character(list(...))
+  for (i in seq_along(attrs)) {
+    tag$attribs[[ attrs[i] ]] <- NULL
+  }
+  tag
+}
+
+tagRemoveAttributes(myTag, "id")
+```
+
+删除内容，可以直接将`NULL`赋给对应的内容即可。
+
+### Conditionally set attributes
+
+在编写自己的函数时，标签的某些属性需要根据情况来添加，此时需要添加判断逻辑。例如：
+
+```{r}
+my_button <- function(color = NULL) {
+  tags$button(
+    style = if (!is.null(color)) paste("color:", color),
+    p("Hello")
+  )
+}
+
+my_button("blue")
+my_button()
+```
+
+如果不添加`is.null()`判断，单独运行`my_button()`时就会出现:
+
+```html
+<button style="color: ">
+  <p>Hello</p>
+</button>
+```
+
+### Using %>%/|>
+
+操作同一个标签时可以使用`magrittr::%>%`或`|>`来省去中间对象：
+
+```{r}
+myTag <- div(class = "cl", h1("Hello")) |>
+  tagAppendAttributes(id = "myid") |>
+  tagAppendChild(p("some extra text here!"))
+
+myTag
+```
+
+### Programmatically create children elements
+
+当创建多个相同的标签时，可以使用`lapply()`或`purrr::map()`：
+
+```{r}
+# base R
+div(lapply(1:5, function(i) span(i)))
+# purrr + %>%
+purrr::map(1:5, function(i) span(i)) |> div()
+```
+
+## Modern {htmltools}
