@@ -29,7 +29,7 @@ website:
   reader-mode: true # 阅读者模式
   # page-footer: "Copyright 2025 RSSPhto"
   margin-footer: | # 侧边栏脚注
-    ![](/logo.jpg){width="200px" .conditional-footer}
+    ![](/logo.jpg){width="200px"}
   navbar:
     title: RSSPtho
     # logo: logo.jpg
